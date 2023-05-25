@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>Monitoreo de plagas P-POES-Q-05-02</title>
+    <style>
+        :root{
+        --very-light-pink: #C7C7C7;
+        --text-input-field: #F7F7F7;
+        --hospital-green: #ACD9B2;
+        --rojo-quinta: #B43C2C;
+        --amarillo-quinta: #f3ba14;
+        --naranjo-quinta: #d07020;
+        --naranjo-claro-quinta: #d4841c;
+        --white: #FFFFFF;
+        --black: #000000;
+        --sm: 14px;
+        --md: 16px;
+        --lg: 18px;
+        }
+        body {
+            margin: 24;
+            font-family: 'Quicksand',
+            sans-serif;
+            background-color: var(--naranjo-claro-quinta);
+        }
+        .login {
+            width: 100%;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+        }
+        .logo {
+            width: 200px;
+            margin-bottom: 16px;
+            justify-self: center;
+        }
+        .login-container {
+            display: grid;
+            grid-template-rows: auto 1fr
+            auto;
+            width: 600px;
+            justify-items: center;
+        }
+        .title {
+            font-size: var(--lg);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .subtitle {
+            color: var(--rojo-quinta);
+            font-size: var(--md);
+            font-weight: 300;
+            margin-top: 0;
+            font-weight: bold;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .label {
+            font-size: var(--sm);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .input {
+            background-color: var(--text-input-field);
+            border: none;
+            border-radius: 8px;
+            height: 32px;
+            font-size: var(--md);
+            padding: 6px;
+            margin-bottom: 12px;
+        }
+        .subtitle2 {
+            color: var(--rojo-quinta);
+            font-size: var(--md);
+            font-weight: 300;
+            margin-top: 0;
+            font-weight: bold;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .input-ac {
+            width: 200px;
+            background-color: var(--text-input-field);
+            border: none;
+            border-radius: 8px;
+            height: 32px;
+            font-size: var(--md);
+            padding: 6px;
+            margin-bottom: 12px;
+        }
+        .form {
+            display:  grid;
+            flex-direction: column;
+            justify-items: center;
+        }
+        .primary-button {
+            background-color: var(--rojo-quinta);
+            border-radius: 8px;
+            border: none;
+            color: var(--white);
+            width: 200%;
+            cursor: pointer;
+            font-size: var(--md);
+            font-weight: bold;
+            height: 40px;
+        }
+        .login-button {
+            margin-top: 14px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login">
+        <img src="https://quintaalimentos.cl/wp-content/uploads/2020/02/XMLID_16_@2x.png" alt="logo" class="logo">
+        <div class="login-container">
+            <h1 class="title">Control de plagas P-POES-Q-05-02</h1>
+            <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
+            <label class="label">Nombre tecnologo calidad</label>
+            <input type="text" class="input">
+            <label class="label">Fecha</label>
+            <input class="input" type="datetime-local">
+        </div>
+        <div class="login-container">
+            <h2 class="title">Ingreso datos de trampas</h2>
+            <p class="subtitle2">Ingresar cada trampa y luego grabar</p>
+
+            <label class="label">Numero Estacion</label>
+            <input class="input" type="number">
+
+            <label class="label">Tipo de plaga</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="roedores">Roedores</option>
+                    <option value="voladores">Voladores</option>
+                </select>
+            
+            <label class="label">Tipo de trampa</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="cebadera">Cebadera</option>
+                    <option value="pegajosa">Pegajosa</option>
+                    <option value="capturaviva">Captura viva</option>
+                    <option value="tuv">TUV</option>
+                </select>
+
+            <label class="label">Ubicacion</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="deslinde">Deslinde</option>
+                    <option value="pcercano">P. cercano</option>
+                    <option value="interna">Interna</option>
+                </select>
+
+            <label class="label">Monitoreo</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="operativa">Operativa</option>
+                    <option value="cumple">Cumple</option>
+                    <option value="conconsumo">Con consumo</option>
+                    <option value="nocumple">No cumple</option>
+                    <option value="noaplica">No aplica</option>
+                    <option value="noencontrado">No encontrado</option>
+                </select>
+
+            <label class="label">AC</label>
+                <select class="input-ac">
+                    <option value="blanco"> </option>
+                    <option value="1">Trampas UV no se encuantran activas, se deberian conectar inmediatamente</option>
+                    <option value="2">Trampas UV se encuentran colapsadas de insectos, se debera dar aviso al servicio de control de plagas para la reposicion de la lamina pegagosa</option>
+                    <option value="3">Trampas presentan desperfecto, rotas o se encuentran extraviadas, se debera dar aviso al servicio de control de plagas para su reposicion o arreglo</option>
+                    <option value="4">Trampas presentan consumo total o parcial, se debera dar aviso al servicio de control de plagas para su reposicion</option>
+                    <option value="5">Si durante el monitoreo una de las trampas presenta un vector, se debera dar aviso al servicio de control de plagas y/o, por parte del tecnologo de calidad debera realizar la captura o eliminacion del roedor utilizando mascarilla y guantes, para posteriormente colocarlo en doble bolsa cerrada, para finalmente desecharlo en el contenedpr de basura</option>
+                </select>
+            
+            <form class="form" action="#">
+                <button class="primary-button login-button">Grabar</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
