@@ -24,28 +24,36 @@
         --lg: 18px;
         }
         body {
-            margin: 24px;
+            margin: 0;
             font-family: 'Quicksand', sans-serif;
-            background-color: var(--naranjo-claro-quinta);
-            /*background-image: url(./Fondo.png);*/
+            /*background-color: var(--naranjo-claro-quinta);*/
+            background-image: url(./Fondo.png);
         }
         .login {
             width: 100%;
-            height: 100vh;
+            height: 900vh;
             display: grid;
             place-items: center;
+            /*margin-bottom: 24px;
+            border-radius: 32px;
+            background-color: var(--naranjo-claro-quinta);*/
         }
         .logo {
             width: 200px;
             margin-bottom: 16px;
             justify-self: center;
+            border-top: 24px;
+            margin-top: 24px;
         }
         .container-inicio {
             display: grid;
             grid-template-rows: auto 1fr auto;
             width: 550px;
             justify-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 60px;
+            margin-bottom: 24px;
+            border-radius: 32px;
+            background-color: var(--naranjo-claro-quinta);
         }
         .title {
             font-size: var(--lg);
@@ -80,7 +88,9 @@
             grid-template-rows: auto 1fr auto;
             width: 900px;
             justify-items: center;
-            margin-bottom: 4px;
+            margin-bottom: 40px;
+            background-color: var(--naranjo-claro-quinta);
+            border-radius: 32px;
         }
         .sub-sub-subtitle {
             color: var(--rojo-quinta);
@@ -124,6 +134,13 @@
         .login-button {
             margin-top: 14px;
             margin-bottom: 30px;
+        }
+        .footer-img {
+            display: grid;
+            justify-items: center;
+            border: 0;
+            width: 1400px;
+            height: 300px;
         }
     </style>
 </head>
@@ -1225,5 +1242,8 @@
             <button class="primary-button login-button">Grabar</button>
         </form>
     </div>
+    <footer class="footer">
+        <img src="./header2.png" alt="footer" class="footer-img">
+    </footer>
 </body>
 </html>
