@@ -91,6 +91,15 @@
             flex-direction: column;
             justify-items: center;
         }
+        .sub-subtitle {
+            color: var(--black);
+            font-size: var(--sm);
+            font-weight: 300;
+            margin-top: 0;
+            font-weight: bold;
+            margin-bottom: 32px;
+            text-align: center;
+        }
         .primary-button {
             background-color: var(--rojo-quinta);
             border-radius: 8px;
@@ -180,7 +189,11 @@
             </div>
 
             <label class="label">AC</label>
-            <input class="input" type="text">
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="op1">1</option>
+                </select>
+            <p class="sub-subtitle">(1) En el caso de existir una desviacion durante el monitoreo, el tecnologo de calidad debera realizar monitoreo cada una hora por tres tomas de muestra, se ser reiterativa la desviacion se debera informar al jefe de planta.</p>
 
             <label class="label">Resultado de la AC</label>
             <select class="input">

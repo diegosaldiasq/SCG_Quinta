@@ -102,6 +102,15 @@
             padding: 6px;
             margin-bottom: 12px;
         }
+        .sub-subtitle {
+            color: var(--black);
+            font-size: var(--sm);
+            font-weight: 300;
+            margin-top: 0;
+            font-weight: bold;
+            margin-bottom: 32px;
+            text-align: center;
+        }
         .form {
             display:  grid;
             flex-direction: column;
@@ -180,12 +189,17 @@
             <label class="label">AC</label>
                 <select class="input-ac">
                     <option value="blanco"> </option>
-                    <option value="1">Trampas UV no se encuantran activas, se deberian conectar inmediatamente</option>
-                    <option value="2">Trampas UV se encuentran colapsadas de insectos, se debera dar aviso al servicio de control de plagas para la reposicion de la lamina pegagosa</option>
-                    <option value="3">Trampas presentan desperfecto, rotas o se encuentran extraviadas, se debera dar aviso al servicio de control de plagas para su reposicion o arreglo</option>
-                    <option value="4">Trampas presentan consumo total o parcial, se debera dar aviso al servicio de control de plagas para su reposicion</option>
-                    <option value="5">Si durante el monitoreo una de las trampas presenta un vector, se debera dar aviso al servicio de control de plagas y/o, por parte del tecnologo de calidad debera realizar la captura o eliminacion del roedor utilizando mascarilla y guantes, para posteriormente colocarlo en doble bolsa cerrada, para finalmente desecharlo en el contenedpr de basura</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                 </select>
+            <p class="sub-subtitle">(1) Trampas UV no se encuantran activas, se deberian conectar inmediatamente.</p>
+            <p class="sub-subtitle">(2) Trampas UV se encuentran colapsadas de insectos, se debera dar aviso al servicio de control de plagas para la reposicion de la lamina pegagosa.</p>
+            <p class="sub-subtitle">(3) Trampas presentan desperfecto, rotas o se encuentran extraviadas, se debera dar aviso al servicio de control de plagas para su reposicion o arreglo.</p>
+            <p class="sub-subtitle">(4) Trampas presentan consumo total o parcial, se debera dar aviso al servicio de control de plagas para su reposicion.</p>
+            <p class="sub-subtitle">(5) Si durante el monitoreo una de las trampas presenta un vector, se debera dar aviso al servicio de control de plagas y/o, por parte del tecnologo de calidad debera realizar la captura o eliminacion del roedor utilizando mascarilla y guantes, para posteriormente colocarlo en doble bolsa cerrada, para finalmente desecharlo en el contenedpr de basura.</p>
             
             <form class="form" action="#">
                 <button class="primary-button login-button">Grabar</button>
