@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <title>Monitoreo de plagas P-POES-Q-05-02</title>
+    <title>Informe de reclamo a proveedores IN-POE-Q-10-02</title>
     <style>
         :root{
         --very-light-pink: #C7C7C7;
@@ -32,7 +32,7 @@
         }
         .login {
             width: 100%;
-            height: 150vh;
+            height: 100vh;
             display: grid;
             justify-content: center;
             /*background-color: var(--naranjo-claro-quinta);
@@ -47,9 +47,8 @@
         }
         .login-container {
             display: grid;
-            grid-template-rows: auto 1fr
-            auto;
-            width: 500px;
+            grid-template-rows: auto 1fr auto;
+            width: 600px;
             justify-items: center;
             background-color: var(--naranjo-claro-quinta);
             border-radius: 32px;
@@ -83,25 +82,6 @@
             padding: 6px;
             margin-bottom: 12px;
         }
-        .subtitle2 {
-            color: var(--rojo-quinta);
-            font-size: var(--md);
-            font-weight: 300;
-            margin-top: 0;
-            font-weight: bold;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-        .input-ac {
-            width: 200px;
-            background-color: var(--text-input-field);
-            border: none;
-            border-radius: 8px;
-            height: 32px;
-            font-size: var(--md);
-            padding: 6px;
-            margin-bottom: 12px;
-        }
         .sub-subtitle {
             color: var(--black);
             font-size: var(--sm);
@@ -110,6 +90,16 @@
             font-weight: bold;
             margin-bottom: 32px;
             text-align: center;
+        }
+        .archivo {
+            border-radius: 8px;
+            border: none;
+            color: var(--white);
+            width: 50%;
+            cursor: pointer;
+            font-size: var(--md);
+            font-weight: bold;
+            height: 40px;
         }
         .form {
             display:  grid;
@@ -121,7 +111,7 @@
             border-radius: 8px;
             border: none;
             color: var(--white);
-            width: 200%;
+            width: 50%;
             cursor: pointer;
             font-size: var(--md);
             font-weight: bold;
@@ -137,7 +127,7 @@
     <div class="login">
         <img src="https://quintaalimentos.cl/wp-content/uploads/2020/02/XMLID_16_@2x.png" alt="logo" class="logo">
         <div class="login-container">
-            <h1 class="title">Control de plagas P-POES-Q-05-02</h1>
+            <h1 class="title">Informe de reclamo a proveedores IN-POE-Q-10-02</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
             <input type="text" class="input">
@@ -145,66 +135,52 @@
             <input class="input" type="datetime-local">
         </div>
         <div class="login-container">
-            <h2 class="title">Ingreso datos de trampas</h2>
-            <p class="subtitle2">Ingresar cada trampa y luego grabar</p>
-
-            <label class="label">Numero Estacion</label>
-            <input class="input" type="number">
-
-            <label class="label">Tipo de plaga</label>
-                <select class="input">
-                    <option value="blanco"> </option>
-                    <option value="roedores">Roedores</option>
-                    <option value="voladores">Voladores</option>
-                </select>
-            
-            <label class="label">Tipo de trampa</label>
-                <select class="input">
-                    <option value="blanco"> </option>
-                    <option value="cebadera">Cebadera</option>
-                    <option value="pegajosa">Pegajosa</option>
-                    <option value="capturaviva">Captura viva</option>
-                    <option value="tuv">TUV</option>
-                </select>
-
-            <label class="label">Ubicacion</label>
-                <select class="input">
-                    <option value="blanco"> </option>
-                    <option value="deslinde">Deslinde</option>
-                    <option value="pcercano">P. cercano</option>
-                    <option value="interna">Interna</option>
-                </select>
-
-            <label class="label">Monitoreo</label>
-                <select class="input">
-                    <option value="blanco"> </option>
-                    <option value="operativa">Operativa</option>
-                    <option value="cumple">Cumple</option>
-                    <option value="conconsumo">Con consumo</option>
-                    <option value="nocumple">No cumple</option>
-                    <option value="noaplica">No aplica</option>
-                    <option value="noencontrado">No encontrado</option>
-                </select>
-
-            <label class="label">AC</label>
-                <select class="input-ac">
-                    <option value="blanco"> </option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            <p class="sub-subtitle">(1) Trampas UV no se encuantran activas, se deberian conectar inmediatamente.</p>
-            <p class="sub-subtitle">(2) Trampas UV se encuentran colapsadas de insectos, se debera dar aviso al servicio de control de plagas para la reposicion de la lamina pegagosa.</p>
-            <p class="sub-subtitle">(3) Trampas presentan desperfecto, rotas o se encuentran extraviadas, se debera dar aviso al servicio de control de plagas para su reposicion o arreglo.</p>
-            <p class="sub-subtitle">(4) Trampas presentan consumo total o parcial, se debera dar aviso al servicio de control de plagas para su reposicion.</p>
-            <p class="sub-subtitle">(5) Si durante el monitoreo una de las trampas presenta un vector, se debera dar aviso al servicio de control de plagas y/o, por parte del tecnologo de calidad debera realizar la captura o eliminacion del roedor utilizando mascarilla y guantes, para posteriormente colocarlo en doble bolsa cerrada, para finalmente desecharlo en el contenedor de basura.</p>
-            
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar</button>
-            </form>
+            <p class="subtitle">Datos del proveedor</p>
+            <label class="label">Nombre</label>
+            <input type="text" class="input">
+            <label class="label">Fecha del reclamo</label>
+            <input type="date" class="input">
         </div>
+        <div class="login-container">
+            <p class="subtitle">Datos del producto</p>
+            <label class="label">Nombre del producto</label>
+            <input type="text" class="input">
+            <label class="label">Fecha de elaboracion</label>
+            <input type="date" class="input">
+            <label class="label">Lote</label>
+            <input type="text" class="input">
+            <label class="label">Fecha de vencimiento</label>
+            <input type="date" class="input">
+            <label class="label">No conformidad</label>
+            <input type="text" class="input">
+        </div>
+        <div class="login-container">
+            <label class="label">Clasificacion</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="calidad">Calidad</option>
+                    <option value="inocuidad">Inocuidad</option>
+                    <option value="legalidad">Legalidad</option>
+                </select>
+
+            <label class="label">Cantidad involucrada</label>
+            <input type="text" class="input">
+
+            <label class="label">Unidad de medida</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="kg">Kg</option>
+                    <option value="gr">gr</option>
+                    <option value="un">Un</option>
+                    <option value="l">l</option>
+                </select>
+            
+            <label class="label">Fotografia</label>
+            <input type="file" name="archivosubido" class="archivo">
+        </div>
+        <form class="form" action="#">
+            <button class="primary-button login-button">Grabar</button>
+        </form>
     </div>
 </body>
 </html>
