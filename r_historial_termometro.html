@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="./logoquinta2.png" />
     <title>Registro historial termometro R-POE-E-07-01</title>
     <style>
         :root{
@@ -123,7 +124,7 @@
             <label class="label">Codigo termometro</label>
             <input type="text" class="input">
             <p class="subtitle">Lectura termometro patron °C (X1)</p>
-            <form class="form" method="POST" oninput="resultado3.value=((parseFloat(resultado1.value)+parseFloat(resultado2.value))/2)-parseFloat(factan.value)"></form>
+            <form class="form" method="POST" oninput="resultado3.value=((parseFloat(valor1.value)+parseFloat(valor2.value)+parseFloat(valor3.value)+parseFloat(valor4.value)+parseFloat(valor5.value)+parseFloat(valor6.value)+parseFloat(valor7.value)+parseFloat(valor8.value)+parseFloat(valor9.value)+parseFloat(valor10.value))/10)-parseFloat(factan.value)"></form>
                 <form class="form" method="POST" oninput="resultado1.value=(parseFloat(valor1.value)+parseFloat(valor2.value)+parseFloat(valor3.value)+parseFloat(valor4.value)+parseFloat(valor5.value))/5">
                     <label class="label">X1-M1</label>
                     <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor1" value="0">
@@ -161,11 +162,11 @@
                 
                 <p class="subtitle">Calculo promedio °C (X3)</p>
                 <label class="label">Factor Anual (E)</label>
-                <input class="input" type="number" min="-2.0" max="2.0" step="0.1" id="factan" value="0.0">
+                <input class="input" type="number" min="-2.0" max="2.0" step="0.1" id="factan" value="0">
                 
                     <label class="label">Resultado promedio X3</label>
                     <div class="sub-container">
-                        <output name="resultado3" for="resultado1 resultado2 factan">0.0</output>
+                        <output name="resultado3" for="valor1 valor2 valor3 valor4 valor5 valor6 valor7 valor8 valor9 valor10 factan">0.0</output>
                     </div>
             </form>
         </div>
