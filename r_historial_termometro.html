@@ -81,6 +81,16 @@
             flex-direction: column;
             justify-items: center;
         }
+        .sub-container {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            width: 80px;
+            height: 20px;
+            justify-items: center;
+            background-color: var(--white);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
         .primary-button {
             background-color: var(--rojo-quinta);
             border-radius: 8px;
@@ -113,35 +123,50 @@
             <label class="label">Codigo termometro</label>
             <input type="text" class="input">
             <p class="subtitle">Lectura termometro patron °C (X1)</p>
-            <form class="form" method="POST" oninput="resultado.value=(parseFloat(valor1.value)+parseFloat(valor2.value)+parseFloat(valor3.value)+parseFloat(valor4.value)+parseFloat(valor5.value))/5">
-                <label class="label">X1-M1</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor1" value="0">
-                <label class="label">X1-M2</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor2" value="0">
-                <label class="label">X1-M3</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor3" value="0">
-                <label class="label">X1-M4</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor4" value="0">
-                <label class="label">X1-M5</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor5" value="0">
-                <label class="label">Resultado promedio X1</label>
-                <output name="resultado" for="valor1 valor2 valor3 valor4 valor5">0.0</output>
-            </form>
+            <form class="form" method="POST" oninput="resultado3.value=((parseFloat(resultado1.value)+parseFloat(resultado2.value))/2)-parseFloat(factan.value)"></form>
+                <form class="form" method="POST" oninput="resultado1.value=(parseFloat(valor1.value)+parseFloat(valor2.value)+parseFloat(valor3.value)+parseFloat(valor4.value)+parseFloat(valor5.value))/5">
+                    <label class="label">X1-M1</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor1" value="0">
+                    <label class="label">X1-M2</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor2" value="0">
+                    <label class="label">X1-M3</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor3" value="0">
+                    <label class="label">X1-M4</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor4" value="0">
+                    <label class="label">X1-M5</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor5" value="0">
+                    <label class="label">Resultado promedio X1</label>
+                    <div class="sub-container">
+                        <output name="resultado1" for="valor1 valor2 valor3 valor4 valor5" id="outputx1">0.0</output>
+                    </div>
+                </form>
 
-            <p class="subtitle">Lectura termometro trabajo °C (X2)</p>
-            <form class="form" method="POST" oninput="resultado.value=(parseFloat(valor1.value)+parseFloat(valor2.value)+parseFloat(valor3.value)+parseFloat(valor4.value)+parseFloat(valor5.value))/5">
-                <label class="label">X2-M1</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor1" value="0">
-                <label class="label">X2-M2</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor2" value="0">
-                <label class="label">X2-M3</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor3" value="0">
-                <label class="label">X2-M4</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor4" value="0">
-                <label class="label">X2-M5</label>
-                <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor5" value="0">
-                <label class="label">Resultado promedio X2</label>
-                <output name="resultado" for="valor1 valor2 valor3 valor4 valor5">0.0</output>
+                <p class="subtitle">Lectura termometro trabajo °C (X2)</p>
+                <form class="form" method="POST" oninput="resultado2.value=(parseFloat(valor6.value)+parseFloat(valor7.value)+parseFloat(valor8.value)+parseFloat(valor9.value)+parseFloat(valor10.value))/5">
+                    <label class="label">X2-M1</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor6" value="0">
+                    <label class="label">X2-M2</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor7" value="0">
+                    <label class="label">X2-M3</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor8" value="0">
+                    <label class="label">X2-M4</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor9" value="0">
+                    <label class="label">X2-M5</label>
+                    <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor10" value="0">
+                    <label class="label">Resultado promedio X2</label>
+                    <div class="sub-container">
+                        <output name="resultado2" for="valor6 valor7 valor8 valor9 valor10" id="outputx2">0.0</output>
+                    </div>
+                </form>
+                
+                <p class="subtitle">Calculo promedio °C (X3)</p>
+                <label class="label">Factor Anual (E)</label>
+                <input class="input" type="number" min="-2.0" max="2.0" step="0.1" id="factan" value="0.0">
+                
+                    <label class="label">Resultado promedio X3</label>
+                    <div class="sub-container">
+                        <output name="resultado3" for="resultado1 resultado2 factan">0.0</output>
+                    </div>
             </form>
         </div>
 
