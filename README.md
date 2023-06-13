@@ -12,3 +12,4 @@ Para ingresar a la aplicacion es necesario un dispositivo movil, ya sea celular 
 ## Herramientas y lenguajes de programacion utulizados
 
 Se ha utilizado para el desarrollo frontend HTML, CSS y JavaScript. Para el desarrollo backend se utiliza Python con Django. La base de datos se quiere trabajar con PosgreSQL (aun por definir).
+Se utiliza para el control de versiones y el manejor del flujo de trabajo git y github.
