@@ -86,10 +86,10 @@
             margin-bottom: 32px;
             text-align: center;
         }
-        .form {
+        .botones {
             display:  flex;
             flex-direction: row;
-            justify-self: flex-start;
+            justify-self: center;
             gap: 16px;
         }
         .primary-button {
@@ -97,7 +97,7 @@
             border-radius: 8px;
             border: none;
             color: var(--white);
-            width: 50%;
+            width: 180px;
             cursor: pointer;
             font-size: var(--md);
             font-weight: bold;
@@ -191,7 +191,11 @@
         <div class="botones">
             <form class="form" action="#">
                 <button class="primary-button login-button">Grabar y continuar</button>
+            </form>
+            <form class="form" action="#">
                 <button class="primary-button login-button">Grabar y salir</button>
+            </form>
+            <form class="form" action="./selecciones.html">
                 <button class="primary-button login-button">Salir</button>
             </form>
         </div>
