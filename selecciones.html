@@ -77,6 +77,26 @@
         color: var(--white);
         text-decoration: none;
     }
+    .form {
+        display:  grid;
+        flex-direction: column;
+        justify-items: center;
+    }
+    .primary-button {
+        background-color: var(--rojo-quinta);
+        border-radius: 8px;
+        border: none;
+        color: var(--white);
+        width: 50%;
+        cursor: pointer;
+        font-size: var(--md);
+        font-weight: bold;
+        height: 40px;
+    }
+    .login-button {
+        margin-top: 14px;
+        margin-bottom: 30px;
+    }
     </style>
 </head>
 <body>
@@ -105,46 +125,49 @@
         <div class="login-container">
             <p class="subtitle">POE</p>
             <p class="registro">
-                <span>5.- Registro control de recepcion de MP y ME</span>
+                <span>1.- Registro control de recepcion de MP y ME</span>
                 <a href="./r_recepcion_mpme.html">R-POE-E-02-01</a>
             </p>
             <p class="registro">
-                <span>6.- Registro PCC N°2 detector de metales</span>
+                <span>2.- Registro PCC N°2 detector de metales</span>
                 <a href="./r_pcc2_detector_metales.html">R-POE-E-03-09</a>
             </p>
             <p class="registro">
-                <span>7.- Control de transporte</span>
+                <span>3.- Control de transporte</span>
                 <a href="./r_control_de_transporte.html">R-POE-E-05-09</a>
             </p>
             <p class="registro">
-                <span>8.- Registro temperatura de despacho productos jumbo</span>
+                <span>4.- Registro temperatura de despacho productos jumbo</span>
                 <a href="./r_temperatura_despacho_ptjumbo.html">R-POE-E-05-01</a>
             </p>
             <p class="registro">
-                <span>9.- Registro temperatura de despacho productos sisa</span>
+                <span>5.- Registro temperatura de despacho productos sisa</span>
                 <a href="./r_temperatura_despacho_ptsisa.html">R-POE-E-05-02</a>
             </p>
             <p class="registro">
-                <span>10.- Registro historial termometro</span>
+                <span>6.- Registro historial termometro</span>
                 <a href="./r_historial_termometro.html">R-POE-E-07-01</a>
             </p>
             <p class="registro">
-                <span>11.- Informe de reclamo a proveedores</span>
+                <span>7.- Informe de reclamo a proveedores</span>
                 <a href="./r_informe_reclamo_a_proveedores.html">IN-POE-Q-10-02</a>
             </p>
             <p class="registro">
-                <span>12.- Informe de rechazo de MP, insumos y material de envase</span>
+                <span>8.- Informe de rechazo de MP, insumos y material de envase</span>
                 <a href="./r_informe_rechazo_mp_in_me.html">IN-POE-Q-10-03</a>
             </p>
             <p class="registro">
-                <span>13.- Informe de incidentes</span>
+                <span>9.- Informe de incidentes</span>
                 <a href="./r_informe_de_incidentes.html">R-POE-Q-15-01</a>
             </p>
             <p class="registro">
-                <span>14.- Control de material extraño</span>
+                <span>10.- Control de material extraño</span>
                 <a href="./r_control_material_extraño.html">R-POE-Q-15-02</a>
             </p>
         </div>
+        <form class="form" action="#">
+            <button class="primary-button login-button">Volver inicio</button>
+        </form>
     </div>
 </body>
 </html>

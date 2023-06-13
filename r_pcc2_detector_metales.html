@@ -26,9 +26,7 @@
         }
         body {
             margin: 24;
-            font-family: 'Quicksand',
-            sans-serif;
-            /*background-color: var(--naranjo-claro-quinta);*/
+            font-family: 'Quicksand', sans-serif;
             background-image: url(./Fondo.png);
         }
         .login {
@@ -36,10 +34,6 @@
             height: 100vh;
             display: grid;
             justify-content: center;
-            /*background-color: var(--naranjo-claro-quinta);
-            border-radius: 32px;
-            border-top: 24px;
-            margin-bottom: 20px;*/
         }
         .logo {
             width: 200px;
@@ -93,9 +87,10 @@
             text-align: center;
         }
         .form {
-            display:  grid;
-            flex-direction: column;
-            justify-items: center;
+            display:  flex;
+            flex-direction: row;
+            justify-self: flex-start;
+            gap: 16px;
         }
         .primary-button {
             background-color: var(--rojo-quinta);
@@ -221,9 +216,13 @@
             <p class="sub-subtitle">(1) Si durante el monitoreo del funicionamiento del equipo, los patrones no son detectados, se debe ajustar y revisar los parametros del detector hasta que los patrones sean detectados nuevamente. los productor previos a la ultima verificacion se debe bloquear y volver a evaluar.</p>
             <p class="sub-subtitle">(2) Si durante el paso de productos, el detector evidencia presencia de metal, el producto se retiene y se vuelve a pasar por el detector de metales, trozar hasta encontrar el contaminante. Si existe presencia de metal, se debe investigar la causa.</p>
         </div>
-        <form class="form" action="#">
-            <button class="primary-button login-button">Grabar</button>
-        </form>
+        <div class="botones">
+            <form class="form" action="#">
+                <button class="primary-button login-button">Grabar y continuar</button>
+                <button class="primary-button login-button">Grabar y salir</button>
+                <button class="primary-button login-button">Salir</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

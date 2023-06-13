@@ -26,9 +26,7 @@
         }
         body {
             margin: 24;
-            font-family: 'Quicksand',
-            sans-serif;
-            /*background-color: var(--naranjo-claro-quinta);*/
+            font-family: 'Quicksand', sans-serif;
             background-image: url(./Fondo.png);
         }
         .inicio {
@@ -81,16 +79,17 @@
             margin-bottom: 16px;
         }
         .form {
-            display:  grid;
-            flex-direction: column;
-            justify-items: center;
+            display:  flex;
+            flex-direction: row;
+            justify-self: flex-start;
+            gap: 16px;
         }
         .primary-button {
             background-color: var(--rojo-quinta);
             border-radius: 8px;
             border: none;
             color: var(--white);
-            width: 150%;
+            width: 160px;
             cursor: pointer;
             font-size: var(--md);
             font-weight: bold;
@@ -220,9 +219,12 @@
 
             <label class="label">° Brix o NA</label>
             <input type="text" class="input">
-
+        </div>
+        <div class="botones">
             <form class="form" action="#">
-                <button class="primary-button login-button">Grabar</button>
+                <button class="primary-button login-button">Grabar y continuar</button>
+                <button class="primary-button login-button">Grabar y salir</button>
+                <button class="primary-button login-button">Salir</button>
             </form>
         </div>
     </div>
