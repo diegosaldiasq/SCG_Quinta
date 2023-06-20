@@ -12,6 +12,9 @@ const valor9 = document.getElementById('valor9');
 const valor10 = document.getElementById('valor10');
 const output2 = document.getElementById('outputx2');
 
+const factan = document.getElementById('factan');
+const output3 = document.getElementById('outputx3');
+
 //console.log("valor 1: "+valor1.value);
 function btnOnClick() {
     const sumaCantidad1 = (Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5;
@@ -23,4 +26,10 @@ function btnOnClick2() {
     const sumaCantidad2 = (Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/5;
     output2.innerText = sumaCantidad2;
     return sumaCantidad2;
+}
+
+function btnOnClick3() {
+    const promedioCantidad = (Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value) + Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/10 - Number(factan.value);
+    output3.innerText = promedioCantidad;
+    return promedioCantidad;
 }

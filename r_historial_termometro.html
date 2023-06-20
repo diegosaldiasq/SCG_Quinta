@@ -92,6 +92,12 @@
         border-radius: 8px;
         margin-bottom: 20px;
     }
+    .botones {
+        display:  flex;
+        flex-direction: row;
+        justify-self: center;
+        gap: 16px;
+    }
     .primary-button {
         background-color: var(--rojo-quinta);
         border-radius: 8px;
@@ -167,8 +173,20 @@
                 <input class="input" type="number" min="-2.0" max="2.0" step="0.1" id="factan" value="0">
                 <label class="label">Resultado promedio X3</label>
                 <div class="sub-container">
-                    <output name="resultado3">0.0</output>
+                    <output name="resultado3" id="outputx3">0.0</output>
                 </div>
+                <button type="button" class="primary-button login-button" id="boton3" onclick="btnOnClick3()">Ver promedio X3</button>
+            </form>
+        </div>
+        <div class="botones">
+            <form class="form" action="#">
+                <button class="primary-button login-button">Grabar y continuar</button>
+            </form>
+            <form class="form" action="#">
+                <button class="primary-button login-button">Grabar y salir</button>
+            </form>
+            <form class="form" action="./selecciones.html">
+                <button class="primary-button login-button">Salir</button>
             </form>
         </div>
 
