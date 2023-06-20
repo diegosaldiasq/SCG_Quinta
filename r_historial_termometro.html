@@ -97,11 +97,11 @@
         border-radius: 8px;
         border: none;
         color: var(--white);
-        width: 50%;
+        width: 160px;
         cursor: pointer;
         font-size: var(--md);
         font-weight: bold;
-        height: 40px;
+        height: 30px;
     }
     .login-button {
         margin-top: 14px;
@@ -124,8 +124,8 @@
             <label class="label">Codigo termometro</label>
             <input type="text" class="input">
             <p class="subtitle">Lectura termometro patron °C (X1)</p>
-            <form class="form" method="POST" oninput="resultado3.value=((parseFloat(valor1.value)+parseFloat(valor2.value)+parseFloat(valor3.value)+parseFloat(valor4.value)+parseFloat(valor5.value)+parseFloat(valor6.value)+parseFloat(valor7.value)+parseFloat(valor8.value)+parseFloat(valor9.value)+parseFloat(valor10.value))/10)-parseFloat(factan.value)"></form>
-                <form class="form" method="POST" oninput="resultado1.value=(parseFloat(valor1.value)+parseFloat(valor2.value)+parseFloat(valor3.value)+parseFloat(valor4.value)+parseFloat(valor5.value))/5">
+            <form class="form" method="POST"></form>
+                <form class="form" method="POST">
                     <label class="label">X1-M1</label>
                     <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor1" value="0">
                     <label class="label">X1-M2</label>
@@ -138,12 +138,13 @@
                     <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor5" value="0">
                     <label class="label">Resultado promedio X1</label>
                     <div class="sub-container">
-                        <output name="resultado1" for="valor1 valor2 valor3 valor4 valor5" id="outputx1">0.0</output>
+                        <output name="resultado1" id="outputx1">0.0</output>
                     </div>
+                    <button type="button" class="primary-button login-button" id="boton1" onclick="btnOnClick()">Ver promedio X1</button>
                 </form>
 
                 <p class="subtitle">Lectura termometro trabajo °C (X2)</p>
-                <form class="form" method="POST" oninput="resultado2.value=(parseFloat(valor6.value)+parseFloat(valor7.value)+parseFloat(valor8.value)+parseFloat(valor9.value)+parseFloat(valor10.value))/5">
+                <form class="form" method="POST">
                     <label class="label">X2-M1</label>
                     <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor6" value="0">
                     <label class="label">X2-M2</label>
@@ -156,8 +157,9 @@
                     <input class="input" type="number" min="-5.0" max="5.0" step="0.1" id="valor10" value="0">
                     <label class="label">Resultado promedio X2</label>
                     <div class="sub-container">
-                        <output name="resultado2" for="valor6 valor7 valor8 valor9 valor10" id="outputx2">0.0</output>
+                        <output name="resultado2" id="outputx2">0.0</output>
                     </div>
+                    <button type="button" class="primary-button login-button" id="boton2" onclick="btnOnClick2()">Ver promedio X2</button>
                 </form>
                 
                 <p class="subtitle">Calculo promedio °C (X3)</p>
@@ -165,7 +167,7 @@
                 <input class="input" type="number" min="-2.0" max="2.0" step="0.1" id="factan" value="0">
                 <label class="label">Resultado promedio X3</label>
                 <div class="sub-container">
-                    <output name="resultado3" for="valor1 valor2 valor3 valor4 valor5 valor6 valor7 valor8 valor9 valor10 factan">0.0</output>
+                    <output name="resultado3">0.0</output>
                 </div>
             </form>
         </div>
@@ -178,8 +180,7 @@
                 <output name="resultado" for="valor1 valor2"></output>
             </form>-->
         <!--FIN-->
-
-        </div>
     </div>
+    <script src="./scrips_r_historial_termometro.js"></script>
 </body>
 </html>
