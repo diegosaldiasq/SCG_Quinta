@@ -113,6 +113,30 @@
         margin-top: 14px;
         margin-bottom: 30px;
     }
+    .sub-subtitle {
+        color: var(--black);
+        font-size: var(--sm);
+        font-weight: 300;
+        margin-top: 0;
+        font-weight: bold;
+        margin-bottom: 32px;
+        text-align: center;
+    }
+    .secundary-button {
+        background-color: var(--rojo-quinta);
+        border-radius: 8px;
+        border: none;
+        color: var(--white);
+        width: 180px;
+        cursor: pointer;
+        font-size: var(--md);
+        font-weight: bold;
+        height: 40px;
+    }
+    .login-button2 {
+        margin-top: 14px;
+        margin-bottom: 30px;
+    }
     </style>
 </head>
 <body>
@@ -175,29 +199,40 @@
                 <div class="sub-container">
                     <output name="resultado3" id="outputx3">0.0</output>
                 </div>
+
                 <button type="button" class="primary-button login-button" id="boton3" onclick="btnOnClick3()">Ver promedio X3</button>
+
+                <label class="label">Nivel de aceptacion</label>
+                <div class="sub-container">
+                    <output name="resultado4" id="outputx4"></output>
+                </div>
+
+                <label class="label">AC</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="op1">1</option>
+                </select>
+                <p class="sub-subtitle">(1) Si durante el monitoreo la temperatura del producto no cumple con especificacion, se debera dar un golpe de frio al producto y verificar nuevamente la temperatura.</p>
+
+                <label class="label">VAC</label>
+                <select class="input">
+                    <option value="blanco"> </option>
+                    <option value="cumple">Cumple</option>
+                    <option value="nocumple">No cumple</option>
+                </select>
             </form>
         </div>
         <div class="botones">
             <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y continuar</button>
+                <button class="secundary-button login-button2">Grabar y continuar</button>
             </form>
             <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
+                <button class="secundary-button login-button2">Grabar y salir</button>
             </form>
             <form class="form" action="./selecciones.html">
-                <button class="primary-button login-button">Salir</button>
+                <button class="secundary-button login-button2">Salir</button>
             </form>
         </div>
-
-        <!--Como hacer un calculo en linea-->
-        <!--<div class="login-container">
-            <form method="POST" oninput="resultado.value=(parseInt(valor1.value)+parseInt(valor2.value))/2">
-                <input type="number" id="valor1" value="0"> +
-                <input type="number" id="valor2" value="0"> =
-                <output name="resultado" for="valor1 valor2"></output>
-            </form>-->
-        <!--FIN-->
     </div>
     <script src="./scrips_r_historial_termometro.js"></script>
 </body>

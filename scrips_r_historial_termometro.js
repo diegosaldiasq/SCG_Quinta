@@ -14,8 +14,8 @@ const output2 = document.getElementById('outputx2');
 
 const factan = document.getElementById('factan');
 const output3 = document.getElementById('outputx3');
+const output4 = document.getElementById('outputx4');
 
-//console.log("valor 1: "+valor1.value);
 function btnOnClick() {
     const sumaCantidad1 = (Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5;
     output1.innerText = sumaCantidad1.toFixed(1);
@@ -29,4 +29,7 @@ function btnOnClick2() {
 function btnOnClick3() {
     const promedioCantidad = (Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value) + Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/10 - Number(factan.value);
     output3.innerText = promedioCantidad.toFixed(1);
+    const x1 = (((Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5) + ((Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/5))/Number(factan.value);
+    // hacer un condicional
+    output4.innerText = x1.toFixed(1);
 }
