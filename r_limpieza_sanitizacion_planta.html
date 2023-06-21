@@ -7,149 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="./Estilos-CSS/estilos_r_limpieza_sanitizacion_planta.css">
     <link rel="icon" href="./logoquinta2.png" />
     <title>Limpieza y sanitización de planta R-POES-E-03-06</title>
-    <style>
-        :root{
-        --very-light-pink: #C7C7C7;
-        --text-input-field: #F7F7F7;
-        --hospital-green: #ACD9B2;
-        --rojo-quinta: #B43C2C;
-        --amarillo-quinta: #f3ba14;
-        --naranjo-quinta: #d07020;
-        --naranjo-claro-quinta: #d4841c;
-        --white: #FFFFFF;
-        --black: #000000;
-        --sm: 14px;
-        --md: 16px;
-        --lg: 18px;
-        }
-        body {
-            margin: 0;
-            font-family: 'Quicksand', sans-serif;
-            background-image: url(./Fondo.png);
-        }
-        .login {
-            width: 100%;
-            height: 100vh;
-            display: grid;
-            place-items: center;
-        }
-        .logo {
-            width: 200px;
-            margin-bottom: 16px;
-            justify-self: center;
-            border-top: 24px;
-            margin-top: 24px;
-        }
-        .container-inicio {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            width: 550px;
-            justify-items: center;
-            margin-bottom: 60px;
-            margin-bottom: 24px;
-            border-radius: 32px;
-            background-color: var(--naranjo-claro-quinta);
-        }
-        .title {
-            font-size: var(--lg);
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .subtitle {
-            color: var(--rojo-quinta);
-            font-size: var(--md);
-            font-weight: 300;
-            margin-top: 0;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .label {
-            font-size: var(--sm);
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-        .input {
-            background-color: var(--text-input-field);
-            border: none;
-            border-radius: 12px;
-            height: 28px;
-            font-size: var(--md);
-            padding: 6px;
-            margin-bottom: 8px;
-        }
-        .sub-container-inicio {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            width: 900px;
-            justify-items: center;
-            margin-bottom: 40px;
-            background-color: var(--naranjo-claro-quinta);
-            border-radius: 32px;
-        }
-        .sub-sub-subtitle {
-            color: var(--rojo-quinta);
-            font-size: 32px;
-            font-weight: 300;
-            margin-top: 0;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .sub-subtitle {
-            color: var(--hospital-green);
-            font-size: var(--sm);
-            font-weight: 300;
-            margin-top: 0;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .archivo {
-            border-radius: 8px;
-            border: none;
-            color: var(--white);
-            width: 50%;
-            cursor: pointer;
-            font-size: var(--md);
-            font-weight: bold;
-            height: 40px;
-        }
-        .botones {
-            display:  flex;
-            flex-direction: row;
-            justify-self: center;
-            gap: 16px;
-        }
-        .primary-button {
-            background-color: var(--rojo-quinta);
-            border-radius: 8px;
-            border: none;
-            color: var(--white);
-            width: 180px;
-            cursor: pointer;
-            font-size: var(--md);
-            font-weight: bold;
-            height: 50px;
-        }
-        .login-button {
-            margin-top: 14px;
-            margin-bottom: 30px;
-        }
-        /*.footer-img {
-            display: grid;
-            justify-items: center;
-            border: 0;
-            width: 1400px;
-            height: 300px;
-        }*/
-    </style>
 </head>
 <body>
     <div class="login">
-        <img src="./logoquinta.png" alt="logo" class="logo">
+        <img src="./Estilos-CSS/logoquinta.png" alt="logo" class="logo">
         <div class="container-inicio">
             <h1 class="title">Limpieza y sanitizacion de planta R-POES-E-03-06</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
@@ -160,6 +24,9 @@
             <label class="label">Fecha</label>
             <input class="input" type="datetime-local">
         </div>
+
+        <!--CAMBIO DE VARIABLE 1-->
+
         <div class="sub-container-inicio">
             <p class="sub-sub-subtitle">Filtro Sanitario</p>
             <div class="sub-container">
@@ -189,7 +56,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Pediluvio, limpia botas limpio sin materia organica y seco</p>
                 <label class="label">C/NC</label>
@@ -216,7 +82,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Jaboneras limpias dotadas de jabon, secador de manos limpios y secos</p>
                 <label class="label">C/NC</label>
@@ -243,7 +108,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Basurero con bolsa, limpio, hasta 3/4 de capacidad</p>
                 <label class="label">C/NC</label>
@@ -270,7 +134,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Lavamanos limpios</p>
                 <label class="label">C/NC</label>
@@ -297,11 +160,8 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
             </div>
         </div>
-        <!--<input type="file" name="archivosubido">
-        <input type="submit" value="Enviar datos">-->
 
         <!--CAMBIO DE VARIABLE 2-->
 
@@ -334,7 +194,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Pallet limpios y en buen estado</p>
                 <label class="label">C/NC</label>
@@ -361,7 +220,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Basurero con bolsa, limpio, hasta 3/4 de capacidad</p>
                 <label class="label">C/NC</label>
@@ -388,7 +246,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Muros limpios</p>
                 <label class="label">C/NC</label>
@@ -415,7 +272,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Camara de refrigerado limpia y seca</p>
                 <label class="label">C/NC</label>
@@ -442,7 +298,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Implementos de aseo ordenados y limpios</p>
                 <label class="label">C/NC</label>
@@ -469,7 +324,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Rack limpios</p>
                 <label class="label">C/NC</label>
@@ -496,7 +350,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
             </div>
         </div>
         
@@ -531,7 +384,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Muros limpios</p>
                 <label class="label">C/NC</label>
@@ -558,7 +410,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Mesones y cintas limpias</p>
                 <label class="label">C/NC</label>
@@ -585,7 +436,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Implementos de aseo ordenados y limpios</p>
                 <label class="label">C/NC</label>
@@ -612,7 +462,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Equipos limpios, secos y sin materia organica</p>
                 <label class="label">C/NC</label>
@@ -639,7 +488,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Basureros con bolsa, limpio, hasta 3/4 de capacidad</p>
                 <label class="label">C/NC</label>
@@ -666,7 +514,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Lavamanos limpios y operativos</p>
                 <label class="label">C/NC</label>
@@ -693,7 +540,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
             </div>
         </div>
 
@@ -728,7 +574,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Mesones y cintas limpias</p>
                 <label class="label">C/NC</label>
@@ -755,7 +600,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Equipos limpios, secos y sin materia organica</p>
                 <label class="label">C/NC</label>
@@ -782,7 +626,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Basurero con bolsa, limpio, hasta 3/4 de capacidad</p>
                 <label class="label">C/NC</label>
@@ -809,7 +652,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Lavafondos limpios y en buen estado</p>
                 <label class="label">C/NC</label>
@@ -836,7 +678,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
             </div>
         </div>
 
@@ -871,7 +712,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Mesones limpios, secos y sin materia organica</p>
                 <label class="label">C/NC</label>
@@ -898,7 +738,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Basurero con bolsa, limpio, hasta 3/4 de capacidad</p>
                 <label class="label">C/NC</label>
@@ -925,7 +764,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Lavafondo limpio y en buen estado</p>
                 <label class="label">C/NC</label>
@@ -952,7 +790,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Equipos limpios, secos, y sin materia organica</p>
                 <label class="label">C/NC</label>
@@ -979,7 +816,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
             </div>
         </div>
 
@@ -1014,7 +850,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Basurero con bolsa, limpio, hasta 3/4 de capacidad</p>
                 <label class="label">C/NC</label>
@@ -1041,7 +876,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Batidoras limpias, secas y sin materia organica</p>
                 <label class="label">C/NC</label>
@@ -1068,7 +902,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Lavafondos limpios y en buen estado</p>
                 <label class="label">C/NC</label>
@@ -1095,7 +928,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
             </div>
         </div>
 
@@ -1130,7 +962,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Cintas transportadoras limpias</p>
                 <label class="label">C/NC</label>
@@ -1157,7 +988,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Andenes limpios y sin polvo visible</p>
                 <label class="label">C/NC</label>
@@ -1184,7 +1014,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">Basurero con bolsa, limpio, hasta 3/4 de capacidad</p>
                 <label class="label">C/NC</label>
@@ -1211,7 +1040,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
 
                 <p class="sub-subtitle">No se observan acumulacion de cartones</p>
                 <label class="label">C/NC</label>
@@ -1238,7 +1066,6 @@
                 <label class="label">Observaciones</label>
                 <input type="text" class="input">
                 <input type="file" name="archivosubido" class="archivo">
-                <!--<input type="submit" value="Enviar datos">-->
             </div>
         </div>
         <div class="botones">
@@ -1253,8 +1080,5 @@
             </form>
         </div>
     </div>
-    <!--<footer class="footer">
-        <img src="./header2.png" alt="footer" class="footer-img">
-    </footer>-->
 </body>
 </html>
