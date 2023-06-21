@@ -69,21 +69,6 @@ body {
     justify-self: center;
     gap: 16px;
 }
-.primary-button {
-    background-color: var(--rojo-quinta);
-    border-radius: 8px;
-    border: none;
-    color: var(--white);
-    width: 100%;
-    cursor: pointer;
-    font-size: var(--md);
-    font-weight: bold;
-    height: 60px;
-}
-.login-button {
-    margin-top: 14px;
-    margin-bottom: 40px;
-}
 .secundary-button {
     background-color: var(--rojo-quinta);
     border-radius: 8px;
