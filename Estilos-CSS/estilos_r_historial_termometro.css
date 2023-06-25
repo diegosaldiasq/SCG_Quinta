@@ -129,4 +129,15 @@ body {
     .login-container {
         width: 100%;
     }
+    .botones {
+        gap: 8px;
+    }
+    .primary-button {
+        font-size: 12px;
+    }
+    .secundary-button {
+        width: 120px;
+        font-size: 10px;
+        height: 40px;
+    }
 }

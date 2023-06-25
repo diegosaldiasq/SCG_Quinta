@@ -140,4 +140,12 @@ body {
     .container-inicio {
         width: 100%;
     }
+    .botones {
+        gap: 8px;
+    }
+    .primary-button {
+        width: 120px;
+        font-size: 10px;
+        height: 40px;
+    }
 }
