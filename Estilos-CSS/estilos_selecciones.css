@@ -88,6 +88,9 @@ body {
         width: 100%;
     }
     .registro {
-        font-size: var(--sm);   
+        font-size: 8px;   
+    }
+    .title {
+        font-size: var(--md);
     }
 }
