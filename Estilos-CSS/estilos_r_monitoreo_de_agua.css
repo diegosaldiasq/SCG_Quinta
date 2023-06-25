@@ -101,3 +101,8 @@ body {
     margin-top: 24px;
     margin-bottom: 60px;
 }
+@media (max-width: 650px) {
+    .container {
+        width: 100%;
+    }
+}

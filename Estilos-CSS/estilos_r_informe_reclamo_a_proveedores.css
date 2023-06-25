@@ -78,7 +78,7 @@ body {
     border-radius: 8px;
     border: none;
     color: var(--white);
-    width: 60%;
+    width: 70%;
     cursor: pointer;
     font-size: var(--md);
     font-weight: bold;
@@ -104,4 +104,9 @@ body {
 .login-button {
     margin-top: 14px;
     margin-bottom: 30px;
+}
+@media (max-width: 650px) {
+    .login-container {
+        width: 100%;
+    }
 }
