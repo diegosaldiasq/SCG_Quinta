@@ -18,17 +18,17 @@
             <h1 class="title">Informe de incidentes R-POE-Q-15-01</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nomb-tecno">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="login-container">
             <label class="label">Fuente del material</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="fuente-material">
             <label class="label">Cantidad producto contaminado</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="cantidad-cont">
             <label class="label">Unidad de medida</label>
-                <select class="input">
+                <select class="input" id="udm">
                     <option value="blanco"> </option>
                     <option value="kg">Kg</option>
                     <option value="gr">gr</option>
@@ -36,15 +36,15 @@
                     <option value="l">l</option>
                 </select>
             <label class="label">Lote producto contaminado</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="lote-prod-cont">
             <label class="label">Observaciones</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="obs">
         </div>
         <div class="login-container">
             <label class="label">Analisis de causa</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="analisis-causa">
             <label class="label">Acciones correctivas y/o preventivas</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="ac">
         </div>
         <div class="botones">
             <form class="form" action="#">
@@ -58,5 +58,6 @@
             </form>
         </div>
     </div>
+    <script src="./Scrips-JS/scrip_r_informe_de_incidentes.js"></script>
 </body>
 </html>

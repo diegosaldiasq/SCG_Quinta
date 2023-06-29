@@ -18,26 +18,26 @@
             <h1 class="title">Control de plagas P-POES-Q-05-02</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-tecnologo">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="login-container">
             <h2 class="title">Ingreso datos de trampas</h2>
             <p class="subtitle2">Ingresar cada trampa y luego grabar</p>
 
             <label class="label">Numero Estacion</label>
-            <input class="input" type="number">
+            <input class="input" type="number" id="numero-estacion">
 
             <label class="label">Tipo de plaga</label>
-                <select class="input">
+                <select class="input" id="tipo-plaga">
                     <option value="blanco"> </option>
                     <option value="roedores">Roedores</option>
                     <option value="voladores">Voladores</option>
                 </select>
             
             <label class="label">Tipo de trampa</label>
-                <select class="input">
+                <select class="input" id="tipo-trampa">
                     <option value="blanco"> </option>
                     <option value="cebadera">Cebadera</option>
                     <option value="pegajosa">Pegajosa</option>
@@ -46,7 +46,7 @@
                 </select>
 
             <label class="label">Ubicacion</label>
-                <select class="input">
+                <select class="input" id="ubicacion">
                     <option value="blanco"> </option>
                     <option value="deslinde">Deslinde</option>
                     <option value="pcercano">P. cercano</option>
@@ -54,7 +54,7 @@
                 </select>
 
             <label class="label">Monitoreo</label>
-                <select class="input">
+                <select class="input" id="monitoreo">
                     <option value="blanco"> </option>
                     <option value="operativa">Operativa</option>
                     <option value="cumple">Cumple</option>
@@ -65,7 +65,7 @@
                 </select>
 
             <label class="label">AC</label>
-                <select class="input-ac">
+                <select class="input-ac" id="ac">
                     <option value="blanco"> </option>
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -92,5 +92,6 @@
             </form>
         </div>
     </div>
+    <script src="./Scrips-JS/scrip_r_monitoreo_de_plagas.js"></script>
 </body>
 </html>

@@ -18,35 +18,34 @@
             <h1 class="title">Registro control de transporte R-POE-E-05-09</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nom-tec">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="login-container">
             <label class="label">Fecha recepcion</label>
-            <input class="input" type="date">
+            <input class="input" type="date" id="fecha-recep">
 
             <label class="label">Producto</label>
-                <select class="input">
+                <select class="input" id='producto'>
                     <option value="blanco"> </option>
                     <option value="manjar">Berlin manjar</option>
                     <option value="pastelera">Berlin pastelera</option>
                 </select>
 
             <label class="label">T° Transporte</label>
-            <input class="input" type="number" min="-2.0" max="5.0" step="0.1">
+            <input class="input" type="number" min="-2.0" max="5.0" step="0.1" id="t-transporte">
 
             <label class="label">T° Producto</label>
-            <input class="input" type="number" min="0.0" max="8.0" step="0.1">
+            <input class="input" type="number" min="0.0" max="8.0" step="0.1" id="t-producto">
 
             <label class="label">Lote</label>
-            <input class="input" type="text">
-
+            
             <label class="label">Fecha vencimiento</label>
-            <input class="input" type="date">
+            <input class="input" type="date" id="fecha-venc">
 
             <label class="label">AC</label>
-                <select class="input">
+                <select class="input" id="ac">
                     <option value="blanco"> </option>
                     <option value="ac1">1</option>
                     <option value="ac2">2</option>
@@ -55,7 +54,7 @@
             <p class="sub-subtitle">(2) Si durante el monitoreo de la temperatura del producto, se debe rechazar el producto.</p>
 
             <label class="label">VAC</label>
-                <select class="input">
+                <select class="input" id="vac">
                     <option value="blanco"> </option>
                     <option value="cumple">Cumple</option>
                     <option value="nocumple">No cumple</option>
@@ -73,5 +72,6 @@
             </form>
         </div>
     </div>
+    <script src="./Scrips-JS/scrip_r_control_de_transporte.js"></script>
 </body>
 </html>

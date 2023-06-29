@@ -9,7 +9,6 @@ const valor6 = document.getElementById('valor6');
 const valor7 = document.getElementById('valor7');
 const valor8 = document.getElementById('valor8');
 const valor9 = document.getElementById('valor9');
-const valor10 = document.getElementById('valor10');
 const output2 = document.getElementById('outputx2');
 
 const factan = document.getElementById('factan');

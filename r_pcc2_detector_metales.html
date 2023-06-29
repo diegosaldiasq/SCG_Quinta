@@ -18,13 +18,13 @@
             <h1 class="title">Registro PCC N°2 Deteccion de metales R-POE-E-03-09</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-tecnologo">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
             <label class="label">Lote dia</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="lote">
             <label class="label">Turno</label>
-                <select class="input">
+                <select class="input" id="turno">
                     <option value="blanco"> </option>
                     <option value="turnoa">A</option>
                     <option value="Turnob">B</option>
@@ -33,14 +33,14 @@
         </div>
         <div class="login-container">
             <label class="label">Tipo metal</label>
-                <select class="input">
+                <select class="input" id="tipo-metal">
                     <option value="blanco"> </option>
                     <option value="ferroso">Ferroso</option>
                     <option value="aceinox">Aceron inoxidable</option>
                 </select>
 
             <label class="label">Medicion</label>
-                <select class="input">
+                <select class="input" id="medicion">
                     <option value="blanco"> </option>
                     <option value="d">D</option>
                     <option value="nd">ND</option>
@@ -48,7 +48,7 @@
                 </select>
 
             <label class="label">Producto</label>
-                <select class="input">
+                <select class="input" id="producto">
                     <option value="blanco"> </option>
                     <option value="producto">Torta piña jumbo</option>
                     <option value="producto">Torta hoja manjar jumbo</option>
@@ -107,10 +107,10 @@
                 </select>
             
             <label class="label">Observaciones</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="obs">
 
             <label class="label">AC</label>
-                <select class="input">
+                <select class="input" id="ac">
                     <option value="blanco"> </option>
                     <option value="op1">1</option>
                     <option value="op2">2</option>
@@ -130,5 +130,6 @@
             </form>
         </div>
     </div>
+    <script src="./Scrips-JS/scrip_r_pcc2_detector_metales.js"></script>
 </body>
 </html>

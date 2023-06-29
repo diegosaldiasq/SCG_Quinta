@@ -18,81 +18,81 @@
             <h1 class="title">Control de recepcion de materias primas R-POE-E-02-01</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-tecnologo">
             <label class="label">Lote dia</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="lote-dia">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="container-inicio">
             <h2 class="title">Ingreso datos monitoreo</h2>
             <p class="subtitle">Ingresar cada registro y luego grabar</p>
 
             <label class="label">Proveedor</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="proveedor">
 
             <label class="label">Producto</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="producto">
 
             <label class="label">Elaboracion</label>
-            <input type="date" class="input">
+            <input type="date" class="input" id="fecha-elab">
 
             <label class="label">Vencimiento</label>
-            <input type="date" class="input">
+            <input type="date" class="input" id="fecha-venc">
 
             <label class="label">Lote</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="lote-producto">
 
             <label class="label">N° Factura</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="numero-factura">
 
             <p class="subtitle">Condiciones de transporte</p>
 
             <label class="label">Higiene</label>
-            <select class="input">
+            <select class="input" id="higiene">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
             </select>
 
             <label class="label">RS</label>
-            <select class="input">
+            <select class="input" id="rs">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
             </select>
 
             <label class="label">Temperatura °C transporte (-20 a 20 °C) o NA</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="temperatura-trans">
 
             <p class="subtitle">Caracteristicas de producto</p>
 
             <label class="label">Apariencia</label>
-            <select class="input">
+            <select class="input" id="apariencia">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
             </select>
 
             <label class="label">Textura</label>
-            <select class="input">
+            <select class="input" id="textura">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
             </select>
 
             <label class="label">Ausencia de materias extrañas</label>
-            <select class="input">
+            <select class="input" id="ausencia-me">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
             </select>
 
             <label class="label">Temperatura °C producto (-20 a 20 °C) o NA</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="temperatura-prod">
 
             <label class="label">Condicion del envase</label>
-            <select class="input">
+            <select class="input" id="condicion-env">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
@@ -101,7 +101,7 @@
             </select>
 
             <label class="label">Color</label>
-            <select class="input">
+            <select class="input" id="color">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
@@ -110,7 +110,7 @@
             </select>
 
             <label class="label">Olor</label>
-            <select class="input">
+            <select class="input" id="olor">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
@@ -119,7 +119,7 @@
             </select>
 
             <label class="label">Sabor</label>
-            <select class="input">
+            <select class="input" id="sabor">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
@@ -128,7 +128,7 @@
             </select>
 
             <label class="label">° Brix o NA</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="grados-brix">
         </div>
         <div class="botones">
             <form class="form" action="#">
@@ -142,5 +142,6 @@
             </form>
         </div>
     </div>
+    <script src="./Scrips-JS/scrip_r_recepcion_mpme.js"></script>
 </body>
 </html>

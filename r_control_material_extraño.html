@@ -18,11 +18,11 @@
             <h1 class="title">Control de material extraño R-POE-Q-15-02</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nomb-tec">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
             <label class="label">Turno</label>
-                <select class="input">
+                <select class="input" id="turno">
                     <option value="blanco"> </option>
                     <option value="turnoa">A</option>
                     <option value="Turnob">B</option>
@@ -31,7 +31,7 @@
         </div>
         <div class="login-container">
             <label class="label">Area material</label>
-                <select class="input">
+                <select class="input" id="area">
                     <option value="blanco"> </option>
                     <option value="op1">Recepcion</option>
                     <option value="op2">Almacenamiento BMP</option>
@@ -57,7 +57,7 @@
                 </select>
             
             <label class="label">Tipo material</label>
-                <select class="input">
+                <select class="input" id="tipo-material">
                     <option value="blanco"> </option>
                     <option value="vidrio">Vidrio</option>
                     <option value="plastico">Plastico</option>
@@ -66,7 +66,7 @@
                 </select>
 
             <label class="label">AC</label>
-                <select class="input">
+                <select class="input" id="ac">
                     <option value="blanco"> </option>
                     <option value="op1">1</option>
                     <option value="op2">2</option>
@@ -83,7 +83,7 @@
             <p class="sub-subtitle">(6) Si durante el monitoreo se evidencian partes de artefactos o maquinaria en mal estado propensos a contaminar el producto. Dar aviso a mantenimiento para que esta sea reparada o cambiada en su totalidad segun lo requiera.</p>
 
             <label class="label">VAC</label>
-                <select class="input">
+                <select class="input" id="vac">
                     <option value="blanco"> </option>
                     <option value="cumple">Cumple</option>
                     <option value="nocumple">No cumple</option>
@@ -91,7 +91,7 @@
                 </select>
 
             <label class="label">Observaciones</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="observaciones">
         </div>
         <div class="botones">
             <form class="form" action="#">
@@ -105,5 +105,6 @@
             </form>
         </div>
     </div>
+    <script src="./Scrips-JS/scrip_r_control_material_extraño.js"></script>
 </body>
 </html>

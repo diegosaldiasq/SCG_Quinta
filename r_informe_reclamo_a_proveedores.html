@@ -18,33 +18,33 @@
             <h1 class="title">Informe de reclamo a proveedores IN-POE-Q-10-02</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-tecnologo">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="login-container">
             <p class="subtitle">Datos del proveedor</p>
             <label class="label">Nombre</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-prov">
             <label class="label">Fecha del reclamo</label>
-            <input type="date" class="input">
+            <input type="date" class="input" id="fecha-recl">
         </div>
         <div class="login-container">
             <p class="subtitle">Datos del producto</p>
             <label class="label">Nombre del producto</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-prod">
             <label class="label">Fecha de elaboracion</label>
-            <input type="date" class="input">
+            <input type="date" class="input" id="fecha-elab">
             <label class="label">Lote</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="lote">
             <label class="label">Fecha de vencimiento</label>
-            <input type="date" class="input">
+            <input type="date" class="input" id="fecha-venc">
             <label class="label">No conformidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="no-conf">
         </div>
         <div class="login-container">
             <label class="label">Clasificacion</label>
-                <select class="input">
+                <select class="input" id="clasificacion">
                     <option value="blanco"> </option>
                     <option value="calidad">Calidad</option>
                     <option value="inocuidad">Inocuidad</option>
@@ -52,10 +52,10 @@
                 </select>
 
             <label class="label">Cantidad involucrada</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="cantidad-inv">
 
             <label class="label">Unidad de medida</label>
-                <select class="input">
+                <select class="input" id="udm">
                     <option value="blanco"> </option>
                     <option value="kg">Kg</option>
                     <option value="gr">gr</option>
@@ -64,7 +64,7 @@
                 </select>
             
             <label class="label">Fotografia</label>
-            <input type="file" name="archivosubido" class="archivo">
+            <input type="file" name="archivosubido" class="archivo" id="archivo-foto">
         </div>
         <div class="botones">
             <form class="form" action="#">
@@ -78,5 +78,6 @@
             </form>
         </div>
     </div>
+    <script src="./Scrips-JS/scrip_r_informe_reclamo_a_proveedores.js"></script>
 </body>
 </html>
