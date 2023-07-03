@@ -31,7 +31,6 @@ function btnOnClick3() {
     const promedioCantidad = (((Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5) + ((Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/5))/2;
     output3.innerText = promedioCantidad.toFixed(1);
     const x1 = ((Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5) - ((Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/5) + Number(factan.value);
-    // hacer un condicional
     output4.innerText = x1.toFixed(1);
     if (x1 >= -0.5 && x1 <= 0.5) {
         regla.innerText = 'Cumple';
