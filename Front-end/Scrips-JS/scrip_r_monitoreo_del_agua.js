@@ -17,19 +17,19 @@ $(document).ready(function() {
     $("#miBoton").click(function() {
 
         $.ajax({
-            url: "../../Back-end/SCG_Quinta/monitoreo_del_agua/",  // Ruta a tu vista Django
+            url: "../../Back-end/SCG_Quinta/monitoreo_del_agua/views.py",  // Ruta a tu vista Django
             method: "POST",
             data: {
                 nombre_tecnologo: nombreTecnologo,
                 fecha_registro: fechaRegistro,
-                turno_: turno,
-                planta_: planta,
+                turno_mda: turno,
+                planta_mda: planta,
                 numero_llave: numeroLlave,
                 punto_muestreo: puntoMuestreo,
                 sabor_insipido: saborInsipido,
                 olor_inodora: olorInodora,
                 color_incoloro: colorIcoloro,
-                ph_: ph,
+                ph_mda: ph,
                 cloro_libre: cloroLibre,
                 accion_correctiva: accionCorrectiva,
                 resultado_ac: resultadoAc

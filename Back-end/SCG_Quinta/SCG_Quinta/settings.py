@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 LOCAL_APPS = [
     "inicio.apps.InicioConfig",
+    "monitoreo_del_agua.apps.MonitoreoDelAguaConfig"
 ]
 
 DJANGO_APPS = [
