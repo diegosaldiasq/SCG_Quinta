@@ -12,3 +12,35 @@ const ph = document.querySelector('#ph');
 const cloroLibre = document.querySelector('#cloro-libre');
 const accionCorrectiva = document.querySelector('#ac');
 const resultadoAc = document.querySelector('#resultado-ac');
+
+$(document).ready(function() {
+    $("#miBoton").click(function() {
+
+        $.ajax({
+            url: "../../Back-end/SCG_Quinta/monitoreo_del_agua/",  // Ruta a tu vista Django
+            method: "POST",
+            data: {
+                nombre_tecnologo: nombreTecnologo,
+                fecha_registro: fechaRegistro,
+                turno_: turno,
+                planta_: planta,
+                numero_llave: numeroLlave,
+                punto_muestreo: puntoMuestreo,
+                sabor_insipido: saborInsipido,
+                olor_inodora: olorInodora,
+                color_incoloro: colorIcoloro,
+                ph_: ph,
+                cloro_libre: cloroLibre,
+                accion_correctiva: accionCorrectiva,
+                resultado_ac: resultadoAc
+            },
+            success: function(response) {
+                // Hacer algo con la respuesta del servidor
+                console.log(response);
+            },
+            error: function() {
+                // Manejar errores
+            }
+        });
+    });
+});
