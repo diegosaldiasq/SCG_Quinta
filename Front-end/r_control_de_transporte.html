@@ -40,6 +40,7 @@
             <input class="input" type="number" min="0.0" max="8.0" step="0.1" id="t-producto">
 
             <label class="label">Lote</label>
+            <input class="input" type="text" id="lote">
             
             <label class="label">Fecha vencimiento</label>
             <input class="input" type="date" id="fecha-venc">
@@ -62,7 +63,7 @@
         </div>
         <div class="botones">
             <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y continuar</button>
+                <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
             </form>
             <form class="form" action="#">
                 <button class="primary-button login-button">Grabar y salir</button>
@@ -72,6 +73,7 @@
             </form>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="./Scrips-JS/scrip_r_control_de_transporte.js"></script>
 </body>
 </html>
