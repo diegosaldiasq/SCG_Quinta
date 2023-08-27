@@ -33,7 +33,8 @@ ALLOWED_HOSTS = []
 LOCAL_APPS = [
     "inicio.apps.InicioConfig",
     "monitoreo_del_agua.apps.MonitoreoDelAguaConfig",
-    "monitoreo_de_plagas.apps.MonitoreoDePlagasConfig"
+    "monitoreo_de_plagas.apps.MonitoreoDePlagasConfig",
+    "pcc2_detector_metales.apps.Pcc2DetectorMetalesConfig"
 ]
 
 DJANGO_APPS = [
