@@ -23,6 +23,7 @@ urlpatterns = [
     path("monitoreo_del_agua/", include("monitoreo_del_agua.urls")),
     path("monitoreo_de_plagas/", include("monitoreo_de_plagas.urls")),
     path("pcc2_detector_metales/", include("pcc2_detector_metales.urls")),
-    path("recepcion_mpme/", include("recepcion_mpme.urls"))
+    path("recepcion_mpme/", include("recepcion_mpme.urls")),
+    path("higiene_y_conducta_personal/", include("higiene_y_conducta_personal.urls"))
 ]
 
