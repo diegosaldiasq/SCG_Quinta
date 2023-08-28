@@ -18,20 +18,20 @@
             <h1 class="title">Registro temperatura despacho PT SISA R-POE-E-05-02</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-tecnologo">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="login-container">
             <label class="label">Cadena</label>
-                <select class="input">
+                <select class="input" id="cadena">
                     <option value="blanco"> </option>
                     <option value="sisa">SISA</option>
                     <option value="quinta">Quinta</option>
                 </select>
     
             <label class="label">Item</label>
-                <select class="input">
+                <select class="input" id="item">
                     <option value="blanco"> </option>
                     <option value="torta">Torta</option>
                     <option value="congelada">Congelada</option>
@@ -40,7 +40,7 @@
                 </select>
             
             <label class="label">Producto</label>
-                <select class="input">
+                <select class="input" id="producto">
                     <option value="blanco"> </option>
                     <option value="producto">Torta mocaccino</option>
                     <option value="producto">Torta crema manjar mediana</option>
@@ -78,7 +78,7 @@
             <!--Agregado por Diego-->
 
             <label class="label">Congelado/Refrigerado?</label>
-                <select class="input">
+                <select class="input" id="cong-refr">
                     <option value="blanco"> </option>
                     <option value="congelada">Congelado</option>
                     <option value="refrigerado">Refrigerado</option>
@@ -87,30 +87,30 @@
             <!--Fin-->
             
             <label class="label">T° Producto</label>
-            <input class="input" type="number" min="-15.0" max="5.0" step="0.1">
+            <input class="input" type="number" min="-15.0" max="5.0" step="0.1" id="t-producto">
 
             <label class="label">Revision de etiquetado</label>
-                <select class="input">
+                <select class="input" id="rev-etiquetado">
                     <option value="blanco"> </option>
                     <option value="cumple">Cumple</option>
                     <option value="nocumple">No cumple</option>
                 </select>
 
             <label class="label">Lote</label>
-            <input class="input" type="text">
+            <input class="input" type="text" id="lote">
 
             <label class="label">Fecha vencimiento</label>
-            <input class="input" type="date">
+            <input class="input" type="date" id="fecha-vencimiento">
 
             <label class="label">AC</label>
-                <select class="input">
+                <select class="input" id="ac">
                     <option value="blanco"> </option>
                     <option value="op1">1</option>
                 </select>
             <p class="sub-subtitle">(1) Si durante el monitoreo la temperatura del producto no cumple con especificacion, se debera dar un golpe de frio al producto y verificar nuevamente la temperatura.</p>
 
             <label class="label">T° VAC</label>
-            <input class="input" type="number" min="-15.0" max="5.0" step="0.1">
+            <input class="input" type="number" min="-15.0" max="5.0" step="0.1" id="vac">
         </div>
         <div class="botones">
             <form class="form" action="#">

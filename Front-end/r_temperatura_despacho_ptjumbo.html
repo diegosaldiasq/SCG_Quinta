@@ -18,26 +18,26 @@
             <h1 class="title">Registro temperatura despacho PT Jumbo R-POE-E-05-01</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-tecnologo">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="login-container">
             <label class="label">Cadena</label>
-                <select class="input">
+                <select class="input" id="cadena">
                     <option value="blanco"> </option>
                     <option value="jumbo">Jumbo</option>
                 </select>
             
             <label class="label">Item</label>
-                <select class="input">
+                <select class="input" id="item">
                     <option value="blanco"> </option>
                     <option value="torta">Torta</option>
                     <option value="pastel">Pastel</option>
                 </select>
 
             <label class="label">Producto</label>
-                <select class="input">
+                <select class="input" id="producto">
                     <option value="blanco"> </option>
                     <option value="producto">Torta piña</option>
                     <option value="producto">Torta hoja manjar</option>
@@ -65,30 +65,30 @@
                 </select>
 
             <label class="label">T° Producto</label>
-            <input class="input" type="number" min="-3.0" max="10.0" step="0.1">
+            <input class="input" type="number" min="-3.0" max="10.0" step="0.1" id="t-producto">
 
             <label class="label">Revision de etiquetado</label>
-            <select class="input">
+            <select class="input" id="rev-etiquetado">
                 <option value="blanco"> </option>
                 <option value="cumple">Cumple</option>
                 <option value="nocumple">No cumple</option>
             </select>
 
             <label class="label">Lote</label>
-            <input class="input" type="text">
+            <input class="input" type="text" id="lote">
 
             <label class="label">Fecha vencimiento</label>
-            <input class="input" type="date">
+            <input class="input" type="date" id="fecha-vencimiento">
 
             <label class="label">AC</label>
-                <select class="input">
+                <select class="input" id="ac">
                     <option value="blanco"> </option>
                     <option value="op1">1</option>
                 </select>
             <p class="sub-subtitle">(1) Si durante el monitoreo la temperatura del producto no cumple con especificacion, se debera dar un golpe de frio al producto y verificar nuevamente la temperatura.</p>
 
             <label class="label">T° VAC</label>
-            <input class="input" type="number" min="0.0" max="8.0" step="0.1">
+            <input class="input" type="number" min="0.0" max="8.0" step="0.1" id="vac">
         </div>
         <div class="botones">
             <form class="form" action="#">
