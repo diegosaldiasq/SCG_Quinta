@@ -26,6 +26,7 @@ urlpatterns = [
     path("recepcion_mpme/", include("recepcion_mpme.urls")),
     path("higiene_y_conducta_personal/", include("higiene_y_conducta_personal.urls")),
     path("control_de_transporte/", include("control_de_transporte.urls")),
-    path("temperatura_despacho_ptjumbo/", include("temperatura_despacho_ptjumbo.urls"))
+    path("temperatura_despacho_ptjumbo/", include("temperatura_despacho_ptjumbo.urls")),
+    path("temperatura_despacho_ptsisa/", include("temperatura_despacho_ptsisa.urls"))
 ]
 
