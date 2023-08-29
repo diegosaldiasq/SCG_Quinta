@@ -37,7 +37,8 @@ LOCAL_APPS = [
     "pcc2_detector_metales.apps.Pcc2DetectorMetalesConfig",
     "recepcion_mpme.apps.RecepcionMpmeConfig",
     "higiene_y_conducta_personal.apps.HigieneYConductaPersonalConfig",
-    "control_de_transporte.apps.ControlDeTransporteConfig"
+    "control_de_transporte.apps.ControlDeTransporteConfig",
+    "temperatura_despacho_ptjumbo.apps.TemperaturaDespachoPtjumboConfig"
 ]
 
 DJANGO_APPS = [
