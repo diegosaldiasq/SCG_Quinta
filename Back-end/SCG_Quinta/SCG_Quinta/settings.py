@@ -39,7 +39,8 @@ LOCAL_APPS = [
     "higiene_y_conducta_personal.apps.HigieneYConductaPersonalConfig",
     "control_de_transporte.apps.ControlDeTransporteConfig",
     "temperatura_despacho_ptjumbo.apps.TemperaturaDespachoPtjumboConfig",
-    "temperatura_despacho_ptsisa.apps.TemperaturaDespachoPtsisaConfig"
+    "temperatura_despacho_ptsisa.apps.TemperaturaDespachoPtsisaConfig",
+    "informe_de_incidentes.apps.InformeDeIncidentesConfig"
 ]
 
 DJANGO_APPS = [
