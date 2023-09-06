@@ -18,13 +18,13 @@
             <h1 class="title">Registro historial termometro R-POE-E-07-01</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
             <label class="label">Nombre tecnologo calidad</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="nombre-tecnologo">
             <label class="label">Fecha</label>
-            <input class="input" type="datetime-local">
+            <input class="input" type="datetime-local" id="fecha-reg">
         </div>
         <div class="login-container">
             <label class="label">Codigo termometro</label>
-            <input type="text" class="input">
+            <input type="text" class="input" id="codigo-termometro">
             <p class="subtitle">Lectura termometro patron °C (X1)</p>
             <form class="form" method="POST"></form>
                 <form class="form" method="POST">
@@ -84,14 +84,14 @@
                 </div>
                 
                 <label class="label">AC</label>
-                <select class="input">
+                <select class="input" id="ac">
                     <option value="blanco"> </option>
                     <option value="op1">1</option>
                 </select>
                 <p class="sub-subtitle">(1) Si durante el monitoreo la temperatura del producto no cumple con especificacion, se debera dar un golpe de frio al producto y verificar nuevamente la temperatura.</p>
 
                 <label class="label">VAC</label>
-                <select class="input">
+                <select class="input" id="vac">
                     <option value="blanco"> </option>
                     <option value="cumple">Cumple</option>
                     <option value="nocumple">No cumple</option>
