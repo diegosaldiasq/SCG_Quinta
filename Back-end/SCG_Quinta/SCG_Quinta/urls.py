@@ -29,6 +29,7 @@ urlpatterns = [
     path("temperatura_despacho_ptjumbo/", include("temperatura_despacho_ptjumbo.urls")),
     path("temperatura_despacho_ptsisa/", include("temperatura_despacho_ptsisa.urls")),
     path("informe_de_incidentes/", include("informe_de_incidentes.urls")),
-    path("historial_termometro/", include("historial_termometro.urls"))
+    path("historial_termometro/", include("historial_termometro.urls")),
+    path("control_material_extraño/", include("control_material_extraño.urls"))
 ]
 

@@ -41,7 +41,8 @@ LOCAL_APPS = [
     "temperatura_despacho_ptjumbo.apps.TemperaturaDespachoPtjumboConfig",
     "temperatura_despacho_ptsisa.apps.TemperaturaDespachoPtsisaConfig",
     "informe_de_incidentes.apps.InformeDeIncidentesConfig",
-    "historial_termometro.apps.HistorialTermometroConfig"
+    "historial_termometro.apps.HistorialTermometroConfig",
+    "control_material_extraño.apps.ControlMaterialExtrañoConfig"
 ]
 
 DJANGO_APPS = [

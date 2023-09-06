@@ -7,3 +7,31 @@ const tipoMaterial = document.querySelector('#tipo-material');
 const accionCorrectiva = document.querySelector('#ac');
 const verificacionAccionCorrectiva = document.querySelector('#vac');
 const observaciones = document.querySelector('#observaciones');
+
+
+$(document).ready(function() {
+    $("#miBoton").click(function() {
+
+        $.ajax({
+            url: "../../Back-end/SCG_Quinta/control_material_extraño/views.py",  // Ruta a tu vista Django
+            method: "POST",
+            data: {
+                nombre_tecnologo: nombreTecnologo,
+                fecha_registro: fechaRegistro,
+                turno: turno,
+                area_material: areaMaterial,
+                tipo_material: tipoMaterial,
+                accion_correctiva: accionCorrectiva,
+                verificacion_accion_correctiva: verificacionAccionCorrectiva,
+                observaciones: observaciones
+            },
+            success: function(response) {
+                // Hacer algo con la respuesta del servidor
+                console.log(response);
+            },
+            error: function() {
+                // Manejar errores
+            }
+        });
+    });
+});
