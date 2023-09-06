@@ -25,21 +25,20 @@ const verificacionAccionCorrectiva = document.getElementById('vac');
 
 
 // funcion para ver promedio de ingreso de termometro de muestra
-const functionOne = function btnOnClick() {
+function btnOnClick() {
     const sumaCantidad1 = (Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5;
     output1.innerText = sumaCantidad1.toFixed(1);
-    return sumaCantidad1;
 }
 
 // funcion para ver promedio de ingreso de termometro patron
-const functionTwo = function btnOnClick2() {
+function btnOnClick2() {
     const sumaCantidad2 = (Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/5;
     output2.innerText = sumaCantidad2.toFixed(1);
     return sumaCantidad2;
 }
 
 // funcion para ver promedio de ambos termometros, factor de correccion y regla
-const functionTree = function btnOnClick3() {
+function btnOnClick3() {
     const promedioCantidad = (((Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5) + ((Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/5))/2;
     output3.innerText = promedioCantidad.toFixed(1);
     const x1 = ((Number(valor1.value) + Number(valor2.value) + Number(valor3.value) + Number(valor4.value) + Number(valor5.value))/5) - ((Number(valor6.value) + Number(valor7.value) + Number(valor8.value) + Number(valor9.value) + Number(valor10.value))/5) + Number(factan.value);
@@ -75,7 +74,7 @@ $(document).ready(function() {
                 valor_3: valor3,
                 valor_4: valor4,
                 valor_5: valor5,
-                promedio_prueba: functionOne,
+                promedio_prueba: outputOne,
                 valor_6: valor6,
                 valor_7: valor7,
                 valor_8: valor8,
