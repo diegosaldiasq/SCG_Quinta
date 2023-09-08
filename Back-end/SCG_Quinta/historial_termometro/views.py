@@ -56,3 +56,6 @@ def historial_termometro(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def vista_historial_termometro(request):
+    return render(request, 'historial_termometro/historial_termometro.html')
