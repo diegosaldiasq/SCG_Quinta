@@ -10,3 +10,4 @@ def vista_selecciones(request):
 def redireccionar_historial_termometro(request):
     url_historial_termometro = reverse('vista_historial_termometro')
     return HttpResponseRedirect(url_historial_termometro)
+

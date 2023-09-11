@@ -32,6 +32,7 @@ urlpatterns = [
     path("historial_termometro/", include("historial_termometro.urls")),
     path("control_material_extraño/", include("control_material_extraño.urls")),
     path("rechazo_mp_in_me/", include("rechazo_mp_in_me.urls")),
-    path("reclamo_a_proveedores/", include("reclamo_a_proveedores.urls"))
+    path("reclamo_a_proveedores/", include("reclamo_a_proveedores.urls")),
+    path("selecciones/", include("selecciones.urls"))
 ]
 

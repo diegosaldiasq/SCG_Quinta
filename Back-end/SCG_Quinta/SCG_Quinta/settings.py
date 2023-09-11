@@ -44,7 +44,8 @@ LOCAL_APPS = [
     "historial_termometro.apps.HistorialTermometroConfig",
     "control_material_extraño.apps.ControlMaterialExtrañoConfig",
     "rechazo_mp_in_me.apps.RechazoMpInMeConfig",
-    "reclamo_a_proveedores.apps.ReclamoAProveedoresConfig"
+    "reclamo_a_proveedores.apps.ReclamoAProveedoresConfig",
+    "selecciones.apps.SeleccionesConfig"
 ]
 
 DJANGO_APPS = [
