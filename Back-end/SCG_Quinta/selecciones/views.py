@@ -11,3 +11,7 @@ def redireccionar_historial_termometro(request):
     url_historial_termometro = reverse('historial_termometro')
     return HttpResponseRedirect(url_historial_termometro)
 
+def redireccionar_inicio(request):
+    url_inicio = reverse('index')
+    return HttpResponseRedirect(url_inicio)
+

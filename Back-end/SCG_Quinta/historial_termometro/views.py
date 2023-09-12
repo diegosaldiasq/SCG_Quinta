@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioHistorialTermometro
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
@@ -60,6 +62,10 @@ def vista_historial_termometro(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+    
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)
 
 
 
