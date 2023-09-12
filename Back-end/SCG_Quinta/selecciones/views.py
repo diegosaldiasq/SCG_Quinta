@@ -8,6 +8,6 @@ def vista_selecciones(request):
     return render(request, 'selecciones/selecciones.html')
 
 def redireccionar_historial_termometro(request):
-    url_historial_termometro = reverse('vista_historial_termometro')
+    url_historial_termometro = reverse('historial_termometro')
     return HttpResponseRedirect(url_historial_termometro)
 

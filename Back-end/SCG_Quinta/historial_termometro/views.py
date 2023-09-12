@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioHistorialTermometro
+from django.http import HttpResponse
 
 # Create your views here.
+
+
 def vista_historial_termometro(request):
-    return render(request, 'historial_termometro/historial_termometro.html')
+    html = render(request, 'historial_termometro.html')
+    return HttpResponse(html)
+
 
 def historial_termometro(request):
     if request.method == 'POST' and request.is_ajax():
@@ -58,4 +63,5 @@ def historial_termometro(request):
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
 
+    return render(request, 'historial_termometro/r_historial_termometro.html')
 
