@@ -5,13 +5,11 @@ from django.http import HttpResponse
 
 # Create your views here.
 
+def historial_termometro(request):
+    return render(request, 'historial_termometro/r_historial_termometro.html')
+
 
 def vista_historial_termometro(request):
-    html = render(request, 'historial_termometro.html')
-    return HttpResponse(html)
-
-
-def historial_termometro(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -63,5 +61,5 @@ def historial_termometro(request):
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
 
-    return render(request, 'historial_termometro/r_historial_termometro.html')
+
 
