@@ -15,7 +15,7 @@
 body {
     margin: 24;
     font-family: 'Quicksand', sans-serif;
-    background-image: url(./images/Fondo.png)
+    background-image: url(./images/Fondo.png);
 }
 .login {
     width: 100%;
