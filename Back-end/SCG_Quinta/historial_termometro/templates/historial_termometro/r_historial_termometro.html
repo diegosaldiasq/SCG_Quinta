@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="./Estilos-CSS/estilos_r_historial_termometro.css">
-    <link rel="icon" href="./Estilos-CSS/logoquinta2.png" />
+    <link rel="stylesheet" type="text/css" href="{% static 'historial_termometro/estilos_r_historial_termometro.css' %}">
+    <link rel="icon" href="{% static 'historial_termometro/images/logoquinta2.png' %}" />
     <title>Registro historial termometro R-POE-E-07-01</title>
 </head>
 <body>
     <div class="login">
-        <img src="./Estilos-CSS/logoquinta.png" alt="logo" class="logo">
+        <img src="{% static 'historial_termometro/images/logoquinta.png' %}" alt="logo" class="logo">
         <div class="login-container">
             <h1 class="title">Registro historial termometro R-POE-E-07-01</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
@@ -111,6 +113,6 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="./Scrips-JS/scrips_r_historial_termometro.js"></script>
+    <script src="{% static 'historial_termometro/scrips_r_historial_termometro.js' %}"></script>
 </body>
 </html>
