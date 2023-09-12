@@ -15,7 +15,7 @@
 body {
     margin: 0;
     font-family: 'Quicksand', sans-serif;
-    background-image: url('./images/Fondo.png');
+    background-image: url(./images/Fondo.png);
 }
 .header-img {
     display: grid;
