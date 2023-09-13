@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="./Estilos-CSS/estilos_r_monitoreo_de_plagas.css">
-    <link rel="icon" href="./Estilos-CSS/logoquinta2.png" />
+    <link rel="stylesheet" type="text/css" href="{% static 'monitoreo_de_plagas/estilos_r_monitoreo_de_plagas.css' %}">
+    <link rel="icon" href="{% static 'monitoreo_de_plagas/images/logoquinta2.png' %}" />
     <title>Monitoreo de plagas P-POES-Q-05-02</title>
 </head>
 <body>
     <div class="login">
-        <img src="./Estilos-CSS/logoquinta.png" alt="logo" class="logo">
+        <img src="{% static 'monitoreo_de_plagas/images/logoquinta.png' %}" alt="logo" class="logo">
         <div class="login-container">
             <h1 class="title">Control de plagas P-POES-Q-05-02</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
@@ -93,6 +95,6 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="./Scrips-JS/scrip_r_monitoreo_de_plagas.js"></script>
+    <script src="{% static 'monitoreo_de_plagas/scrip_r_monitoreo_de_plagas.js' %}"></script>
 </body>
 </html>

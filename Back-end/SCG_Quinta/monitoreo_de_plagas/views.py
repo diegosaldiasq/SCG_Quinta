@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioMonitoreoDePlagas
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
 def monitoreo_de_plagas(request):
+    return render(request, 'monitoreo_de_plagas/r_monitoreo_de_plagas.html')
+
+def vista_monitoreo_de_plagas(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')

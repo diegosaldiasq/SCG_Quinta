@@ -19,3 +19,7 @@ def redireccionar_monitoreo_del_agua(request):
     url_monitoreo_del_agua = reverse('monitoreo_del_agua')
     return HttpResponseRedirect(url_monitoreo_del_agua)
 
+def redireccionar_monitoreo_de_plagas(request):
+    url_monitoreo_de_plagas = reverse('monitoreo_de_plagas')
+    return HttpResponseRedirect(url_monitoreo_de_plagas)
+
