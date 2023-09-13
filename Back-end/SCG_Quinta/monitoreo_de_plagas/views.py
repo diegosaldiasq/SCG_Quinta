@@ -34,3 +34,7 @@ def vista_monitoreo_de_plagas(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)

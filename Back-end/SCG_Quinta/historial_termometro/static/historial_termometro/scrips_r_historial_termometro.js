@@ -68,7 +68,7 @@ $(document).ready(function() {
     $("#miBoton").click(function() {
 
         $.ajax({
-            url: "../../Back-end/SCG_Quinta/...[].../views.py",  // Ruta a tu vista Django
+            url: "historial_termometro",  // Ruta a tu vista Django
             method: "POST",
             data: {
                 nombre_tecnologo: nombreTecnologo,
