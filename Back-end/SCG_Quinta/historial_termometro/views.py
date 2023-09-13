@@ -8,7 +8,6 @@ from django.urls import reverse
 # Create your views here.
 
 def historial_termometro(request):
-    vista_historial_termometro(request)
     return render(request, 'historial_termometro/r_historial_termometro.html')
 
 

@@ -68,7 +68,7 @@ $(document).ready(function() {
     $("#miBoton").click(function() {
 
         $.ajax({
-            url: "historial_termometro",  // Ruta a tu vista Django
+            url: "vista_historial_termometro",  // Ruta a tu vista Django
             method: "POST",
             data: {
                 nombre_tecnologo: nombreTecnologo,
