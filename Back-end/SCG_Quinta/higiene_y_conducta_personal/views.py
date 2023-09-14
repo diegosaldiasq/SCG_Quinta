@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioHigieneConductaPersonal
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
 def higiene_y_conducta_personal(request):
+    return render(request, 'higiene_y_conducta_personal/r_higuiene_y_conducta_personal.html')
+
+def vista_higiene_y_conducta_personal(request):
     if request.method == 'POST' and request.is_ajax():
         fecha_ingreso = request.POST.get('fecha_ingreso')
         nombre_personal = request.POST.get('nombre_personal')
@@ -34,3 +39,7 @@ def higiene_y_conducta_personal(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)

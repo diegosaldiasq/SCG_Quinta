@@ -23,3 +23,7 @@ def redireccionar_monitoreo_de_plagas(request):
     url_monitoreo_de_plagas = reverse('monitoreo_de_plagas')
     return HttpResponseRedirect(url_monitoreo_de_plagas)
 
+def redireccionar_higiene_y_conducta_personal(request):
+    url_higiene_y_conducta_personal = reverse('higiene_y_conducta_personal')
+    return HttpResponseRedirect(url_higiene_y_conducta_personal)
+
