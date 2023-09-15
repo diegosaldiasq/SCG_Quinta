@@ -38,3 +38,7 @@ def redireccionar_ppc2_detector_metales(request):
 def redireccionar_control_de_transporte(request):
     url_control_de_transporte = reverse('control_de_transporte')
     return HttpResponseRedirect(url_control_de_transporte)
+
+def redireccionar_temperatura_despacho_ptjumbo(request):
+    url_temperatura_despacho_ptjumbo = reverse('temperatura_despacho_ptjumbo')
+    return HttpResponseRedirect(url_temperatura_despacho_ptjumbo)
