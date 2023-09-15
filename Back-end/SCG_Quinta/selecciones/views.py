@@ -34,3 +34,7 @@ def redireccionar_recepcion_mpme(request):
 def redireccionar_ppc2_detector_metales(request):
     url_pcc2_detector_metales = reverse('pcc2_detector_metales')
     return HttpResponseRedirect(url_pcc2_detector_metales)
+
+def redireccionar_control_de_transporte(request):
+    url_control_de_transporte = reverse('control_de_transporte')
+    return HttpResponseRedirect(url_control_de_transporte)

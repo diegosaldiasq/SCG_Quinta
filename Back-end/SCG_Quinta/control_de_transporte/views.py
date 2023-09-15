@@ -1,11 +1,16 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioControlDeTransporte
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
-
 def control_de_transporte(request):
+    return render(request, 'control_de_transporte/r_control_de_transporte.html')
+
+
+def vista_control_de_transporte(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -33,3 +38,7 @@ def control_de_transporte(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)
