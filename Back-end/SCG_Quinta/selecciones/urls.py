@@ -8,6 +8,7 @@ urlpatterns = [
     path("historial_termometro/", views.redireccionar_historial_termometro, name='redireccionar_historial_termometro'),
     path("inicio/", views.redireccionar_inicio, name="redireccionar_inicio"),
     path("monitoreo_de_plagas/", views.redireccionar_monitoreo_de_plagas, name="redireccionar_monitoreo_de_plagas"),
-    path("higiene_y_conducta_personal/", views.redireccionar_higiene_y_conducta_personal, name="redireccionar_higiene_y_conducta_personal")
+    path("higiene_y_conducta_personal/", views.redireccionar_higiene_y_conducta_personal, name="redireccionar_higiene_y_conducta_personal"),
+    path("recepcion_mpme/", views.redireccionar_recepcion_mpme, name="redireccionar_recepcion_mpme")
 ]
 

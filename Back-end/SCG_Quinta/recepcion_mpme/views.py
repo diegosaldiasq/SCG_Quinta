@@ -1,11 +1,16 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioRecepcionMpMe
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 # Create your views here.
 
 def recepcion_mpme(request):
+    return render(request, 'recepcion_mpme/r_recepcion_mpme.html')
+
+def vista_recepcion_mpme(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         lote_dia = request.POST.get('lote_dia')
@@ -56,3 +61,7 @@ def recepcion_mpme(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)

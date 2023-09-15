@@ -27,3 +27,6 @@ def redireccionar_higiene_y_conducta_personal(request):
     url_higiene_y_conducta_personal = reverse('higiene_y_conducta_personal')
     return HttpResponseRedirect(url_higiene_y_conducta_personal)
 
+def redireccionar_recepcion_mpme(request):
+    url_repecion_mpme = reverse('recepcion_mpme')
+    return HttpResponseRedirect(url_repecion_mpme)
