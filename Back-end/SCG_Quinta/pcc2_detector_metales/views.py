@@ -1,10 +1,16 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioPcc2DetectorMetales
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
 def pcc2_detector_metales(request):
+    return render(request, 'pcc2_detector_metales/r_pcc2_detector_metales.html')
+
+
+def vista_pcc2_detector_metales(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -30,3 +36,7 @@ def pcc2_detector_metales(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)

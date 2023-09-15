@@ -30,3 +30,7 @@ def redireccionar_higiene_y_conducta_personal(request):
 def redireccionar_recepcion_mpme(request):
     url_repecion_mpme = reverse('recepcion_mpme')
     return HttpResponseRedirect(url_repecion_mpme)
+
+def redireccionar_ppc2_detector_metales(request):
+    url_pcc2_detector_metales = reverse('pcc2_detector_metales')
+    return HttpResponseRedirect(url_pcc2_detector_metales)
