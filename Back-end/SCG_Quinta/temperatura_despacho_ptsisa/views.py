@@ -1,11 +1,16 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioTemperaturaDespachoSisa
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
-
 def temperatura_despacho_ptsisa(request):
+    return render(request, 'temperatura_despacho_ptsisa/r_temperatura_despacho_ptsisa.html')
+
+
+def vista_temperatura_despacho_ptsisa(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -38,3 +43,7 @@ def temperatura_despacho_ptsisa(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)

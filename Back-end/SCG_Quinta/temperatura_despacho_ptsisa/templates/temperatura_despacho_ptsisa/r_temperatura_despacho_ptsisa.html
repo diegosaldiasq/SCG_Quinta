@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="./Estilos-CSS/estilos_r_temperatura_despacho_ptsisa.css">
-    <link rel="icon" href="./Estilos-CSS/logoquinta2.png" />
+    <link rel="stylesheet" type="text/css" href="{% static 'temperatura_despacho_ptsisa/estilos_r_temperatura_despacho_ptsisa.css' %}">
+    <link rel="icon" href="{% static 'temperatura_despacho_ptsisa/images/logoquinta2.png' %}" />
     <title>Registro temperatura despacho PT SISA R-POE-E-05-02</title>
 </head>
 <body>
     <div class="login">
-        <img src="./Estilos-CSS/logoquinta.png" alt="logo" class="logo">
+        <img src="{% static 'temperatura_despacho_ptsisa/images/logoquinta.png' %}" alt="logo" class="logo">
         <div class="login-container">
             <h1 class="title">Registro temperatura despacho PT SISA R-POE-E-05-02</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
@@ -119,12 +121,12 @@
             <form class="form" action="#">
                 <button class="primary-button login-button">Grabar y salir</button>
             </form>
-            <form class="form" action="./selecciones.html">
+            <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
             </form>
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="./Scrips-JS/scrip_r_temperatura_despacho_ptsisa.js"></script>
+    <script src="{% static 'temperatura_despacho_ptsisa/scrip_r_temperatura_despacho_ptsisa.js' %}"></script>
 </body>
 </html>

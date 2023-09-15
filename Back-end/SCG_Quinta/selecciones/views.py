@@ -42,3 +42,7 @@ def redireccionar_control_de_transporte(request):
 def redireccionar_temperatura_despacho_ptjumbo(request):
     url_temperatura_despacho_ptjumbo = reverse('temperatura_despacho_ptjumbo')
     return HttpResponseRedirect(url_temperatura_despacho_ptjumbo)
+
+def redireccionar_temperatura_despacho_ptsisa(request):
+    url_temperatura_despacho_ptsisa = reverse('temperatura_despacho_ptsisa')
+    return HttpResponseRedirect(url_temperatura_despacho_ptsisa)
