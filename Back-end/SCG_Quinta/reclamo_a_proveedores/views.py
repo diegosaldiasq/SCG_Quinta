@@ -1,10 +1,16 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioReclamoProveedores
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
 def reclamo_a_proveedores(request):
+    return render(request, 'reclamo_a_proveedores/r_informe_reclamo_a_proveedores.html')
+
+
+def vista_reclamo_a_proveedores(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -39,3 +45,7 @@ def reclamo_a_proveedores(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)
