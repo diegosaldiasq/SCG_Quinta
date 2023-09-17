@@ -54,3 +54,7 @@ def redireccionar_reclamo_a_proveedores(request):
 def redireccionar_rechazo_mp_in_me(request):
     url_rechazo_mp_in_me = reverse('rechazo_mp_in_me')
     return HttpResponseRedirect(url_rechazo_mp_in_me)
+
+def redireccionar_informe_de_incidentes(request):
+    url_informe_de_incidentes = reverse('informe_de_incidentes')
+    return HttpResponseRedirect(url_informe_de_incidentes)

@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="./Estilos-CSS/estilos_r_informe_de_incidentes.css">
-    <link rel="icon" href="./Estilos-CSS/logoquinta2.png" />
+    <link rel="stylesheet" type="text/css" href="{% static 'informe_de_incidentes/estilos_r_informe_de_incidentes.css' %}">
+    <link rel="icon" href="{% static 'informe_de_incidentes/images/logoquinta2.png' %}" />
     <title>Informe de incidentes R-POE-Q-15-01</title>
 </head>
 <body>
     <div class="login">
-        <img src="./Estilos-CSS/logoquinta.png" alt="logo" class="logo">
+        <img src="{% static 'informe_de_incidentes/images/logoquinta.png' %}" alt="logo" class="logo">
         <div class="login-container">
             <h1 class="title">Informe de incidentes R-POE-Q-15-01</h1>
             <p class="subtitle">Solo ingresar una vez datos de quien registra</p>
@@ -53,12 +55,12 @@
             <form class="form" action="#">
                 <button class="primary-button login-button">Grabar y salir</button>
             </form>
-            <form class="form" action="./selecciones.html">
+            <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
             </form>
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="./Scrips-JS/scrip_r_informe_de_incidentes.js"></script>
+    <script src="{% static 'informe_de_incidentes/scrip_r_informe_de_incidentes.js' %}"></script>
 </body>
 </html>

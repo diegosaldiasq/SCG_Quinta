@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioInformeDeIncidentes
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
 def informe_de_incidentes(request):
+    return render(request, 'informe_de_incidentes/r_informe_de_incidentes.html')
+
+def vista_informe_de_incidentes(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -31,3 +36,7 @@ def informe_de_incidentes(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)
