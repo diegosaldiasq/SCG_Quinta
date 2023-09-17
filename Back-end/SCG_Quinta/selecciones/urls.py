@@ -14,6 +14,7 @@ urlpatterns = [
     path("control_de_transporte/", views.redireccionar_control_de_transporte, name="redireccionar_control_de_transporte"),
     path("temperatura_despacho_ptjumbo/", views.redireccionar_temperatura_despacho_ptjumbo, name="redireccionar_temperatura_despacho_ptjumbo"),
     path("temperatura_despacho_ptsisa/", views.redireccionar_temperatura_despacho_ptsisa, name="redireccionar_temperatura_despacho_ptsisa"),
-    path("reclamo_a_proveedores/", views.redireccionar_reclamo_a_proveedores, name="redireccionar_reclamo_a_proveedores")
+    path("reclamo_a_proveedores/", views.redireccionar_reclamo_a_proveedores, name="redireccionar_reclamo_a_proveedores"),
+    path("rechazo_mp_in_me/", views.redireccionar_rechazo_mp_in_me, name="redireccionar_rechazo_mp_in_me")
 ]
 

@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioRechazoMpInMe
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
 def rechazo_mp_in_me(request):
+    return render(request, 'rechazo_mp_in_me/r_informe_rechazo_mp_in_me.html')
+
+def vista_rechazo_mp_in_me(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -39,3 +44,7 @@ def rechazo_mp_in_me(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)

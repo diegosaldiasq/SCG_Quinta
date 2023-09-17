@@ -50,3 +50,7 @@ def redireccionar_temperatura_despacho_ptsisa(request):
 def redireccionar_reclamo_a_proveedores(request):
     url_reclamo_a_proveedores = reverse('reclamo_a_proveedores')
     return HttpResponseRedirect(url_reclamo_a_proveedores)
+
+def redireccionar_rechazo_mp_in_me(request):
+    url_rechazo_mp_in_me = reverse('rechazo_mp_in_me')
+    return HttpResponseRedirect(url_rechazo_mp_in_me)
