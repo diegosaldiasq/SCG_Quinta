@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioControlMaterialExtraño
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Create your views here.
 
 def control_material_extraño(request):
+    return render(request, 'control_material_extraño/r_control_material_extraño.html')
+
+def vista_control_material_extraño(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = request.POST.get('fecha_registro')
@@ -29,3 +34,7 @@ def control_material_extraño(request):
         datos.save()
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+
+def redireccionar_selecciones(request):
+    url_selecciones = reverse('vista_selecciones')
+    return HttpResponseRedirect(url_selecciones)

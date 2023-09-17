@@ -58,3 +58,7 @@ def redireccionar_rechazo_mp_in_me(request):
 def redireccionar_informe_de_incidentes(request):
     url_informe_de_incidentes = reverse('informe_de_incidentes')
     return HttpResponseRedirect(url_informe_de_incidentes)
+
+def redireccionar_control_material_extraño(request):
+    url_control_material_extraño = reverse('control_material_extraño')
+    return HttpResponseRedirect(url_control_material_extraño)
