@@ -63,12 +63,34 @@ function btnOnClick3() {
     return informacionFunction = informacion;
 }
 
+
 // envio de datos a django
 $(document).ready(function() {
     $("#miBoton").click(function() {
+        var nombreTecnologo = $("#nombre-tecnologo").val();
+        var fechaRegistro = $("#fecha-reg").val();
+        var codigoTermometro = $("#codigo-termometro").val();
+        var valor1 = $("#valor1").val();
+        var valor2 = $("#valor2").val();
+        var valor3 = $("#valor3").val();
+        var valor4 = $("#valor4").val();
+        var valor5 = $("#valor5").val();
+        var output1 = $("#outputx1").val();
+        var valor6 = $("#valor6").val();
+        var valor7 = $("#valor7").val();
+        var valor8 = $("#valor8").val();
+        var valor9 = $("#valor9").val();
+        var valor10 = $("#valor10").val();
+        var output2 = $("#outputx2").val();
+        var factan = $("#factan").val();
+        var output3 = $("#outputx3").val();
+        var output4 = $("#outputx4").val();
+        var regla = $("#regla").val();
+        var accionCorrectiva = $("#ac").val();
+        var verificacionAccionCorrectiva = $("#vac").val();
 
         $.ajax({
-            url: "historial_termometro/vista_historial_termometro",  // Ruta a tu vista Django
+            url: "/historial_termometro/vista-historial-termometro/",  // Ruta a tu vista Django
             method: "POST",
             data: {
                 nombre_tecnologo: nombreTecnologo,
@@ -87,15 +109,16 @@ $(document).ready(function() {
                 valor_10: valor10,
                 promedio_patron: output2,
                 factor_anual: factan,
-                promedio_termometros: informacionFunction.promedioCantidad,
-                nivel_aceptacion: informacionFunction.x1,
-                cumplimiento: informacionFunction.regla,
+                promedio_termometros: output3,
+                nivel_aceptacion: output4,
+                cumplimiento: regla,
                 accion_correctiva: accionCorrectiva,
                 verificacion_accion_correctiva: verificacionAccionCorrectiva
             },
             success: function(response) {
                 // Hacer algo con la respuesta del servidor
                 console.log(response);
+                $("#mensaje").text(response.mensaje);
             },
             error: function() {
                 // Manejar errores
