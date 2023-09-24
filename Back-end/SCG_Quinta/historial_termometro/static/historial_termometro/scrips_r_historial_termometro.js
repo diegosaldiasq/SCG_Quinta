@@ -1,27 +1,27 @@
-const nombreTecnologo = document.getElementById('nombre-tecnologo');
-const fechaRegistro = document.getElementById('fecha-reg');
+var nombreTecnologo = document.getElementById('nombre-tecnologo');
+var fechaRegistro = document.getElementById('fecha-reg');
 
-const codigoTermometro = document.getElementById('codigo-termometro');
-const valor1 = document.getElementById('valor1');
-const valor2 = document.getElementById('valor2');
-const valor3 = document.getElementById('valor3');
-const valor4 = document.getElementById('valor4');
-const valor5 = document.getElementById('valor5');
+var codigoTermometro = document.getElementById('codigo-termometro');
+var valor1 = document.getElementById('valor1');
+var valor2 = document.getElementById('valor2');
+var valor3 = document.getElementById('valor3');
+var valor4 = document.getElementById('valor4');
+var valor5 = document.getElementById('valor5');
 var output1 = document.getElementById('outputx1');
 
-const valor6 = document.getElementById('valor6');
-const valor7 = document.getElementById('valor7');
-const valor8 = document.getElementById('valor8');
-const valor9 = document.getElementById('valor9');
-const valor10 = document.getElementById('valor10');
+var valor6 = document.getElementById('valor6');
+var valor7 = document.getElementById('valor7');
+var valor8 = document.getElementById('valor8');
+var valor9 = document.getElementById('valor9');
+var valor10 = document.getElementById('valor10');
 var output2 = document.getElementById('outputx2');
 
-const factan = document.getElementById('factan');
-const output3 = document.getElementById('outputx3');
-const output4 = document.getElementById('outputx4');
-const regla = document.getElementById('regla');
-const accionCorrectiva = document.getElementById('ac');
-const verificacionAccionCorrectiva = document.getElementById('vac');
+var factan = document.getElementById('factan');
+var output3 = document.getElementById('outputx3');
+var output4 = document.getElementById('outputx4');
+var regla = document.getElementById('regla');
+var accionCorrectiva = document.getElementById('ac');
+var verificacionAccionCorrectiva = document.getElementById('vac');
 
 
 // funcion para ver promedio de ingreso de termometro de muestra
@@ -65,6 +65,16 @@ function btnOnClick3() {
 
 
 // envio de datos a django
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
 $(document).ready(function() {
     $("#miBoton").click(function() {
         var nombreTecnologo = $("#nombre-tecnologo").val();
@@ -90,7 +100,7 @@ $(document).ready(function() {
         var verificacionAccionCorrectiva = $("#vac").val();
 
         $.ajax({
-            url: "/historial_termometro/vista-historial-termometro/",  // Ruta a tu vista Django
+            url: "/historial_termometro/vista_historial_termometro/",  // Ruta a tu vista Django
             method: "POST",
             data: {
                 nombre_tecnologo: nombreTecnologo,
@@ -120,8 +130,9 @@ $(document).ready(function() {
                 console.log(response);
                 $("#mensaje").text(response.mensaje);
             },
-            error: function() {
+            error: function(textStatus, errorThrown) {
                 // Manejar errores
+                console.error("Error en la solicitud AJAX:", textStatus, errorThrown);
             }
         });
     });

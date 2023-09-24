@@ -4,6 +4,8 @@ from .models import DatosFormularioHistorialTermometro
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -12,16 +14,16 @@ def historial_termometro(request):
 
 
 def vista_historial_termometro(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        #fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%d %H:%M'), timezone=timezone.utc)
         codigo_termometro = request.POST.get('codigo_termometro')
         valor_1 = request.POST.get('valor_1')
         valor_2 = request.POST.get('valor_2')
         valor_3 = request.POST.get('valor_3')
         valor_4 = request.POST.get('valor_4')
         valor_5 = request.POST.get('valor_5')
-        promedio_prueba = request.get('promedio_prueba')
+        promedio_prueba = request.POST.get('promedio_prueba')
         valor_6 = request.POST.get('valor_6')
         valor_7 = request.POST.get('valor_7')
         valor_8 = request.POST.get('valor_8')
@@ -38,7 +40,7 @@ def vista_historial_termometro(request):
 
         datos = DatosFormularioHistorialTermometro(
             nombre_tecnologo=nombre_tecnologo, 
-            fecha_registro=fecha_registro,
+            #fecha_registro=fecha_registro,
             codigo_termometro=codigo_termometro,
             valor_1=valor_1,
             valor_2=valor_2,

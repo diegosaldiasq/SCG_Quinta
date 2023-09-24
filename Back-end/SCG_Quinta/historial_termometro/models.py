@@ -22,7 +22,7 @@ class DatosFormularioHistorialTermometro(models.Model):
     promedio_termometros = models.FloatField()
     nivel_aceptacion = models.FloatField()
     cumplimiento = models.TextField()
-    accion_correctiva = models.IntegerField()
+    accion_correctiva = models.TextField()
     verificacion_accion_correctiva = models.TextField()
 
     def __str__(self):
