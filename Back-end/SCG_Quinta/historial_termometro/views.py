@@ -16,7 +16,8 @@ def historial_termometro(request):
 def vista_historial_termometro(request):
     if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        #fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%d %H:%M'), timezone=timezone.utc)
+        fech_reg = datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M')
+        fecha_registro = timezone.make_aware(fech_reg, timezone=timezone.utc)
         codigo_termometro = request.POST.get('codigo_termometro')
         valor_1 = request.POST.get('valor_1')
         valor_2 = request.POST.get('valor_2')
@@ -40,7 +41,7 @@ def vista_historial_termometro(request):
 
         datos = DatosFormularioHistorialTermometro(
             nombre_tecnologo=nombre_tecnologo, 
-            #fecha_registro=fecha_registro,
+            fecha_registro=fecha_registro,
             codigo_termometro=codigo_termometro,
             valor_1=valor_1,
             valor_2=valor_2,
