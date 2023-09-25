@@ -95,7 +95,7 @@ $(document).ready(function() {
         var factan = $("#factan").val();
         var output3 = $("#outputx3").val();
         var output4 = $("#outputx4").val();
-        var regla = $("#regla").val();
+        var regla = informacionFunction.regla;
         var accionCorrectiva = $("#ac").val();
         var verificacionAccionCorrectiva = $("#vac").val();
 
