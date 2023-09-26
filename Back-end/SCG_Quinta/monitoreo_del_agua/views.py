@@ -13,7 +13,7 @@ def monitoreo_del_agua(request):
     return render(request, 'monitoreo_del_agua/r_monitoreo_del_agua.html')
 
 def vista_monitoreo_del_agua(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         turno_mda = request.POST.get('turno_mda')

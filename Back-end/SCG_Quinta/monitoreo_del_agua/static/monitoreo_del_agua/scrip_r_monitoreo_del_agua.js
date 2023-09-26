@@ -1,17 +1,21 @@
-var nombreTecnologo = document.querySelector('#nombre-tecnologo');
-var fechaRegistro = document.querySelector('#fecha-reg');
+var nombreTecnologo = document.getElementById('nombre-tecnologo');
+var fechaRegistro = document.getElementById('fecha-reg');
 
-var turno = document.querySelector('#turno');
-var planta = document.querySelector('#planta');
-var numeroLlave = document.querySelector('#numero-llave');
-var puntoMuestreo = document.querySelector('#punto-muestreo');
-var saborInsipido = document.querySelector('#sabor-insipido');
-var olorInodora = document.querySelector('#olor-inodora');
-var colorIcoloro = document.querySelector('#color-incoloro');
-var ph = document.querySelector('#ph');
-var cloroLibre = document.querySelector('#cloro-libre');
-var accionCorrectiva = document.querySelector('#ac');
-var resultadoAc = document.querySelector('#resultado-ac');
+var turno = document.getElementById('turno');
+var planta = document.getElementById('planta');
+var numeroLlave = document.getElementById('numero-llave');
+var puntoMuestreo = document.getElementById('punto-muestreo');
+var saborInsipido = document.getElementById('sabor-insipido');
+var olorInodora = document.getElementById('olor-inodora');
+var colorIcoloro = document.getElementById('color-incoloro');
+var ph = document.getElementById('ph');
+var cloroLibre = document.getElementById('cloro-libre');
+var accionCorrectiva = document.getElementById('ac');
+var resultadoAc = document.getElementById('resultado-ac');
+
+function btnOnClick() {
+    return "hello";
+}
 
 // Envio de datos a Django
 
