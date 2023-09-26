@@ -18,7 +18,7 @@
         <img src="{% static 'higiene_y_conducta_personal/images/logoquinta.png' %}" alt="logo" class="logo">
         <div class="login-container">
             <h1 class="title">Registo higiene y conducta personal P-POES-Q-02-01</h1>
-            <form class="ingreso" action="#">
+            <form class="ingreso" method="POST">
                 <label class="label">Fecha</label>
                 <input class="input" type="datetime-local" id="fecha-ingreso">
  
@@ -28,100 +28,100 @@
                 <label class="label">Turno</label>
                 <select class="input" name="turno" id="turno">
                     <option value="blanco"> </option>
-                    <option value="turnoa">A</option>
-                    <option value="turnob">B</option>
-                    <option value="turnoc">C</option>
+                    <option value="Turno A">A</option>
+                    <option value="Turno B">B</option>
+                    <option value="Turno C">C</option>
                 </select>
       
                 <label class="label">Planta</label>
                 <select class="input" name="planta" id="planta">
                     <option value="blanco"> </option>
                     <option value="pv">Puerto vespucio</option>
-                    <option value="en">ENEA</option>
-                    <option value="cu">Curico</option>
+                    <option value="enea">ENEA</option>
+                    <option value="curico">Curico</option>
                 </select>
     
                 <label class="label">Area</label>
                 <select class="input" name="area" id="area">
                     <option value="blanco"> </option>
-                    <option value="bmp">B.M.P.</option>
-                    <option value="cremas">Cremas</option>
-                    <option value="dosificado">Dosificado</option>
-                    <option value="prelisto">Prelisto</option>
-                    <option value="decorado">Decorado</option>
-                    <option value="jefes">Jefes</option>
-                    <option value="bpt">B.P.T.</option>
-                    <option value="area-pqq">Area panqueques</option>
-                    <option value="mantencion">Mantencion</option>
-                    <option value="sap">SAP</option>
-                    <option value="aseo">Aseo</option>
-                    <option value="kyt">Kuchen y tartaleta</option>
-                    <option value="masasdulces">Masas dulces</option>
-                    <option value="envasadopt">Envasado de PT</option>
-                    <option value="masas">Masas</option>
-                    <option value="batidos">Batidos</option>
-                    <option value="pasteleria">Pasteleria</option>
-                    <option value="envasadoinsumos">Envasado de insumos</option>
-                    <option value="hornodesmolde">Horno y/o desmolde</option>
-                    <option value="supervisor">Supervisor</option>
-                    <option value="desarrollo">Desarrollo</option>
-                    <option value="operarios">Operarios</option>
+                    <option value="B.M.P">B.M.P.</option>
+                    <option value="Cremas">Cremas</option>
+                    <option value="Dosificado">Dosificado</option>
+                    <option value="Prelisto">Prelisto</option>
+                    <option value="Decorado">Decorado</option>
+                    <option value="Jefes">Jefes</option>
+                    <option value="B.P.T.">B.P.T.</option>
+                    <option value="Area panqueque">Area panqueques</option>
+                    <option value="Mantencion">Mantencion</option>
+                    <option value="SAP">SAP</option>
+                    <option value="Aseo">Aseo</option>
+                    <option value="Kucehn y tartaleta">Kuchen y tartaleta</option>
+                    <option value="Masas dulces">Masas dulces</option>
+                    <option value="Envasado pt">Envasado de PT</option>
+                    <option value="Masas">Masas</option>
+                    <option value="Batidos">Batidos</option>
+                    <option value="Pasteleria">Pasteleria</option>
+                    <option value="Envasado insumos">Envasado de insumos</option>
+                    <option value="Horno y/o desmolde">Horno y/o desmolde</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Desarrollo">Desarrollo</option>
+                    <option value="Operarios">Operarios</option>
                 </select>
   
                 <label class="label">Cumplimiento</label>
                 <select class="input" name="cumplimiento" id="cumpl">
                     <option value="blanco"> </option>
-                    <option value="cumple">Cumple</option>
-                    <option value="nocumple">No cumple</option>
-                    <option value="noaplica">No aplica</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="No cumple">No cumple</option>
+                    <option value="No aplica">No aplica</option>
                 </select>
       
                 <label class="label">Desviacion</label>
                 <select class="input" name="desviacion" id="desv">
                     <option value="blanco"> </option>
-                    <option value="uñaslargas">Uñas largas, sucias y/o esmalte</option>
-                    <option value="uniformesucio">Uniforme sucio</option>
-                    <option value="zapatosucio">Zapatos sucios</option>
-                    <option value="mascarillasucia">Mascarilla sucia/sin mascarilla</option>
-                    <option value="accesoriosprohibidos">Uso de accesorios prohibidos</option>
-                    <option value="sinafeitar">Sin afeitar</option>
-                    <option value="maquillaje">Maquillaje</option>
-                    <option value="peloafuera">Pelo afuera</option>
-                    <option value="comeplanta">Come en planta</option>
-                    <option value="uniformeincompleto">Uniforme incompleto</option>
-                    <option value="estadosalud">No cumple con estado de salud optimo</option>
-                    <option value="estadolentes">Estado defectuoso lentes</option>
-                    <option value="presentaherida">Presenta una herida</option>
-                    <option value="usopestañas">Uso pestañas postisas</option>
-                    <option value="lavadomanos">Accede a planta sin realizar lavado de manos en filtro sanitario</option>
+                    <option value="Uñas largas">Uñas largas, sucias y/o esmalte</option>
+                    <option value="Uniforme sucio">Uniforme sucio</option>
+                    <option value="Zapato sucio">Zapatos sucios</option>
+                    <option value="Mascarilla sucia">Mascarilla sucia/sin mascarilla</option>
+                    <option value="Accesorios prohibidos">Uso de accesorios prohibidos</option>
+                    <option value="Sin afeitar">Sin afeitar</option>
+                    <option value="Maquillaje">Maquillaje</option>
+                    <option value="Pelo afuera">Pelo afuera</option>
+                    <option value="Come en planta">Come en planta</option>
+                    <option value="Uniforme incompleto">Uniforme incompleto</option>
+                    <option value="Estado salud">No cumple con estado de salud optimo</option>
+                    <option value="Estado lentes">Estado defectuoso lentes</option>
+                    <option value="Presenta herida">Presenta una herida</option>
+                    <option value="Uso pestañas">Uso pestañas postisas</option>
+                    <option value="Lavado manos">Accede a planta sin realizar lavado de manos en filtro sanitario</option>
                 </select>
         
                 <label class="label">AC</label>
                 <select class="input" name="ac" id="ac">
                     <option value="blanco"> </option>
-                    <option value="cortarquitarlimpiar">Cortar, limpiar y/o quitar esmalte</option>
-                    <option value="limparlavar">Limpiar y/o lavar uniforme</option>
-                    <option value="enviarlimpiar">Enviar a limpiar</option>
-                    <option value="reemplazarmascarilla">Reemplazar mascarilla</option>
-                    <option value="quitaraccesorios">Quitar accesorios</option>
-                    <option value="afeitar">Afeitar</option>
-                    <option value="desmaquillar">Desmaquillar</option>
-                    <option value="arreglarpelo">Arreglar pelo</option>
-                    <option value="capacitacion">Capacitacion</option>
-                    <option value="reponeruniforme">Reponer uniforme con RRHH</option>
-                    <option value="asignararea">Asignar a un area donde no tenga contanto directo con alimentos</option>
-                    <option value="cambiolentes">Solicitar cambio de lentes</option>
-                    <option value="parchecurita">Se entrega parche curita y guantes</option>
-                    <option value="quitarpestañas">Quitar pestañas postizas</option>
-                    <option value="realizarlavadomanos">Realizar lavado de manos en filtro sanitario</option>
+                    <option value="Cortar, quitar y/o limpiar esmalte">Cortar, limpiar y/o quitar esmalte</option>
+                    <option value="Limpar lavar uniforme">Limpiar y/o lavar uniforme</option>
+                    <option value="Enviar a limpiar">Enviar a limpiar</option>
+                    <option value="Reemplazar mascarilla">Reemplazar mascarilla</option>
+                    <option value="Quitar accesorios">Quitar accesorios</option>
+                    <option value="Afeitar">Afeitar</option>
+                    <option value="Desmaquillar">Desmaquillar</option>
+                    <option value="Arreglar pelo">Arreglar pelo</option>
+                    <option value="Capacitacion">Capacitacion</option>
+                    <option value="Reponer uniforme">Reponer uniforme con RRHH</option>
+                    <option value="Asignar area">Asignar a un area donde no tenga contanto directo con alimentos</option>
+                    <option value="Cambio lentes">Solicitar cambio de lentes</option>
+                    <option value="Entrega parche curita">Se entrega parche curita y guantes</option>
+                    <option value="Quitar pestañas">Quitar pestañas postizas</option>
+                    <option value="Realizar lavado manos">Realizar lavado de manos en filtro sanitario</option>
                 </select>
         
                 <label class="label">VAC</label>
                 <select class="input" name="vac" id="vac">
                     <option value="blanco"> </option>
-                    <option value="cumple">Cumple</option>
-                    <option value="nocumple">No cumple</option>
-                    <option value="noaplica">No aplica</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="No cumple">No cumple</option>
+                    <option value="No aplica">No aplica</option>
                 </select>
         
                 <label class="label">Observacion</label>
@@ -132,11 +132,8 @@
             </form>
         </div>
         <div class="botones">
-            <form class="form" action="#">
+            <form class="form">
                 <button class="secundary-button login-button2" id="miBoton">Grabar y continuar</button>
-            </form>
-            <form class="form" action="#">
-                <button class="secundary-button login-button2">Grabar y salir</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="secundary-button login-button2">Salir</button>
@@ -144,6 +141,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'higiene_y_conducta_personal/scrip_r_higiene_y_conducta_personal.js' %}"></script>
 </body>
 </html>
