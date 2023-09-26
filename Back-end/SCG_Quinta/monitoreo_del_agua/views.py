@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioMonitoreoDelAgua
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 
 # Create your views here.
@@ -13,7 +15,7 @@ def monitoreo_del_agua(request):
 def vista_monitoreo_del_agua(request):
     if request.method == 'POST' and request.is_ajax():
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         turno_mda = request.POST.get('turno_mda')
         planta_mda = request.POST.get('planta_mda')
         numero_llave = request.POST.get('numero_llave')

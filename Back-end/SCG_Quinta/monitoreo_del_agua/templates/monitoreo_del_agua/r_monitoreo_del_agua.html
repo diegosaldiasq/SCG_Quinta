@@ -11,10 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'monitoreo_del_agua/estilos_r_monitoreo_de_agua.css' %}">
     <link rel="icon" href="{% static 'monitoreo_del_agua/images/logoquinta2.png' %}" />
-    <title>Monitoreo del agua R-POES-Q-01-01</title>
+    <title>Monitoreo del agua R-POES-Q-01-01</title> 
 </head>
 <body>
-   <div class="ingreso">
+    <div class="ingreso">
     <img src="{% static 'monitoreo_del_agua/images/logoquinta.png' %}" alt="logo" class="logo">
         <div class="container">
             <h1 class="title">Monitoreo de agua R-POES-Q-01-01</h1>
@@ -31,9 +31,9 @@
             <label class="label">Turno</label>
             <select class="input" id="turno">
                 <option value="blanco"> </option>
-                <option value="turnoa">A</option>
-                <option value="turnob">B</option>
-                <option value="turnoc">C</option>
+                <option value="Turno A">A</option>
+                <option value="Turno B">B</option>
+                <option value="Turno C">C</option>
             </select>
 
             <label class="label">Planta</label>
@@ -50,9 +50,9 @@
             <label class="label">Punto de muestreo</label>
             <select class="input" id="punto-muestreo">
                 <option value="blanco"> </option>
-                <option value="zona1">zona1</option>
-                <option value="zona2">zona2</option>
-                <option value="zona3">zona3</option>
+                <option value="zona 1">zona 1</option>
+                <option value="zona 2">zona 2</option>
+                <option value="zona 3">zona 3</option>
             </select>
             <div class="subcontainer">
                 <p class="subtitle">Control fisico</p>
@@ -60,20 +60,20 @@
                 <label class="label">Sabor insipido</label>
                 <select class="input" id="sabor-insipido">
                     <option value="blanco"> </option>
-                    <option value="cumple">Cumple</option>
-                    <option value="nocumple">No cumple</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="No cumple">No cumple</option>
                 </select>
                 <label class="label">Olor inodora</label>
                 <select class="input" id="olor-inodora">
                     <option value="blanco"> </option>
-                    <option value="cumple">Cumple</option>
-                    <option value="nocumple">No cumple</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="No cumple">No cumple</option>
                 </select>
                 <label class="label">Color incoloro</label>
                 <select class="input" id="color-incoloro">
                     <option value="blanco"> </option>
-                    <option value="cumple">Cumple</option>
-                    <option value="nocumple">No cumple</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="No cumple">No cumple</option>
                 </select>
 
                 <p class="subtitle">Control quimico</p>
@@ -86,7 +86,7 @@
                 <label class="label">AC</label>
                 <select class="input" id="ac">
                     <option value="blanco"> </option>
-                    <option value="op1">1</option>
+                    <option value="1">1</option>
                 </select>
                 <p class="sub-subtitle">(1) En el caso de existir una desviacion durante el monitoreo, el tecnologo de calidad debera realizar monitoreo cada una hora por tres tomas de muestra, se ser reiterativa la desviacion se debera informar al jefe de planta.</p>
 
@@ -102,15 +102,16 @@
             <form class="form">
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
             </form>
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
-            </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
             </form>
         </div>
-   </div> 
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-   <script src="{% static 'monitoreo_del_agua/scrip_r_monitoreo_del_agua.js' %}"></script>
+    </div> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'monitoreo_del_agua/scrip_r_monitoreo_del_agua.js' %}"></script>
 </body>
 </html>

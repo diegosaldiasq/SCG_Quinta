@@ -7,7 +7,7 @@ class DatosFormularioMonitoreoDelAgua(models.Model):
     fecha_registro = models.DateTimeField()
     turno_mda = models.TextField()
     planta_mda = models.TextField()
-    numero_llave = models.IntegerField()
+    numero_llave = models.TextField()
     punto_muestreo = models.TextField()
     sabor_insipido = models.TextField()
     olor_inodora = models.TextField()
@@ -15,7 +15,7 @@ class DatosFormularioMonitoreoDelAgua(models.Model):
     ph_mda = models.FloatField()
     cloro_libre = models.FloatField()
     accion_correctiva = models.TextField()
-    resultado_ac = models.IntegerField()
+    resultado_ac = models.TextField()
 
     def __str__(self):
         return self.nombre
