@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioPcc2DetectorMetales
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -11,9 +13,9 @@ def pcc2_detector_metales(request):
 
 
 def vista_pcc2_detector_metales(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         lote = request.POST.get('lote')
         turno = request.POST.get('turno')
         tipo_metal = request.POST.get('tipo_metal')
