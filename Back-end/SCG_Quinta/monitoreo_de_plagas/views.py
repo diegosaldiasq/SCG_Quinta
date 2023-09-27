@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioMonitoreoDePlagas
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -10,9 +12,9 @@ def monitoreo_de_plagas(request):
     return render(request, 'monitoreo_de_plagas/r_monitoreo_de_plagas.html')
 
 def vista_monitoreo_de_plagas(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         numero_estacion = request.POST.get('numero_estacion')
         tipo_plaga = request.POST.get('tipo_plaga')
         tipo_trampa = request.POST.get('tipo_trampa')

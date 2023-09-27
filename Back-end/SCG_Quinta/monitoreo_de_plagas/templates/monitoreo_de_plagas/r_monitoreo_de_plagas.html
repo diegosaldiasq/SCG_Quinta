@@ -34,36 +34,36 @@
             <label class="label">Tipo de plaga</label>
                 <select class="input" id="tipo-plaga">
                     <option value="blanco"> </option>
-                    <option value="roedores">Roedores</option>
-                    <option value="voladores">Voladores</option>
+                    <option value="Roedores">Roedores</option>
+                    <option value="Voladores">Voladores</option>
                 </select>
             
             <label class="label">Tipo de trampa</label>
                 <select class="input" id="tipo-trampa">
                     <option value="blanco"> </option>
-                    <option value="cebadera">Cebadera</option>
-                    <option value="pegajosa">Pegajosa</option>
-                    <option value="capturaviva">Captura viva</option>
-                    <option value="tuv">TUV</option>
+                    <option value="Cebadera">Cebadera</option>
+                    <option value="Pegajosa">Pegajosa</option>
+                    <option value="Captura viva">Captura viva</option>
+                    <option value="TUV">TUV</option>
                 </select>
 
             <label class="label">Ubicacion</label>
                 <select class="input" id="ubicacion">
                     <option value="blanco"> </option>
-                    <option value="deslinde">Deslinde</option>
-                    <option value="pcercano">P. cercano</option>
-                    <option value="interna">Interna</option>
+                    <option value="Deslinde">Deslinde</option>
+                    <option value="P. cercano">P. cercano</option>
+                    <option value="Interna">Interna</option>
                 </select>
 
             <label class="label">Monitoreo</label>
                 <select class="input" id="monitoreo">
                     <option value="blanco"> </option>
-                    <option value="operativa">Operativa</option>
-                    <option value="cumple">Cumple</option>
-                    <option value="conconsumo">Con consumo</option>
-                    <option value="nocumple">No cumple</option>
-                    <option value="noaplica">No aplica</option>
-                    <option value="noencontrado">No encontrado</option>
+                    <option value="Operativa">Operativa</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="Con consumo">Con consumo</option>
+                    <option value="No cumple">No cumple</option>
+                    <option value="No aplica">No aplica</option>
+                    <option value="No encontrado">No encontrado</option>
                 </select>
 
             <label class="label">AC</label>
@@ -83,11 +83,8 @@
         
         </div>
         <div class="botones">
-            <form class="form" action="#">
+            <form class="form">
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
-            </form>
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
@@ -95,6 +92,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'monitoreo_de_plagas/scrip_r_monitoreo_de_plagas.js' %}"></script>
 </body>
 </html>
