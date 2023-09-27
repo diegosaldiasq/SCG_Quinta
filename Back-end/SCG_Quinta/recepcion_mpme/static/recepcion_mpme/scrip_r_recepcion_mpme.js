@@ -1,63 +1,97 @@
-const nombreTecnologo = document.querySelector('#nombre-tecnologo');
-const loteDia = document.querySelector('#lote-dia');
-const fechaRegistro = document.querySelector('#fecha-reg');
+document.addEventListener("DOMContentLoaded", function() {
+    // Tu código JavaScript aquí
+    var nombreTecnologo = document.getElementById('nombre-tecnologo');
+    var loteDia = document.getElementById('lote-dia');
+    var fechaRegistro = document.getElementById('fecha-reg');
+    var nombreProveedor = document.getElementById('proveedor');
+    var nombreProducto = document.getElementById('producto');
+    var fechaDeElaboracion = document.getElementById('fecha-elab');
+    var fechaDeVencimiento = document.getElementById('fecha-venc');
+    var loteProducto = document.getElementById('lote-producto');
+    var numeroFactura = document.getElementById('numero-factura')
+    var higiene = document.getElementById('higiene');
+    var rs = document.getElementById('rs');
+    var temperaturaTransporte = document.getElementById('temperatura-trans');
+    var apariencia = document.getElementById('apariencia');
+    var textura = document.getElementById('textura');
+    var ausenciaMaterialExtraño = document.getElementById('ausencia-me');
+    var temperaturaProducto = document.getElementById('temperatura-prod');
+    var condicionEnvase = document.getElementById('condicion-env');
+    var color = document.getElementById('color');
+    var olor = document.getElementById('olor');
+    var sabor = document.getElementById('sabor');
+    var gradosBrix = document.getElementById('grados-brix');
 
-const nombreProveedor = document.querySelector('#proveedor');
-const nombreProducto = document.querySelector('#producto');
-const fechaDeElaboracion = document.querySelector('#fecha-elab');
-const fechaDeVencimiento = document.querySelector('#fecha-venc');
-const loteProducto = document.querySelector('#lote-producto');
-const numeroFactura = document.querySelector('#numero-factura')
-const higiene = document.querySelector('#higiene');
-const rs = document.querySelector('#rs');
-const temperaturaTransporte = document.querySelector('#temperatura-trans');
-const apariencia = document.querySelector('#apariencia');
-const textura = document.querySelector('#textura');
-const ausenciaMaterialExtraño = document.querySelector('#ausencia-me');
-const temperaturaProducto = document.querySelector('#temperatura-prod');
-const condicionEnvase = document.querySelector('#condicion-env');
-const color = document.querySelector('#color');
-const olor = document.querySelector('#olor');
-const sabor = document.querySelector('#sabor');
-const gradosBrix = document.querySelector('#grados-brix');
-
-
-$(document).ready(function() {
-    $("#miBoton").click(function() {
-
-        $.ajax({
-            url: "../../Back-end/SCG_Quinta/recepcion_mpme/views.py",  // Ruta a tu vista Django
-            method: "POST",
-            data: {
-                nombre_tecnologo: nombreTecnologo,
-                lote_dia: loteDia,
-                fecha_registro: fechaRegistro,
-                nombre_proveedor: nombreProveedor,
-                nombre_producto: nombreProducto,
-                fecha_elaboracion: fechaDeElaboracion,
-                fecha_vencimiento: fechaDeVencimiento,
-                lote_producto: loteProducto,
-                numero_factura: numeroFactura,
-                higiene: higiene,
-                rs: rs,
-                temperatura_transporte: temperaturaTransporte,
-                apariencia: apariencia,
-                textura: textura,
-                ausencia_material_extraño: ausenciaMaterialExtraño,
-                temperatura_producto: temperaturaProducto,
-                condicion_envase: condicionEnvase,
-                color: color,
-                olor: olor,
-                sabor: sabor,
-                grados_brix: gradosBrix
-            },
-            success: function(response) {
-                // Hacer algo con la respuesta del servidor
-                console.log(response);
-            },
-            error: function() {
-                // Manejar errores
+    // Envio de datos a Django
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
+        }
+    });
+
+    $(document).ready(function() {
+        $("#miBoton").click(function() {
+            var nombreTecnologo = $("#nombre-tecnologo").val();
+            var loteDia = $("#lote-dia").val();
+            var fechaRegistro = $("#fecha-reg").val();
+            var nombreProveedor = $("#proveedor").val();
+            var nombreProducto = $("#producto").val();
+            var fechaDeElaboracion = $("#fecha-elab").val();
+            var fechaDeVencimiento = $("#fecha-venc").val();
+            var loteProducto = $("#lote-producto").val();
+            var numeroFactura = $("#numero-factura").val();
+            var higiene = $("#higiene").val();
+            var rs = $("#rs").val();
+            var temperaturaTransporte = $("#temperatura-trans").val();
+            var apariencia = $("#apariencia").val();
+            var textura = $("#textura").val();
+            var ausenciaMaterialExtraño = $("#ausencia-me").val();
+            var temperaturaProducto = $("#temperatura-prod").val();
+            var condicionEnvase = $("#condicion-env").val();
+            var color = $("#color").val();
+            var olor = $("#olor").val();
+            var sabor = $("#sabor").val();
+            var gradosBrix = $("#grados-brix").val();
+    
+            $.ajax({
+                url: "/recepcion_mpme/vista_recepcion_mpme/",  // Ruta a tu vista Django
+                method: "POST",
+                data: {
+                    nombre_tecnologo: nombreTecnologo,
+                    lote_dia: loteDia,
+                    fecha_registro: fechaRegistro,
+                    nombre_proveedor: nombreProveedor,
+                    nombre_producto: nombreProducto,
+                    fecha_elaboracion: fechaDeElaboracion,
+                    fecha_vencimiento: fechaDeVencimiento,
+                    lote_producto: loteProducto,
+                    numero_factura: numeroFactura,
+                    higiene: higiene,
+                    rs: rs,
+                    temperatura_transporte: temperaturaTransporte,
+                    apariencia: apariencia,
+                    textura: textura,
+                    ausencia_material_extraño: ausenciaMaterialExtraño,
+                    temperatura_producto: temperaturaProducto,
+                    condicion_envase: condicionEnvase,
+                    color: color,
+                    olor: olor,
+                    sabor: sabor,
+                    grados_brix: gradosBrix
+                },
+                success: function(response) {
+                    // Hacer algo con la respuesta del servidor
+                    console.log(response);
+                    $("#mensaje").text(response.mensaje);
+                },
+                error: function() {
+                    // Manejar errores
+                    console.error("Error en la solicitud AJAX:", textStatus, errorThrown);
+                }
+            });
         });
     });
+    alert("El archivo JavaScript se ha cargado y la página está lista.");
 });

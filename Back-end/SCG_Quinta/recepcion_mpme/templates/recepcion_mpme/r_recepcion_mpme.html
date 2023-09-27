@@ -53,15 +53,15 @@
             <label class="label">Higiene</label>
             <select class="input" id="higiene">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
             </select>
 
-            <label class="label">RS</label>
+            <label class="label">Resolucion sanitaria</label>
             <select class="input" id="rs">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
             </select>
 
             <label class="label">Temperatura °C transporte (-20 a 20 °C) o NA</label>
@@ -72,22 +72,22 @@
             <label class="label">Apariencia</label>
             <select class="input" id="apariencia">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
             </select>
 
             <label class="label">Textura</label>
             <select class="input" id="textura">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
             </select>
 
             <label class="label">Ausencia de materias extrañas</label>
             <select class="input" id="ausencia-me">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
             </select>
 
             <label class="label">Temperatura °C producto (-20 a 20 °C) o NA</label>
@@ -96,48 +96,45 @@
             <label class="label">Condicion del envase</label>
             <select class="input" id="condicion-env">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
-                <option value="noexiste">No existe</option>
-                <option value="noaplica">No aplica</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
+                <option value="No existe">No existe</option>
+                <option value="No aplica">No aplica</option>
             </select>
 
             <label class="label">Color</label>
             <select class="input" id="color">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
-                <option value="noexiste">No existe</option>
-                <option value="noaplica">No aplica</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
+                <option value="No existe">No existe</option>
+                <option value="No aplica">No aplica</option>
             </select>
 
             <label class="label">Olor</label>
             <select class="input" id="olor">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
-                <option value="noexiste">No existe</option>
-                <option value="noaplica">No aplica</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
+                <option value="No existe">No existe</option>
+                <option value="No aplica">No aplica</option>
             </select>
 
             <label class="label">Sabor</label>
             <select class="input" id="sabor">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
-                <option value="noexiste">No existe</option>
-                <option value="noaplica">No aplica</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
+                <option value="No existe">No existe</option>
+                <option value="No aplica">No aplica</option>
             </select>
 
             <label class="label">° Brix o NA</label>
             <input type="text" class="input" id="grados-brix">
         </div>
         <div class="botones">
-            <form class="form" action="#">
+            <form class="form">
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
-            </form>
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
@@ -145,6 +142,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'recepcion_mpme/scrip_r_recepcion_mpme.js' %}"></script>
 </body>
 </html>

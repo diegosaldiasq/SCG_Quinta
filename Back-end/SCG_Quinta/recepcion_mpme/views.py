@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioRecepcionMpMe
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 
 # Create your views here.
@@ -11,14 +13,14 @@ def recepcion_mpme(request):
     return render(request, 'recepcion_mpme/r_recepcion_mpme.html')
 
 def vista_recepcion_mpme(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
         lote_dia = request.POST.get('lote_dia')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         nombre_proveedor = request.POST.get('nombre_proveedor')
         nombre_producto = request.POST.get('nombre_producto')
-        fecha_elaboracion = request.POST.get('fecha_elaboracion')
-        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
+        fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
         lote_producto = request.POST.get('lote_producto')
         numero_factura = request.POST.get('numero_factura')
         higiene = request.POST.get('higiene')
