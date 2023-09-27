@@ -32,8 +32,8 @@
             <label class="label">Producto</label>
                 <select class="input" id='producto'>
                     <option value="blanco"> </option>
-                    <option value="manjar">Berlin manjar</option>
-                    <option value="pastelera">Berlin pastelera</option>
+                    <option value="Berlin manjar">Berlin manjar</option>
+                    <option value="Berlin pastelera">Berlin pastelera</option>
                 </select>
 
             <label class="label">T° Transporte</label>
@@ -51,8 +51,8 @@
             <label class="label">AC</label>
                 <select class="input" id="ac">
                     <option value="blanco"> </option>
-                    <option value="ac1">1</option>
-                    <option value="ac2">2</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
                 </select>
             <p class="sub-subtitle">(1) Si durante el monitoreo de la temperatura del transporte no cumple con la especificacion, se debe rechazar la recepcion del</p>
             <p class="sub-subtitle">(2) Si durante el monitoreo de la temperatura del producto, se debe rechazar el producto.</p>
@@ -60,16 +60,13 @@
             <label class="label">VAC</label>
                 <select class="input" id="vac">
                     <option value="blanco"> </option>
-                    <option value="cumple">Cumple</option>
-                    <option value="nocumple">No cumple</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="No cumple">No cumple</option>
                 </select>
         </div>
         <div class="botones">
-            <form class="form" action="#">
+            <form class="form">
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
-            </form>
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
@@ -77,6 +74,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'control_de_transporte/scrip_r_control_de_transporte.js' %}"></script>
 </body>
 </html>
