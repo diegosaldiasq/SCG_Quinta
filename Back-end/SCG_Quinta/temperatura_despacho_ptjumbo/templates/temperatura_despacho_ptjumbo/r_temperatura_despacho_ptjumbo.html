@@ -28,42 +28,42 @@
             <label class="label">Cadena</label>
                 <select class="input" id="cadena">
                     <option value="blanco"> </option>
-                    <option value="jumbo">Jumbo</option>
+                    <option value="Jumbo">Jumbo</option>
                 </select>
             
             <label class="label">Item</label>
                 <select class="input" id="item">
                     <option value="blanco"> </option>
-                    <option value="torta">Torta</option>
-                    <option value="pastel">Pastel</option>
+                    <option value="Torta">Torta</option>
+                    <option value="Pastel">Pastel</option>
                 </select>
 
             <label class="label">Producto</label>
                 <select class="input" id="producto">
                     <option value="blanco"> </option>
-                    <option value="producto">Torta piña</option>
-                    <option value="producto">Torta hoja manjar</option>
-                    <option value="producto">Torta hoja manjar pastelera</option>
-                    <option value="producto">Torta lucuma</option>
-                    <option value="producto">Torta selva negra</option>
-                    <option value="producto">Torta tres leches</option>
-                    <option value="producto">Torta viena</option>
-                    <option value="producto">Torta trufa</option>
-                    <option value="producto">Torta panqueque naranja</option>
-                    <option value="producto">Torta cuatro leches</option>
-                    <option value="producto">Torta bombom</option>
-                    <option value="producto">Torta beatriz</option>
-                    <option value="producto">Torta san jorge</option>
-                    <option value="producto">Torta san jorge chocolate</option>
-                    <option value="producto">Torta san jorge guinda</option>
-                    <option value="producto">Torta celebracion</option>
-                    <option value="producto">Torta chocolate frambuesa vegana</option>
-                    <option value="producto">Pastel piña</option>
-                    <option value="producto">Pastel trufa</option>
-                    <option value="producto">Pastel tres leches</option>
-                    <option value="producto">Pastel hoja manjar pastelera</option>
-                    <option value="producto">Pastel panqueque naranja</option>
-                    <option value="producto">Pastel selva negra</option>
+                    <option value="Torta piña">Torta piña</option>
+                    <option value="Torta hoja manjar">Torta hoja manjar</option>
+                    <option value="Torta hoja manjar pastelera">Torta hoja manjar pastelera</option>
+                    <option value="Torta lucuma">Torta lucuma</option>
+                    <option value="Torta selva negra">Torta selva negra</option>
+                    <option value="Torta tres leches">Torta tres leches</option>
+                    <option value="Torta viena">Torta viena</option>
+                    <option value="Torta trufa">Torta trufa</option>
+                    <option value="Torta panqueque naranja">Torta panqueque naranja</option>
+                    <option value="Torta cuatro leches">Torta cuatro leches</option>
+                    <option value="Torta bombom">Torta bombom</option>
+                    <option value="Torta beatriz">Torta beatriz</option>
+                    <option value="Torta san jorge lucuma">Torta san jorge lucuma</option>
+                    <option value="Torta san jorge chocolate">Torta san jorge chocolate</option>
+                    <option value="Torta san jorge guinda">Torta san jorge guinda</option>
+                    <option value="Torta celebracion">Torta celebracion</option>
+                    <option value="Torta chocolate frambuesa vegana">Torta chocolate frambuesa vegana</option>
+                    <option value="Pastel piña">Pastel piña</option>
+                    <option value="Pastel trufa">Pastel trufa</option>
+                    <option value="Pastel tres leches">Pastel tres leches</option>
+                    <option value="Pastel hoja manjar pastelera">Pastel hoja manjar pastelera</option>
+                    <option value="Pastel panqueque naranja">Pastel panqueque naranja</option>
+                    <option value="Pastel selva negra">Pastel selva negra</option>
                 </select>
 
             <label class="label">T° Producto</label>
@@ -72,8 +72,8 @@
             <label class="label">Revision de etiquetado</label>
             <select class="input" id="rev-etiquetado">
                 <option value="blanco"> </option>
-                <option value="cumple">Cumple</option>
-                <option value="nocumple">No cumple</option>
+                <option value="Cumple">Cumple</option>
+                <option value="No cumple">No cumple</option>
             </select>
 
             <label class="label">Lote</label>
@@ -85,7 +85,7 @@
             <label class="label">AC</label>
                 <select class="input" id="ac">
                     <option value="blanco"> </option>
-                    <option value="op1">1</option>
+                    <option value="1">1</option>
                 </select>
             <p class="sub-subtitle">(1) Si durante el monitoreo la temperatura del producto no cumple con especificacion, se debera dar un golpe de frio al producto y verificar nuevamente la temperatura.</p>
 
@@ -93,11 +93,8 @@
             <input class="input" type="number" min="0.0" max="8.0" step="0.1" id="vac">
         </div>
         <div class="botones">
-            <form class="form" action="#">
+            <form class="form">
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
-            </form>
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
@@ -105,6 +102,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'temperatura_despacho_ptjumbo/scrip_r_temperatura_despacho_ptjumbo.js' %}"></script>
 </body>
 </html>
