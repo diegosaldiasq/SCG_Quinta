@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioTemperaturaDespachoSisa
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -11,9 +13,9 @@ def temperatura_despacho_ptsisa(request):
 
 
 def vista_temperatura_despacho_ptsisa(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         cadena = request.POST.get('cadena')
         item = request.POST.get('item')
         producto = request.POST.get('producto')
@@ -21,7 +23,7 @@ def vista_temperatura_despacho_ptsisa(request):
         temperatura_producto = request.POST.get('temperatura_producto')
         revision_etiquetado = request.POST.get('revision_etiquetado')
         lote = request.POST.get('lote')
-        fecha_vencimiento = render.POST.get('fecha_vencimiento')
+        fecha_vencimiento = timezone.make_aware(datetime.strptime(render.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
         accion_correctiva = request.POST.get('accion_correctiva')
         verificacion_accion_correctiva = request.POST.get('verificacion_accion_correctiva')        
 
