@@ -19,7 +19,7 @@ def vista_reclamo_a_proveedores(request):
         nombre_proveedor = request.POST.get('nombre_proveedor')
         fecha_reclamo = timezone.make_aware(datetime.strptime(request.POST.get('fecha_reclamo'), '%Y-%m-%d'), timezone=timezone.utc)
         nombre_del_producto = request.POST.get('nombre_del_producto')
-        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POSt.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
+        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
         lote = request.POST.get('lote')
         fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
         no_conformidad = request.POST.get('no_conformidad')

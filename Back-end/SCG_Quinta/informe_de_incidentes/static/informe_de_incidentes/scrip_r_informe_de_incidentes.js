@@ -21,9 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     $(document).ready(function() {
-        
         $("#miBoton").click(function() {
-
             var nombreTecnologo = $("#nomb-tecno").val();
             var fechaRegistro = $("#fecha-reg").val();
             var fuenteMaterial = $("#fuente-material").val();

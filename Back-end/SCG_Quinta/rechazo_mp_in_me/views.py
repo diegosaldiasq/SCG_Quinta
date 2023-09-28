@@ -19,7 +19,7 @@ def vista_rechazo_mp_in_me(request):
         numero_factura = request.POST.get('numero_factura')
         nombre_transportista = request.POST.get('nombre_transportista')
         nombre_producto = request.POST.get('nombre_producto')
-        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POSt.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
+        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
         lote = request.POST.get('lote')
         fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
         motivo_rechazo = request.POST.get('motivo_rechazo')
