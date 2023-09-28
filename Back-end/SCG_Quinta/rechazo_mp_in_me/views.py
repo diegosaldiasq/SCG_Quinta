@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioRechazoMpInMe
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -10,16 +12,16 @@ def rechazo_mp_in_me(request):
     return render(request, 'rechazo_mp_in_me/r_informe_rechazo_mp_in_me.html')
 
 def vista_rechazo_mp_in_me(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         nombre_proveedor = request.POST.get('nombre_proveedor')
         numero_factura = request.POST.get('numero_factura')
         nombre_transportista = request.POST.get('nombre_transportista')
         nombre_producto = request.POST.get('nombre_producto')
-        fecha_elaboracion = request.POSt.get('fecha_elaboracion')
+        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POSt.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
         lote = request.POST.get('lote')
-        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
         motivo_rechazo = request.POST.get('motivo_rechazo')
         cantidad_producto_involucrado = request.POST.get('cantidad_producto_involucrado')
         unidad_de_medida = request.POST.get('unidad_de_medida')
