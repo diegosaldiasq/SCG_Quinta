@@ -23,7 +23,7 @@ def vista_temperatura_despacho_ptsisa(request):
         temperatura_producto = request.POST.get('temperatura_producto')
         revision_etiquetado = request.POST.get('revision_etiquetado')
         lote = request.POST.get('lote')
-        fecha_vencimiento = timezone.make_aware(datetime.strptime(render.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
+        fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
         accion_correctiva = request.POST.get('accion_correctiva')
         verificacion_accion_correctiva = request.POST.get('verificacion_accion_correctiva')        
 
