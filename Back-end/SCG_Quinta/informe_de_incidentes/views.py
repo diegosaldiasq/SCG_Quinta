@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioInformeDeIncidentes
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -10,9 +12,9 @@ def informe_de_incidentes(request):
     return render(request, 'informe_de_incidentes/r_informe_de_incidentes.html')
 
 def vista_informe_de_incidentes(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         fuente_material = request.POST.get('fuente_material')
         cantidad_contaminada = request.POST.get('cantidad_contaminada')
         unidad_de_medida = request.POST.get('unidad_de_medida')
