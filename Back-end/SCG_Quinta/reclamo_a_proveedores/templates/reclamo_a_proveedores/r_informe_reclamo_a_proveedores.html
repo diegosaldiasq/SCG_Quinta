@@ -48,9 +48,9 @@
             <label class="label">Clasificacion</label>
                 <select class="input" id="clasificacion">
                     <option value="blanco"> </option>
-                    <option value="calidad">Calidad</option>
-                    <option value="inocuidad">Inocuidad</option>
-                    <option value="legalidad">Legalidad</option>
+                    <option value="Calidad">Calidad</option>
+                    <option value="Inocuidad">Inocuidad</option>
+                    <option value="Legalidad">Legalidad</option>
                 </select>
 
             <label class="label">Cantidad involucrada</label>
@@ -69,11 +69,8 @@
             <input type="file" name="archivosubido" class="archivo" id="archivo-foto">
         </div>
         <div class="botones">
-            <form class="form" action="#">
+            <form class="form">
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
-            </form>
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
@@ -81,6 +78,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'reclamo_a_proveedores/scrip_r_informe_reclamo_a_proveedores.js' %}"></script>
 </body>
 </html>

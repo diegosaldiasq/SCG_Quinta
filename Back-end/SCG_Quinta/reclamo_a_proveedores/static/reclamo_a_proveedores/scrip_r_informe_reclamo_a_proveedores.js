@@ -1,48 +1,73 @@
-const nombreTecnologo = document.querySelector('#nombre-tecnologo');
-const fechaRegistro = document.querySelector('#fecha-reg');
+document.addEventListener("DOMContentLoaded", function() {
+    // Tu código JavaScript aquí
+    var nombreTecnologo = document.getElementById('nombre-tecnologo');
+    var fechaRegistro = document.getElementById('fecha-reg');
 
-const nombreProveedor = document.querySelector('#nombre-prov');
-const fechaReclamo = document.querySelector('#fecha-recl');
+    var nombreProveedor = document.getElementById('nombre-prov');
+    var fechaReclamo = document.getElementById('fecha-recl');
 
-const nombreDelProducto = document.querySelector('#nombre-prod');
-const fechaDeElaboracion = document.querySelector('#fecha-elab');
-const lote = document.querySelector('#lote');
-const fechaDeVencimiento = document.querySelector('#fecha-venc');
-const noConformidad = document.querySelector('#no-conf');
+    var nombreDelProducto = document.getElementById('nombre-prod');
+    var fechaDeElaboracion = document.getElementById('fecha-elab');
+    var lote = document.getElementById('lote');
+    var fechaDeVencimiento = document.getElementById('fecha-venc');
+    var noConformidad = document.getElementById('no-conf');
 
-const clasificacion = document.querySelector('#clasificacion');
-const cantidadInvolucrada = document.querySelector('#cantidad-inv');
-const unidadDeMedida = document.querySelector('#udm')
-const archivoFoto = document.querySelector('#archivo-foto');
+    var clasificacion = document.querySelector('clasificacion');
+    var cantidadInvolucrada = document.querySelector('cantidad-inv');
+    var unidadDeMedida = document.querySelector('udm')
+    var archivoFoto = document.querySelector('archivo-foto');
 
-$(document).ready(function() {
-    $("#miBoton").click(function() {
-
-        $.ajax({
-            url: "../../Back-end/SCG_Quinta/temperatura_despacho_ptjumbo/views.py",  // Ruta a tu vista Django
-            method: "POST",
-            data: {
-                nombre_tecnologo: nombreTecnologo,
-                fecha_registro: fechaRegistro,
-                nombre_proveedor: nombreProveedor,
-                fecha_reclamo: fechaReclamo,
-                nombre_del_producto: nombreDelProducto,
-                fecha_elaboracion: fechaDeElaboracion,
-                lote: lote,
-                fecha_vencimiento: fechaDeVencimiento,
-                no_conformidad: noConformidad,
-                clasificacion: clasificacion,
-                cantidad_involucrada: cantidadInvolucrada,
-                unidad_de_medida: unidadDeMedida,
-                archivo_foto: archivoFoto
-            },
-            success: function(response) {
-                // Hacer algo con la respuesta del servidor
-                console.log(response);
-            },
-            error: function() {
-                // Manejar errores
+    // Envio de datos a Django
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
+        }
+    });
+
+    $(document).ready(function() {
+        $("#miBoton").click(function() {
+            var nombreTecnologo = $("#nombre-tecnologo").val();
+            var fechaRegistro = $("#fecha-reg").val();
+            var nombreProveedor = $("#nombre-prov").val();
+            var fechaReclamo = $("#fecha-recl").val();
+            var nombreDelProducto = $("#nombre-prod").val();
+            var fechaDeElaboracion = $("#fecha-elab").val();
+            var lote = $("#lote").val();
+            var fechaDeVencimiento = $("#fecha-venc").val();
+            var noConformidad = $("#no-conf").val();
+            var clasificacion = $("#clasificacion").val();
+            var cantidadInvolucrada = $("#cantidad-inv").val();
+            var unidadDeMedida = $("#udm").val();
+            var archivoFoto = $("#archivo-foto").val();
+
+            $.ajax({
+                url: "/reclamo_a_proveedores/vista_reclamo_a_proveedores/",  // Ruta a tu vista Django
+                method: "POST",
+                data: {
+                    nombre_tecnologo: nombreTecnologo,
+                    fecha_registro: fechaRegistro,
+                    nombre_proveedor: nombreProveedor,
+                    fecha_reclamo: fechaReclamo,
+                    nombre_del_producto: nombreDelProducto,
+                    fecha_elaboracion: fechaDeElaboracion,
+                    lote: lote,
+                    fecha_vencimiento: fechaDeVencimiento,
+                    no_conformidad: noConformidad,
+                    clasificacion: clasificacion,
+                    cantidad_involucrada: cantidadInvolucrada,
+                    unidad_de_medida: unidadDeMedida,
+                    archivo_foto: archivoFoto
+                },
+                success: function(response) {
+                    // Hacer algo con la respuesta del servidor
+                    console.log(response);
+                    $("#mensaje").text(response.mensaje);
+                },
+            });
         });
     });
+    // Fin de envio de datos a Django
+    alert("El archivo JavaScript se ha cargado y la página está lista.");
 });

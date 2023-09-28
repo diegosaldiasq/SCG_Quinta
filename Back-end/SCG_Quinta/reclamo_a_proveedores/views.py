@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioReclamoProveedores
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -11,15 +13,15 @@ def reclamo_a_proveedores(request):
 
 
 def vista_reclamo_a_proveedores(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         nombre_proveedor = request.POST.get('nombre_proveedor')
-        fecha_reclamo = request.POST.get('fecha_reclamo')
+        fecha_reclamo = timezone.make_aware(datetime.strptime(request.POST.get('fecha_reclamo'), '%Y-%m-%d'), timezone=timezone.utc)
         nombre_del_producto = request.POST.get('nombre_del_producto')
-        fecha_elaboracion = request.POSt.get('fecha_elaboracion')
+        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POSt.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
         lote = request.POST.get('lote')
-        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
         no_conformidad = request.POST.get('no_conformidad')
         clasificacion = request.POST.get('clasificacion')
         cantidad_involucrada = request.POST.get('cantidad_involucrada')
