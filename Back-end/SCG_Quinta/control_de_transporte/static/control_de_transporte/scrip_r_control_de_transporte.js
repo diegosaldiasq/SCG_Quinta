@@ -26,11 +26,11 @@ document.addEventListener("DOMContentLoaded", function() {
             var fechaRegistro = $("#fecha-reg").val();
             var fechaRecepcion = $("#fecha-recep").val();
             var productoRecepcion = $("#producto").val();
-            var temperaturaTransporte = $("#t-transporte").val;
+            var temperaturaTransporte = $("#t-transporte").val();
             var temperaturaProducto = $("#t-producto").val();
             var lote = $("#lote").val();
             var fechaVencimiento = $("#fecha-venc").val();
-            var accionCorrectiva = $("#ac").val;
+            var accionCorrectiva = $("#ac").val();
             var verificacionAccionCorrectiva = $("#vac").val();
     
             $.ajax({
