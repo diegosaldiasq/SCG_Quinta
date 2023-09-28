@@ -26,56 +26,56 @@
             <label class="label">Turno</label>
                 <select class="input" id="turno">
                     <option value="blanco"> </option>
-                    <option value="turnoa">A</option>
-                    <option value="Turnob">B</option>
-                    <option value="turnoc">C</option>
+                    <option value="Turno A">A</option>
+                    <option value="Turno B">B</option>
+                    <option value="Turno C">C</option>
                 </select>
         </div>
         <div class="login-container">
             <label class="label">Area material</label>
                 <select class="input" id="area">
                     <option value="blanco"> </option>
-                    <option value="op1">Recepcion</option>
-                    <option value="op2">Almacenamiento BMP</option>
-                    <option value="op3">Pasillo central</option>
-                    <option value="op4">Batidos</option>
-                    <option value="op5">Hornos</option>
-                    <option value="op6">Sala de cremas</option>
-                    <option value="op7">Sala dosificado</option>
-                    <option value="op8">Sala de prelista</option>
-                    <option value="op9">Pasteleria</option>
-                    <option value="op10">Sala de quimicos</option>
-                    <option value="op11">Sala panqueques</option>
-                    <option value="op12">Sala de masas</option>
-                    <option value="op13">Envasado insumos</option>
-                    <option value="op14">Envasado PT</option>
-                    <option value="op15">Tuneles ultra congelado</option>
-                    <option value="op16">Camara congelado</option>
-                    <option value="op17">Camara de refrigerado/refresh</option>
-                    <option value="op18">Bodega productos terminados</option>
-                    <option value="op19">Puertas</option>
-                    <option value="op20">Oficinas</option>
-                    <option value="op21">Filtro sanitario</option>
+                    <option value="Recepcion">Recepcion</option>
+                    <option value="Almacenamiento BMP">Almacenamiento BMP</option>
+                    <option value="Pasillo central">Pasillo central</option>
+                    <option value="Batidos">Batidos</option>
+                    <option value="Hornos">Hornos</option>
+                    <option value="Sala de cremas">Sala de cremas</option>
+                    <option value="Sala dosificado">Sala dosificado</option>
+                    <option value="Sala de prelista">Sala de prelista</option>
+                    <option value="Pasteleria">Pasteleria</option>
+                    <option value="Sala de quimicos">Sala de quimicos</option>
+                    <option value="Sala panqueques">Sala panqueques</option>
+                    <option value="Sala de masas">Sala de masas</option>
+                    <option value="Envasado insumos">Envasado insumos</option>
+                    <option value="Envasado PT">Envasado PT</option>
+                    <option value="Tuneles ultra congelado">Tuneles ultra congelado</option>
+                    <option value="Camara congelado">Camara congelado</option>
+                    <option value="Camara de refrigerado/refresh">Camara de refrigerado/refresh</option>
+                    <option value="Bodega productos terminados">Bodega productos terminados</option>
+                    <option value="Puertas">Puertas</option>
+                    <option value="Oficinas">Oficinas</option>
+                    <option value="Filtro sanitario">Filtro sanitario</option>
                 </select>
             
             <label class="label">Tipo material</label>
                 <select class="input" id="tipo-material">
                     <option value="blanco"> </option>
-                    <option value="vidrio">Vidrio</option>
-                    <option value="plastico">Plastico</option>
-                    <option value="metal">Metal</option>
-                    <option value="madera">Madera</option>
+                    <option value="Vidrio">Vidrio</option>
+                    <option value="Plastico">Plastico</option>
+                    <option value="Metal">Metal</option>
+                    <option value="Madera">Madera</option>
                 </select>
 
             <label class="label">AC</label>
                 <select class="input" id="ac">
                     <option value="blanco"> </option>
-                    <option value="op1">1</option>
-                    <option value="op2">2</option>
-                    <option value="op3">3</option>
-                    <option value="op4">4</option>
-                    <option value="op5">5</option>
-                    <option value="op6">6</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
                 </select>
             <p class="sub-subtitle">(1) Si durante el monitoreo se observa una particula contaminante en algun producto este se debe segregar en area de producto no conforme (PNC)</p>
             <p class="sub-subtitle">(2) Si durante el monitoreo se observan envases de vidrio sin proteccion, se debe solicitar al operario de produccion envolver el producto con film.</p>
@@ -87,20 +87,17 @@
             <label class="label">VAC</label>
                 <select class="input" id="vac">
                     <option value="blanco"> </option>
-                    <option value="cumple">Cumple</option>
-                    <option value="nocumple">No cumple</option>
-                    <option value="noaplica">No aplica</option>
+                    <option value="Cumple">Cumple</option>
+                    <option value="No cumple">No cumple</option>
+                    <option value="No aplica">No aplica</option>
                 </select>
 
             <label class="label">Observaciones</label>
             <input type="text" class="input" id="observaciones">
         </div>
         <div class="botones">
-            <form class="form" action="#">
+            <form class="form">
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
-            </form>
-            <form class="form" action="#">
-                <button class="primary-button login-button">Grabar y salir</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
                 <button class="primary-button login-button">Salir</button>
@@ -108,6 +105,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'control_material_extraño/scrip_r_control_material_extraño.js' %}"></script>
 </body>
 </html>

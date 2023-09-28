@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from .models import DatosFormularioControlMaterialExtraño
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -10,9 +12,9 @@ def control_material_extraño(request):
     return render(request, 'control_material_extraño/r_control_material_extraño.html')
 
 def vista_control_material_extraño(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
-        fecha_registro = request.POST.get('fecha_registro')
+        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         turno = request.POST.get('turno')
         area_material = request.POST.get('area_material')
         tipo_material = request.POST.get('tipo_material')
