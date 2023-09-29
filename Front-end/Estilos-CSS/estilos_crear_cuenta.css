@@ -7,7 +7,6 @@
     --naranjo-quinta: #d07020;
     --naranjo-claro-quinta: #d4841c;
     --azul-quinta: #2c5fb4;
-    --verde-quinta: #008f4C;
     --white: #FFFFFF;
     --black: #000000;
     --sm: 14px;
@@ -31,7 +30,7 @@ body {
     justify-items: center;
     width: 500px;
     border-radius: 20px;
-    background-color: var(--verde-quinta);
+    background-color: var(--azul-quinta);
 }
 .logo {
     width: 250px;
@@ -46,7 +45,7 @@ body {
 }
 .subtitle {
     color: var(--very-light-pink);
-    font-size: var(--hospital-green);
+    font-size: var(--lg);
     font-weight: 300;
     margin-top: 0;
     margin-bottom: 32px;
@@ -55,11 +54,9 @@ body {
 .form {
     display:  flex;
     flex-direction: column;
-    border-bottom: 1px solid var(--very-light-pink);
-    margin-bottom: 12px;
 }
 .label {
-    font-size: var(--md);
+    font-size: var(--sm);
     font-weight: bold;
     margin-bottom: 4px;
 }
@@ -87,36 +84,6 @@ body {
 .login-button {
     margin-top: 14px;
     margin-bottom: 30px;
-}
-.span-container span {
-    font-size: var(--sm);
-}
-.span-container a {
-    color: var(--black);
-    font-size: var(--sm);
-    text-decoration: none;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-.span-container a:hover {
-    color: var(--white);
-}
-.crear-cuenta {
-    background-color: var(--hospital-green);
-    border-radius: 8px;
-    border: none;
-    color: var(--rojo-quinta);
-    width: 180px;
-    cursor: pointer;
-    font-size: var(--md);
-    font-weight: bold;
-    height: 30px;
-    margin-top: 14px;
-    margin-bottom: 30px;
-}
-.crear-cuenta:hover {
-    background-color: var(--rojo-quinta);
-    color: var(--white);
 }
 @media (max-width: 640) {
     .logo {
