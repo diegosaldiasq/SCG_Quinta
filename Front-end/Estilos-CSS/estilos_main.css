@@ -118,8 +118,17 @@ body {
     background-color: var(--rojo-quinta);
     color: var(--white);
 }
-@media (max-width: 640) {
+@media (max-width: 600px) {
+    .form-container {
+        width: 300px;
+    }
     .logo {
-        display: block;
+        width: 150px;
+    }
+    .title {
+        font-size: var(--lg);
+    }
+    .subtitle {
+        font-size: var(--sm);
     }
 }
