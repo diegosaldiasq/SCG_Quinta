@@ -6,6 +6,7 @@
     --amarillo-quinta: #f3ba14;
     --naranjo-quinta: #d07020;
     --naranjo-claro-quinta: #d4841c;
+    --azul-quinta: #2c4fb4;
     --white: #FFFFFF;
     --black: #000000;
     --sm: 14px;
@@ -29,22 +30,22 @@ body {
     justify-items: center;
     width: 400px;
     border-radius: 20px;
-    background-color: var(--naranjo-claro-quinta);
+    background-color: var(--azul-quinta);
 }
 .logo {
-    width: 150px;
+    width: 250px;
     margin-bottom: 12px;
     margin-top: 20px;
     justify-self: center;
 }
 .title {
-    font-size: var(--lg);
+    font-size: 24px;
     margin-bottom: 12px;
     text-align: center;
 }
 .subtitle {
     color: var(--very-light-pink);
-    font-size: var(--md);
+    font-size: var(--lg);
     font-weight: 300;
     margin-top: 0;
     margin-bottom: 32px;

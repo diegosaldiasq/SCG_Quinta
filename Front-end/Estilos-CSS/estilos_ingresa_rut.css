@@ -6,6 +6,7 @@
     --amarillo-quinta: #f3ba14;
     --naranjo-quinta: #d07020;
     --naranjo-claro-quinta: #d4841c;
+    --azul-quinta: #2c5cb4;
     --white: #FFFFFF;
     --black: #000000;
     --sm: 14px;
@@ -27,24 +28,24 @@ body {
     display: grid;
     grid-template-rows: auto 1fr auto;
     justify-items: center;
-    width: 400px;
+    width: 500px;
     border-radius: 20px;
-    background-color: var(--naranjo-claro-quinta);
+    background-color: var(--azul-quinta);
 }
 .logo {
-    width: 150px;
+    width: 250px;
     margin-bottom: 12px;
     margin-top: 20px;
     justify-self: center;
 }
 .title {
-    font-size: var(--lg);
+    font-size: 24px;
     margin-bottom: 12px;
     text-align: center;
 }
 .subtitle {
     color: var(--black);
-    font-size: var(--md);
+    font-size: var(--lg);
     font-weight: 300;
     margin-top: 0;
     margin-bottom: 32px;
@@ -83,4 +84,18 @@ body {
 .login-button {
     margin-top: 14px;
     margin-bottom: 30px;
+}
+@media (max-width: 650px) {
+    .login {
+        width: 100%;
+    }
+    .logo {
+        width: 100%;
+    }
+    .title {
+        font-size: var(--lg);
+    }
+    .subtitle {
+        font-size: var(--sm);
+    }
 }
