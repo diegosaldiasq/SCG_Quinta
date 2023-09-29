@@ -15,7 +15,7 @@ class DatosFormularioReclamoProveedores(models.Model):
     clasificacion = models.TextField()
     cantidad_involucrada = models.FloatField()
     unidad_de_medida = models.TextField()
-    archivo_foto = models.BinaryField()
+    archivo_foto = models.FileField()
 
     def __str__(self):
         return self.nombre

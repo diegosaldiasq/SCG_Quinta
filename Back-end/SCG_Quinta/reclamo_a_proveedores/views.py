@@ -26,7 +26,7 @@ def vista_reclamo_a_proveedores(request):
         clasificacion = request.POST.get('clasificacion')
         cantidad_involucrada = request.POST.get('cantidad_involucrada')
         unidad_de_medida = request.POST.get('unidad_de_medida')
-        archivo_foto = request.POST.get('archivo_foto')
+        archivo_foto = request.FILES.get('archivo_foto')
         
 
         datos = DatosFormularioReclamoProveedores(
