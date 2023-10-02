@@ -45,7 +45,8 @@ LOCAL_APPS = [
     "control_material_extraño.apps.ControlMaterialExtrañoConfig",
     "rechazo_mp_in_me.apps.RechazoMpInMeConfig",
     "reclamo_a_proveedores.apps.ReclamoAProveedoresConfig",
-    "selecciones.apps.SeleccionesConfig"
+    "selecciones.apps.SeleccionesConfig",
+    "login.apps.LoginConfig"
 ]
 
 DJANGO_APPS = [
@@ -105,8 +106,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'SCG_Quinta',
         'USER': 'postgres',
-        #'PASSWORD': 'radcliffe', # Para Windows
-        'PASSWORD': 'Dsal1212', # Para Linux
+        'PASSWORD': 'radcliffe', # Para Windows
+        #'PASSWORD': 'Dsal1212', # Para Linux
         'HOST': 'localhost',  # Puede ser una dirección IP si tu PostgreSQL está en otro servidor.
         'PORT': '5432',  # Puerto predeterminado de PostgreSQL.
     }

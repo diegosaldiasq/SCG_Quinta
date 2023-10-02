@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +9,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="./Estilos-CSS/estilos_main.css">
-    <link rel="icon" href="./Estilos-CSS/logoquinta2.png"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'login/estilos_main.css' %}">
+    <link rel="icon" href={% static 'login/images/logoquinta2.png' %}>
     <title>Principal</title>
 </head>
 <body>
     <div class="login">
         <div class="form-container">
-            <img src="./Estilos-CSS/logoquinta.png" alt="logo" class="logo">
+            <img src="{% static 'login/images/logoquinta.png' %}" alt="logo" class="logo">
             <h1 class="title">Ingreso cuenta SCGC Quinta</h1>
             <p class="subtitle">Ingresa tus datos para ingresar a tu cuenta</p>
             <form action="./" class="form">
@@ -30,7 +32,7 @@
                 <label for="password" class="label">Contraseña</label>
                 <input type="password" id="password" placeholder="**********" class="input input-password">
 
-                <input type="submit" value="Iniciar sesion" class="primary-button login-button">
+                <button class="primary-button login-button" src="{% url 'ingresa_rut' %}">Iniciar sesion</button>
             </form>
             <div class="span-container">
                 <span class="span">¿Olvidste tu contraseña?</span>
