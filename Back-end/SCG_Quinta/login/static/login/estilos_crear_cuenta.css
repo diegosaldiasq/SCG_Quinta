@@ -51,9 +51,9 @@ body {
     margin-bottom: 32px;
     text-align: center;
 }
-.form {
-    display:  flex;
-    flex-direction: column;
+.inputs-container {
+    display: grid;
+    justify-self: center;
 }
 .label {
     font-size: var(--sm);
@@ -70,7 +70,7 @@ body {
     padding: 6px;
     margin-bottom: 12px;
 }
-.buton-container {
+.button-container {
     display:  flex;
     flex-direction: row;
     justify-self: center;
@@ -102,6 +102,10 @@ body {
         font-size: var(--lg);
     }
     .subtitle {
+        font-size: var(--sm);
+    }
+    .primary-button {
+        width: 80px;
         font-size: var(--sm);
     }
 }

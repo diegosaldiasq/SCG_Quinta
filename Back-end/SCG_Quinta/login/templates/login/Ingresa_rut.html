@@ -23,9 +23,15 @@
             <form action="#" class="form">
                 <label for="rut" class="label">RUT</label>
                 <input type="text" id="rut" placeholder="*********" class="input input-rut">
-
-                <input type="submit" value="Confirmar" class="primary-button login-button">
             </form>
+            <div class="button-container">
+                <form action="./">
+                    <button class="primary-button login-button">Confirmar</button>
+                </form>
+                <form action="{% url 'main' %}">
+                    <button class="primary-button login-button">Salir</button>
+                </form>
+            </div>
         </div>
     </div>
 </body>
