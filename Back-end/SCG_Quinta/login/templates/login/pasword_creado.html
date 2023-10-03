@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +9,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="./Estilos-CSS/estilos_pasword_creado.css">
-    <link rel="icon" href="./Estilos-CSS/logoquinta2.png"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'login/estilos_pasword_creado.css' %}">
+    <link rel="icon" href="{% static 'login/images/logoquinta2.png' %}"/>
     <title>Crando nueva contraseña</title>
 </head>
 <body>
     <div class="login">
         <div class="login-container">
-            <img src="./Estilos-CSS/logoquinta.png" alt="logo" class="logo">
+            <img src="{% static/images/logoquinta.png' %}" alt="logo" class="logo">
             <h1 class="title">¡Felicidades!</h1>
             <p class="subtitle">Contraseña creada con exito</p>
         </div>
