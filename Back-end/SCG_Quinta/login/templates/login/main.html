@@ -32,14 +32,19 @@
                 <label for="password" class="label">Contraseña</label>
                 <input type="password" id="password" placeholder="**********" class="input input-password">
 
-                <button class="primary-button login-button" src="{% url 'ingresa_rut' %}">Iniciar sesion</button>
+                <form action="./">
+                    <button class="primary-button login-button" id="registrardatos">Iniciar sesion</button>
+                </form>
+
+                <!--<button class="primary-button login-button" src="{% url 'ingresa_rut' %}">Iniciar sesion</button>-->
             </form>
             <div class="span-container">
                 <span class="span">¿Olvidste tu contraseña?</span>
-                <a href="./">Recuperar</a>
+                <a href="{% url 'ingresa_rut' %}">Recuperar</a>
             </div>
-
-            <button class="crear-cuenta">Crear cuenta</button>
+            <form action="{% url 'crear_cuenta' %}">
+                <button class="crear-cuenta">Crear cuenta</button>
+            </form>
         </div>
     </div>
 </body>

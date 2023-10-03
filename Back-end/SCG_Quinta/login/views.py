@@ -11,3 +11,6 @@ def main(request):
 
 def ingresa_rut(request):
     return render(request, 'login/ingresa_rut.html')
+
+def crear_cuenta(request):
+    return render(request, 'login/crear_cuenta.html')
