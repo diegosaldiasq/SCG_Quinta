@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .models import DatosFormularioCrearCuenta
 from django.http import JsonResponse
+from django.shortcuts import redirect
 
 # Create your views here.
 
@@ -35,5 +36,10 @@ def vista_crear_cuenta(request):
             )
         datos.save()
 
-        #return render(request, 'login/cuenta_creada.html')
-        return HttpResponse("Datos guardados exitosamente")
+        return render(request, 'login/cuenta_creada.html')
+        #return HttpResponse("Datos guardados exitosamente")
+        #return redirect('cuenta_creada')
+    
+    
+def cuenta_creada(request):
+    return render(request, 'login/cuenta_creada.html')

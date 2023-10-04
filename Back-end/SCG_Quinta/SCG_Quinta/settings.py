@@ -106,8 +106,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'SCG_Quinta',
         'USER': 'postgres',
-        #'PASSWORD': 'radcliffe', # Para Windows
-        'PASSWORD': 'Dsal1212', # Para Linux
+        'PASSWORD': 'radcliffe', # Para Windows
+        #'PASSWORD': 'Dsal1212', # Para Linux
         'HOST': 'localhost',  # Puede ser una dirección IP si tu PostgreSQL está en otro servidor.
         'PORT': '5432',  # Puerto predeterminado de PostgreSQL.
     }
@@ -154,3 +154,22 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

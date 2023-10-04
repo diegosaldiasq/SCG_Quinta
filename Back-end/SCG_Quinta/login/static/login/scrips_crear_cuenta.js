@@ -43,6 +43,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     console.error("Error en la solicitud AJAX:", textStatus, errorThrown);
                 }
             });
-        });
+        }); 
     });
 });
