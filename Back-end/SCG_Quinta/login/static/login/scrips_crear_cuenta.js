@@ -44,8 +44,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
         }); 
+        setTimeout(function() {
+            window.location.href = "/login/cuenta_creada/";
+        }, 8000);  // 8000 milisegundos son 8 segundos
     });
-    setTimeout(function() {
-        window.location.href = "/login/cuenta_creada/";
-    }, 8000);  // 8000 milisegundos son 8 segundos
 });
