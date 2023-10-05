@@ -40,6 +40,13 @@
 
                 <label for="new-password" class="label">Repita contraseña</label>
                 <input type="password" id="new-password" placeholder="**********" class="input input-password">
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
             </div>
                 
             <div class="button-container">

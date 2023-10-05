@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from .models import DatosFormularioCrearCuenta
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.contrib import messages
 
 # Create your views here.
 
@@ -26,6 +27,8 @@ def vista_crear_cuenta(request):
         password = request.POST.get('password')
         new_password = request.POST.get('new_password')
 
+        if password != new_password:
+            messages.error(request, "Las contraseñas no coinciden")
 
         datos = DatosFormularioCrearCuenta(
             nombre_completo=nombre_completo, 
@@ -37,8 +40,9 @@ def vista_crear_cuenta(request):
         datos.save()
 
         #return render(request, 'login/cuenta_creada.html')
-        return HttpResponse("Datos guardados exitosamente")
+        #return HttpResponse("Datos guardados exitosamente")
         #return redirect('cuenta_creada')
+        return redirect('cuenta_creada')
     
     
 def cuenta_creada(request):
