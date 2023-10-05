@@ -36,8 +36,8 @@ def vista_crear_cuenta(request):
             )
         datos.save()
 
-        return render(request, 'login/cuenta_creada.html')
-        #return HttpResponse("Datos guardados exitosamente")
+        #return render(request, 'login/cuenta_creada.html')
+        return HttpResponse("Datos guardados exitosamente")
         #return redirect('cuenta_creada')
     
     
