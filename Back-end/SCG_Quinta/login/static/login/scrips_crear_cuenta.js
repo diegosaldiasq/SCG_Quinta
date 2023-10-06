@@ -22,6 +22,11 @@ document.addEventListener("DOMContentLoaded", function() {
             var rut = $("#rut").val();
             var password = $("#password").val();
             var newPassword = $("#new-password").val();
+
+            if (password != newPassword) {  // Si las contraseñas no coinciden  
+                alert("Las contraseñas no coinciden");
+                return false;
+            }
     
             $.ajax({
                 url: "/login/vista_crear_cuenta/",  // Ruta a tu vista Django
