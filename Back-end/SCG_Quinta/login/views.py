@@ -42,7 +42,7 @@ def vista_crear_cuenta(request):
         #return render(request, 'login/cuenta_creada.html')
         #return HttpResponse("Datos guardados exitosamente")
         #return redirect('cuenta_creada')
-        return redirect('cuenta_creada')
+        return HttpResponseRedirect(reverse('cuenta_creada'))
     
     
 def cuenta_creada(request):
