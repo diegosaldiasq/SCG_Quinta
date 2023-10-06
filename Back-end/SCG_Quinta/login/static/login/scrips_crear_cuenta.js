@@ -43,9 +43,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     console.error("Error en la solicitud AJAX:", textStatus, errorThrown);
                 }
             });
-            $.ajax({
-                url: "/login/crear_cuenta/"  // Ruta a tu vista Django
-            });
         }); 
     });
 });
