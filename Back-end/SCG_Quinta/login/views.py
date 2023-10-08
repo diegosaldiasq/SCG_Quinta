@@ -39,11 +39,16 @@ def vista_crear_cuenta(request):
             )
         datos.save()
 
-        #return render(request, 'login/cuenta_creada.html')
         return HttpResponse("Datos guardados exitosamente")
-        #return redirect('cuenta_creada')
-        #return HttpResponseRedirect(reverse('login/cuenta_creada'))
-    
-    
+       
 def cuenta_creada(request):
     return render(request, 'login/cuenta_creada.html')
+
+def vista_ingresa_rut(request):
+    datos = DatosFormularioCrearCuenta.objects.all()
+    data = [{'rut_base': dato.rut} for dato in datos]
+    return JsonResponse(data, safe=False)
+
+def pasword(request):
+    return render(request, 'login/pasword.html')
+

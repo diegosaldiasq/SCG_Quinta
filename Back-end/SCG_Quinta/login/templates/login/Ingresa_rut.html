@@ -25,7 +25,7 @@
                 <input type="text" id="rut" placeholder="*********" class="input input-rut">
             </form>
             <div class="button-container">
-                <form action="./">
+                <form id="miBoton">
                     <button class="primary-button login-button">Confirmar</button>
                 </form>
                 <form action="{% url 'main' %}">
@@ -34,5 +34,11 @@
             </div>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'login/scrips_ingresa_rut.js' %}"></script>
 </body>
 </html>
