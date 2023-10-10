@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .then(data => {
                 const rutEnBase = data.map(item => item.rut_base);
+                rutEnWeb = document.getElementById('rut').value;
     
                 if (rutEnBase.includes(rutEnWeb)) {
                     //window.location.href = "/login/pasword/";
