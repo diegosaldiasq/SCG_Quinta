@@ -81,7 +81,7 @@ body {
     border-radius: 8px;
     border: none;
     color: var(--white);
-    width: 180px;
+    width: 120px;
     cursor: pointer;
     font-size: var(--md);
     font-weight: bold;

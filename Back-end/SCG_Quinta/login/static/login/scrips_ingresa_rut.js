@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('miBoton').addEventListener('click', async function() {
         var rutEnWeb = document.getElementById('rut').value;
-        var response = await fetch('/login/vista_ingresa_rut/') // Ruta a tu vista Django
+        var response = await fetch('/login/vista_ingresa_rut/'); // Ruta a tu vista Django
         var data = await response.json();    
         var rutEnBase = await data.map(item => item.rut_base);
         console.log(rutEnBase, rutEnWeb);
