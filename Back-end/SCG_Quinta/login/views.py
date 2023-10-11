@@ -6,6 +6,7 @@ from .models import DatosFormularioCrearCuenta
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
+import json
 
 # Create your views here.
 
@@ -45,9 +46,13 @@ def cuenta_creada(request):
     return render(request, 'login/cuenta_creada.html')
 
 def vista_ingresa_rut(request):
-    datos = DatosFormularioCrearCuenta.objects.all()
-    data = [{'rut_base': dato.rut} for dato in datos]
-    return JsonResponse(data, safe=False)
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        rut_recibido = body_data.get('dato')
+
+        data = DatosFormularioCrearCuenta.objects.filter(rut=rut_recibido).exists()
+        return JsonResponse({'existe': data})
 
 def pasword(request):
     return render(request, 'login/pasword.html')
