@@ -1,17 +1,25 @@
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById('miBoton').addEventListener('click', async function() {
+    let logic = false; // Declara la variable en un ámbito superior
+
+    document.getElementById('oneClick').addEventListener('click', async function() { // Note el uso de "async"
         var rutEnWeb = document.getElementById('rut').value;
-        var response = await fetch('/login/vista_ingresa_rut/'); // Ruta a tu vista Django
-        var data = await response.json();    
-        var rutEnBase = await data.map(item => item.rut_base);
-        console.log(rutEnBase, rutEnWeb);
-        if (rutEnBase.includes(rutEnWeb)) {
+        
+        try {
+            let response = await fetch('/login/vista_ingresa_rut/'); // Espera a que la petición se complete
+            let data = await response.json(); // Espera a que la respuesta se convierta a JSON
+
+            var rutEnBase = data.map(item => item.rut_base);
+            logic = rutEnBase.includes(rutEnWeb);
+
+        } catch (error) {
+            console.error("Error al obtener el rut:", error);
+        }
+    
+        if (logic == true) {
             //window.location.href = "/login/pasword/";
             alert("El rut ingresado se encuentra en la base de datos");
-            return true;
         } else {
             alert("El rut ingresado no se encuentra en la base de datos");
-            return false;
         }   
     });
 });
