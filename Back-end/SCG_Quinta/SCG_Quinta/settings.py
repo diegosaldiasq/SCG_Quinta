@@ -106,8 +106,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'SCG_Quinta',
         'USER': 'postgres',
-        'PASSWORD': 'radcliffe', # Para Windows
-        #'PASSWORD': 'Dsal1212', # Para Linux
+        #'PASSWORD': 'radcliffe', # Para Windows
+        'PASSWORD': 'Dsal1212', # Para Linux
         'HOST': 'localhost',  # Puede ser una dirección IP si tu PostgreSQL está en otro servidor.
         'PORT': '5432',  # Puerto predeterminado de PostgreSQL.
     }
