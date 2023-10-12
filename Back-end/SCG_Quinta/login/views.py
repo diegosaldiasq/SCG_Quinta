@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 import json
+from django.core.cache import cache
 
 # Create your views here.
 
@@ -52,8 +53,28 @@ def vista_ingresa_rut(request):
         rut_recibido = body_data.get('dato')
 
         data = DatosFormularioCrearCuenta.objects.filter(rut=rut_recibido).exists()
+        if data == True:
+            request.session['rut'] = rut_recibido
         return JsonResponse({'existe': data})
 
 def pasword(request):
     return render(request, 'login/pasword.html')
 
+def vista_pasword(request):
+    rut_temporal_recibido = request.session.get('rut', default=None)
+    print(rut_temporal_recibido)
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        nueva_contraseña = body_data.get('dato')
+        usuario = DatosFormularioCrearCuenta.objects.get(rut=rut_temporal_recibido)
+        usuario.password = nueva_contraseña
+        usuario.new_password = nueva_contraseña
+        usuario.save()
+        
+        data = DatosFormularioCrearCuenta.objects.filter(rut=rut_temporal_recibido).exists()
+        print(data)
+        return JsonResponse({'existe': data})
+    
+def pasword_creado(request):
+    return render(request, 'login/pasword_creado.html')

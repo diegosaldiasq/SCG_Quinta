@@ -70,6 +70,12 @@ body {
     padding: 6px;
     margin-bottom: 12px;
 }
+.button-container {
+    display:  flex;
+    flex-direction: row;
+    justify-self: center;
+    gap: 16px;
+}
 .primary-button {
     background-color: var(--rojo-quinta);
     border-radius: 8px;

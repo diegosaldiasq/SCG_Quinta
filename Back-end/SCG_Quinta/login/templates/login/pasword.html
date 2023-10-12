@@ -26,9 +26,17 @@
                 <label for="new-password" class="label">Repita contraseña</label>
                 <input type="password" id="new-password" placeholder="**********" class="input input-password">
 
-                <input type="submit" value="Confirmar" class="primary-button login-button">
+                <!--<input type="submit" value="Confirmar" class="primary-button login-button">-->
             </form>
+            <div class="button-container">
+                <form id="miBoton">
+                    {% csrf_token %}
+                    <button class="primary-button login-button">Confirmar</button>
+                </form>
+            </div>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'login/scrips_pasword.js' %}"></script>
 </body>
 </html>
