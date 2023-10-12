@@ -62,7 +62,6 @@ def pasword(request):
 
 def vista_pasword(request):
     rut_temporal_recibido = request.session.get('rut', default=None)
-    print(rut_temporal_recibido)
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
@@ -73,7 +72,6 @@ def vista_pasword(request):
         usuario.save()
         
         data = DatosFormularioCrearCuenta.objects.filter(rut=rut_temporal_recibido).exists()
-        print(data)
         return JsonResponse({'existe': data})
     
 def pasword_creado(request):
