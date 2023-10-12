@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("miBoton").addEventListener("click", async function() {
         try {
+            event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
             var rutEnBase = document.getElementById("rut").value;
             
             // Obtener el CSRF token
@@ -15,8 +16,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 body: JSON.stringify({ dato: rutEnBase })
             });
             var data = await response.json();
+            debugger; // <-- Agrega esta línea
             if (data.existe) {
-                alert("El rut existe en la base de datos.");
+                window.location.href = "/login/pasword/";
+                //alert("El rut existe en la base de datos.");
                 return true;
             } else {
                 alert("El rut NO existe en la base de datos.");
