@@ -13,4 +13,6 @@ def redireccionar_selecciones(request):
     url_selecciones = reverse('vista_selecciones')
     return HttpResponseRedirect(url_selecciones)
 
-
+def redireccionar_main(request):
+    url_main = reverse('main')
+    return HttpResponseRedirect(url_main)
