@@ -15,6 +15,29 @@ from django.core.cache import cache
 def main(request):
     return render(request, 'login/main.html')
 
+def vista_main(request):
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        nombre_recibido = body_data.get('nombreCompleto')
+        perfil_recibido = body_data.get('perfilUsuario')
+        rut_recibido = body_data.get('rut')
+        password_recibido = body_data.get('pasword')
+
+        usuario = DatosFormularioCrearCuenta.objects.get(rut=rut_recibido)
+       
+        nombre_esta = usuario.nombre_completo == nombre_recibido
+        perfil_esta = usuario.perfil_usuario == perfil_recibido
+        rut_esta = usuario.rut == rut_recibido
+        password_esta = usuario.new_password == password_recibido
+        
+        return JsonResponse({
+            'nombre': nombre_esta,
+            'perfil': perfil_esta,
+            'rut': rut_esta,
+            'password': password_esta
+        })
+
 def ingresa_rut(request):
     return render(request, 'login/ingresa_rut.html')
 
@@ -71,7 +94,7 @@ def vista_pasword(request):
         usuario.new_password = nueva_contraseña
         usuario.save()
         
-        data = DatosFormularioCrearCuenta.objects.filter(rut=rut_temporal_recibido).exists()
+        data = DatosFormularioCrearCuenta.objects.filter(password=nueva_contraseña).exists()
         return JsonResponse({'existe': data})
     
 def pasword_creado(request):

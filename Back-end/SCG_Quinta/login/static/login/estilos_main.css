@@ -84,6 +84,10 @@ body {
     font-weight: bold;
     height: 50px;
 }
+.primary-button:hover {
+    background-color: var(--azul-quinta);
+    color: var(--amarillo-quinta);
+}
 .login-button {
     margin-top: 14px;
     margin-bottom: 30px;

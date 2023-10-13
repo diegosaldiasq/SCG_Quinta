@@ -24,7 +24,13 @@
                 <input type="text" id="nombre-completo" class="input input-nombre-completo">
 
                 <label class="label">Perfil de usuario</label>
-                <input type="text" id="perfil-usuario" class="input input-perfil-usuario">
+                <select class="input" id="perfil-usuario">
+                    <option value="blanco"> </option>
+                    <option value="Tecnologo calidad">Tecnologo calidad</option>
+                    <option value="Jefe calidad">Jefe calidad</option>
+                    <option value="Devps">Devps</option>
+                    <option value="Otro">Otro</option>
+                </select>
 
                 <label class="label">RUT (sin puntos ni guion)</label>
                 <input type="text" id="rut" class="input input-rut">
@@ -32,11 +38,13 @@
                 <label for="password" class="label">Contraseña</label>
                 <input type="password" id="password" placeholder="**********" class="input input-password">
 
-                <form action="./">
-                    <button class="primary-button login-button" id="registrardatos">Iniciar sesion</button>
-                </form>
+                
 
                 <!--<button class="primary-button login-button" src="{% url 'ingresa_rut' %}">Iniciar sesion</button>-->
+            </form>
+            <form id="miBoton">
+                {% csrf_token %}
+                <button class="primary-button login-button" id="registrardatos">Iniciar sesion</button>
             </form>
             <div class="span-container">
                 <span class="span">¿Olvidste tu contraseña?</span>
@@ -47,5 +55,7 @@
             </form>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'login/scrips_main.js' %}"></script>
 </body>
 </html>

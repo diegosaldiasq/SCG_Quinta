@@ -12,4 +12,5 @@ urlpatterns = [
     path("pasword/", views.pasword, name="pasword"),
     path("pasword_creado/", views.pasword_creado, name="ingresa_password"),
     path("vista_pasword/", views.vista_pasword, name="vista_pasword"),
+    path("vista_main/", views.vista_main, name="vista_main")
 ]
