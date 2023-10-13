@@ -5,12 +5,15 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required
 def higiene_y_conducta_personal(request):
     return render(request, 'higiene_y_conducta_personal/r_higuiene_y_conducta_personal.html')
 
+@login_required
 def vista_higiene_y_conducta_personal(request):
     if request.method == 'POST':
         fecha_ingreso = timezone.make_aware(datetime.strptime(request.POST.get('fecha_ingreso'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
@@ -42,6 +45,7 @@ def vista_higiene_y_conducta_personal(request):
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
 
+@login_required
 def redireccionar_selecciones(request):
     url_selecciones = reverse('vista_selecciones')
     return HttpResponseRedirect(url_selecciones)

@@ -5,13 +5,15 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
-
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required
 def recepcion_mpme(request):
     return render(request, 'recepcion_mpme/r_recepcion_mpme.html')
 
+@login_required
 def vista_recepcion_mpme(request):
     if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
@@ -64,6 +66,7 @@ def vista_recepcion_mpme(request):
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
 
+@login_required
 def redireccionar_selecciones(request):
     url_selecciones = reverse('vista_selecciones')
     return HttpResponseRedirect(url_selecciones)

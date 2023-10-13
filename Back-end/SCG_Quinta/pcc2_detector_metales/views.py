@@ -5,13 +5,15 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required
 def pcc2_detector_metales(request):
     return render(request, 'pcc2_detector_metales/r_pcc2_detector_metales.html')
 
-
+@login_required
 def vista_pcc2_detector_metales(request):
     if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
@@ -39,6 +41,7 @@ def vista_pcc2_detector_metales(request):
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
 
+@login_required
 def redireccionar_selecciones(request):
     url_selecciones = reverse('vista_selecciones')
     return HttpResponseRedirect(url_selecciones)

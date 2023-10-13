@@ -7,10 +7,8 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 import json
-from django.core.cache import cache
 
 # Create your views here.
-
 
 def main(request):
     return render(request, 'login/main.html')
@@ -65,7 +63,7 @@ def vista_crear_cuenta(request):
         datos.save()
 
         return HttpResponse("Datos guardados exitosamente")
-       
+    
 def cuenta_creada(request):
     return render(request, 'login/cuenta_creada.html')
 
@@ -96,6 +94,6 @@ def vista_pasword(request):
         
         data = DatosFormularioCrearCuenta.objects.filter(password=nueva_contraseña).exists()
         return JsonResponse({'existe': data})
-    
+
 def pasword_creado(request):
     return render(request, 'login/pasword_creado.html')

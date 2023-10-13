@@ -5,12 +5,15 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required
 def monitoreo_de_plagas(request):
     return render(request, 'monitoreo_de_plagas/r_monitoreo_de_plagas.html')
 
+@login_required
 def vista_monitoreo_de_plagas(request):
     if request.method == 'POST':
         nombre_tecnologo = request.POST.get('nombre_tecnologo')
@@ -37,6 +40,7 @@ def vista_monitoreo_de_plagas(request):
 
         return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
 
+@login_required
 def redireccionar_selecciones(request):
     url_selecciones = reverse('vista_selecciones')
     return HttpResponseRedirect(url_selecciones)
