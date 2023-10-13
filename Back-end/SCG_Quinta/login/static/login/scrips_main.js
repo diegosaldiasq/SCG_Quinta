@@ -25,21 +25,8 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             var responseData = await response.json();
 
-            if (
-                responseData.nombre && 
-                responseData.perfil &&
-                responseData.rut &&
-                responseData.password
-            ) {
+            if (responseData.existe) {
                 window.location.href = "/inicio/index/";
-            } else if (!responseData.nombre) {
-                alert("No se pudo ingresar a la cuenta: nombre no existe.");
-            } else if (!responseData.perfil) {
-                alert("No se pudo ingresar a la cuenta: perfil no existe.");
-            } else if (!responseData.rut) {
-                alert("No se pudo ingresar a la cuenta: rut no existe.");
-            } else if (!responseData.password) {
-                alert("No se pudo ingresar a la cuenta: contraseña no existe.");
             } else {
                 alert("No se pudo ingresar a la cuenta: datos incorrectos.");
             }
