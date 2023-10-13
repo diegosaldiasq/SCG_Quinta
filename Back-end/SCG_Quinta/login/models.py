@@ -4,19 +4,20 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, nombre_completo, perfil_usuario, rut, pasword=None,):
+    def create_user(self, nombre_completo, perfil_usuario, rut, password=None):
         if not rut:
             raise ValueError("El campo RUT es obligatorio")
-        user = self.model(nombre_completo=nombre_completo, perfil_usuario=perfil_usuario, pasword=pasword)
-        user.set_password(pasword)
+        user = self.model(nombre_completo=nombre_completo, perfil_usuario=perfil_usuario, rut=rut)
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, nombre_completo, perfil_usuario, rut, pasword=None):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        return self.create_user(nombre_completo, perfil_usuario, rut, pasword)
+    def create_superuser(self, nombre_completo, perfil_usuario, rut, password=None):
+        user = self.create_user(nombre_completo, perfil_usuario, rut, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
 
 class DatosFormularioCrearCuenta(AbstractBaseUser, PermissionsMixin):
     nombre_completo = models.TextField()
