@@ -21,8 +21,8 @@ class CustomUserManager(BaseUserManager):
 
 class DatosFormularioCrearCuenta(AbstractBaseUser, PermissionsMixin):
     nombre_completo = models.TextField()
-    perfil_usuario = models.TextField()
-    rut = models.TextField(unique=True)
+    perfil_usuario = models.CharField(max_length=20)
+    rut = models.CharField(max_length=12, unique=True)
     password = models.TextField()
     new_password = models.TextField()
     is_active = models.BooleanField(default=True)
@@ -30,6 +30,6 @@ class DatosFormularioCrearCuenta(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'rut'
-    REQUIRED_FIELDS = ['nombre_completo', 'perfil_usuario', 'password']
+    REQUIRED_FIELDS = ['nombre_completo', 'perfil_usuario']
 
     objects = CustomUserManager()
