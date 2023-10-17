@@ -24,7 +24,7 @@ def vista_main(request):
         password_recibido = body_data.get('pasword')
 
         print(DatosFormularioCrearCuenta.objects.get(rut=rut_recibido))
-        print(nombre_recibido, password_recibido)
+        print(type(nombre_recibido), password_recibido)
         usuario = authenticate(request, username=nombre_recibido, password=password_recibido)
         print(usuario)
         #usuario = DatosFormularioCrearCuenta.objects.get(rut=rut_recibido)
