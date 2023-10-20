@@ -18,19 +18,21 @@ def vista_main(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        nombre_recibido = body_data.get('nombreCompleto')
+        nombre_completo = body_data.get('nombreCompleto')
         perfil_recibido = body_data.get('perfilUsuario')
         rut_recibido = body_data.get('rut')
-        password_recibido = body_data.get('pasword')
+        password = body_data.get('pasword')
 
         print(DatosFormularioCrearCuenta.objects.get(rut=rut_recibido))
-        print(nombre_recibido, password_recibido)
-        usuario = authenticate(request, username=nombre_recibido, password=password_recibido)
+        print(nombre_completo, password)
+        print(nombre_completo==DatosFormularioCrearCuenta.nombre_completo, password==DatosFormularioCrearCuenta.password)
+        usuario = authenticate(request, username=nombre_completo, password=password)
         print(usuario)
         #usuario = DatosFormularioCrearCuenta.objects.get(rut=rut_recibido)
         dato = None
         if usuario is not None:
             dato = True
+            login(request, usuario)
         else:
             dato = False
         print(dato)
@@ -57,9 +59,9 @@ def vista_crear_cuenta(request):
             nombre_completo=nombre_completo, 
             perfil_usuario=perfil_usuario,
             rut=rut,
-            password=password,
             new_password=new_password
             )
+        datos.set_password(password)
         datos.save()
 
         return HttpResponse("Datos guardados exitosamente")
@@ -88,7 +90,7 @@ def vista_pasword(request):
         body_data = json.loads(body_unicode)
         nueva_contraseña = body_data.get('dato')
         usuario = DatosFormularioCrearCuenta.objects.get(rut=rut_temporal_recibido)
-        usuario.password = nueva_contraseña
+        usuario.set_password(nueva_contraseña)
         usuario.new_password = nueva_contraseña
         usuario.save()
         
