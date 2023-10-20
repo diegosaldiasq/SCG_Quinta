@@ -7,11 +7,12 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 import json
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
 
 def main(request):
+    logout(request)
     return render(request, 'login/main.html')
 
 def vista_main(request):
@@ -23,19 +24,13 @@ def vista_main(request):
         rut_recibido = body_data.get('rut')
         password = body_data.get('pasword')
 
-        print(DatosFormularioCrearCuenta.objects.get(rut=rut_recibido))
-        print(nombre_completo, password)
-        print(nombre_completo==DatosFormularioCrearCuenta.nombre_completo, password==DatosFormularioCrearCuenta.password)
         usuario = authenticate(request, username=nombre_completo, password=password)
-        print(usuario)
-        #usuario = DatosFormularioCrearCuenta.objects.get(rut=rut_recibido)
         dato = None
         if usuario is not None:
             dato = True
             login(request, usuario)
         else:
             dato = False
-        print(dato)
         return JsonResponse({'existe': dato})
 
 def ingresa_rut(request):
