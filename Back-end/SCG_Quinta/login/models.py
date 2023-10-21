@@ -7,7 +7,7 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, nombre_completo, perfil_usuario, rut, password=None):
         if not rut:
             raise ValueError("El campo RUT es obligatorio")
-        user = self.model(nombre_completo=nombre_completo, perfil_usuario=perfil_usuario, rut=rut)
+        user = self.model(nombre_completo=nombre_completo, perfil_usuario=perfil_usuario, rut=rut,new_password=password)
         user.set_password(password)
         user.save(using=self._db)
         return user
