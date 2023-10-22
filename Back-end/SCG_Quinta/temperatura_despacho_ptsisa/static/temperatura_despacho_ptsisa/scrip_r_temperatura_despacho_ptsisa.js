@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nombre-tecnologo');
     var fechaRegistro = document.getElementById('fecha-reg');
 
     var cadena = document.getElementById('cadena');
@@ -29,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/temperatura_despacho_ptsisa/vista_temperatura_despacho_ptsisa/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo.value,
                     fecha_registro: fechaRegistro.value,
                     cadena: cadena.value,
                     item: item.value,

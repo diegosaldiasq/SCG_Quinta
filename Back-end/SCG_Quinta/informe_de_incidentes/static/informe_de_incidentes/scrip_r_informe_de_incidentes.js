@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nomb-tecno');
     var fechaRegistro = document.getElementById('fecha-reg');
 
     var fuenteMaterial = document.getElementById('fuente-material');
@@ -22,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var nombreTecnologo = $("#nomb-tecno").val();
             var fechaRegistro = $("#fecha-reg").val();
             var fuenteMaterial = $("#fuente-material").val();
             var cantidadContaminada = $("#cantidad-cont").val();
@@ -36,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/informe_de_incidentes/vista_informe_de_incidentes/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo,
                     fecha_registro: fechaRegistro,
                     fuente_material: fuenteMaterial,
                     cantidad_contaminada: cantidadContaminada,

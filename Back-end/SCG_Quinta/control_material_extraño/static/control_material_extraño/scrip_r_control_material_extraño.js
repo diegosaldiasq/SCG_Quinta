@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nomb-tec');
     var fechaRegistro = document.getElementById('fecha-reg');
     var turno = document.getElementById('turno');
 
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var nombreTecnologo = $("#nomb-tec").val();
             var fechaRegistro = $("#fecha-reg").val();
             var turno = $("#turno").val();
             var areaMaterial = $("#area").val();
@@ -34,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/control_material_extraño/vista_control_material_extraño/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo,
                     fecha_registro: fechaRegistro,
                     turno: turno,
                     area_material: areaMaterial,

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nombre-tecnologo');
     var fechaRegistro = document.getElementById('fecha-reg');
 
     var nombreProveedor = document.getElementById('nombre-prov');
@@ -28,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var nombreTecnologo = $("#nombre-tecnologo").val();
             var fechaRegistro = $("#fecha-reg").val();
             var nombreProveedor = $("#nombre-prov").val();
             var fechaReclamo = $("#fecha-recl").val();
@@ -46,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/reclamo_a_proveedores/vista_reclamo_a_proveedores/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo,
                     fecha_registro: fechaRegistro,
                     nombre_proveedor: nombreProveedor,
                     fecha_reclamo: fechaReclamo,

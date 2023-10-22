@@ -26,7 +26,7 @@ def vista_higiene_y_conducta_personal(request):
         accion_correctiva = request.POST.get('accion_correctiva')
         verificacion_accion_correctiva = request.POST.get('verificacion_accion_correctiva')
         observacion = request.POST.get('observacion')
-        nombre_tecnologo = request.POST.get('nombre_tecnologo')
+        nombre_tecnologo = request.user.nombre_completo
 
         datos = DatosFormularioHigieneConductaPersonal(
             fecha_ingreso=fecha_ingreso,

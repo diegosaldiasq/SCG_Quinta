@@ -16,7 +16,7 @@ def informe_de_incidentes(request):
 @login_required
 def vista_informe_de_incidentes(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.POST.get('nombre_tecnologo')
+        nombre_tecnologo = request.user.nombre_completo
         fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         fuente_material = request.POST.get('fuente_material')
         cantidad_contaminada = request.POST.get('cantidad_contaminada')

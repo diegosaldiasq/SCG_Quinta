@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nomb-tecn');
     var fechaRegistro = document.getElementById('fecha-reg');
 
     var nombreDeProveedor = document.getElementById('nomb-prov');
@@ -29,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         $("#miBoton").click(function() {
 
-            var nombreTecnologo = $("#nomb-tecn").val();
             var fechaRegistro = $("#fecha-reg").val();
             var nombreDeProveedor = $("#nomb-prov").val();
             var numeroFactura = $("#numero-factura").val();
@@ -47,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/rechazo_mp_in_me/vista_rechazo_mp_in_me/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo,
                     fecha_registro: fechaRegistro,
                     nombre_proveedor: nombreDeProveedor,
                     numero_factura: numeroFactura,

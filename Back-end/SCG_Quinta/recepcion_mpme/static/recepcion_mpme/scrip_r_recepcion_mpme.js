@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nombre-tecnologo');
     var loteDia = document.getElementById('lote-dia');
     var fechaRegistro = document.getElementById('fecha-reg');
     var nombreProveedor = document.getElementById('proveedor');
@@ -33,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var nombreTecnologo = $("#nombre-tecnologo").val();
             var loteDia = $("#lote-dia").val();
             var fechaRegistro = $("#fecha-reg").val();
             var nombreProveedor = $("#proveedor").val();
@@ -59,7 +57,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/recepcion_mpme/vista_recepcion_mpme/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo,
                     lote_dia: loteDia,
                     fecha_registro: fechaRegistro,
                     nombre_proveedor: nombreProveedor,

@@ -16,7 +16,7 @@ def pcc2_detector_metales(request):
 @login_required
 def vista_pcc2_detector_metales(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.POST.get('nombre_tecnologo')
+        nombre_tecnologo = request.user.nombre_completo
         fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         lote = request.POST.get('lote')
         turno = request.POST.get('turno')

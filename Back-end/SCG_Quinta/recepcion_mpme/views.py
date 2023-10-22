@@ -16,7 +16,7 @@ def recepcion_mpme(request):
 @login_required
 def vista_recepcion_mpme(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.POST.get('nombre_tecnologo')
+        nombre_tecnologo = request.user.nombre_completo
         lote_dia = request.POST.get('lote_dia')
         fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         nombre_proveedor = request.POST.get('nombre_proveedor')

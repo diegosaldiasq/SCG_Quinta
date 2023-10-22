@@ -16,7 +16,7 @@ def monitoreo_de_plagas(request):
 @login_required
 def vista_monitoreo_de_plagas(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.POST.get('nombre_tecnologo')
+        nombre_tecnologo = request.user.nombre_completo
         fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         numero_estacion = request.POST.get('numero_estacion')
         tipo_plaga = request.POST.get('tipo_plaga')

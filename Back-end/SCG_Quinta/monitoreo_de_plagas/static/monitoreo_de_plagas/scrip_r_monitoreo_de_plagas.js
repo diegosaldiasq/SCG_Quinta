@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nombre-tecnologo');
     var fechaDeRegistro = document.getElementById('fecha-reg');
 
     var numeroDeEstacion = document.getElementById('numero-estacion');
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var nombreTecnologo = $("#nombre-tecnologo").val();
             var fechaDeRegistro = $("#fecha-reg").val();
             var numeroDeEstacion = $("#numero-estacion").val();
             var tipoDePlaga = $("#tipo-plaga").val();
@@ -34,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/monitoreo_de_plagas/vista_monitoreo_de_plagas/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo,
                     fecha_registro: fechaDeRegistro,
                     numero_estacion: numeroDeEstacion,
                     tipo_plaga: tipoDePlaga,

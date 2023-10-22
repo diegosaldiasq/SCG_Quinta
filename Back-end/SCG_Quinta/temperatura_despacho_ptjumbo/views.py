@@ -16,7 +16,7 @@ def temperatura_despacho_ptjumbo(request):
 @login_required
 def vista_temperatura_despacho_ptjumbo(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.POST.get('nombre_tecnologo')
+        nombre_tecnologo = request.user.nombre_completo
         fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
         cadena = request.POST.get('cadena')
         item = request.POST.get('item')

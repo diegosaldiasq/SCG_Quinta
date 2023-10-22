@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var accionCorrectiva = document.getElementById('ac');
     var verificacionAccionCorrectiva = document.getElementById('vac');
     var observacion = document.getElementById('obs');
-    var nombreTecnologo = document.getElementById('nomb-tecno');
-
     // Envio de datos a Django
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
@@ -33,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
             var accionCorrectiva = $("#ac").val();
             var verificacionAccionCorrectiva = $("#vac").val();
             var observacion = $("#obs").val();
-            var nombreTecnologo = $("#nomb-tecno").val();
 
             $.ajax({
                 url: "/higiene_y_conducta_personal/vista_higiene_y_conducta_personal/",  // Ruta a tu vista Django
@@ -48,8 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     desviacion: desviacion,
                     accion_correctiva: accionCorrectiva,
                     verificacion_accion_correctiva: verificacionAccionCorrectiva,
-                    observacion: observacion,
-                    nombre_tecnologo: nombreTecnologo
+                    observacion: observacion
                 },
                 success: function(response) {
                     // Hacer algo con la respuesta del servidor

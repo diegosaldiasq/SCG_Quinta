@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var nombreTecnologo = document.getElementById('nom-tec');
     var fechaRegistro = document.getElementById('fecha-reg');
     var fechaRecepcion = document.getElementById('fecha-recep');
     var productoRecepcion = document.getElementById('producto');
@@ -22,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var nombreTecnologo = $("#nom-tec").val();
             var fechaRegistro = $("#fecha-reg").val();
             var fechaRecepcion = $("#fecha-recep").val();
             var productoRecepcion = $("#producto").val();
@@ -37,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/control_de_transporte/vista_control_de_transporte/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    nombre_tecnologo: nombreTecnologo,
                     fecha_registro: fechaRegistro,
                     fecha_recepcion: fechaRecepcion,
                     producto_recepcion: productoRecepcion,
