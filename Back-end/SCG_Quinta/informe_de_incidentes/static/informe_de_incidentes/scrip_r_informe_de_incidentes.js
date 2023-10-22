@@ -55,5 +55,4 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     });   
-    alert("El archivo JavaScript se ha cargado y la página está lista.");
 });

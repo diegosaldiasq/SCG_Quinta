@@ -66,5 +66,4 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
     // Fin de envio de datos a Django
-    alert("El archivo JavaScript se ha cargado y la página está lista.");
 });
