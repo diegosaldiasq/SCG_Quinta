@@ -73,6 +73,13 @@ body {
     padding: 6px;
     margin-bottom: 12px;
 }
+.subtitle-ej {
+    color: var(--very-light-pink);
+    font-size: var(--md);
+    font-weight: 300;
+    margin-top: 0;
+    text-align: center;
+}
 .primary-button {
     background-color: var(--rojo-quinta);
     border-radius: 8px;
