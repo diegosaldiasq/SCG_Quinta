@@ -67,14 +67,14 @@ def descargar_monitoreo_del_agua(request):
                     objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                     objeto.turno_mda,
                     objeto.planta_mda,
-                    objeto.numero_llave,
+                    int(objeto.numero_llave),
                     objeto.punto_muestreo,
                     objeto.sabor_insipido,
                     objeto.olor_inodora,
                     objeto.color_incoloro,
                     objeto.ph_mda,
                     objeto.cloro_libre,
-                    objeto.accion_correctiva,
+                    int(objeto.accion_correctiva),
                     objeto.resultado_ac])
     wb.save(response)
     return response
@@ -169,26 +169,26 @@ def descargar_recepcion_mpme(request):
     
     for objeto in DatosFormularioRecepcionMpMe.objects.all():
         ws.append([objeto.nombre_tecnologo,
-                         objeto.lote_dia,
+                         int(objeto.lote_dia),
                          objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.nombre_proveedor,
                          objeto.nombre_producto,
                          objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.lote_producto,
-                         objeto.numero_factura,
+                         int(objeto.numero_factura),
                          objeto.higiene,
                          objeto.rs,
-                         objeto.temperatura_transporte,
+                         int(objeto.temperatura_transporte),
                          objeto.apariencia,
                          objeto.textura,
                          objeto.ausencia_material_extraño,
-                         objeto.temperatura_producto,
+                         int(objeto.temperatura_producto),
                          objeto.condicion_envase,
                          objeto.color,
                          objeto.olor,
                          objeto.sabor,
-                         objeto.grados_brix])
+                         int(objeto.grados_brix)])
     wb.save(response)
     return response
                      
@@ -240,13 +240,13 @@ def descargar_control_de_transporte(request):
     
     for objeto in DatosFormularioControlDeTransporte.objects.all():
         ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
-                         objeto.fecha_recepcion,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                         objeto.fecha_recepcion.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.producto_recepcion,
                          objeto.temperatura_transporte,
                          objeto.temperatura_producto,
-                         objeto.lote,
-                         objeto.fecha_vencimiento,
+                         int(objeto.lote),
+                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva])
     wb.save(response)
@@ -278,7 +278,7 @@ def descargar_temperatura_despacho_ptjumbo(request):
                          objeto.producto,
                          objeto.temperatura_producto,
                          objeto.revision_etiquetado,
-                         objeto.lote,
+                         int(objeto.lote),
                          objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva])
@@ -311,7 +311,7 @@ def descargar_temperatura_despacho_ptsisa(request):
                          objeto.producto,
                          objeto.temperatura_producto,
                          objeto.revision_etiquetado,
-                         objeto.lote,
+                         int(objeto.lote),
                          objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva])
@@ -395,16 +395,16 @@ def descargar_reclamo_a_proveedores(request):
         ws.append([objeto.nombre_tecnologo,
                          objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.nombre_proveedor,
-                         objeto.fecha_reclamo,
+                         objeto.fecha_reclamo.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.nombre_del_producto,
                          objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.lote,
+                         int(objeto.lote),
                          objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.no_conformidad,
                          objeto.clasificacion,
                          objeto.cantidad_involucrada,
                          objeto.unidad_de_medida,
-                         objeto.archivo_foto])
+                         objeto.archivo_foto.url])
     wb.save(response)
     return response
 
@@ -436,7 +436,7 @@ def descargar_rechazo_mp_in_me(request):
                          objeto.nombre_transportista,
                          objeto.nombre_producto,
                          objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.lote,
+                         int(objeto.lote),
                          objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.motivo_rechazo,
                          objeto.cantidad_producto_involucrado,
@@ -465,9 +465,9 @@ def descargar_informe_de_incidentes(request):
         ws.append([objeto.nombre_tecnologo,
                          objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.fuente_material,
-                         objeto.cantidad_contaminada,
+                         int(objeto.cantidad_contaminada),
                          objeto.unidad_de_medida,
-                         objeto.lote_producto_contaminado,
+                         int(objeto.lote_producto_contaminado),
                          objeto.observaciones,
                          objeto.analisis_causa,
                          objeto.accion_correctiva])
