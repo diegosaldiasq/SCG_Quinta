@@ -81,10 +81,11 @@ def descargar_monitoreo_del_agua(request):
 
 @login_required
 def descargar_higiene_y_conducta_personal(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="higiene_y_conducta_personal.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['fecha_ingreso',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="higiene_y_conducta_personal.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['fecha_ingreso',
                      'nombre_personal',
                      'turno',
                      'planta',
@@ -97,7 +98,7 @@ def descargar_higiene_y_conducta_personal(request):
                      'nombre_tecnologo'])
     
     for objeto in DatosFormularioHigieneConductaPersonal.objects.all():
-        writer.writerow([objeto.fecha_ingreso,
+        ws.append([objeto.fecha_ingreso.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.nombre_personal,
                          objeto.turno,
                          objeto.planta,
@@ -108,14 +109,16 @@ def descargar_higiene_y_conducta_personal(request):
                          objeto.verificacion_accion_correctiva,
                          objeto.observacion,
                          objeto.nombre_tecnologo])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_monitoreo_de_plagas(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="monitoreo_de_plagas.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="monitoreo_de_plagas.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'numero_estacion',
                      'tipo_plaga',
@@ -125,22 +128,24 @@ def descargar_monitoreo_de_plagas(request):
                      'accion_correctiva'])
     
     for objeto in DatosFormularioMonitoreoDePlagas.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.numero_estacion,
                          objeto.tipo_plaga,
                          objeto.tipo_trampa,
                          objeto.ubicacion,
                          objeto.monitoreo,
                          objeto.accion_correctiva])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_recepcion_mpme(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="recepcion_mpme.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="recepcion_mpme.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'lote_dia',
                      'fecha_registro',
                      'nombre_proveedor',
@@ -163,13 +168,13 @@ def descargar_recepcion_mpme(request):
                      'grados_brix'])
     
     for objeto in DatosFormularioRecepcionMpMe.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
+        ws.append([objeto.nombre_tecnologo,
                          objeto.lote_dia,
-                         objeto.fecha_registro,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.nombre_proveedor,
                          objeto.nombre_producto,
-                         objeto.fecha_elaboracion,
-                         objeto.fecha_vencimiento,
+                         objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
+                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.lote_producto,
                          objeto.numero_factura,
                          objeto.higiene,
@@ -184,14 +189,16 @@ def descargar_recepcion_mpme(request):
                          objeto.olor,
                          objeto.sabor,
                          objeto.grados_brix])
+    wb.save(response)
     return response
                      
 @login_required
 def descargar_pcc2_detector_metales(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="pcc2_detector_metales.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="pcc2_detector_metales.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'lote',
                      'turno',
@@ -202,8 +209,8 @@ def descargar_pcc2_detector_metales(request):
                      'accion_correctiva'])
     
     for objeto in DatosFormularioPcc2DetectorMetales.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.lote,
                          objeto.turno,
                          objeto.tipo_metal,
@@ -211,14 +218,16 @@ def descargar_pcc2_detector_metales(request):
                          objeto.producto,
                          objeto.observaciones,
                          objeto.accion_correctiva])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_control_de_transporte(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="control_de_transporte.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="control_de_transporte.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'fecha_recepcion',
                      'producto_recepcion',
@@ -230,7 +239,7 @@ def descargar_control_de_transporte(request):
                      'verificacion_accion_correctiva'])
     
     for objeto in DatosFormularioControlDeTransporte.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
+        ws.append([objeto.nombre_tecnologo,
                          objeto.fecha_registro,
                          objeto.fecha_recepcion,
                          objeto.producto_recepcion,
@@ -240,14 +249,16 @@ def descargar_control_de_transporte(request):
                          objeto.fecha_vencimiento,
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_temperatura_despacho_ptjumbo(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptjumbo.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptjumbo.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'cadena',
                      'item',
@@ -260,25 +271,27 @@ def descargar_temperatura_despacho_ptjumbo(request):
                      'verificacion_accion_correctiva'])
     
     for objeto in DatosFormularioTemperaturaDespachoJumbo.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.cadena,
                          objeto.item,
                          objeto.producto,
                          objeto.temperatura_producto,
                          objeto.revision_etiquetado,
                          objeto.lote,
-                         objeto.fecha_vencimiento,
+                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_temperatura_despacho_ptsisa(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptsisa.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptsisa.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'cadena',
                      'item',
@@ -291,25 +304,27 @@ def descargar_temperatura_despacho_ptsisa(request):
                      'verificacion_accion_correctiva'])
     
     for objeto in DatosFormularioTemperaturaDespachoSisa.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.cadena,
                          objeto.item,
                          objeto.producto,
                          objeto.temperatura_producto,
                          objeto.revision_etiquetado,
                          objeto.lote,
-                         objeto.fecha_vencimiento,
+                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_historial_termometro(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="historial_termometro.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="historial_termometro.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'codigo_termometro',
                      'valor_1',
@@ -332,8 +347,8 @@ def descargar_historial_termometro(request):
                      'verificacion_accion_correctiva'])
     
     for objeto in DatosFormularioHistorialTermometro.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.codigo_termometro,
                          objeto.valor_1,
                          objeto.valor_2,
@@ -353,14 +368,16 @@ def descargar_historial_termometro(request):
                          objeto.cumplimiento,
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_reclamo_a_proveedores(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="reclamo_a_proveedores.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="reclamo_a_proveedores.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'nombre_proveedor',
                      'fecha_reclamo',
@@ -375,27 +392,29 @@ def descargar_reclamo_a_proveedores(request):
                      'archivo_foto'])
     
     for objeto in DatosFormularioReclamoProveedores.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.nombre_proveedor,
                          objeto.fecha_reclamo,
                          objeto.nombre_del_producto,
-                         objeto.fecha_elaboracion,
+                         objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.lote,
-                         objeto.fecha_vencimiento,
+                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.no_conformidad,
                          objeto.clasificacion,
                          objeto.cantidad_involucrada,
                          objeto.unidad_de_medida,
                          objeto.archivo_foto])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_rechazo_mp_in_me(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="rechazo_mp_in_me.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="rechazo_mp_in_me.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'nombre_proveedor',
                      'numero_factura',
@@ -410,27 +429,29 @@ def descargar_rechazo_mp_in_me(request):
                      'clasificacion'])
     
     for objeto in DatosFormularioRechazoMpInMe.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.nombre_proveedor,
                          objeto.numero_factura,
                          objeto.nombre_transportista,
                          objeto.nombre_producto,
-                         objeto.fecha_elaboracion,
+                         objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.lote,
-                         objeto.fecha_vencimiento,
+                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.motivo_rechazo,
                          objeto.cantidad_producto_involucrado,
                          objeto.unidad_de_medida,
                          objeto.clasificacion])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_informe_de_incidentes(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="informe_de_incidentes.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="informe_de_incidentes.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'fuente_material',
                      'cantidad_contaminada',
@@ -441,8 +462,8 @@ def descargar_informe_de_incidentes(request):
                      'accion_correctiva'])
     
     for objeto in DatosFormularioInformeDeIncidentes.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.fuente_material,
                          objeto.cantidad_contaminada,
                          objeto.unidad_de_medida,
@@ -450,14 +471,16 @@ def descargar_informe_de_incidentes(request):
                          objeto.observaciones,
                          objeto.analisis_causa,
                          objeto.accion_correctiva])
+    wb.save(response)
     return response
 
 @login_required
 def descargar_control_material_extraño(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="control_material_extraño.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="control_material_extraño.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
                      'fecha_registro',
                      'turno',
                      'area_material',
@@ -467,12 +490,13 @@ def descargar_control_material_extraño(request):
                      'observaciones'])
     
     for objeto in DatosFormularioControlMaterialExtraño.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
+        ws.append([objeto.nombre_tecnologo,
+                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                          objeto.turno,
                          objeto.area_material,
                          objeto.tipo_material,
                          objeto.accion_correctiva,
                          objeto.verificacion_accion_correctiva,
                          objeto.observaciones])
+    wb.save(response)
     return response
