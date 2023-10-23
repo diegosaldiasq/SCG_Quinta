@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 import csv
+from openpyxl import Workbook
+import pytz
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -42,37 +44,39 @@ def descargas(request):
 
 @login_required
 def descargar_monitoreo_del_agua(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="monitoreo_del_agua.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['nombre_tecnologo',
-                     'fecha_registro',
-                     'turno_mda',
-                     'planta_mda',
-                     'numero_llave',
-                     'punto_muestreo',
-                     'sabor_insipido',
-                     'olor_inodora',
-                     'color_incoloro',
-                     'ph_mda',
-                     'cloro_libre',
-                     'accion_correctiva',
-                     'resultado_ac'])
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="monitoreo_del_agua.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['nombre_tecnologo',
+                'fecha_registro',
+                'turno_mda',
+                'planta_mda',
+                'numero_llave',
+                'punto_muestreo',
+                'sabor_insipido',
+                'olor_inodora',
+                'color_incoloro',
+                'ph_mda',
+                'cloro_libre',
+                'accion_correctiva',
+                'resultado_ac'])
     
     for objeto in DatosFormularioMonitoreoDelAgua.objects.all():
-        writer.writerow([objeto.nombre_tecnologo,
-                         objeto.fecha_registro,
-                         objeto.turno_mda,
-                         objeto.planta_mda,
-                         objeto.numero_llave,
-                         objeto.punto_muestreo,
-                         objeto.sabor_insipido,
-                         objeto.olor_inodora,
-                         objeto.color_incoloro,
-                         objeto.ph_mda,
-                         objeto.cloro_libre,
-                         objeto.accion_correctiva,
-                         objeto.resultado_ac])
+        ws.append([objeto.nombre_tecnologo,
+                    objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                    objeto.turno_mda,
+                    objeto.planta_mda,
+                    objeto.numero_llave,
+                    objeto.punto_muestreo,
+                    objeto.sabor_insipido,
+                    objeto.olor_inodora,
+                    objeto.color_incoloro,
+                    objeto.ph_mda,
+                    objeto.cloro_libre,
+                    objeto.accion_correctiva,
+                    objeto.resultado_ac])
+    wb.save(response)
     return response
 
 @login_required
