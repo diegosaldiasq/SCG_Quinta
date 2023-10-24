@@ -20,6 +20,8 @@ from rechazo_mp_in_me.models import DatosFormularioRechazoMpInMe
 from informe_de_incidentes.models import DatosFormularioInformeDeIncidentes
 from control_material_extraño.models import DatosFormularioControlMaterialExtraño
 from login.models import DatosFormularioCrearCuenta
+import json
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -506,3 +508,19 @@ def descargar_control_material_extraño(request):
 def permisos(request):
     usuarios = DatosFormularioCrearCuenta.objects.all()
     return render(request, 'inicio/permisos.html', {'usuarios': usuarios})
+
+@login_required
+def vista_permisos(request):
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        datos = body_data.get('userdata')
+        print(datos)
+
+        for dato in datos:
+            for i in dato:
+                usuario = DatosFormularioCrearCuenta.objects.get(nombre_completo=i['name'])
+                usuario.is_active = i['isActive']
+                usuario.is_staff = i['isStaff']
+                usuario.save()
+        return JsonResponse({'existe': True})

@@ -48,9 +48,18 @@
                 </div>
             {% endfor %}
         </div>
-        <form class="form" action="{% url 'redireccionar_inicio' %}">
-            <button class="primary-button button">Volver inicio</button>
-        </form>
+        
+        <div class="button-container">
+            <form class="form" id="miBoton">
+                {% csrf_token %}
+                <button class="primary-button button">Guardar cambios</button>  
+            </form>
+            <form class="form" action="{% url 'redireccionar_inicio' %}">
+                <button class="primary-button button">Volver inicio</button>
+            </form>
+        </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'inicio/scrips_descargas.js' %}"></script>
 </body>
 </html>
