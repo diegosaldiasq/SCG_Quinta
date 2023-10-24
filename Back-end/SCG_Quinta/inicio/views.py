@@ -19,6 +19,7 @@ from reclamo_a_proveedores.models import DatosFormularioReclamoProveedores
 from rechazo_mp_in_me.models import DatosFormularioRechazoMpInMe
 from informe_de_incidentes.models import DatosFormularioInformeDeIncidentes
 from control_material_extraño.models import DatosFormularioControlMaterialExtraño
+from login.models import DatosFormularioCrearCuenta
 
 
 # Create your views here.
@@ -500,3 +501,8 @@ def descargar_control_material_extraño(request):
                          objeto.observaciones])
     wb.save(response)
     return response
+
+@login_required
+def permisos(request):
+    usuarios = DatosFormularioCrearCuenta.objects.all()
+    return render(request, 'inicio/permisos.html', {'usuarios': usuarios})
