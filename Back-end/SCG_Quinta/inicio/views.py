@@ -37,6 +37,10 @@ def redireccionar_selecciones(request):
     return HttpResponseRedirect(url_selecciones)
 
 @login_required
+def permisos_faltante(request):
+    return render(request, 'inicio/falta_permiso.html') 
+
+@login_required
 def redireccionar_main(request):
     url_main = reverse('main')
     return HttpResponseRedirect(url_main)
@@ -506,8 +510,11 @@ def descargar_control_material_extraño(request):
 
 @login_required
 def permisos(request):
-    usuarios = DatosFormularioCrearCuenta.objects.all()
-    return render(request, 'inicio/permisos.html', {'usuarios': usuarios})
+    if request.user.is_staff:
+        usuarios = DatosFormularioCrearCuenta.objects.all()
+        return render(request, 'inicio/permisos.html', {'usuarios': usuarios})
+    else:
+        return render(request, 'inicio/falta_permiso.html')
 
 @login_required
 def vista_permisos(request):
