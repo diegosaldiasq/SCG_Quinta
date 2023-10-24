@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", function() {
             var data = await response.json();
             debugger; // <-- Agrega esta línea
             if (data.existe) {
-                window.location.href = "/login/permiso_creado/";
-                //alert("El rut existe en la base de datos.");
+                //window.location.href = "/inicio/permiso_creado/";
+                alert("Se actualizaron los permisos correctamente.");
                 return true;
             } else {
                 alert("No se pudo actualizar los permisos.");

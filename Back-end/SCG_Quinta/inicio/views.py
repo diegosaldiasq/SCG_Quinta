@@ -511,16 +511,22 @@ def permisos(request):
 
 @login_required
 def vista_permisos(request):
-    if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
-        body_data = json.loads(body_unicode)
-        datos = body_data.get('userdata')
-        print(datos)
+    try:
+        # ... (tu código existente)
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
 
-        for dato in datos:
-            for i in dato:
-                usuario = DatosFormularioCrearCuenta.objects.get(nombre_completo=i['name'])
-                usuario.is_active = i['isActive']
-                usuario.is_staff = i['isStaff']
+            for dato in datos:
+                nombre = dato['name']
+                es_activo = dato['isActive']
+                es_jefatura = dato['isStaff']
+
+                usuario = DatosFormularioCrearCuenta.objects.get(nombre_completo=nombre)
+                usuario.is_active = es_activo
+                usuario.is_staff = es_jefatura
                 usuario.save()
-        return JsonResponse({'existe': True})
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
