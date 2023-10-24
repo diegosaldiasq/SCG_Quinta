@@ -25,7 +25,7 @@ class DatosFormularioCrearCuenta(AbstractBaseUser, PermissionsMixin):
     rut = models.CharField(max_length=12)
     password = models.TextField()
     new_password = models.TextField()
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 

@@ -22,6 +22,7 @@ body {
     height: 100vh;
     display: grid;
     justify-content: center;
+    align-items: center;
 }
 .logo {
     width: 200px;
@@ -33,6 +34,28 @@ body {
     margin-bottom: 8px;
     text-align: center;
     color: var(--black);
+}
+.filtro-fechas {
+    display: flex;                /* Para mostrar sus hijos en una fila horizontal */
+    justify-content: space-between;  /* Para espaciar los elementos uniformemente */
+    align-items: center;          /* Alineación vertical centrada de los elementos */
+    padding: 10px;                /* Proporcionar un espaciado alrededor de los elementos */
+    background-color: var(--amarillo-quinta);  /* Utilizando la variable de color existente */
+    border-radius: 16px;          /* Esquinas redondeadas como otros elementos */
+    width: 630px;                 /* Ajustar al ancho del login-container */
+    margin-bottom: 20px;          /* Proporcionar un espacio debajo de la sección de filtro */
+}
+
+.filtro-fechas .label {
+    margin-right: 10px;           /* Proporcionar espacio entre la etiqueta y el campo de entrada */
+}
+
+.filtro-fechas .input {
+    background-color: var(--text-input-field);  /* Utilizando la variable de color existente */
+    border: 1px solid var(--very-light-pink);   /* Utilizando la variable de color existente */
+    border-radius: 8px;          /* Esquinas redondeadas para los campos de entrada */
+    padding: 5px;                /* Relleno dentro del campo de entrada */
+    font-size: var(--md);        /* Utilizando la variable de tamaño de fuente existente */
 }
 .login-container {
     display: grid;
