@@ -51,6 +51,11 @@ def descargas(request):
 
 @login_required
 def descargar_monitoreo_del_agua(request):
+    fecha_inicio = request.GET.get('fecha-inicio')
+    fecha_fin = request.GET.get('fecha-fin')
+    print(fecha_inicio, fecha_fin)
+    print(request.GET)
+    objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="monitoreo_del_agua.xlsx"'
     wb = Workbook()
@@ -69,7 +74,7 @@ def descargar_monitoreo_del_agua(request):
                 'accion_correctiva',
                 'resultado_ac'])
     
-    for objeto in DatosFormularioMonitoreoDelAgua.objects.all():
+    for objeto in objeto_filtrado:
         ws.append([objeto.nombre_tecnologo,
                     objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
                     objeto.turno_mda,

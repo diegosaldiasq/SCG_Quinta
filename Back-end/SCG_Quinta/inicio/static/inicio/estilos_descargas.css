@@ -57,6 +57,17 @@ body {
     padding: 5px;                /* Relleno dentro del campo de entrada */
     font-size: var(--md);        /* Utilizando la variable de tamaño de fuente existente */
 }
+.primary-button2 {
+    background-color: var(--rojo-quinta);
+    border-radius: 8px;
+    border: none;
+    color: var(--white);
+    width: 100px;
+    cursor: pointer;
+    font-size: var(--md);
+    font-weight: bold;
+    height: 40px;
+}
 .login-container {
     display: grid;
     grid-template-rows: auto 1fr auto;
