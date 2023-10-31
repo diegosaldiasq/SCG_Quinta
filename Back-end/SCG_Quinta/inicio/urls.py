@@ -22,5 +22,6 @@ urlpatterns = [
     path("descargar_control_material_extraño/", views.descargar_control_material_extraño, name="descargar_control_material_extraño"),
     path("permisos/", views.permisos, name="permisos"),
     path("vista_permisos/", views.vista_permisos, name="vista_permisos"),
-    path("permisos_faltante/", views.permisos_faltante, name="permisos_faltante")
+    path("permisos_faltante/", views.permisos_faltante, name="permisos_faltante"),
+    path("intermedio/", views.intermedio, name="intermedio")
 ]

@@ -515,7 +515,7 @@ def descargar_control_material_extraño(request):
 
 @login_required
 def permisos(request):
-    if request.user.is_staff:
+    if request.user.is_staff or request.user.is_superuser:
         usuarios = DatosFormularioCrearCuenta.objects.all()
         return render(request, 'inicio/permisos.html', {'usuarios': usuarios})
     else:
@@ -542,3 +542,7 @@ def vista_permisos(request):
             return JsonResponse({'existe': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@login_required    
+def intermedio(request):
+    return render(request, 'inicio/intermedio.html')

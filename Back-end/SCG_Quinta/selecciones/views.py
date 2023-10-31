@@ -78,3 +78,8 @@ def redireccionar_informe_de_incidentes(request):
 def redireccionar_control_material_extraño(request):
     url_control_material_extraño = reverse('control_material_extraño')
     return HttpResponseRedirect(url_control_material_extraño)
+
+@login_required
+def redireccionar_intermedio(request):
+    url_intermedio = reverse('intermedio')
+    return HttpResponseRedirect(url_intermedio)

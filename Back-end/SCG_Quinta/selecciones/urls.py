@@ -17,6 +17,7 @@ urlpatterns = [
     path("reclamo_a_proveedores/", views.redireccionar_reclamo_a_proveedores, name="redireccionar_reclamo_a_proveedores"),
     path("rechazo_mp_in_me/", views.redireccionar_rechazo_mp_in_me, name="redireccionar_rechazo_mp_in_me"),
     path("informe_de_incidentes/", views.redireccionar_informe_de_incidentes, name="redireccionar_informe_de_incidentes"),
-    path("control_material_extraño/", views.redireccionar_control_material_extraño, name="redireccionar_control_material_extraño")
+    path("control_material_extraño/", views.redireccionar_control_material_extraño, name="redireccionar_control_material_extraño"),
+    path("intermedio/", views.redireccionar_intermedio, name="redireccionar_intermedio")
 ]
 
