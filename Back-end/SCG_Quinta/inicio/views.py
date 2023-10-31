@@ -22,6 +22,8 @@ from control_material_extraño.models import DatosFormularioControlMaterialExtra
 from login.models import DatosFormularioCrearCuenta
 import json
 from django.http import JsonResponse
+from django.utils import timezone
+from datetime import datetime
 
 
 # Create your views here.
@@ -51,45 +53,47 @@ def descargas(request):
 
 @login_required
 def descargar_monitoreo_del_agua(request):
-    fecha_inicio = request.GET.get('fecha-inicio')
-    fecha_fin = request.GET.get('fecha-fin')
-    print(fecha_inicio, fecha_fin)
-    print(request.GET)
-    objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="monitoreo_del_agua.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                'fecha_registro',
-                'turno_mda',
-                'planta_mda',
-                'numero_llave',
-                'punto_muestreo',
-                'sabor_insipido',
-                'olor_inodora',
-                'color_incoloro',
-                'ph_mda',
-                'cloro_libre',
-                'accion_correctiva',
-                'resultado_ac'])
-    
-    for objeto in objeto_filtrado:
-        ws.append([objeto.nombre_tecnologo,
-                    objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                    objeto.turno_mda,
-                    objeto.planta_mda,
-                    int(objeto.numero_llave),
-                    objeto.punto_muestreo,
-                    objeto.sabor_insipido,
-                    objeto.olor_inodora,
-                    objeto.color_incoloro,
-                    objeto.ph_mda,
-                    objeto.cloro_libre,
-                    int(objeto.accion_correctiva),
-                    objeto.resultado_ac])
-    wb.save(response)
-    return response
+    if request.method == 'POST':
+        fecha_inicio = timezone.make_aware(datetime.strptime(request.POST.get('fechainicio'), '%Y-%m-%d'), timezone=timezone.utc)
+        fecha_fin = timezone.make_aware(datetime.strptime(request.POST.get('fechafin'), '%Y-%m-%d'), timezone=timezone.utc)
+        print(fecha_inicio, fecha_fin)
+        objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+        objeto_prueba = DatosFormularioMonitoreoDelAgua.objects.all()
+        print(objeto_prueba)
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="monitoreo_del_agua.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                    'fecha_registro',
+                    'turno_mda',
+                    'planta_mda',
+                    'numero_llave',
+                    'punto_muestreo',
+                    'sabor_insipido',
+                    'olor_inodora',
+                    'color_incoloro',
+                    'ph_mda',
+                    'cloro_libre',
+                    'accion_correctiva',
+                    'resultado_ac'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                        objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                        objeto.turno_mda,
+                        objeto.planta_mda,
+                        int(objeto.numero_llave),
+                        objeto.punto_muestreo,
+                        objeto.sabor_insipido,
+                        objeto.olor_inodora,
+                        objeto.color_incoloro,
+                        objeto.ph_mda,
+                        objeto.cloro_libre,
+                        int(objeto.accion_correctiva),
+                        objeto.resultado_ac])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_higiene_y_conducta_personal(request):

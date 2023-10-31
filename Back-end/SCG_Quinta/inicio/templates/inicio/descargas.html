@@ -28,7 +28,8 @@
             <p class="subtitle">POES</p>
             <p class="registro">
                 <span>1.- Registro monitoreo del agua</span>
-                <a href="{% url 'descargar_monitoreo_del_agua' %}">R-POES-Q-01-01</a>
+                <!--<a href="{% url 'descargar_monitoreo_del_agua' %}">R-POES-Q-01-01</a>-->
+                <button class="a" id="descarga-monitoreo-del-agua">R-POES-Q-01-01</button>
             </p>
             <p class="registro">
                 <span>2.- Registro higiene y conducta del personal</span>
@@ -90,5 +91,11 @@
             <button class="primary-button login-button">Volver inicio</button>
         </form>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'inicio/scrips_descargas.js' %}"></script>
 </body>
 </html>

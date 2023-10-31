@@ -5,3 +5,12 @@ Back-end/SCG_Quinta/db.sqlite3
 #*.jpg
 __pycache__/
 *.pyc
+.vscode/
+```
+I have tried to add the following to the .gitignore file:
+```
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+```

@@ -93,9 +93,14 @@ body {
     color: var(--black);
     font-weight: bold;
 }
-.registro a {
-    color: var(--white);
+.a {
+    color: var(--rojo-quinta);
     text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    background: var(--hospital-green);
+    font-weight: bold;
 }
 .form {
     display:  grid;
