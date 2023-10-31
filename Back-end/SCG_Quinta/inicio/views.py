@@ -56,10 +56,11 @@ def descargar_monitoreo_del_agua(request):
     if request.method == 'POST':
         fecha_inicio = timezone.make_aware(datetime.strptime(request.POST.get('fechainicio'), '%Y-%m-%d'), timezone=timezone.utc)
         fecha_fin = timezone.make_aware(datetime.strptime(request.POST.get('fechafin'), '%Y-%m-%d'), timezone=timezone.utc)
-        print(fecha_inicio, fecha_fin)
+        print(fecha_inicio, fecha_fin) #debug
         objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
-        objeto_prueba = DatosFormularioMonitoreoDelAgua.objects.all()
-        print(objeto_prueba)
+        objeto_prueba = DatosFormularioMonitoreoDelAgua.objects.all() #debug
+        print(objeto_prueba[3].fecha_registro) #debug
+        print(objeto_filtrado[0].fecha_registro) #debug
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="monitoreo_del_agua.xlsx"'
         wb = Workbook()

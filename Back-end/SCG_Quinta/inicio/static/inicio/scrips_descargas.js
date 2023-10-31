@@ -20,14 +20,13 @@ $(document).ready(function() {
                 fechainicio: fechainicio,
                 fechafin: fechafin
             },
-            success: function(response) {
-                // Hacer algo con la respuesta del servidor
-                //console.log(response);
-                $("#mensaje").text(response.mensaje);
-            },
-            error: function() {
-                // Manejar errores
-                console.error("Error en la solicitud AJAX:", textStatus, errorThrown);
+            success: function(data) {
+                console.log(data);
+                if (data == "ok") {
+                    alert("Se ha descargado el archivo correctamente");
+                } else {
+                    alert("No se ha podido descargar el archivo");
+                }
             }
         });
     });

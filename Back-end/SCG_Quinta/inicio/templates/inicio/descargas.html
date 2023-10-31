@@ -17,7 +17,8 @@
     <div class="login">
         <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
         <h1 class="title">Seleccionar registro a descargar</h1>
-        <form class="filtro-fechas" method="GET">
+        <form class="filtro-fechas" method="POST">
+            {% csrf_token %}
             <label class="label">Fecha inicio</label>
             <input class="input" type="date" name="fecha-inicio" id="fecha-inicio">
             <label class="label">Fecha fin</label>
