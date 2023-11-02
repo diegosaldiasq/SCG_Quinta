@@ -118,425 +118,593 @@ def descargar_monitoreo_del_agua(request):
 
 @login_required
 def descargar_higiene_y_conducta_personal(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="higiene_y_conducta_personal.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['fecha_ingreso',
-                     'nombre_personal',
-                     'turno',
-                     'planta',
-                     'area',
-                     'cumplimiento',
-                     'desviacion',
-                     'accion_correctiva',
-                     'verificacion_accion_correctiva',
-                     'observacion',
-                     'nombre_tecnologo'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioHigieneConductaPersonal.objects.all():
-        ws.append([objeto.fecha_ingreso.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.nombre_personal,
-                         objeto.turno,
-                         objeto.planta,
-                         objeto.area,
-                         objeto.cumplimiento,
-                         objeto.desviacion,
-                         objeto.accion_correctiva,
-                         objeto.verificacion_accion_correctiva,
-                         objeto.observacion,
-                         objeto.nombre_tecnologo])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioHigieneConductaPersonal.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioHigieneConductaPersonal.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="higiene_y_conducta_personal.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['fecha_ingreso',
+                        'nombre_personal',
+                        'turno',
+                        'planta',
+                        'area',
+                        'cumplimiento',
+                        'desviacion',
+                        'accion_correctiva',
+                        'verificacion_accion_correctiva',
+                        'observacion',
+                        'nombre_tecnologo'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.fecha_ingreso.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.nombre_personal,
+                            objeto.turno,
+                            objeto.planta,
+                            objeto.area,
+                            objeto.cumplimiento,
+                            objeto.desviacion,
+                            objeto.accion_correctiva,
+                            objeto.verificacion_accion_correctiva,
+                            objeto.observacion,
+                            objeto.nombre_tecnologo])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_monitoreo_de_plagas(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="monitoreo_de_plagas.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'numero_estacion',
-                     'tipo_plaga',
-                     'tipo_trampa',
-                     'ubicacion',
-                     'monitoreo',
-                     'accion_correctiva'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioMonitoreoDePlagas.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.numero_estacion,
-                         objeto.tipo_plaga,
-                         objeto.tipo_trampa,
-                         objeto.ubicacion,
-                         objeto.monitoreo,
-                         objeto.accion_correctiva])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioMonitoreoDePlagas.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioMonitoreoDePlagas.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="monitoreo_de_plagas.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'numero_estacion',
+                        'tipo_plaga',
+                        'tipo_trampa',
+                        'ubicacion',
+                        'monitoreo',
+                        'accion_correctiva'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.numero_estacion,
+                            objeto.tipo_plaga,
+                            objeto.tipo_trampa,
+                            objeto.ubicacion,
+                            objeto.monitoreo,
+                            objeto.accion_correctiva])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_recepcion_mpme(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="recepcion_mpme.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'lote_dia',
-                     'fecha_registro',
-                     'nombre_proveedor',
-                     'nombre_producto',
-                     'fecha_elaboracion',
-                     'fecha_vencimiento',
-                     'lote_producto',
-                     'numero_factura',
-                     'higiene',
-                     'rs',
-                     'temperatura_transporte',
-                     'apariencia',
-                     'textura',
-                     'ausencia_material_extraño',
-                     'temperatura_producto',
-                     'condicion_envase',
-                     'color',
-                     'olor',
-                     'sabor',
-                     'grados_brix'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioRecepcionMpMe.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         int(objeto.lote_dia),
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.nombre_proveedor,
-                         objeto.nombre_producto,
-                         objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.lote_producto,
-                         int(objeto.numero_factura),
-                         objeto.higiene,
-                         objeto.rs,
-                         int(objeto.temperatura_transporte),
-                         objeto.apariencia,
-                         objeto.textura,
-                         objeto.ausencia_material_extraño,
-                         int(objeto.temperatura_producto),
-                         objeto.condicion_envase,
-                         objeto.color,
-                         objeto.olor,
-                         objeto.sabor,
-                         int(objeto.grados_brix)])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioRecepcionMpMe.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioRecepcionMpMe.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="recepcion_mpme.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'lote_dia',
+                        'fecha_registro',
+                        'nombre_proveedor',
+                        'nombre_producto',
+                        'fecha_elaboracion',
+                        'fecha_vencimiento',
+                        'lote_producto',
+                        'numero_factura',
+                        'higiene',
+                        'rs',
+                        'temperatura_transporte',
+                        'apariencia',
+                        'textura',
+                        'ausencia_material_extraño',
+                        'temperatura_producto',
+                        'condicion_envase',
+                        'color',
+                        'olor',
+                        'sabor',
+                        'grados_brix'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            int(objeto.lote_dia),
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.nombre_proveedor,
+                            objeto.nombre_producto,
+                            objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.lote_producto,
+                            int(objeto.numero_factura),
+                            objeto.higiene,
+                            objeto.rs,
+                            int(objeto.temperatura_transporte),
+                            objeto.apariencia,
+                            objeto.textura,
+                            objeto.ausencia_material_extraño,
+                            int(objeto.temperatura_producto),
+                            objeto.condicion_envase,
+                            objeto.color,
+                            objeto.olor,
+                            objeto.sabor,
+                            int(objeto.grados_brix)])
+        wb.save(response)
+        return response
                      
 @login_required
 def descargar_pcc2_detector_metales(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="pcc2_detector_metales.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'lote',
-                     'turno',
-                     'tipo_metal',
-                     'medicion',
-                     'producto',
-                     'observaciones',
-                     'accion_correctiva'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioPcc2DetectorMetales.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.lote,
-                         objeto.turno,
-                         objeto.tipo_metal,
-                         objeto.medicion,
-                         objeto.producto,
-                         objeto.observaciones,
-                         objeto.accion_correctiva])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioPcc2DetectorMetales.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioPcc2DetectorMetales.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="pcc2_detector_metales.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'lote',
+                        'turno',
+                        'tipo_metal',
+                        'medicion',
+                        'producto',
+                        'observaciones',
+                        'accion_correctiva'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.lote,
+                            objeto.turno,
+                            objeto.tipo_metal,
+                            objeto.medicion,
+                            objeto.producto,
+                            objeto.observaciones,
+                            objeto.accion_correctiva])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_control_de_transporte(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="control_de_transporte.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'fecha_recepcion',
-                     'producto_recepcion',
-                     'temperatura_transporte',
-                     'temperatura_producto',
-                     'lote',
-                     'fecha_vencimiento',
-                     'accion_correctiva',
-                     'verificacion_accion_correctiva'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioControlDeTransporte.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.fecha_recepcion.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.producto_recepcion,
-                         objeto.temperatura_transporte,
-                         objeto.temperatura_producto,
-                         int(objeto.lote),
-                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.accion_correctiva,
-                         objeto.verificacion_accion_correctiva])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioControlDeTransporte.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioControlDeTransporte.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="control_de_transporte.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'fecha_recepcion',
+                        'producto_recepcion',
+                        'temperatura_transporte',
+                        'temperatura_producto',
+                        'lote',
+                        'fecha_vencimiento',
+                        'accion_correctiva',
+                        'verificacion_accion_correctiva'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.fecha_recepcion.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.producto_recepcion,
+                            objeto.temperatura_transporte,
+                            objeto.temperatura_producto,
+                            int(objeto.lote),
+                            objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.accion_correctiva,
+                            objeto.verificacion_accion_correctiva])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_temperatura_despacho_ptjumbo(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptjumbo.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'cadena',
-                     'item',
-                     'producto',
-                     'temperatura_producto',
-                     'revision_etiquetado',
-                     'lote',
-                     'fecha_vencimiento',
-                     'accion_correctiva',
-                     'verificacion_accion_correctiva'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioTemperaturaDespachoJumbo.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.cadena,
-                         objeto.item,
-                         objeto.producto,
-                         objeto.temperatura_producto,
-                         objeto.revision_etiquetado,
-                         int(objeto.lote),
-                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.accion_correctiva,
-                         objeto.verificacion_accion_correctiva])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioTemperaturaDespachoJumbo.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioTemperaturaDespachoJumbo.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptjumbo.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'cadena',
+                        'item',
+                        'producto',
+                        'temperatura_producto',
+                        'revision_etiquetado',
+                        'lote',
+                        'fecha_vencimiento',
+                        'accion_correctiva',
+                        'verificacion_accion_correctiva'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.cadena,
+                            objeto.item,
+                            objeto.producto,
+                            objeto.temperatura_producto,
+                            objeto.revision_etiquetado,
+                            int(objeto.lote),
+                            objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.accion_correctiva,
+                            objeto.verificacion_accion_correctiva])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_temperatura_despacho_ptsisa(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptsisa.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'cadena',
-                     'item',
-                     'producto',
-                     'temperatura_producto',
-                     'revision_etiquetado',
-                     'lote',
-                     'fecha_vencimiento',
-                     'accion_correctiva',
-                     'verificacion_accion_correctiva'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioTemperaturaDespachoSisa.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.cadena,
-                         objeto.item,
-                         objeto.producto,
-                         objeto.temperatura_producto,
-                         objeto.revision_etiquetado,
-                         int(objeto.lote),
-                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.accion_correctiva,
-                         objeto.verificacion_accion_correctiva])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioTemperaturaDespachoSisa.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioTemperaturaDespachoSisa.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="temperatura_despacho_ptsisa.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'cadena',
+                        'item',
+                        'producto',
+                        'temperatura_producto',
+                        'revision_etiquetado',
+                        'lote',
+                        'fecha_vencimiento',
+                        'accion_correctiva',
+                        'verificacion_accion_correctiva'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.cadena,
+                            objeto.item,
+                            objeto.producto,
+                            objeto.temperatura_producto,
+                            objeto.revision_etiquetado,
+                            int(objeto.lote),
+                            objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.accion_correctiva,
+                            objeto.verificacion_accion_correctiva])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_historial_termometro(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="historial_termometro.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'codigo_termometro',
-                     'valor_1',
-                     'valor_2',
-                     'valor_3',
-                     'valor_4',
-                     'valor_5',
-                     'promedio_prueba',
-                     'valor_6',
-                     'valor_7',
-                     'valor_8',
-                     'valor_9',
-                     'valor_10',
-                     'promedio_patron',
-                     'factor_anual',
-                     'promedio_termometros',
-                     'nivel_aceptacion',
-                     'cumplimiento',
-                     'accion_correctiva',
-                     'verificacion_accion_correctiva'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioHistorialTermometro.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.codigo_termometro,
-                         objeto.valor_1,
-                         objeto.valor_2,
-                         objeto.valor_3,
-                         objeto.valor_4,
-                         objeto.valor_5,
-                         objeto.promedio_prueba,
-                         objeto.valor_6,
-                         objeto.valor_7,
-                         objeto.valor_8,
-                         objeto.valor_9,
-                         objeto.valor_10,
-                         objeto.promedio_patron,
-                         objeto.factor_anual,
-                         objeto.promedio_termometros,
-                         objeto.nivel_aceptacion,
-                         objeto.cumplimiento,
-                         objeto.accion_correctiva,
-                         objeto.verificacion_accion_correctiva])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioHistorialTermometro.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioHistorialTermometro.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="historial_termometro.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'codigo_termometro',
+                        'valor_1',
+                        'valor_2',
+                        'valor_3',
+                        'valor_4',
+                        'valor_5',
+                        'promedio_prueba',
+                        'valor_6',
+                        'valor_7',
+                        'valor_8',
+                        'valor_9',
+                        'valor_10',
+                        'promedio_patron',
+                        'factor_anual',
+                        'promedio_termometros',
+                        'nivel_aceptacion',
+                        'cumplimiento',
+                        'accion_correctiva',
+                        'verificacion_accion_correctiva'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.codigo_termometro,
+                            objeto.valor_1,
+                            objeto.valor_2,
+                            objeto.valor_3,
+                            objeto.valor_4,
+                            objeto.valor_5,
+                            objeto.promedio_prueba,
+                            objeto.valor_6,
+                            objeto.valor_7,
+                            objeto.valor_8,
+                            objeto.valor_9,
+                            objeto.valor_10,
+                            objeto.promedio_patron,
+                            objeto.factor_anual,
+                            objeto.promedio_termometros,
+                            objeto.nivel_aceptacion,
+                            objeto.cumplimiento,
+                            objeto.accion_correctiva,
+                            objeto.verificacion_accion_correctiva])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_reclamo_a_proveedores(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="reclamo_a_proveedores.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'nombre_proveedor',
-                     'fecha_reclamo',
-                     'nombre_del_producto',
-                     'fecha_elaboracion',
-                     'lote',
-                     'fecha_vencimiento',
-                     'no_conformidad',
-                     'clasificacion',
-                     'cantidad_involucrada',
-                     'unidad_de_medida',
-                     'archivo_foto'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioReclamoProveedores.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.nombre_proveedor,
-                         objeto.fecha_reclamo.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.nombre_del_producto,
-                         objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
-                         int(objeto.lote),
-                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.no_conformidad,
-                         objeto.clasificacion,
-                         objeto.cantidad_involucrada,
-                         objeto.unidad_de_medida,
-                         objeto.archivo_foto.url])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioReclamoProveedores.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioReclamoProveedores.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="reclamo_a_proveedores.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'nombre_proveedor',
+                        'fecha_reclamo',
+                        'nombre_del_producto',
+                        'fecha_elaboracion',
+                        'lote',
+                        'fecha_vencimiento',
+                        'no_conformidad',
+                        'clasificacion',
+                        'cantidad_involucrada',
+                        'unidad_de_medida',
+                        'archivo_foto'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.nombre_proveedor,
+                            objeto.fecha_reclamo.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.nombre_del_producto,
+                            objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
+                            int(objeto.lote),
+                            objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.no_conformidad,
+                            objeto.clasificacion,
+                            objeto.cantidad_involucrada,
+                            objeto.unidad_de_medida,
+                            objeto.archivo_foto.url])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_rechazo_mp_in_me(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="rechazo_mp_in_me.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'nombre_proveedor',
-                     'numero_factura',
-                     'nombre_transportista',
-                     'nombre_producto',
-                     'fecha_elaboracion',
-                     'lote',
-                     'fecha_vencimiento',
-                     'motivo_rechazo',
-                     'cantidad_producto_involucrado',
-                     'unidad_de_medida',
-                     'clasificacion'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioRechazoMpInMe.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.nombre_proveedor,
-                         objeto.numero_factura,
-                         objeto.nombre_transportista,
-                         objeto.nombre_producto,
-                         objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
-                         int(objeto.lote),
-                         objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.motivo_rechazo,
-                         objeto.cantidad_producto_involucrado,
-                         objeto.unidad_de_medida,
-                         objeto.clasificacion])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioRechazoMpInMe.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioRechazoMpInMe.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="rechazo_mp_in_me.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'nombre_proveedor',
+                        'numero_factura',
+                        'nombre_transportista',
+                        'nombre_producto',
+                        'fecha_elaboracion',
+                        'lote',
+                        'fecha_vencimiento',
+                        'motivo_rechazo',
+                        'cantidad_producto_involucrado',
+                        'unidad_de_medida',
+                        'clasificacion'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.nombre_proveedor,
+                            objeto.numero_factura,
+                            objeto.nombre_transportista,
+                            objeto.nombre_producto,
+                            objeto.fecha_elaboracion.astimezone(pytz.UTC).replace(tzinfo=None),
+                            int(objeto.lote),
+                            objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.motivo_rechazo,
+                            objeto.cantidad_producto_involucrado,
+                            objeto.unidad_de_medida,
+                            objeto.clasificacion])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_informe_de_incidentes(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="informe_de_incidentes.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'fuente_material',
-                     'cantidad_contaminada',
-                     'unidad_de_medida',
-                     'lote_producto_contaminado',
-                     'observaciones',
-                     'analisis_causa',
-                     'accion_correctiva'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioInformeDeIncidentes.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.fuente_material,
-                         int(objeto.cantidad_contaminada),
-                         objeto.unidad_de_medida,
-                         int(objeto.lote_producto_contaminado),
-                         objeto.observaciones,
-                         objeto.analisis_causa,
-                         objeto.accion_correctiva])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioInformeDeIncidentes.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioInformeDeIncidentes.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="informe_de_incidentes.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'fuente_material',
+                        'cantidad_contaminada',
+                        'unidad_de_medida',
+                        'lote_producto_contaminado',
+                        'observaciones',
+                        'analisis_causa',
+                        'accion_correctiva'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.fuente_material,
+                            int(objeto.cantidad_contaminada),
+                            objeto.unidad_de_medida,
+                            int(objeto.lote_producto_contaminado),
+                            objeto.observaciones,
+                            objeto.analisis_causa,
+                            objeto.accion_correctiva])
+        wb.save(response)
+        return response
 
 @login_required
 def descargar_control_material_extraño(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="control_material_extraño.xlsx"'
-    wb = Workbook()
-    ws = wb.active
-    ws.append(['nombre_tecnologo',
-                     'fecha_registro',
-                     'turno',
-                     'area_material',
-                     'tipo_material',
-                     'accion_correctiva',
-                     'verificacion_accion_correctiva',  
-                     'observaciones'])
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
     
-    for objeto in DatosFormularioControlMaterialExtraño.objects.all():
-        ws.append([objeto.nombre_tecnologo,
-                         objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
-                         objeto.turno,
-                         objeto.area_material,
-                         objeto.tipo_material,
-                         objeto.accion_correctiva,
-                         objeto.verificacion_accion_correctiva,
-                         objeto.observaciones])
-    wb.save(response)
-    return response
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioControlMaterialExtraño.objects.all()
+    else:
+        objeto_filtrado = DatosFormularioControlMaterialExtraño.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="control_material_extraño.xlsx"'
+        wb = Workbook()
+        ws = wb.active
+        ws.append(['nombre_tecnologo',
+                        'fecha_registro',
+                        'turno',
+                        'area_material',
+                        'tipo_material',
+                        'accion_correctiva',
+                        'verificacion_accion_correctiva',  
+                        'observaciones'])
+        
+        for objeto in objeto_filtrado:
+            ws.append([objeto.nombre_tecnologo,
+                            objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                            objeto.turno,
+                            objeto.area_material,
+                            objeto.tipo_material,
+                            objeto.accion_correctiva,
+                            objeto.verificacion_accion_correctiva,
+                            objeto.observaciones])
+        wb.save(response)
+        return response
 
 @login_required
 def permisos(request):
