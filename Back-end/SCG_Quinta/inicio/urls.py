@@ -23,5 +23,7 @@ urlpatterns = [
     path("permisos/", views.permisos, name="permisos"),
     path("vista_permisos/", views.vista_permisos, name="vista_permisos"),
     path("permisos_faltante/", views.permisos_faltante, name="permisos_faltante"),
-    path("intermedio/", views.intermedio, name="intermedio")
+    path("intermedio/", views.intermedio, name="intermedio"),
+    path("set_fechas/", views.set_fechas, name="set_fechas"),
+    path("no_hay_datos/", views.no_hay_datos, name="no_hay_datos")
 ]

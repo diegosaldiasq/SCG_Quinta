@@ -52,15 +52,35 @@ def descargas(request):
     return render(request, 'inicio/descargas.html')
 
 @login_required
-def descargar_monitoreo_del_agua(request):
+def set_fechas(request):
     if request.method == 'POST':
-        fecha_inicio = timezone.make_aware(datetime.strptime(request.POST.get('fechainicio'), '%Y-%m-%d'), timezone=timezone.utc)
-        fecha_fin = timezone.make_aware(datetime.strptime(request.POST.get('fechafin'), '%Y-%m-%d'), timezone=timezone.utc)
+        fecha_inicio = request.POST.get('fechainicio')
+        fecha_fin = request.POST.get('fechafin')
+        request.session['fechainicio'] = fecha_inicio
+        request.session['fechafin'] = fecha_fin
         print(fecha_inicio, fecha_fin) #debug
+        return JsonResponse({'success': True})
+    
+@login_required
+def no_hay_datos(request):
+    return render(request, 'inicio/no_hay_datos.html')
+
+@login_required
+def descargar_monitoreo_del_agua(request):
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
+    
+    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+    objeto_filtrado = None
+    if fecha_inicio == [] or fecha_fin == []:
+        objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.all()
+    else:
         objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
-        objeto_prueba = DatosFormularioMonitoreoDelAgua.objects.all() #debug
-        print(objeto_prueba[3].fecha_registro) #debug
-        print(objeto_filtrado[0].fecha_registro) #debug
+
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="monitoreo_del_agua.xlsx"'
         wb = Workbook()
