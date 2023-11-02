@@ -70,12 +70,12 @@ def descargar_monitoreo_del_agua(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioMonitoreoDelAgua.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -114,6 +114,9 @@ def descargar_monitoreo_del_agua(request):
                         int(objeto.accion_correctiva),
                         objeto.resultado_ac])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -121,12 +124,12 @@ def descargar_higiene_y_conducta_personal(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioHigieneConductaPersonal.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioHigieneConductaPersonal.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -161,6 +164,9 @@ def descargar_higiene_y_conducta_personal(request):
                             objeto.observacion,
                             objeto.nombre_tecnologo])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -168,12 +174,12 @@ def descargar_monitoreo_de_plagas(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioMonitoreoDePlagas.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioMonitoreoDePlagas.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -202,6 +208,9 @@ def descargar_monitoreo_de_plagas(request):
                             objeto.monitoreo,
                             objeto.accion_correctiva])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -209,12 +218,12 @@ def descargar_recepcion_mpme(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioRecepcionMpMe.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioRecepcionMpMe.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -269,6 +278,9 @@ def descargar_recepcion_mpme(request):
                             objeto.sabor,
                             int(objeto.grados_brix)])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
                      
 @login_required
@@ -276,12 +288,12 @@ def descargar_pcc2_detector_metales(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioPcc2DetectorMetales.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioPcc2DetectorMetales.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -312,6 +324,9 @@ def descargar_pcc2_detector_metales(request):
                             objeto.observaciones,
                             objeto.accion_correctiva])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -319,12 +334,12 @@ def descargar_control_de_transporte(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioControlDeTransporte.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioControlDeTransporte.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -357,6 +372,9 @@ def descargar_control_de_transporte(request):
                             objeto.accion_correctiva,
                             objeto.verificacion_accion_correctiva])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -364,12 +382,12 @@ def descargar_temperatura_despacho_ptjumbo(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioTemperaturaDespachoJumbo.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioTemperaturaDespachoJumbo.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -404,6 +422,9 @@ def descargar_temperatura_despacho_ptjumbo(request):
                             objeto.accion_correctiva,
                             objeto.verificacion_accion_correctiva])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -411,12 +432,12 @@ def descargar_temperatura_despacho_ptsisa(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioTemperaturaDespachoSisa.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioTemperaturaDespachoSisa.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -451,6 +472,9 @@ def descargar_temperatura_despacho_ptsisa(request):
                             objeto.accion_correctiva,
                             objeto.verificacion_accion_correctiva])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -458,12 +482,12 @@ def descargar_historial_termometro(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioHistorialTermometro.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioHistorialTermometro.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -518,6 +542,9 @@ def descargar_historial_termometro(request):
                             objeto.accion_correctiva,
                             objeto.verificacion_accion_correctiva])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -525,12 +552,12 @@ def descargar_reclamo_a_proveedores(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioReclamoProveedores.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioReclamoProveedores.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -569,6 +596,9 @@ def descargar_reclamo_a_proveedores(request):
                             objeto.unidad_de_medida,
                             objeto.archivo_foto.url])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -576,12 +606,12 @@ def descargar_rechazo_mp_in_me(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioRechazoMpInMe.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioRechazoMpInMe.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -620,6 +650,9 @@ def descargar_rechazo_mp_in_me(request):
                             objeto.unidad_de_medida,
                             objeto.clasificacion])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -627,12 +660,12 @@ def descargar_informe_de_incidentes(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioInformeDeIncidentes.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioInformeDeIncidentes.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -663,6 +696,9 @@ def descargar_informe_de_incidentes(request):
                             objeto.analisis_causa,
                             objeto.accion_correctiva])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required
@@ -670,12 +706,12 @@ def descargar_control_material_extraño(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     
-    fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-    fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
     objeto_filtrado = None
-    if fecha_inicio == [] or fecha_fin == []:
+    if fecha_inicio_str == None or fecha_fin_str == None:
         objeto_filtrado = DatosFormularioControlMaterialExtraño.objects.all()
     else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
         objeto_filtrado = DatosFormularioControlMaterialExtraño.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     if not objeto_filtrado.exists():
@@ -704,6 +740,9 @@ def descargar_control_material_extraño(request):
                             objeto.verificacion_accion_correctiva,
                             objeto.observaciones])
         wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
         return response
 
 @login_required

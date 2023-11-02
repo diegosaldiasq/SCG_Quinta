@@ -53,8 +53,8 @@ body {
     text-align: center;
 }
 .registro {
-        font-size: var(--md);   
-    }
+    font-size: var(--md);   
+}
 .registro span {
     color: var(--black);
     font-weight: bold;
