@@ -97,7 +97,10 @@ def descargar_monitoreo_del_agua(request):
                     'ph_mda',
                     'cloro_libre',
                     'accion_correctiva',
-                    'resultado_ac'])
+                    'resultado_ac',
+                    'verificado',
+                    'verificado_por',
+                    'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -112,7 +115,10 @@ def descargar_monitoreo_del_agua(request):
                         objeto.ph_mda,
                         objeto.cloro_libre,
                         int(objeto.accion_correctiva),
-                        objeto.resultado_ac])
+                        objeto.resultado_ac,
+                        objeto.verificado,
+                        objeto.verificado_por,
+                        objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -149,7 +155,10 @@ def descargar_higiene_y_conducta_personal(request):
                         'accion_correctiva',
                         'verificacion_accion_correctiva',
                         'observacion',
-                        'nombre_tecnologo'])
+                        'nombre_tecnologo'
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.fecha_ingreso.astimezone(pytz.UTC).replace(tzinfo=None),
@@ -162,7 +171,10 @@ def descargar_higiene_y_conducta_personal(request):
                             objeto.accion_correctiva,
                             objeto.verificacion_accion_correctiva,
                             objeto.observacion,
-                            objeto.nombre_tecnologo])
+                            objeto.nombre_tecnologo,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -196,7 +208,10 @@ def descargar_monitoreo_de_plagas(request):
                         'tipo_trampa',
                         'ubicacion',
                         'monitoreo',
-                        'accion_correctiva'])
+                        'accion_correctiva',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -206,7 +221,10 @@ def descargar_monitoreo_de_plagas(request):
                             objeto.tipo_trampa,
                             objeto.ubicacion,
                             objeto.monitoreo,
-                            objeto.accion_correctiva])
+                            objeto.accion_correctiva,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -253,7 +271,10 @@ def descargar_recepcion_mpme(request):
                         'color',
                         'olor',
                         'sabor',
-                        'grados_brix'])
+                        'grados_brix',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -276,7 +297,10 @@ def descargar_recepcion_mpme(request):
                             objeto.color,
                             objeto.olor,
                             objeto.sabor,
-                            int(objeto.grados_brix)])
+                            int(objeto.grados_brix),
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -311,7 +335,10 @@ def descargar_pcc2_detector_metales(request):
                         'medicion',
                         'producto',
                         'observaciones',
-                        'accion_correctiva'])
+                        'accion_correctiva',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -322,7 +349,10 @@ def descargar_pcc2_detector_metales(request):
                             objeto.medicion,
                             objeto.producto,
                             objeto.observaciones,
-                            objeto.accion_correctiva])
+                            objeto.accion_correctiva,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -358,7 +388,10 @@ def descargar_control_de_transporte(request):
                         'lote',
                         'fecha_vencimiento',
                         'accion_correctiva',
-                        'verificacion_accion_correctiva'])
+                        'verificacion_accion_correctiva',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -370,7 +403,10 @@ def descargar_control_de_transporte(request):
                             int(objeto.lote),
                             objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                             objeto.accion_correctiva,
-                            objeto.verificacion_accion_correctiva])
+                            objeto.verificacion_accion_correctiva,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -407,7 +443,10 @@ def descargar_temperatura_despacho_ptjumbo(request):
                         'lote',
                         'fecha_vencimiento',
                         'accion_correctiva',
-                        'verificacion_accion_correctiva'])
+                        'verificacion_accion_correctiva',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -420,7 +459,10 @@ def descargar_temperatura_despacho_ptjumbo(request):
                             int(objeto.lote),
                             objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                             objeto.accion_correctiva,
-                            objeto.verificacion_accion_correctiva])
+                            objeto.verificacion_accion_correctiva,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -457,7 +499,10 @@ def descargar_temperatura_despacho_ptsisa(request):
                         'lote',
                         'fecha_vencimiento',
                         'accion_correctiva',
-                        'verificacion_accion_correctiva'])
+                        'verificacion_accion_correctiva',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -470,7 +515,10 @@ def descargar_temperatura_despacho_ptsisa(request):
                             int(objeto.lote),
                             objeto.fecha_vencimiento.astimezone(pytz.UTC).replace(tzinfo=None),
                             objeto.accion_correctiva,
-                            objeto.verificacion_accion_correctiva])
+                            objeto.verificacion_accion_correctiva,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -517,7 +565,10 @@ def descargar_historial_termometro(request):
                         'nivel_aceptacion',
                         'cumplimiento',
                         'accion_correctiva',
-                        'verificacion_accion_correctiva'])
+                        'verificacion_accion_correctiva',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -540,7 +591,10 @@ def descargar_historial_termometro(request):
                             objeto.nivel_aceptacion,
                             objeto.cumplimiento,
                             objeto.accion_correctiva,
-                            objeto.verificacion_accion_correctiva])
+                            objeto.verificacion_accion_correctiva,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -579,7 +633,10 @@ def descargar_reclamo_a_proveedores(request):
                         'clasificacion',
                         'cantidad_involucrada',
                         'unidad_de_medida',
-                        'archivo_foto'])
+                        'archivo_foto',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -594,7 +651,10 @@ def descargar_reclamo_a_proveedores(request):
                             objeto.clasificacion,
                             objeto.cantidad_involucrada,
                             objeto.unidad_de_medida,
-                            objeto.archivo_foto.url])
+                            objeto.archivo_foto.url,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -633,7 +693,10 @@ def descargar_rechazo_mp_in_me(request):
                         'motivo_rechazo',
                         'cantidad_producto_involucrado',
                         'unidad_de_medida',
-                        'clasificacion'])
+                        'clasificacion',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -648,7 +711,10 @@ def descargar_rechazo_mp_in_me(request):
                             objeto.motivo_rechazo,
                             objeto.cantidad_producto_involucrado,
                             objeto.unidad_de_medida,
-                            objeto.clasificacion])
+                            objeto.clasificacion,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -683,7 +749,10 @@ def descargar_informe_de_incidentes(request):
                         'lote_producto_contaminado',
                         'observaciones',
                         'analisis_causa',
-                        'accion_correctiva'])
+                        'accion_correctiva',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -694,7 +763,10 @@ def descargar_informe_de_incidentes(request):
                             int(objeto.lote_producto_contaminado),
                             objeto.observaciones,
                             objeto.analisis_causa,
-                            objeto.accion_correctiva])
+                            objeto.accion_correctiva,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
@@ -728,7 +800,10 @@ def descargar_control_material_extraño(request):
                         'tipo_material',
                         'accion_correctiva',
                         'verificacion_accion_correctiva',  
-                        'observaciones'])
+                        'observaciones',
+                        'verificado',
+                        'verificado_por',
+                        'fecha_de_verificacion'])
         
         for objeto in objeto_filtrado:
             ws.append([objeto.nombre_tecnologo,
@@ -738,7 +813,10 @@ def descargar_control_material_extraño(request):
                             objeto.tipo_material,
                             objeto.accion_correctiva,
                             objeto.verificacion_accion_correctiva,
-                            objeto.observaciones])
+                            objeto.observaciones,
+                            objeto.verificado,
+                            objeto.verificado_por,
+                            objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)])
         wb.save(response)
         if fecha_inicio_str != None or fecha_fin_str != None:
             del request.session['fechainicio']
