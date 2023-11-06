@@ -16,6 +16,9 @@ class DatosFormularioReclamoProveedores(models.Model):
     cantidad_involucrada = models.FloatField()
     unidad_de_medida = models.TextField()
     archivo_foto = models.FileField(upload_to='fotos_reclamos/') # Define la ruta donde se guardarán las fotos
+    verificado = models.BooleanField(default=False)
+    verificado_por = models.CharField(max_length=50 ,null=True, blank=True)
+    fecha_de_verificacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre

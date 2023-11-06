@@ -15,6 +15,9 @@ class DatosFormularioHigieneConductaPersonal(models.Model):
     verificacion_accion_correctiva = models.TextField()
     observacion = models.TextField()
     nombre_tecnologo = models.CharField(max_length=100)
+    verificado = models.BooleanField(default=False)
+    verificado_por = models.CharField(max_length=50 ,null=True, blank=True)
+    fecha_de_verificacion = models.DateTimeField(null=True, blank=True)
 
 
     def __str__(self):
