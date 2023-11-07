@@ -58,7 +58,6 @@ def set_fechas(request):
         fecha_fin = request.POST.get('fechafin')
         request.session['fechainicio'] = fecha_inicio
         request.session['fechafin'] = fecha_fin
-        print(fecha_inicio, fecha_fin) #debug
         return JsonResponse({'success': True})
     
 @login_required
