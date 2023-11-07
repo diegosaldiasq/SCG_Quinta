@@ -21,11 +21,7 @@
             <p class="subtitle">POES</p>
             <p class="registro">
                 <span>1.- Registro monitoreo del agua</span>
-                <!--<a href="">R-POES-Q-01-01</a>-->
-                <form class="form" id="monitoreo-del-agua">
-                    {% csrf_token %}
-                    <button class="a">R-POES-Q-01-01</button>
-                </form>
+                <a href="{% url 'verificar' %}?config=monitoreo_del_agua">R-POES-Q-01-01</a>
             </p>
             <p class="registro">
                 <span>2.- Registro higiene y conducta del personal</span>
@@ -87,7 +83,5 @@
             <button class="primary-button login-button">Volver inicio</button>
         </form>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="{% static 'inicio/scrips_selec_verifica.js' %}"></script>
 </body>
 </html>

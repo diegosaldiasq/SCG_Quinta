@@ -24,6 +24,7 @@ import json
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import datetime
+from django.db.models.fields import Field
 
 
 # Create your views here.
@@ -911,3 +912,19 @@ def intermedio(request):
 @login_required
 def seleccion_verifica(request):
     return render(request, 'inicio/seleccion_verifica.html')
+
+@login_required
+def verificar(request):
+    config = request.GET['config']
+    if config == "monitoreo_del_agua":
+        datos = DatosFormularioMonitoreoDelAgua.objects.filter(verificado=False)
+        campos = DatosFormularioMonitoreoDelAgua._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_de_verificacion':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+        print(nombres_campos)
+    return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
