@@ -907,3 +907,7 @@ def vista_permisos(request):
 @login_required    
 def intermedio(request):
     return render(request, 'inicio/intermedio.html')
+
+@login_required
+def seleccion_verifica(request):
+    return render(request, 'inicio/seleccion_verifica.html')

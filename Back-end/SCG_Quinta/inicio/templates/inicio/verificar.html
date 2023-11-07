@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'inicio/estilos_verificar.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}" />
+    <title>Seleccion de descargas</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
+        <h1 class="title">Selecciona permisos</h1>
+        <div class="login-container">
+            <p class="subtitle">Permisos Usuarios</p>
+            <div class="header-row">
+                <span>Nombre usuario</span>
+                <span>Perfil</span>
+                <span>Usuario Activo</span>
+                <span></span>
+                <span>Jefatura</span>
+                <span></span>
+            </div>
+            {% for usuario in usuarios %}
+                <div class="usuario">
+                    <li>
+                        <span>{{ usuario.nombre_completo }}</span>
+                        <span>{{ usuario.perfil_usuario }}</span>
+                        <span>Está Activo</span>
+                        {% if usuario.is_active %}
+                            <input type="checkbox" {% if usuario.is_active %}checked{% endif %}>
+                        {% else %}
+                            <input type="checkbox">
+                        {% endif %}
+                        <span>Es Jefatura</span>
+                        {% if usuario.is_staff %}
+                            <input type="checkbox" {% if usuario.is_staff %}checked{% endif %}>
+                        {% else %}
+                            <input type="checkbox">
+                        {% endif %}
+                    </li>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="button-container">
+            <form class="form" id="miBoton">
+                {% csrf_token %}
+                <button class="primary-button button">Guardar cambios</button>  
+            </form>
+            <form class="form" action="{% url 'redireccionar_inicio' %}">
+                <button class="primary-button button">Volver inicio</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'inicio/scrips_verificar.js' %}"></script>
+</body>
+</html>
