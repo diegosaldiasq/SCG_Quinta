@@ -21,4 +21,4 @@ class DatosFormularioMonitoreoDelAgua(models.Model):
     fecha_de_verificacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.nombre
+        return self.nombre_tecnologo

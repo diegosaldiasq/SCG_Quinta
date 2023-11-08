@@ -8,6 +8,7 @@
     --naranjo-claro-quinta: #d4841c;
     --white: #FFFFFF;
     --black: #000000;
+    --usm: 10px;
     --sm: 14px;
     --md: 16px;
     --lg: 18px;
@@ -37,7 +38,7 @@ body {
 .login-container {
     display: grid;
     grid-template-rows: auto 1fr auto;
-    width: 500px;
+    width: auto;
     justify-items: center;
     background-color: var(--amarillo-quinta);
     border-radius: 32px;
@@ -54,27 +55,29 @@ body {
     margin-bottom: 12px;
     text-align: center;
 }
-.header-row {
+.monitoreo_del_agua {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 50px 1fr 50px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 10px;
     align-items: center;
     background-color: var(--rojo-quinta);
     color: var(--white);
+    font-size: var(--usm);
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
 }
 
-.header-row span {
+.monitoreo_del_agua span {
     display: block;
     text-align: center;
     margin: auto;
 }
-.usuario {
+.usuario_monitoreo_del_agua {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 40px 1fr 40px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 1px solid black;
+    font-size: var(--sm);
     padding: 10px;
     align-items: center;
 }

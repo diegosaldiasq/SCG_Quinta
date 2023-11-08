@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     isStaff: isStaff
                 });
             });          
-            
             // Obtener el CSRF token
             var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
