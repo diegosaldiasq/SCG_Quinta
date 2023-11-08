@@ -1,26 +1,24 @@
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("miBoton").addEventListener("click", async function() {
+    document.getElementById("miBoton_monitoreo_del_agua").addEventListener("click", async function() {
         try {
             event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
             var userData = [];
 
-            let users = document.querySelectorAll('.usuario');
+            let datos = document.querySelectorAll('.usuario_monitoreo_del_agua');
 
-            users.forEach(function(user) {
-                let name = user.querySelector('span').innerText;
-                let isActive = user.querySelectorAll('input[type="checkbox"]')[0].checked;
-                let isStaff = user.querySelectorAll('input[type="checkbox"]')[1].checked;
+            datos.forEach(function(dato) {
+                let id = dato.querySelectorAll('.id').innerText;
+                let isVerificado = dato.querySelectorAll('.checkbox_monitoreo_del_agua').checked;
         
                 userData.push({
-                    name: name,
-                    isActive: isActive,
-                    isStaff: isStaff
+                    id: id,
+                    isVerificado: isVerificado
                 });
             });          
             // Obtener el CSRF token
             var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
-            var response = await fetch('/inicio/vista_permisos/', {
+            var response = await fetch('/inicio/verificar_monitoreo_del_agua/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

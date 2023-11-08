@@ -926,5 +926,4 @@ def verificar(request):
         for nombres in nombres_campos:
             if nombres == 'verificado_por':
                 nombres_campos.remove(nombres)
-        print(nombres_campos)
     return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
