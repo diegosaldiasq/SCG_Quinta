@@ -81,7 +81,7 @@ body {
     padding: 10px;
     align-items: center;
 }
-.usuario li {
+.usuario_monitoreo_del_agua li {
     list-style-type: none;
     display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
 }
