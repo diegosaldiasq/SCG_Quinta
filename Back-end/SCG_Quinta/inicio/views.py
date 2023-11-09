@@ -25,6 +25,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from datetime import datetime
 from django.db.models.fields import Field
+from django.apps import apps
 
 
 # Create your views here.
@@ -916,149 +917,35 @@ def seleccion_verifica(request):
 @login_required
 def verificar(request):
     config = request.GET['config']
-    # renderizado monitoreo del agua
-    if config == "monitoreo_del_agua":
-        datos = DatosFormularioMonitoreoDelAgua.objects.filter(verificado=False)
-        campos = DatosFormularioMonitoreoDelAgua._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_de_verificacion':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado higiene y conducta personal
-    if config == "higiene_y_conducta_personal":
-        datos = DatosFormularioHigieneConductaPersonal.objects.filter(verificado=False)
-        campos = DatosFormularioHigieneConductaPersonal._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_de_verificacion':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado monitoreo de plagas
-    if config == "monitoreo_de_plagas":
-        datos = DatosFormularioMonitoreoDePlagas.objects.filter(verificado=False)
-        campos = DatosFormularioMonitoreoDePlagas._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_de_verificacion':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado recepcion mpme
-    if config == "recepcion_mpme":
-        datos = DatosFormularioRecepcionMpMe.objects.filter(verificado=False)
-        campos = DatosFormularioRecepcionMpMe._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_de_verificacion':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado pcc2 detector de metales
-    if config == "pcc2_detector_metales":
-        datos = DatosFormularioPcc2DetectorMetales.objects.filter(verificado=False)
-        campos = DatosFormularioPcc2DetectorMetales._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_de_verificacion':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado control de transporte
-    if config == "control_de_transporte":
-        datos = DatosFormularioControlDeTransporte.objects.filter(verificado=False)
-        campos = DatosFormularioControlDeTransporte._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_de_verificacion':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado temperatura despacho ptjumbo
-    if config == "temperatura_despacho_ptjumbo":
-        datos = DatosFormularioTemperaturaDespachoJumbo.objects.filter(verificado=False)
-        campos = DatosFormularioTemperaturaDespachoJumbo._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_registro':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado temperatura despacho ptsisa
-    if config == "temperatura_despacho_ptsisa":
-        datos = DatosFormularioTemperaturaDespachoSisa.objects.filter(verificado=False)
-        campos = DatosFormularioTemperaturaDespachoSisa._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos:
-            if nombres == 'fecha_registro':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado historial termometro
-    if config == "historial_termometro":
-        datos = DatosFormularioHistorialTermometro.objects.filter(verificado=False)
-        campos = DatosFormularioHistorialTermometro._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos: 
-            if nombres == 'fecha_registro':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado reclamo a proveedores
-    if config == "reclamo_a_proveedores":
-        datos = DatosFormularioReclamoProveedores.objects.filter(verificado=False)
-        campos = DatosFormularioReclamoProveedores._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos: 
-            if nombres == 'fecha_registro':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado rechazo mp in me
-    if config == "rechazo_mp_in_me":
-        datos = DatosFormularioRechazoMpInMe.objects.filter(verificado=False)
-        campos = DatosFormularioRechazoMpInMe._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos: 
-            if nombres == 'fecha_registro':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado informe de incidentes
-    if config == "informe_de_incidentes":
-        datos = DatosFormularioInformeDeIncidentes.objects.filter(verificado=False)
-        campos = DatosFormularioInformeDeIncidentes._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos: 
-            if nombres == 'fecha_registro':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
-    # renderizado control material extraño
-    if config == "control_material_extraño":
-        datos = DatosFormularioControlMaterialExtraño.objects.filter(verificado=False)
-        campos = DatosFormularioControlMaterialExtraño._meta.get_fields()
-        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
-        for nombres in nombres_campos: 
-            if nombres == 'fecha_registro':
-                nombres_campos.remove(nombres)
-        for nombres in nombres_campos:
-            if nombres == 'verificado_por':
-                nombres_campos.remove(nombres)
+    model_mapping = {
+        'monitoreo_del_agua': 'DatosFormularioMonitoreoDelAgua',
+        'higiene_y_conducta_personal': 'DatosFormularioHigieneConductaPersonal',
+        'monitoreo_de_plagas': 'DatosFormularioMonitoreoDePlagas',
+        'recepcion_mpme': 'DatosFormularioRecepcionMpMe',
+        'pcc2_detector_metales': 'DatosFormularioPcc2DetectorMetales',
+        'control_de_transporte': 'DatosFormularioControlDeTransporte',
+        'temperatura_despacho_ptjumbo': 'DatosFormularioTemperaturaDespachoJumbo',
+        'temperatura_despacho_ptsisa': 'DatosFormularioTemperaturaDespachoSisa',
+        'historial_termometro': 'DatosFormularioHistorialTermometro',
+        'reclamo_a_proveedores': 'DatosFormularioReclamoProveedores',
+        'rechazo_mp_in_me': 'DatosFormularioRechazoMpInMe',
+        'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
+        'control_material_extraño': 'DatosFormularioControlMaterialExtraño'
+    }
+    # Función de ayuda para obtener nombres de campos
+    def get_field_names(model):
+        fields = model._meta.get_fields()
+        return [
+            field.name for field in fields 
+            if isinstance(field, Field) and 
+            field.name not in ['fecha_de_verificacion', 'verificado_por']
+        ]
+    # Obtener el modelo correspondiente al parámetro config
+    model_name = model_mapping.get(config)
+    # Obtener el modelo dinámicamente utilizando apps.get_model
+    model = apps.get_model(config , model_name) 
+    datos = model.objects.filter(verificado=False)
+    nombres_campos = get_field_names(model)
     return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
 
 @login_required
