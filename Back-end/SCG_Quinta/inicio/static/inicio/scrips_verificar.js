@@ -30,15 +30,15 @@ document.addEventListener("DOMContentLoaded", function() {
             debugger; // <-- Agrega esta línea
             if (data.existe) {
                 //window.location.href = "/inicio/permiso_creado/";
-                alert("Se actualizaron los permisos correctamente.");
+                alert("Se actualizaron las verificaciones correctamente.");
                 return true;
             } else {
-                alert("No se pudo actualizar los permisos.");
+                alert("No se pudo actualizar las verificaciones.");
                 return false;
             }
         } catch (error) {
             console.error("Hubo un error:", error);
-            alert("Hubo un problema al guardar los permisos.");
+            alert("Hubo un problema al verificar los registros.");
         }
     });
 });

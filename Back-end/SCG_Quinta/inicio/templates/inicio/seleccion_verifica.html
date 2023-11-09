@@ -25,7 +25,7 @@
             </p>
             <p class="registro">
                 <span>2.- Registro higiene y conducta del personal</span>
-                <a href="">R-POES-Q-02-01</a>
+                <a href="{% url 'verificar' %}?config=higiene_y_conducta_personal">R-POES-Q-02-01</a>
             </p>
             <p class="registro">
                 <span>3.- Registro limpieza y sanitizacion de planta</span>
@@ -33,50 +33,50 @@
             </p>
             <p class="registro">
                 <span>4.- Registro monitoreo de plagas</span>
-                <a href="">R-POES-Q-05-02</a>
+                <a href="{% url 'verificar' %}?config=monitoreo_de_plagas">R-POES-Q-05-02</a>
             </p>
         </div>
         <div class="login-container">
             <p class="subtitle">POE</p>
             <p class="registro">
                 <span>1.- Registro control de recepcion de MP y ME</span>
-                <a href="">R-POE-E-02-01</a>
+                <a href="{% url 'verificar' %}?config=recepcion_mpme">R-POE-E-02-01</a>
             </p>
             <p class="registro">
                 <span>2.- Registro PCC N°2 detector de metales</span>
-                <a href="">R-POE-E-03-09</a>
+                <a href="{% url 'verificar' %}?config=pcc2_detector_metales">R-POE-E-03-09</a>
             </p>
             <p class="registro">
                 <span>3.- Control de transporte</span>
-                <a href="">R-POE-E-05-09</a>
+                <a href="{% url 'verificar' %}?config=control_de_transporte">R-POE-E-05-09</a>
             </p>
             <p class="registro">
                 <span>4.- Registro temperatura de despacho productos jumbo</span>
-                <a href="">R-POE-E-05-01</a>
+                <a href="{% url 'verificar' %}?config=temperatura_despacho_ptjumbo">R-POE-E-05-01</a>
             </p>
             <p class="registro">
                 <span>5.- Registro temperatura de despacho productos sisa</span>
-                <a href="">R-POE-E-05-02</a>
+                <a href="{% url 'verificar' %}?config=temperatura_despacho_ptsisa">R-POE-E-05-02</a>
             </p>
             <p class="registro">
                 <span>6.- Registro historial termometro</span>
-                <a href="">R-POE-E-07-01</a>
+                <a href="{% url 'verificar' %}?config=historial_termometro">R-POE-E-07-01</a>
             </p>
             <p class="registro">
                 <span>7.- Informe de reclamo a proveedores</span>
-                <a href="">IN-POE-Q-10-02</a>
+                <a href="{% url 'verificar' %}?config=reclamo_a_proveedores">IN-POE-Q-10-02</a>
             </p>
             <p class="registro">
                 <span>8.- Informe de rechazo de MP, insumos y material de envase</span>
-                <a href="">IN-POE-Q-10-03</a>
+                <a href="{% url 'verificar' %}?config=rechazo_mp_in_me">IN-POE-Q-10-03</a>
             </p>
             <p class="registro">
                 <span>9.- Informe de incidentes</span>
-                <a href="">R-POE-Q-15-01</a>
+                <a href="{% url 'verificar' %}?config=informe_de_incidentes">R-POE-Q-15-01</a>
             </p>
             <p class="registro">
                 <span>10.- Control de material extraño</span>
-                <a href="">R-POE-Q-15-02</a>
+                <a href="{% url 'verificar' %}?config=control_material_extraño">R-POE-Q-15-02</a>
             </p>
         </div>
         <form class="form" action="{% url 'redireccionar_inicio' %}">

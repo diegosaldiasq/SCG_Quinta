@@ -916,6 +916,7 @@ def seleccion_verifica(request):
 @login_required
 def verificar(request):
     config = request.GET['config']
+    # renderizado monitoreo del agua
     if config == "monitoreo_del_agua":
         datos = DatosFormularioMonitoreoDelAgua.objects.filter(verificado=False)
         campos = DatosFormularioMonitoreoDelAgua._meta.get_fields()
@@ -926,4 +927,158 @@ def verificar(request):
         for nombres in nombres_campos:
             if nombres == 'verificado_por':
                 nombres_campos.remove(nombres)
+    # renderizado higiene y conducta personal
+    if config == "higiene_y_conducta_personal":
+        datos = DatosFormularioHigieneConductaPersonal.objects.filter(verificado=False)
+        campos = DatosFormularioHigieneConductaPersonal._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_de_verificacion':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado monitoreo de plagas
+    if config == "monitoreo_de_plagas":
+        datos = DatosFormularioMonitoreoDePlagas.objects.filter(verificado=False)
+        campos = DatosFormularioMonitoreoDePlagas._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_de_verificacion':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado recepcion mpme
+    if config == "recepcion_mpme":
+        datos = DatosFormularioRecepcionMpMe.objects.filter(verificado=False)
+        campos = DatosFormularioRecepcionMpMe._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_de_verificacion':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado pcc2 detector de metales
+    if config == "pcc2_detector_metales":
+        datos = DatosFormularioPcc2DetectorMetales.objects.filter(verificado=False)
+        campos = DatosFormularioPcc2DetectorMetales._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_de_verificacion':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado control de transporte
+    if config == "control_de_transporte":
+        datos = DatosFormularioControlDeTransporte.objects.filter(verificado=False)
+        campos = DatosFormularioControlDeTransporte._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_de_verificacion':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado temperatura despacho ptjumbo
+    if config == "temperatura_despacho_ptjumbo":
+        datos = DatosFormularioTemperaturaDespachoJumbo.objects.filter(verificado=False)
+        campos = DatosFormularioTemperaturaDespachoJumbo._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_registro':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado temperatura despacho ptsisa
+    if config == "temperatura_despacho_ptsisa":
+        datos = DatosFormularioTemperaturaDespachoSisa.objects.filter(verificado=False)
+        campos = DatosFormularioTemperaturaDespachoSisa._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos:
+            if nombres == 'fecha_registro':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado historial termometro
+    if config == "historial_termometro":
+        datos = DatosFormularioHistorialTermometro.objects.filter(verificado=False)
+        campos = DatosFormularioHistorialTermometro._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos: 
+            if nombres == 'fecha_registro':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado reclamo a proveedores
+    if config == "reclamo_a_proveedores":
+        datos = DatosFormularioReclamoProveedores.objects.filter(verificado=False)
+        campos = DatosFormularioReclamoProveedores._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos: 
+            if nombres == 'fecha_registro':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado rechazo mp in me
+    if config == "rechazo_mp_in_me":
+        datos = DatosFormularioRechazoMpInMe.objects.filter(verificado=False)
+        campos = DatosFormularioRechazoMpInMe._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos: 
+            if nombres == 'fecha_registro':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado informe de incidentes
+    if config == "informe_de_incidentes":
+        datos = DatosFormularioInformeDeIncidentes.objects.filter(verificado=False)
+        campos = DatosFormularioInformeDeIncidentes._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos: 
+            if nombres == 'fecha_registro':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
+    # renderizado control material extraño
+    if config == "control_material_extraño":
+        datos = DatosFormularioControlMaterialExtraño.objects.filter(verificado=False)
+        campos = DatosFormularioControlMaterialExtraño._meta.get_fields()
+        nombres_campos = [campo.name for campo in campos if isinstance(campo, Field)]
+        for nombres in nombres_campos: 
+            if nombres == 'fecha_registro':
+                nombres_campos.remove(nombres)
+        for nombres in nombres_campos:
+            if nombres == 'verificado_por':
+                nombres_campos.remove(nombres)
     return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
+
+@login_required
+def verificar_monitoreo_del_agua(request):
+    try:
+        # ... (tu código existente)
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+
+                usuario = DatosFormularioMonitoreoDelAgua.objects.get(id=id)
+                usuario.verificado = isVerificado
+                usuario.verificado_por = request.user.nombre_completo
+                usuario.fecha_de_verificacion = timezone.now()
+                usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
