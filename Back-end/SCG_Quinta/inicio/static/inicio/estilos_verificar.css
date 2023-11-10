@@ -101,7 +101,7 @@ body {
     cursor: pointer;
 }
 
-.higuiene_y_conducta_personal {
+.higiene_y_conducta_personal {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 10px;
@@ -113,12 +113,12 @@ body {
     border-top: 1px solid black;
     border-bottom: 1px solid black;
 }
-.higuiene_y_conducta_personal span {
+.higiene_y_conducta_personal span {
     display: block;
     text-align: center;
     margin: auto;
 }
-.usuario_higuiene_y_conducta_personal {
+.usuario_higiene_y_conducta_personal {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 1px solid black;
@@ -126,23 +126,23 @@ body {
     padding: 10px;
     align-items: center;
 }
-.usuario_higuiene_y_conducta_personal li {
+.usuario_higiene_y_conducta_personal li {
     list-style-type: none;
     display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
 }
-.usuario_higuiene_y_conducta_personal span, .usuario_higuiene_y_conducta_personal input[type="checkbox"] {
+.usuario_higiene_y_conducta_personal span, .usuario_higiene_y_conducta_personal input[type="checkbox"] {
     display: block;
     text-align: center;
     margin: auto;
 }
-.usuario_higuiene_y_conducta_personal input[type="checkbox"] {
+.usuario_higiene_y_conducta_personal input[type="checkbox"] {
     width: 20px;
     height: 20px;
 }
-.usuario_higuiene_y_conducta_personal input[type="checkbox"]:checked {
+.usuario_higiene_y_conducta_personal input[type="checkbox"]:checked {
     background-color: var(--rojo-quinta);
 }
-.usuario_higuiene_y_conducta_personal input[type="checkbox"]:hover {
+.usuario_higiene_y_conducta_personal input[type="checkbox"]:hover {
     cursor: pointer;
 }
 
@@ -153,7 +153,7 @@ body {
     align-items: center;
     background-color: var(--rojo-quinta);
     color: var(--white);
-    font-size: var(--usm);
+    font-size: var(--sm);
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
@@ -236,7 +236,7 @@ body {
     cursor: pointer;
 }
 
-.pcc2_detector_de_metales {
+.pcc2_detector_metales {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 10px;
@@ -249,12 +249,12 @@ body {
     border-bottom: 1px solid black;
 }
 
-.pcc2_detector_de_metales span {
+.pcc2_detector_metales span {
     display: block;
     text-align: center;
     margin: auto;
 }
-.usuario_pcc2_detector_de_metales {
+.usuario_pcc2_detector_metales {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 1px solid black;
@@ -262,23 +262,23 @@ body {
     padding: 10px;
     align-items: center;
 }
-.usuario_pcc2_detector_de_metales li {
+.usuario_pcc2_detector_metales li {
     list-style-type: none;
     display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
 }
-.usuario_pcc2_detector_de_metales span, .usuario_pcc2_detector_de_metales input[type="checkbox"] {
+.usuario_pcc2_detector_metales span, .usuario_pcc2_detector_metales input[type="checkbox"] {
     display: block;
     text-align: center;
     margin: auto;
 }
-.usuario_pcc2_detector_de_metales input[type="checkbox"] {
+.usuario_pcc2_detector_metales input[type="checkbox"] {
     width: 20px;
     height: 20px;
 }
-.usuario_pcc2_detector_de_metales input[type="checkbox"]:checked {
+.usuario_pcc2_detector_metales input[type="checkbox"]:checked {
     background-color: var(--rojo-quinta);
 }
-.usuario_pcc2_detector_de_metales input[type="checkbox"]:hover {
+.usuario_pcc2_detector_metales input[type="checkbox"]:hover {
     cursor: pointer;
 }
 
@@ -374,7 +374,7 @@ body {
 
 .temperatura_despacho_ptsisa {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 10px;
     align-items: center;
     background-color: var(--rojo-quinta);
@@ -391,7 +391,7 @@ body {
 }
 .usuario_temperatura_despacho_ptsisa {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     border-bottom: 1px solid black;
     font-size: var(--sm);
     padding: 10px;
@@ -514,7 +514,7 @@ body {
     align-items: center;
     background-color: var(--rojo-quinta);
     color: var(--white);
-    font-size: 12px;
+    font-size: var(--usm);
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
@@ -557,9 +557,9 @@ body {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 10px;
     align-items: center;
-    background-color: var(--amarillo-quinta);
-    color: var(--black);
-    font-size: 12px;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--sm);
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
@@ -602,9 +602,9 @@ body {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 10px;
     align-items: center;
-    background-color: var(--amarillo-quinta);
-    color: var(--black);
-    font-size: 12px;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--sm);
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
