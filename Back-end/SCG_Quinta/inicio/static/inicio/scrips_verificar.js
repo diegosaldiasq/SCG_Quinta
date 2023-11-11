@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let datos = document.querySelectorAll('.usuario_monitoreo_del_agua');
 
             datos.forEach(function(dato) {
-                let id = dato.querySelectorAll('.id').innerText;
+                let id = dato.querySelector('span').innerText;
                 let isVerificado = dato.querySelectorAll('.checkbox_monitoreo_del_agua').checked;
         
                 userData.push({
