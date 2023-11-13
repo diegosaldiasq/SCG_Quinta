@@ -27,5 +27,6 @@ urlpatterns = [
     path("set_fechas/", views.set_fechas, name="set_fechas"),
     path("no_hay_datos/", views.no_hay_datos, name="no_hay_datos"),
     path("seleccion_verifica/", views.seleccion_verifica, name="seleccion_verifica"),
-    path("verificar/", views.verificar, name="verificar")
+    path("verificar/", views.verificar, name="verificar"),
+    path("verificar_monitoreo_del_agua/", views.verificar_monitoreo_del_agua, name="verificar_monitoreo_del_agua")
 ]

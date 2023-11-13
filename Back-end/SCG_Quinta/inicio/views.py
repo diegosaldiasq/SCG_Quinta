@@ -956,16 +956,18 @@ def verificar_monitoreo_del_agua(request):
             body_unicode = request.body.decode('utf-8')
             body_data = json.loads(body_unicode)
             datos = body_data.get('userData')
+            print(datos)
 
             for dato in datos:
                 id = dato['id']
                 isVerificado = dato['isVerificado']
-
-                usuario = DatosFormularioMonitoreoDelAgua.objects.get(id=id)
-                usuario.verificado = isVerificado
-                usuario.verificado_por = request.user.nombre_completo
-                usuario.fecha_de_verificacion = timezone.now()
-                usuario.save()
+                 
+                if isVerificado:
+                    usuario = DatosFormularioMonitoreoDelAgua.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
             return JsonResponse({'existe': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
