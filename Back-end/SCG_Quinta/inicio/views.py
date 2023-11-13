@@ -956,7 +956,6 @@ def verificar_monitoreo_del_agua(request):
             body_unicode = request.body.decode('utf-8')
             body_data = json.loads(body_unicode)
             datos = body_data.get('userData')
-            print(datos)
 
             for dato in datos:
                 id = dato['id']
@@ -968,6 +967,280 @@ def verificar_monitoreo_del_agua(request):
                     usuario.verificado_por = request.user.nombre_completo
                     usuario.fecha_de_verificacion = timezone.now()
                     usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_higiene_y_conducta_personal(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioHigieneConductaPersonal.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_monitoreo_de_plagas(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioMonitoreoDePlagas.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_recepcion_mpme(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioRecepcionMpMe.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_pcc2_detector_metales(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioPcc2DetectorMetales.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_control_de_transporte(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioControlDeTransporte.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_temperatura_despacho_ptjumbo(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+            
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioTemperaturaDespachoJumbo.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_temperatura_despacho_ptsisa(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            datos = body_data.get('userData')
+            
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioTemperaturaDespachoSisa.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_historial_termometro(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+            
+            datos = body_data.get('userData')
+            
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioHistorialTermometro.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now()
+                    usuario.save()
+
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_reclamo_a_proveedores(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+
+            datos = body_data.get('userData')
+            
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioReclamoProveedores.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now() 
+                    usuario.save()
+
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_rechazo_mp_in_me(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+
+            datos = body_data.get('userData')
+            
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado:
+                    usuario = DatosFormularioRechazoMpInMe.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now() 
+                    usuario.save()
+
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_informe_de_incidentes(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+
+            datos = body_data.get('userData')
+            
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado: 
+                    usuario = DatosFormularioInformeDeIncidentes.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now() 
+                    usuario.save()
+
+            return JsonResponse({'existe': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def verificar_control_material_extraño(request):
+    try:
+        if request.method == 'POST':
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+
+            datos = body_data.get('userData')
+            
+            for dato in datos:
+                id = dato['id']
+                isVerificado = dato['isVerificado']
+                 
+                if isVerificado: 
+                    usuario = DatosFormularioControlMaterialExtraño.objects.get(id=id)
+                    usuario.verificado = isVerificado
+                    usuario.verificado_por = request.user.nombre_completo
+                    usuario.fecha_de_verificacion = timezone.now() 
+                    usuario.save()
+
             return JsonResponse({'existe': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
