@@ -26,7 +26,7 @@
             {% endfor %}
             </div>
             {% for dato in datos %}
-                <div class="usuario_{{ config }}">
+                <div class="usuario_{{ config }}" id="usuario">
                     {% for nombre in nombres_campos %}
                         {% if nombre == 'verificado' %}
                             <input type="checkbox" class="checkbox_{{ config }}">
@@ -38,7 +38,7 @@
             {% endfor %}
         </div>   
         <div class="button-container">
-            <form class="form" id="miBoton_{{ config }}">
+            <form class="form" id="miBoton">
                 {% csrf_token %}
                 <button class="primary-button button">Guardar cambios</button>  
             </form>
@@ -48,6 +48,9 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        let config = "{{ config }}";  // Asignando el valor de Django 'config' a una variable JS
+    </script>
     <script src="{% static 'inicio/scrips_verificar.js' %}"></script>
 </body>
 </html>
