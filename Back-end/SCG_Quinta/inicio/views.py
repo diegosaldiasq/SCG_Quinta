@@ -953,7 +953,6 @@ def verificar(request):
 def verificar_registros(request):
     try:
         config = request.session.get('config')
-        print(config)
         model_mapping = {
             'monitoreo_del_agua': 'DatosFormularioMonitoreoDelAgua',
             'higiene_y_conducta_personal': 'DatosFormularioHigieneConductaPersonal',
@@ -969,24 +968,20 @@ def verificar_registros(request):
             'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
             'control_material_extraño': 'DatosFormularioControlMaterialExtraño'
         }
-        model_name = model_mapping.get(config)
-        print(model_name)
-        model = apps.get_model(config , model_name)
-        print(model)
         if request.method == 'POST':
             body_unicode = request.body.decode('utf-8')
             body_data = json.loads(body_unicode)
             datos = body_data.get('userData')
-            print(datos)
+            model_name = model_mapping.get(config)
+            model = apps.get_model(config , model_name)
 
             for dato in datos:
                 id = dato['id']
                 isVerificado = dato['isVerificado']
                  
                 if isVerificado:
-                    usuario = model.objects.get(id=id)
-                    print(usuario)
-                    usuario.verificado = isVerificado
+                    usuario = model.objects.get(id=id, verificado=False)
+                    usuario.verificado = True
                     usuario.verificado_por = request.user.nombre_completo
                     usuario.fecha_de_verificacion = timezone.now()
                     usuario.save()
