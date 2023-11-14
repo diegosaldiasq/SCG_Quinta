@@ -160,7 +160,7 @@ def descargar_higiene_y_conducta_personal(request):
                         'accion_correctiva',
                         'verificacion_accion_correctiva',
                         'observacion',
-                        'nombre_tecnologo'
+                        'nombre_tecnologo',
                         'verificado',
                         'verificado_por',
                         'fecha_de_verificacion'])
