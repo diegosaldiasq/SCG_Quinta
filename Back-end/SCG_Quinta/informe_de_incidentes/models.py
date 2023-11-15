@@ -6,7 +6,7 @@ class DatosFormularioInformeDeIncidentes(models.Model):
     nombre_tecnologo = models.CharField(max_length=100)
     fecha_registro = models.DateTimeField()
     fuente_material = models.TextField()
-    cantidad_contaminada = models.TextField()
+    cantidad_contaminada = models.FloatField()
     unidad_de_medida = models.TextField()
     lote_producto_contaminado = models.TextField()
     observaciones = models.TextField()
