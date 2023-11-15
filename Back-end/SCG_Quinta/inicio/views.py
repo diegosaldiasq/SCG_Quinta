@@ -105,11 +105,11 @@ def descargar_monitoreo_del_agua(request):
         
         for objeto in objeto_filtrado:
             fecha_de_verificacion = (
-                objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)
+                objeto.fecha_de_verificacion.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None)
                 if objeto.fecha_de_verificacion else None
             )
             ws.append([objeto.nombre_tecnologo,
-                        objeto.fecha_registro.astimezone(pytz.UTC).replace(tzinfo=None),
+                        objeto.fecha_registro.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None),
                         objeto.turno_mda,
                         objeto.planta_mda,
                         objeto.numero_llave,
@@ -988,3 +988,64 @@ def verificar_registros(request):
             return JsonResponse({'existe': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+# Función para descargar los datos de los formularios, reemplaza los anteriormente creados
+@login_required
+def descargar_registros(request):
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
+    config = request.GET['config']
+    model_mapping = {
+            'monitoreo_del_agua': 'DatosFormularioMonitoreoDelAgua',
+            'higiene_y_conducta_personal': 'DatosFormularioHigieneConductaPersonal',
+            'monitoreo_de_plagas': 'DatosFormularioMonitoreoDePlagas',
+            'recepcion_mpme': 'DatosFormularioRecepcionMpMe',
+            'pcc2_detector_metales': 'DatosFormularioPcc2DetectorMetales',
+            'control_de_transporte': 'DatosFormularioControlDeTransporte',
+            'temperatura_despacho_ptjumbo': 'DatosFormularioTemperaturaDespachoJumbo',
+            'temperatura_despacho_ptsisa': 'DatosFormularioTemperaturaDespachoSisa',
+            'historial_termometro': 'DatosFormularioHistorialTermometro',
+            'reclamo_a_proveedores': 'DatosFormularioReclamoProveedores',
+            'rechazo_mp_in_me': 'DatosFormularioRechazoMpInMe',
+            'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
+            'control_material_extraño': 'DatosFormularioControlMaterialExtraño'
+        }
+    model_name = model_mapping.get(config)
+    model = apps.get_model(config , model_name)
+    
+    objeto_filtrado = None
+    if fecha_inicio_str == None or fecha_fin_str == None:
+        objeto_filtrado = model.objects.all()
+    else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+        objeto_filtrado = model.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+
+    filename = str(config) + '.xlsx'
+    if not objeto_filtrado.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+    else:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        wb = Workbook()
+        ws = wb.active
+        def get_field_names(model):
+            fields = model._meta.get_fields()
+            return [
+                field.name for field in fields 
+                if isinstance(field, Field)
+            ]
+        nombres_campos = get_field_names(model)
+        ws.append([nombres_campos])
+        
+        for objeto in objeto_filtrado:
+            fecha_de_verificacion = (
+                objeto.fecha_de_verificacion.astimezone(pytz.UTC).replace(tzinfo=None)
+                if objeto.fecha_de_verificacion else None
+            )
+            ws.append([fecha_de_verificacion if isinstance(objeto, datetime) else objeto.nombre for nombre in nombres_campos])
+        wb.save(response)
+        if fecha_inicio_str != None or fecha_fin_str != None:
+            del request.session['fechainicio']
+            del request.session['fechafin']
+        return response
