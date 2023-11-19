@@ -28,12 +28,12 @@
             <p class="subtitle">POES</p>
             <p class="registro">
                 <span>1.- Registro monitoreo del agua</span>
-                <a href="{% url 'descargar_monitoreo_del_agua' %}">R-POES-Q-01-01</a>
+                <a href="{% url 'descargar_registros' %}?config=monitoreo_del_agua">R-POES-Q-01-01</a>
                 <!--<button class="a" id="descarga-monitoreo-del-agua">R-POES-Q-01-01</button>-->
             </p>
             <p class="registro">
                 <span>2.- Registro higiene y conducta del personal</span>
-                <a href="{% url 'descargar_higiene_y_conducta_personal' %}">R-POES-Q-02-01</a>
+                <a href="{% url 'descargar_registros' %}?config=higiene_y_conducta_personal">R-POES-Q-02-01</a>
             </p>
             <p class="registro">
                 <span>3.- Registro limpieza y sanitizacion de planta</span>
@@ -41,50 +41,50 @@
             </p>
             <p class="registro">
                 <span>4.- Registro monitoreo de plagas</span>
-                <a href="{% url 'descargar_monitoreo_de_plagas' %}">R-POES-Q-05-02</a>
+                <a href="{% url 'descargar_registros' %}?config=monitoreo_de_plagas">R-POES-Q-05-02</a>
             </p>
         </div>
         <div class="login-container">
             <p class="subtitle">POE</p>
             <p class="registro">
                 <span>1.- Registro control de recepcion de MP y ME</span>
-                <a href="{% url 'descargar_recepcion_mpme' %}">R-POE-E-02-01</a>
+                <a href="{% url 'descargar_registros' %}?config=recepcion_mpme">R-POE-E-02-01</a>
             </p>
             <p class="registro">
                 <span>2.- Registro PCC N°2 detector de metales</span>
-                <a href="{% url 'descargar_pcc2_detector_metales' %}">R-POE-E-03-09</a>
+                <a href="{% url 'descargar_registros' %}?config=pcc2_detector_metales">R-POE-E-03-09</a>
             </p>
             <p class="registro">
                 <span>3.- Control de transporte</span>
-                <a href="{% url 'descargar_control_de_transporte' %}">R-POE-E-05-09</a>
+                <a href="{% url 'descargar_registros' %}?config=control_de_transporte">R-POE-E-05-09</a>
             </p>
             <p class="registro">
                 <span>4.- Registro temperatura de despacho productos jumbo</span>
-                <a href="{% url 'descargar_temperatura_despacho_ptjumbo' %}">R-POE-E-05-01</a>
+                <a href="{% url 'descargar_registros' %}?config=temperatura_despacho_ptjumbo">R-POE-E-05-01</a>
             </p>
             <p class="registro">
                 <span>5.- Registro temperatura de despacho productos sisa</span>
-                <a href="{% url 'descargar_temperatura_despacho_ptsisa' %}">R-POE-E-05-02</a>
+                <a href="{% url 'descargar_registros' %}?config=temperatura_despacho_ptsisa">R-POE-E-05-02</a>
             </p>
             <p class="registro">
                 <span>6.- Registro historial termometro</span>
-                <a href="{% url 'descargar_historial_termometro' %}">R-POE-E-07-01</a>
+                <a href="{% url 'descargar_registros' %}?config=historial_termometro">R-POE-E-07-01</a>
             </p>
             <p class="registro">
                 <span>7.- Informe de reclamo a proveedores</span>
-                <a href="{% url 'descargar_reclamo_a_proveedores' %}">IN-POE-Q-10-02</a>
+                <a href="{% url 'descargar_registros' %}?config=reclamo_a_proveedores">IN-POE-Q-10-02</a>
             </p>
             <p class="registro">
                 <span>8.- Informe de rechazo de MP, insumos y material de envase</span>
-                <a href="{% url 'descargar_rechazo_mp_in_me' %}">IN-POE-Q-10-03</a>
+                <a href="{% url 'descargar_registros' %}?config=rechazo_mp_in_me">IN-POE-Q-10-03</a>
             </p>
             <p class="registro">
                 <span>9.- Informe de incidentes</span>
-                <a href="{% url 'descargar_informe_de_incidentes' %}">R-POE-Q-15-01</a>
+                <a href="{% url 'descargar_registros' %}?config=informe_de_incidentes">R-POE-Q-15-01</a>
             </p>
             <p class="registro">
                 <span>10.- Control de material extraño</span>
-                <a href="{% url 'descargar_control_material_extraño' %}">R-POE-Q-15-02</a>
+                <a href="{% url 'descargar_registros' %}?config=control_material_extraño">R-POE-Q-15-02</a>
             </p>
         </div>
         <form class="form" action="{% url 'redireccionar_inicio' %}">
