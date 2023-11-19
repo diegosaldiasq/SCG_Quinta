@@ -6,19 +6,6 @@ import pytz
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from historial_termometro.models import DatosFormularioHistorialTermometro
-from monitoreo_del_agua.models import DatosFormularioMonitoreoDelAgua
-from higiene_y_conducta_personal.models import DatosFormularioHigieneConductaPersonal
-from monitoreo_de_plagas.models import DatosFormularioMonitoreoDePlagas
-from recepcion_mpme.models import DatosFormularioRecepcionMpMe
-from pcc2_detector_metales.models import DatosFormularioPcc2DetectorMetales
-from control_de_transporte.models import DatosFormularioControlDeTransporte
-from temperatura_despacho_ptjumbo.models import DatosFormularioTemperaturaDespachoJumbo
-from temperatura_despacho_ptsisa.models import DatosFormularioTemperaturaDespachoSisa
-from reclamo_a_proveedores.models import DatosFormularioReclamoProveedores
-from rechazo_mp_in_me.models import DatosFormularioRechazoMpInMe
-from informe_de_incidentes.models import DatosFormularioInformeDeIncidentes
-from control_material_extraño.models import DatosFormularioControlMaterialExtraño
 from login.models import DatosFormularioCrearCuenta
 import json
 from django.http import JsonResponse
@@ -106,11 +93,8 @@ def intermedio(request):
 def seleccion_verifica(request):
     return render(request, 'inicio/seleccion_verifica.html')
 
-@login_required
-def verificar(request):
-    config = request.GET['config']
-    request.session['config'] = config
-    model_mapping = {
+# Diccionario para mapear el nombre de la configuración con el nombre del modelo
+model_mapping = {
         'monitoreo_del_agua': 'DatosFormularioMonitoreoDelAgua',
         'higiene_y_conducta_personal': 'DatosFormularioHigieneConductaPersonal',
         'monitoreo_de_plagas': 'DatosFormularioMonitoreoDePlagas',
@@ -125,6 +109,11 @@ def verificar(request):
         'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
         'control_material_extraño': 'DatosFormularioControlMaterialExtraño'
     }
+
+@login_required
+def verificar(request):
+    config = request.GET['config']
+    request.session['config'] = config
     # Función de ayuda para obtener nombres de campos
     def get_field_names(model):
         fields = model._meta.get_fields()
@@ -145,21 +134,6 @@ def verificar(request):
 def verificar_registros(request):
     try:
         config = request.session.get('config')
-        model_mapping = {
-            'monitoreo_del_agua': 'DatosFormularioMonitoreoDelAgua',
-            'higiene_y_conducta_personal': 'DatosFormularioHigieneConductaPersonal',
-            'monitoreo_de_plagas': 'DatosFormularioMonitoreoDePlagas',
-            'recepcion_mpme': 'DatosFormularioRecepcionMpMe',
-            'pcc2_detector_metales': 'DatosFormularioPcc2DetectorMetales',
-            'control_de_transporte': 'DatosFormularioControlDeTransporte',
-            'temperatura_despacho_ptjumbo': 'DatosFormularioTemperaturaDespachoJumbo',
-            'temperatura_despacho_ptsisa': 'DatosFormularioTemperaturaDespachoSisa',
-            'historial_termometro': 'DatosFormularioHistorialTermometro',
-            'reclamo_a_proveedores': 'DatosFormularioReclamoProveedores',
-            'rechazo_mp_in_me': 'DatosFormularioRechazoMpInMe',
-            'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
-            'control_material_extraño': 'DatosFormularioControlMaterialExtraño'
-        }
         if request.method == 'POST':
             body_unicode = request.body.decode('utf-8')
             body_data = json.loads(body_unicode)
@@ -187,21 +161,6 @@ def descargar_registros(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     config = request.GET['config']
-    model_mapping = {
-            'monitoreo_del_agua': 'DatosFormularioMonitoreoDelAgua',
-            'higiene_y_conducta_personal': 'DatosFormularioHigieneConductaPersonal',
-            'monitoreo_de_plagas': 'DatosFormularioMonitoreoDePlagas',
-            'recepcion_mpme': 'DatosFormularioRecepcionMpMe',
-            'pcc2_detector_metales': 'DatosFormularioPcc2DetectorMetales',
-            'control_de_transporte': 'DatosFormularioControlDeTransporte',
-            'temperatura_despacho_ptjumbo': 'DatosFormularioTemperaturaDespachoJumbo',
-            'temperatura_despacho_ptsisa': 'DatosFormularioTemperaturaDespachoSisa',
-            'historial_termometro': 'DatosFormularioHistorialTermometro',
-            'reclamo_a_proveedores': 'DatosFormularioReclamoProveedores',
-            'rechazo_mp_in_me': 'DatosFormularioRechazoMpInMe',
-            'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
-            'control_material_extraño': 'DatosFormularioControlMaterialExtraño'
-        }
     model_name = model_mapping.get(config)
     model = apps.get_model(config , model_name)
     
