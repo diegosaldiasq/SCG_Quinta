@@ -4,7 +4,6 @@ from .models import DatosFormularioMonitoreoDePlagas
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from datetime import datetime
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -17,7 +16,7 @@ def monitoreo_de_plagas(request):
 def vista_monitoreo_de_plagas(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         numero_estacion = request.POST.get('numero_estacion')
         tipo_plaga = request.POST.get('tipo_plaga')
         tipo_trampa = request.POST.get('tipo_trampa')

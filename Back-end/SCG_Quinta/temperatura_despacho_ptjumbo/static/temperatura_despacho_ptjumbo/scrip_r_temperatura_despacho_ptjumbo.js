@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var fechaRegistro = $("#fecha-reg").val();
             var cadena = $("#cadena").val();
             var item = $("#item").val();
             var producto = $("#producto").val();
@@ -27,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/temperatura_despacho_ptjumbo/vista_temperatura_despacho_ptjumbo/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    fecha_registro: fechaRegistro,
                     cadena: cadena,
                     item: item,
                     producto: producto,

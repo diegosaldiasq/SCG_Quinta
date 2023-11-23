@@ -17,7 +17,7 @@ def temperatura_despacho_ptsisa(request):
 def vista_temperatura_despacho_ptsisa(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         cadena = request.POST.get('cadena')
         item = request.POST.get('item')
         producto = request.POST.get('producto')

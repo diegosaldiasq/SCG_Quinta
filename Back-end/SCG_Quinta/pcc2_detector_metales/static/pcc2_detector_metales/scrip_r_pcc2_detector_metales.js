@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var fechaRegistro = document.getElementById('fecha-reg');
     var lote = document.getElementById('lote');
     var turno = document.getElementById('turno');
 
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var fechaRegistro = $("#fecha-reg").val();
             var lote = $("#lote").val();
             var turno = $("#turno").val();
             var tipoMetal = $("#tipo-metal").val();
@@ -34,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/pcc2_detector_metales/vista_pcc2_detector_metales/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    fecha_registro: fechaRegistro,
                     lote: lote,
                     turno: turno,
                     tipo_metal: tipoMetal,

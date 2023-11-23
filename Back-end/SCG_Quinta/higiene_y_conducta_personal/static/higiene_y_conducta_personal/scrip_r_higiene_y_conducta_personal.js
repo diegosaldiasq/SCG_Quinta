@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var fechaIngreso = document.getElementById('fecha-ingreso');
     var nombrePersonal = document.getElementById('nombre-personal');
     var turno = document.getElementById('turno');
     var planta = document.getElementById('planta');
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var fechaIngreso = $("#fecha-ingreso").val();
             var nombrePersonal = $("#nombre-personal").val();
             var turno = $("#turno").val();
             var planta = $("#planta").val();
@@ -36,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/higiene_y_conducta_personal/vista_higiene_y_conducta_personal/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    fecha_ingreso: fechaIngreso,
                     nombre_personal: nombrePersonal,
                     turno: turno,
                     planta: planta,

@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
     var loteDia = document.getElementById('lote-dia');
-    var fechaRegistro = document.getElementById('fecha-reg');
     var nombreProveedor = document.getElementById('proveedor');
     var nombreProducto = document.getElementById('producto');
     var fechaDeElaboracion = document.getElementById('fecha-elab');
@@ -33,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
     $(document).ready(function() {
         $("#miBoton").click(function() {
             var loteDia = $("#lote-dia").val();
-            var fechaRegistro = $("#fecha-reg").val();
             var nombreProveedor = $("#proveedor").val();
             var nombreProducto = $("#producto").val();
             var fechaDeElaboracion = $("#fecha-elab").val();
@@ -58,7 +56,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 method: "POST",
                 data: {
                     lote_dia: loteDia,
-                    fecha_registro: fechaRegistro,
                     nombre_proveedor: nombreProveedor,
                     nombre_producto: nombreProducto,
                     fecha_elaboracion: fechaDeElaboracion,

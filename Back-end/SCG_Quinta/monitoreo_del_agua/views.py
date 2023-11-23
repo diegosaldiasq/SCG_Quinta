@@ -4,7 +4,6 @@ from .models import DatosFormularioMonitoreoDelAgua
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from datetime import datetime
 from django.contrib.auth.decorators import login_required
 
 
@@ -18,7 +17,7 @@ def monitoreo_del_agua(request):
 def vista_monitoreo_del_agua(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         turno_mda = request.POST.get('turno_mda')
         planta_mda = request.POST.get('planta_mda')
         numero_llave = request.POST.get('numero_llave')

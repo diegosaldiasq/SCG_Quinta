@@ -4,7 +4,6 @@ from .models import DatosFormularioHigieneConductaPersonal
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from datetime import datetime
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -16,7 +15,7 @@ def higiene_y_conducta_personal(request):
 @login_required
 def vista_higiene_y_conducta_personal(request):
     if request.method == 'POST':
-        fecha_ingreso = timezone.make_aware(datetime.strptime(request.POST.get('fecha_ingreso'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_ingreso = timezone.now()
         nombre_personal = request.POST.get('nombre_personal')
         turno = request.POST.get('turno')
         planta = request.POST.get('planta')

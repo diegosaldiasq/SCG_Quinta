@@ -17,7 +17,7 @@ def control_de_transporte(request):
 def vista_control_de_transporte(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         fecha_recepcion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_recepcion'), '%Y-%m-%d'), timezone=timezone.utc)
         producto_recepcion = request.POST.get('producto_recepcion')
         temperatura_transporte = request.POST.get('temperatura_transporte')

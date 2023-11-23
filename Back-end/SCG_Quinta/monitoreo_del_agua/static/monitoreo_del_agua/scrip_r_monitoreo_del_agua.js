@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var fechaRegistro = document.getElementById('fecha-reg');
-
     var turno = document.getElementById('turno');
     var planta = document.getElementById('planta');
     var numeroLlave = document.getElementById('numero-llave');
@@ -25,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var fechaRegistro = $("#fecha-reg").val();
             var turno = $("#turno").val();
             var planta = $("#planta").val();
             var numeroLlave = $("#numero-llave").val();
@@ -42,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/monitoreo_del_agua/vista_monitoreo_del_agua/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    fecha_registro: fechaRegistro,
                     turno_mda: turno,
                     planta_mda: planta,
                     numero_llave: numeroLlave,

@@ -18,7 +18,7 @@ def vista_recepcion_mpme(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
         lote_dia = request.POST.get('lote_dia')
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         nombre_proveedor = request.POST.get('nombre_proveedor')
         nombre_producto = request.POST.get('nombre_producto')
         fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
