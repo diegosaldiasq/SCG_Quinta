@@ -17,7 +17,7 @@ def control_material_extraño(request):
 def vista_control_material_extraño(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         turno = request.POST.get('turno')
         area_material = request.POST.get('area_material')
         tipo_material = request.POST.get('tipo_material')

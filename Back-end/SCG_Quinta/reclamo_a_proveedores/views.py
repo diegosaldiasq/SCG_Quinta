@@ -17,7 +17,7 @@ def reclamo_a_proveedores(request):
 def vista_reclamo_a_proveedores(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         nombre_proveedor = request.POST.get('nombre_proveedor')
         fecha_reclamo = timezone.make_aware(datetime.strptime(request.POST.get('fecha_reclamo'), '%Y-%m-%d'), timezone=timezone.utc)
         nombre_del_producto = request.POST.get('nombre_del_producto')

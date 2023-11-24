@@ -17,7 +17,7 @@ def rechazo_mp_in_me(request):
 def vista_rechazo_mp_in_me(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         nombre_proveedor = request.POST.get('nombre_proveedor')
         numero_factura = request.POST.get('numero_factura')
         nombre_transportista = request.POST.get('nombre_transportista')

@@ -18,7 +18,7 @@ def historial_termometro(request):
 def vista_historial_termometro(request):
     if request.method == 'POST':
         nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.make_aware(datetime.strptime(request.POST.get('fecha_registro'), '%Y-%m-%dT%H:%M'), timezone=timezone.utc)
+        fecha_registro = timezone.now()
         codigo_termometro = request.POST.get('codigo_termometro')
         valor_1 = request.POST.get('valor_1')
         valor_2 = request.POST.get('valor_2')

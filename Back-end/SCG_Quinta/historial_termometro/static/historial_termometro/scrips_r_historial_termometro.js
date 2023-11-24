@@ -1,6 +1,4 @@
 // Funciones para el registro de historial de termometro
-var fechaRegistro = document.getElementById('fecha-reg');
-
 var codigoTermometro = document.getElementById('codigo-termometro');
 var valor1 = document.getElementById('valor1');
 var valor2 = document.getElementById('valor2');
@@ -77,7 +75,6 @@ $.ajaxSetup({
 
 $(document).ready(function() {
     $("#miBoton").click(function() {
-        var fechaRegistro = $("#fecha-reg").val();
         var codigoTermometro = $("#codigo-termometro").val();
         var valor1 = $("#valor1").val();
         var valor2 = $("#valor2").val();
@@ -102,7 +99,6 @@ $(document).ready(function() {
             url: "/historial_termometro/vista_historial_termometro/",  // Ruta a tu vista Django
             method: "POST",
             data: {
-                fecha_registro: fechaRegistro,
                 codigo_termometro: codigoTermometro,
                 valor_1: valor1,
                 valor_2: valor2,

@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var fechaRegistro = document.getElementById('fecha-reg');
-
     var nombreDeProveedor = document.getElementById('nomb-prov');
     var numeroFactura = document.getElementById('numero-factura');
     var nombreDelTransportista = document.getElementById('nomb-trans');
@@ -27,8 +25,6 @@ document.addEventListener("DOMContentLoaded", function() {
     $(document).ready(function() {
 
         $("#miBoton").click(function() {
-
-            var fechaRegistro = $("#fecha-reg").val();
             var nombreDeProveedor = $("#nomb-prov").val();
             var numeroFactura = $("#numero-factura").val();
             var nombreDelTransportista = $("#nomb-trans").val();
@@ -45,7 +41,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/rechazo_mp_in_me/vista_rechazo_mp_in_me/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    fecha_registro: fechaRegistro,
                     nombre_proveedor: nombreDeProveedor,
                     numero_factura: numeroFactura,
                     nombre_transportista: nombreDelTransportista,

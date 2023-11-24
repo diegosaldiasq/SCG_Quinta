@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var fechaRegistro = document.getElementById('fecha-reg');
-
     var fuenteMaterial = document.getElementById('fuente-material');
     var cantidadContaminada = document.getElementById('cantidad-cont');
     var unidadDeMedida = document.getElementById('udm');
@@ -21,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var fechaRegistro = $("#fecha-reg").val();
             var fuenteMaterial = $("#fuente-material").val();
             var cantidadContaminada = $("#cantidad-cont").val();
             var unidadDeMedida = $("#udm").val();
@@ -34,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/informe_de_incidentes/vista_informe_de_incidentes/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    fecha_registro: fechaRegistro,
                     fuente_material: fuenteMaterial,
                     cantidad_contaminada: cantidadContaminada,
                     unidad_de_medida: unidadDeMedida,

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Tu código JavaScript aquí
-    var fechaRegistro = document.getElementById('fecha-reg');
     var turno = document.getElementById('turno');
 
     var areaMaterial = document.getElementById('area');
@@ -20,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(document).ready(function() {
         $("#miBoton").click(function() {
-            var fechaRegistro = $("#fecha-reg").val();
             var turno = $("#turno").val();
             var areaMaterial = $("#area").val();
             var tipoMaterial = $("#tipo-material").val();
@@ -32,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 url: "/control_material_extraño/vista_control_material_extraño/",  // Ruta a tu vista Django
                 method: "POST",
                 data: {
-                    fecha_registro: fechaRegistro,
                     turno: turno,
                     area_material: areaMaterial,
                     tipo_material: tipoMaterial,
