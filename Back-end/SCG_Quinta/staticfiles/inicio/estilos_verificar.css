@@ -1,0 +1,685 @@
+:root{
+    --very-light-pink: #C7C7C7;
+    --text-input-field: #F7F7F7;
+    --hospital-green: #ACD9B2;
+    --rojo-quinta: #B43C2C;
+    --amarillo-quinta: #f3ba14;
+    --naranjo-quinta: #d07020;
+    --naranjo-claro-quinta: #d4841c;
+    --white: #FFFFFF;
+    --black: #000000;
+    --usm: 10px;
+    --sm: 14px;
+    --md: 16px;
+    --lg: 18px;
+}
+body {
+    margin: 24;
+    font-family: 'Quicksand', sans-serif;
+    background-image: url(./images/Fondo.png);
+}
+.login {
+    width: 100%;
+    display: grid;
+    justify-content: center;
+}
+.logo {
+    width: 200px;
+    margin-top: 18px;
+    margin-bottom: 4px;
+    justify-self: center;
+}
+.title {
+    font-size: 32px;
+    margin-bottom: 12px;
+    text-align: center;
+    color: var(--black);
+}
+.login-container {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    width: auto;
+    justify-items: center;
+    background-color: var(--amarillo-quinta);
+    border-radius: 32px;
+    margin-bottom: 30px;
+    align-items: center;
+    padding: 20px;
+}
+.subtitle {
+    color: var(--rojo-quinta);
+    font-size: 24px;
+    font-weight: 300;
+    margin-top: 12px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.monitoreo_del_agua {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.monitoreo_del_agua span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_monitoreo_del_agua {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_monitoreo_del_agua li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_monitoreo_del_agua span, .usuario_monitoreo_del_agua input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_monitoreo_del_agua input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_monitoreo_del_agua input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_monitoreo_del_agua input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.higiene_y_conducta_personal {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.higiene_y_conducta_personal span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_higiene_y_conducta_personal {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_higiene_y_conducta_personal li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_higiene_y_conducta_personal span, .usuario_higiene_y_conducta_personal input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_higiene_y_conducta_personal input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_higiene_y_conducta_personal input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_higiene_y_conducta_personal input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.monitoreo_de_plagas {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--sm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.monitoreo_de_plagas span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_monitoreo_de_plagas {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_monitoreo_de_plagas li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_monitoreo_de_plagas span, .usuario_monitoreo_de_plagas input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_monitoreo_de_plagas input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_monitoreo_de_plagas input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_monitoreo_de_plagas input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.recepcion_mpme {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: 6px;
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.recepcion_mpme span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_recepcion_mpme {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: 8px;
+    padding: 10px;
+    align-items: center;
+}
+.usuario_recepcion_mpme li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_recepcion_mpme span, .usuario_recepcion_mpme input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_recepcion_mpme input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_recepcion_mpme input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_recepcion_mpme input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.pcc2_detector_metales {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--sm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.pcc2_detector_metales span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_pcc2_detector_metales {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_pcc2_detector_metales li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_pcc2_detector_metales span, .usuario_pcc2_detector_metales input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_pcc2_detector_metales input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_pcc2_detector_metales input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_pcc2_detector_metales input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.control_de_transporte {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.control_de_transporte span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_control_de_transporte {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_control_de_transporte li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_control_de_transporte span, .usuario_control_de_transporte input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_control_de_transporte input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_control_de_transporte input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_control_de_transporte input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.temperatura_despacho_ptjumbo {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.temperatura_despacho_ptjumbo span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_temperatura_despacho_ptjumbo {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_temperatura_despacho_ptjumbo li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_temperatura_despacho_ptjumbo span, .usuario_temperatura_despacho_ptjumbo input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_temperatura_despacho_ptjumbo input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_temperatura_despacho_ptjumbo input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_temperatura_despacho_ptjumbo input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.temperatura_despacho_ptsisa {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.temperatura_despacho_ptsisa span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_temperatura_despacho_ptsisa {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_temperatura_despacho_ptsisa li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_temperatura_despacho_ptsisa span, .usuario_temperatura_despacho_ptsisa input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_temperatura_despacho_ptsisa input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_temperatura_despacho_ptsisa input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_temperatura_despacho_ptsisa input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.historial_termometro {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: 6px;
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.historial_termometro span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_historial_termometro {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: 8px;
+    padding: 10px;
+    align-items: center;
+}
+.usuario_historial_termometro li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_historial_termometro span, .usuario_historial_termometro input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_historial_termometro input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_historial_termometro input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_historial_termometro input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.reclamo_a_proveedores {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.reclamo_a_proveedores span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_reclamo_a_proveedores {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_reclamo_a_proveedores li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_reclamo_a_proveedores span, .usuario_reclamo_a_proveedores input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_reclamo_a_proveedores input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_reclamo_a_proveedores input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_reclamo_a_proveedores input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.rechazo_mp_in_me {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.rechazo_mp_in_me span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_rechazo_mp_in_me {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: 12px;
+    padding: 10px;
+    align-items: center;
+}
+.usuario_rechazo_mp_in_me li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_rechazo_mp_in_me span, .usuario_rechazo_mp_in_me input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_rechazo_mp_in_me input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_rechazo_mp_in_me input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_rechazo_mp_in_me input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.informe_de_incidentes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--usm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.informe_de_incidentes span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_informe_de_incidentes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: 12px;
+    padding: 10px;
+    align-items: center;
+}
+.usuario_informe_de_incidentes li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_informe_de_incidentes span, .usuario_informe_de_incidentes input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_informe_de_incidentes input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_informe_de_incidentes input[type="checkbox"]:checked {
+    background-color: var(--amarillo-quinta);
+}
+.usuario_informe_de_incidentes input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.control_material_extraño {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--sm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.control_material_extraño span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_control_material_extraño {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: 12px;
+    padding: 10px;
+    align-items: center;
+}
+.usuario_control_material_extraño li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_control_material_extraño span, .usuario_control_material_extraño input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_control_material_extraño input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_control_material_extraño input[type="checkbox"]:checked {
+    background-color: var(--amarillo-quinta);
+}
+.usuario_control_material_extraño input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.login-container {
+    grid-gap: 10px;  /* Agregando un espacio entre cada fila de permisos de usuario para una mejor separación visual */
+}
+.button-container {
+    display:  flex;
+    flex-direction: row;
+    justify-self: center;
+    gap: 16px;
+}
+.form {
+    display:  grid;
+    flex-direction: column;
+    justify-items: center;
+    margin-bottom: 20px;
+}
+.primary-button {
+    background-color: var(--rojo-quinta);
+    border-radius: 8px;
+    border: none;
+    color: var(--white);
+    width: 220px;
+    cursor: pointer;
+    font-size: var(--md);
+    font-weight: bold;
+    height: 40px;
+}
+.login-button {
+    margin-top: 14px;
+    margin-bottom: 30px;
+}
+@media (max-width: 650px) {
+    .login-container {
+        width: 100%;
+    }
+    .registro {
+        font-size: 8px;   
+    }
+    .title {
+        font-size: var(--md);
+    }
+}
