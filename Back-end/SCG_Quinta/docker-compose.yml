@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: SCG_Quinta
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Dsal1212
+      POSTGRES_PASSWORD: radcliffe
 
   web:
     build: .
@@ -20,7 +20,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://postgres:Dsal1212@db/SCG_Quinta
+      DATABASE_HOST: db
 
   nginx:
     image: nginx:1.19

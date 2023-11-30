@@ -10,9 +10,10 @@ RUN virtualenv venv
 RUN . venv/bin/activate
 RUN pip install -r requirements.txt 
 
-
 COPY . /app
+
+RUN python manage.py makemigrations
 
 EXPOSE 8000
 
-CMD ["python3", "manage.py", "runserver"]
+CMD ["gunicorn", "SCG_Quinta.wsgi:application", "--bind", "0.0.0.0:8000"]
