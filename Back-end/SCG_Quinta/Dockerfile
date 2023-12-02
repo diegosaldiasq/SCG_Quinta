@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY requirements.txt /app
 RUN pip install --upgrade pip 
-#crear ambiente vistual
+#crear ambiente virtual
 RUN pip install virtualenv
 RUN virtualenv venv 
 RUN . venv/bin/activate
@@ -12,7 +12,7 @@ RUN pip install -r requirements.txt
 
 COPY . /app
 
-RUN python manage.py makemigrations
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
