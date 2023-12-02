@@ -7,6 +7,5 @@ __pycache__
 db.sqlite3
 debug.log
 app/
-config/
 pgadmin-data/
 
