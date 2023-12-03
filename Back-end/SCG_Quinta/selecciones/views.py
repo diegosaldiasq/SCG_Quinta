@@ -80,6 +80,6 @@ def redireccionar_control_material_extraño(request):
     return HttpResponseRedirect(url_control_material_extraño)
 
 @login_required
-def redireccionar_intermedio(request):
-    url_intermedio = reverse('intermedio')
+def redireccionar_index(request):
+    url_intermedio = reverse('index')
     return HttpResponseRedirect(url_intermedio)

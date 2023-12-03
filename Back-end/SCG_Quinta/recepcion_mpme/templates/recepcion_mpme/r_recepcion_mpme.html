@@ -61,7 +61,7 @@
             </select>
 
             <label class="label">Temperatura °C transporte (-20 a 20 °C) o NA</label>
-            <input type="text" class="input" id="temperatura-trans">
+            <input type="number" class="input" min="-25.0" max="25.0" step="0.1" id="temperatura-trans">
 
             <p class="subtitle">Caracteristicas de producto</p>
 
@@ -87,7 +87,7 @@
             </select>
 
             <label class="label">Temperatura °C producto (-20 a 20 °C) o NA</label>
-            <input type="text" class="input" id="temperatura-prod">
+            <input type="number" class="input" min="-25.0" max="25.0" step="0.1" id="temperatura-prod">
 
             <label class="label">Condicion del envase</label>
             <select class="input" id="condicion-env">
@@ -126,7 +126,7 @@
             </select>
 
             <label class="label">° Brix o NA</label>
-            <input type="text" class="input" id="grados-brix">
+            <input type="number" class="input" min="0.0" max="100.0" step="0.1" id="grados-brix">
         </div>
         <div class="botones">
             <form class="form">
