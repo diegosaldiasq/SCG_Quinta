@@ -25,11 +25,9 @@ services:
 
   web:
     build: .
-    command: gunicorn SCG_Quinta.wsgi:application --bind 0.0.0.0:8000 # http://127.0.0.1:8000/
+    command: gunicorn SCG_Quinta.wsgi:application --bind 0.0.0.0:8000 --workers 10 --timeout 60
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
     depends_on:
       - db
     environment:
@@ -38,7 +36,7 @@ services:
   nginx:
     image: nginx:1.19
     ports:
-      - "80:80"
+      - "80:80" # http://localhost:80/login  entrada a la aplicacion SCG_Quinta
     volumes:
       - ./config/nginx/conf.d:/etc/nginx/conf.d
       - ./staticfiles:/static
