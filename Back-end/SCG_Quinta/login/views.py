@@ -34,7 +34,7 @@ def vista_main(request):
         return JsonResponse({'existe': dato})
 
 def ingresa_rut(request):
-    return render(request, 'login/ingresa_rut.html')
+    return render(request, 'login/Ingresa_rut.html')
 
 def crear_cuenta(request):
     return render(request, 'login/crear_cuenta.html')
