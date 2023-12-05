@@ -78,7 +78,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 success: function(response) {
                     // Hacer algo con la respuesta del servidor
                     console.log(response);
-                    $("#mensaje").text(response.mensaje);
+                    var mensaje;
+                    if (response.mensaje === 'Datos guardados exitosamente') {
+                        mensaje = response.mensaje;
+                    } else {
+                        mensaje = 'Error al guardar los datos';
+                    }
+                    alert(mensaje);
                 },
                 error: function() {
                     // Manejar errores
