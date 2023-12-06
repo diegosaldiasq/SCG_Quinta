@@ -11,7 +11,7 @@ RUN pip install --upgrade pip
 #RUN . venv/bin/activate
 RUN pip install --no-cache-dir -r requirements.txt 
 
-RUN python manage.py collectstatic --noinput
+#RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
