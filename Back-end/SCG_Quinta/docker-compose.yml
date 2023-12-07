@@ -8,8 +8,8 @@ services:
     environment:
       POSTGRES_DB: SCG_Quinta
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: radcliffe # Para widows
-      #POSTGRES_PASSWORD: Dsal1212 # Para linux
+      #POSTGRES_PASSWORD: radcliffe # Para widows
+      POSTGRES_PASSWORD: Dsal1212 # Para linux
 
   pgadmin:
     image: dpage/pgadmin4
