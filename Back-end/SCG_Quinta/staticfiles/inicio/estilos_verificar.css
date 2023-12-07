@@ -645,6 +645,37 @@ body {
 .login-container {
     grid-gap: 10px;  /* Agregando un espacio entre cada fila de permisos de usuario para una mejor separación visual */
 }
+/* Estilos para el contenedor de paginación */
+.pagination {
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Estilos para los enlaces de paginación */
+.pagination a {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #428bca;
+    text-decoration: none;
+}
+
+/* Cambia el estilo al pasar el mouse por encima */
+.pagination a:hover {
+    border-color: #428bca;
+    background-color: #f0f0f0;
+}
+
+/* Estilo para el texto de la página actual */
+.pagination .current {
+    margin: 0 5px;
+    padding: 5px 10px;
+    background-color: #428bca;
+    color: #fff;
+    border: 1px solid #428bca;
+    border-radius: 6px;
+}
 .button-container {
     display:  flex;
     flex-direction: row;

@@ -13,6 +13,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.db.models.fields import Field
 from django.apps import apps
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -112,8 +113,9 @@ model_mapping = {
 
 @login_required
 def verificar(request):
-    config = request.GET['config']
+    config = request.GET.get('config')
     request.session['config'] = config
+    pagina_numero = request.GET.get('page', 1)
     # Función de ayuda para obtener nombres de campos
     def get_field_names(model):
         fields = model._meta.get_fields()
@@ -126,7 +128,9 @@ def verificar(request):
     model_name = model_mapping.get(config)
     # Obtener el modelo dinámicamente utilizando apps.get_model
     model = apps.get_model(config , model_name) 
-    datos = model.objects.filter(verificado=False)
+    datos_sf = model.objects.filter(verificado=False)
+    paginator = Paginator(datos_sf, 10)
+    datos = paginator.get_page(pagina_numero)
     nombres_campos = get_field_names(model)
     return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
 

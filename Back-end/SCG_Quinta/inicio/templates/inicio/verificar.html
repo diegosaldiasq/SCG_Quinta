@@ -36,7 +36,24 @@
                     {% endfor %}
                 </div>
             {% endfor %}
-        </div>   
+        </div> 
+        <div class="pagination">
+            <span class="step-links">
+                {% if datos.has_previous %}
+                    <a href="?config={{ config }}&page=1">&laquo; primero</a>
+                    <a href="?config={{ config }}&page={{ datos.previous_page_number }}">anterior</a>
+                {% endif %}
+        
+                <span class="current">
+                    Página {{ datos.number }} de {{ datos.paginator.num_pages }}.
+                </span>
+        
+                {% if datos.has_next %}
+                    <a href="?config={{ config }}&page={{ datos.next_page_number }}">siguiente</a>
+                    <a href="?config={{ config }}&page={{ datos.paginator.num_pages }}">último &raquo;</a>
+                {% endif %}
+            </span>
+        </div>  
         <div class="button-container">
             <form class="form" id="miBoton">
                 {% csrf_token %}
