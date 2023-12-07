@@ -159,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.existe) {
                 alert("Datos guardados exitosamente!!");
                 location.reload();
-                return true;
             } else {
                 alert("No se pudo guardar... revisa nuevamente!!");
                 return false;
