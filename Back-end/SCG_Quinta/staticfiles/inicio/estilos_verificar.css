@@ -194,11 +194,11 @@ body {
 .recepcion_mpme {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    padding: 10px;
+    padding: 11px;
     align-items: center;
     background-color: var(--rojo-quinta);
     color: var(--white);
-    font-size: 6px;
+    font-size: 8px;
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
@@ -207,6 +207,7 @@ body {
     display: block;
     text-align: center;
     margin: auto;
+    transform: rotate(-20deg);
 }
 .usuario_recepcion_mpme {
     display: grid;
@@ -649,6 +650,7 @@ body {
 .pagination {
     text-align: center;
     padding: 10px 0;
+    margin-bottom: 20px;
 }
 
 /* Estilos para los enlaces de paginación */

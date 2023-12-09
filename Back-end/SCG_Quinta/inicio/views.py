@@ -113,26 +113,29 @@ model_mapping = {
 
 @login_required
 def verificar(request):
-    config = request.GET.get('config')
-    request.session['config'] = config
-    pagina_numero = request.GET.get('page', 1)
-    # Función de ayuda para obtener nombres de campos
-    def get_field_names(model):
-        fields = model._meta.get_fields()
-        return [
-            field.name for field in fields 
-            if isinstance(field, Field) and 
-            field.name not in ['fecha_de_verificacion', 'verificado_por']
-        ]
-    # Obtener el modelo correspondiente al parámetro config
-    model_name = model_mapping.get(config)
-    # Obtener el modelo dinámicamente utilizando apps.get_model
-    model = apps.get_model(config , model_name) 
-    datos_sf = model.objects.filter(verificado=False)
-    paginator = Paginator(datos_sf, 10)
-    datos = paginator.get_page(pagina_numero)
-    nombres_campos = get_field_names(model)
-    return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
+    if request.user.is_staff or request.user.is_superuser:
+        config = request.GET.get('config')
+        request.session['config'] = config
+        pagina_numero = request.GET.get('page', 1)
+        # Función de ayuda para obtener nombres de campos
+        def get_field_names(model):
+            fields = model._meta.get_fields()
+            return [
+                field.name for field in fields 
+                if isinstance(field, Field) and 
+                field.name not in ['fecha_de_verificacion', 'verificado_por']
+            ]
+        # Obtener el modelo correspondiente al parámetro config
+        model_name = model_mapping.get(config)
+        # Obtener el modelo dinámicamente utilizando apps.get_model
+        model = apps.get_model(config , model_name) 
+        datos_sf = model.objects.filter(verificado=False)
+        paginator = Paginator(datos_sf, 10)
+        datos = paginator.get_page(pagina_numero)
+        nombres_campos = get_field_names(model)
+        return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
+    else:
+        return render(request, 'inicio/falta_permiso.html')
 
 @login_required
 def verificar_registros(request):
