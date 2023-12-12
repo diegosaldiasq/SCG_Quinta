@@ -219,4 +219,5 @@ def descargar_registros(request):
     
 @login_required
 def en_desarrollo(request):
-    return render(request, 'inicio/sitio_en_construccion.html')
+    config = request.GET.get('config')
+    return render(request, 'inicio/sitio_en_construccion.html', {'config': config})

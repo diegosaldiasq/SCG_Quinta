@@ -20,8 +20,9 @@
         </div>
     </div>
     <script>
+        var config = "{{ config }}";
         setTimeout(function() {
-            window.location.href = "/inicio/intermedio/";
+            window.location.href = "/inicio/"+config+"/";
         }, 3000);  // 3000 milisegundos son 5 segundos
     </script>
 </body>
