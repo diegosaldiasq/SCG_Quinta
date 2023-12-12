@@ -13,3 +13,19 @@ Para ingresar a la aplicacion es necesario un dispositivo movil, ya sea celular 
 
 Se ha utilizado para el desarrollo frontend HTML, CSS y JavaScript. Para el desarrollo backend se utiliza Python con Django. La base de datos se quiere trabajar con PosgreSQL (aun por definir).
 Se utiliza para el control de versiones y el manejor del flujo de trabajo git y github.
+
+## Como instalar el proyecto
+
+Para instalar el proyecto se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2.
+
+## Como ejecutar el proyecto
+
+Iniciar sesion de docker con el comando `docker login` y luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`. 
+
+## Como ejecutar las pruebas
+
+Para ejecutar las pruebas se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2. Luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Luego ejecutar el comando `npm run test` para ejecutar las pruebas. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`.
+
+## Como contribuir
+
+Para contribuir se debe tener instalado debes hacer un pull request en github al proyecto https://github.com/diegosaldiasq/SCG_Quinta y esperar a que sea aprobado por el administrador del proyecto.
