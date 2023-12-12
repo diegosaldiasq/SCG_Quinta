@@ -216,3 +216,7 @@ def descargar_registros(request):
             del request.session['fechainicio']
             del request.session['fechafin']
         return response
+    
+@login_required
+def en_desarrollo(request):
+    return render(request, 'inicio/sitio_en_construccion.html')

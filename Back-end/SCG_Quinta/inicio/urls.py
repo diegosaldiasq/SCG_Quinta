@@ -16,5 +16,6 @@ urlpatterns = [
     path("seleccion_verifica/", views.seleccion_verifica, name="seleccion_verifica"),
     path("verificar/", views.verificar, name="verificar"),
     path("verificar_registros/", views.verificar_registros, name="verificar_registros"),
-    path("descargar_registros/", views.descargar_registros, name="descargar_registros")
+    path("descargar_registros/", views.descargar_registros, name="descargar_registros"),
+    path("en_desarrollo/", views.en_desarrollo, name="en_desarrollo")
 ]

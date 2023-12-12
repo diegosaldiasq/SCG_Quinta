@@ -83,3 +83,7 @@ def redireccionar_control_material_extraño(request):
 def redireccionar_index(request):
     url_intermedio = reverse('index')
     return HttpResponseRedirect(url_intermedio)
+
+@login_required
+def en_construccion(request):
+    return render(request, 'selecciones/sitio_en_construccion.html')
