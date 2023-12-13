@@ -14,7 +14,7 @@ Para ingresar a la aplicacion es necesario un dispositivo movil, ya sea celular 
 Se ha utilizado para el desarrollo frontend HTML, CSS y JavaScript. Para el desarrollo backend se utiliza Python con Django. La base de datos se quiere trabajar con PosgreSQL (aun por definir).
 Se utiliza para el control de versiones y el manejor del flujo de trabajo git y github.
 
-## Como instalar el proyecto
+## Recursos necesarios para el proyecto
 
 Para instalar el proyecto se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2.
 
@@ -28,4 +28,4 @@ Para ejecutar las pruebas se debe tener instalado python 3.12.0, pip 23.2.1, dja
 
 ## Como contribuir
 
-Para contribuir se debe tener instalado debes hacer un pull request en github al proyecto https://github.com/diegosaldiasq/SCG_Quinta y esperar a que sea aprobado por el administrador del proyecto.
+Para contribuir se debe tener instalado git, clonar el repositorio de https://github.com/diegosaldiasq/SCG_Quinta, hacer tus modificaciones y luego debes hacer un pull request en github al proyecto https://github.com/diegosaldiasq/SCG_Quinta y esperar a que sea aprobado por el administrador del proyecto.
