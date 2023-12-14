@@ -19,3 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+[]: # Path: README.md
+# [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Build Status](https://travis-ci.org/dsaldias/DSQ.svg?branch=master)](https://travis-ci.org/dsaldias/DSQ) [![codecov](https://codecov.io/gh/dsaldias/DSQ/branch/master/graph/badge.svg)](https://codecov.io/gh/dsaldias/DSQ) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8b8b9b8b8b8b8b8b8b8b8b8b8b8b8b8b)](https://www.codacy.com/app/dsaldias/DSQ?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dsaldias/DSQ&amp;utm_campaign=Badge_Grade) [![Documentation Status](https://readthedocs.org/projects/dsq/badge/?version=latest)](https://dsq.readthedocs.io/en/latest/?badge=latest)

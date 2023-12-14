@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+import json
 
 # Create your views here.
 
@@ -15,30 +16,35 @@ def pcc2_detector_metales(request):
 @login_required
 def vista_pcc2_detector_metales(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.now()
-        lote = request.POST.get('lote')
-        turno = request.POST.get('turno')
-        tipo_metal = request.POST.get('tipo_metal')
-        medicion = request.POST.get('medicion')
-        producto = request.POST.get('producto')
-        observaciones = request.POST.get('observaciones')
-        accion_correctiva = request.POST.get('accion_correctiva')
+        data = json.loads(request.body.decode('utf-8'))
+        dato = data.get('dato', None)
+        if dato:
+            nombre_tecnologo = request.user.nombre_completo
+            fecha_registro = timezone.now()
+            lote = dato.get('lote')
+            turno = dato.get('turno')
+            tipo_metal = dato.get('tipo_metal')
+            medicion = dato.get('medicion')
+            producto = dato.get('producto')
+            observaciones = dato.get('observaciones')
+            accion_correctiva = dato.get('accion_correctiva')
 
-        datos = DatosFormularioPcc2DetectorMetales(
-            nombre_tecnologo=nombre_tecnologo, 
-            fecha_registro=fecha_registro,
-            lote=lote,
-            turno=turno,
-            tipo_metal=tipo_metal,
-            medicion=medicion,
-            producto=producto,
-            observaciones=observaciones,
-            accion_correctiva=accion_correctiva
-            )
-        datos.save()
+            datos = DatosFormularioPcc2DetectorMetales(
+                nombre_tecnologo=nombre_tecnologo, 
+                fecha_registro=fecha_registro,
+                lote=lote,
+                turno=turno,
+                tipo_metal=tipo_metal,
+                medicion=medicion,
+                producto=producto,
+                observaciones=observaciones,
+                accion_correctiva=accion_correctiva
+                )
+            datos.save()
 
-        return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+            return JsonResponse({'existe': True})
+        else:
+            return JsonResponse({'existe': False})
 
 @login_required
 def redireccionar_selecciones(request):

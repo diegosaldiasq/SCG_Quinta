@@ -22,17 +22,17 @@ def vista_rechazo_mp_in_me(request):
         if dato:
             nombre_tecnologo = request.user.nombre_completo
             fecha_registro = timezone.now()
-            nombre_proveedor = request.POST.get('nombre_proveedor')
-            numero_factura = request.POST.get('numero_factura')
-            nombre_transportista = request.POST.get('nombre_transportista')
-            nombre_producto = request.POST.get('nombre_producto')
-            fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
-            lote = request.POST.get('lote')
-            fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
-            motivo_rechazo = request.POST.get('motivo_rechazo')
-            cantidad_producto_involucrado = request.POST.get('cantidad_producto_involucrado')
-            unidad_de_medida = request.POST.get('unidad_de_medida')
-            clasificacion = request.POST.get('clasificacion')
+            nombre_proveedor = dato.get('nombre_proveedor')
+            numero_factura = dato.get('numero_factura')
+            nombre_transportista = dato.get('nombre_transportista')
+            nombre_producto = dato.get('nombre_producto')
+            fecha_elaboracion = timezone.make_aware(datetime.strptime(dato.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
+            lote = dato.get('lote')
+            fecha_vencimiento = timezone.make_aware(datetime.strptime(dato.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
+            motivo_rechazo = dato.get('motivo_rechazo')
+            cantidad_producto_involucrado = dato.get('cantidad_producto_involucrado')
+            unidad_de_medida = dato.get('unidad_de_medida')
+            clasificacion = dato.get('clasificacion')
 
 
             datos = DatosFormularioRechazoMpInMe(

@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+import json
 
 # Create your views here.
 
@@ -15,34 +16,39 @@ def higiene_y_conducta_personal(request):
 @login_required
 def vista_higiene_y_conducta_personal(request):
     if request.method == 'POST':
-        fecha_ingreso = timezone.now()
-        nombre_personal = request.POST.get('nombre_personal')
-        turno = request.POST.get('turno')
-        planta = request.POST.get('planta')
-        area = request.POST.get('area')
-        cumplimiento = request.POST.get('cumplimiento')
-        desviacion = request.POST.get('desviacion')
-        accion_correctiva = request.POST.get('accion_correctiva')
-        verificacion_accion_correctiva = request.POST.get('verificacion_accion_correctiva')
-        observacion = request.POST.get('observacion')
-        nombre_tecnologo = request.user.nombre_completo
+        data = json.loads(request.body.decode('utf-8'))
+        dato = data.get('dato', None)
+        if dato:
+            fecha_ingreso = timezone.now()
+            nombre_personal = dato.get('nombre_personal')
+            turno = dato.get('turno')
+            planta = dato.get('planta')
+            area = dato.get('area')
+            cumplimiento = dato.get('cumplimiento')
+            desviacion = dato.get('desviacion')
+            accion_correctiva = dato.get('accion_correctiva')
+            verificacion_accion_correctiva = dato.get('verificacion_accion_correctiva')
+            observacion = dato.get('observacion')
+            nombre_tecnologo = request.user.nombre_completo
 
-        datos = DatosFormularioHigieneConductaPersonal(
-            fecha_ingreso=fecha_ingreso,
-            nombre_personal=nombre_personal,
-            turno=turno,
-            planta=planta,
-            area=area,
-            cumplimiento=cumplimiento,
-            desviacion=desviacion,
-            accion_correctiva=accion_correctiva,
-            verificacion_accion_correctiva=verificacion_accion_correctiva,
-            observacion=observacion,
-            nombre_tecnologo=nombre_tecnologo
-            )
-        datos.save()
+            datos = DatosFormularioHigieneConductaPersonal(
+                fecha_ingreso=fecha_ingreso,
+                nombre_personal=nombre_personal,
+                turno=turno,
+                planta=planta,
+                area=area,
+                cumplimiento=cumplimiento,
+                desviacion=desviacion,
+                accion_correctiva=accion_correctiva,
+                verificacion_accion_correctiva=verificacion_accion_correctiva,
+                observacion=observacion,
+                nombre_tecnologo=nombre_tecnologo
+                )
+            datos.save()
 
-        return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+            return JsonResponse({'existe': True})
+        else:
+            return JsonResponse({'existe': False})
 
 @login_required
 def redireccionar_selecciones(request):

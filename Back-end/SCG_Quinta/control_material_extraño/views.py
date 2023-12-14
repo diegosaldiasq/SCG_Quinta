@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
+import json
 
 # Create your views here.
 
@@ -16,29 +17,34 @@ def control_material_extraño(request):
 @login_required
 def vista_control_material_extraño(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.now()
-        turno = request.POST.get('turno')
-        area_material = request.POST.get('area_material')
-        tipo_material = request.POST.get('tipo_material')
-        accion_correctiva = request.POST.get('accion_correctiva')
-        verificacion_accion_correctiva = request.POST.get('verificacion_accion_correctiva')
-        observaciones = request.POST.get('observaciones')
+        data = json.loads(request.body.decode('utf-8'))
+        dato = data.get('dato', None)
+        if dato:
+            nombre_tecnologo = request.user.nombre_completo
+            fecha_registro = timezone.now()
+            turno = dato.get('turno')
+            area_material = dato.get('area_material')
+            tipo_material = dato.get('tipo_material')
+            accion_correctiva = dato.get('accion_correctiva')
+            verificacion_accion_correctiva = dato.get('verificacion_accion_correctiva')
+            observaciones = dato.get('observaciones')
 
 
-        datos = DatosFormularioControlMaterialExtraño(
-            nombre_tecnologo=nombre_tecnologo, 
-            fecha_registro=fecha_registro,
-            turno=turno,
-            area_material=area_material,
-            tipo_material=tipo_material,
-            accion_correctiva=accion_correctiva,
-            verificacion_accion_correctiva=verificacion_accion_correctiva,
-            observaciones=observaciones
-            )
-        datos.save()
+            datos = DatosFormularioControlMaterialExtraño(
+                nombre_tecnologo=nombre_tecnologo, 
+                fecha_registro=fecha_registro,
+                turno=turno,
+                area_material=area_material,
+                tipo_material=tipo_material,
+                accion_correctiva=accion_correctiva,
+                verificacion_accion_correctiva=verificacion_accion_correctiva,
+                observaciones=observaciones
+                )
+            datos.save()
 
-        return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+            return JsonResponse({'existe': True})
+        else:
+            return JsonResponse({'existe': False})
 
 @login_required
 def redireccionar_selecciones(request):

@@ -128,6 +128,7 @@
         </div>
         <div class="botones">
             <form class="form">
+                {% csrf_token %}
                 <button class="secundary-button login-button2" id="miBoton">Grabar y continuar</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">

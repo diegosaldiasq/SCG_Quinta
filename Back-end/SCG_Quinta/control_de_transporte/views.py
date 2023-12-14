@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
+import json
 
 # Create your views here.
 
@@ -15,33 +16,38 @@ def control_de_transporte(request):
 
 @login_required
 def vista_control_de_transporte(request):
-    if request.method == 'POST':
-        nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.now()
-        fecha_recepcion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_recepcion'), '%Y-%m-%d'), timezone=timezone.utc)
-        producto_recepcion = request.POST.get('producto_recepcion')
-        temperatura_transporte = request.POST.get('temperatura_transporte')
-        temperatura_producto = request.POST.get('temperatura_producto')
-        lote = request.POST.get('lote')
-        fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
-        accion_correctiva = request.POST.get('accion_correctiva')
-        verificacion_accion_correctiva = request.POST.get('verificacion_accion_correctiva')
+     if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        dato = data.get('dato', None)
+        if dato:
+            nombre_tecnologo = request.user.nombre_completo
+            fecha_registro = timezone.now()
+            fecha_recepcion = timezone.make_aware(datetime.strptime(dato.get('fecha_recepcion'), '%Y-%m-%d'), timezone=timezone.utc)
+            producto_recepcion = dato.get('producto_recepcion')
+            temperatura_transporte = dato.get('temperatura_transporte')
+            temperatura_producto = dato.get('temperatura_producto')
+            lote = dato.get('lote')
+            fecha_vencimiento = timezone.make_aware(datetime.strptime(dato.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
+            accion_correctiva = dato.get('accion_correctiva')
+            verificacion_accion_correctiva = dato.get('verificacion_accion_correctiva')
 
-        datos = DatosFormularioControlDeTransporte(
-            nombre_tecnologo=nombre_tecnologo,
-            fecha_registro=fecha_registro,
-            fecha_recepcion=fecha_recepcion,
-            producto_recepcion=producto_recepcion,
-            temperatura_transporte=temperatura_transporte,
-            temperatura_producto=temperatura_producto,
-            lote=lote,
-            fecha_vencimiento=fecha_vencimiento,
-            accion_correctiva=accion_correctiva,
-            verificacion_accion_correctiva=verificacion_accion_correctiva
-            )
-        datos.save()
+            datos = DatosFormularioControlDeTransporte(
+                nombre_tecnologo=nombre_tecnologo,
+                fecha_registro=fecha_registro,
+                fecha_recepcion=fecha_recepcion,
+                producto_recepcion=producto_recepcion,
+                temperatura_transporte=temperatura_transporte,
+                temperatura_producto=temperatura_producto,
+                lote=lote,
+                fecha_vencimiento=fecha_vencimiento,
+                accion_correctiva=accion_correctiva,
+                verificacion_accion_correctiva=verificacion_accion_correctiva
+                )
+            datos.save()
 
-        return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+            return JsonResponse({'existe': True})
+        else:
+            return JsonResponse({'existe': False})
 
 @login_required
 def redireccionar_selecciones(request):
