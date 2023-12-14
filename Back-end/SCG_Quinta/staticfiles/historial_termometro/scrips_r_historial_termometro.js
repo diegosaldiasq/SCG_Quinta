@@ -64,7 +64,7 @@ function btnOnClick3() {
 
 // envio de datos a django
 
-$.ajaxSetup({
+/*$.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -134,4 +134,79 @@ $(document).ready(function() {
 
 //console.log(informacionFunction.promedioCantidad);
 //console.log(informacionFunction.x1);
-//console.log(informacionFunction.regla);
+//console.log(informacionFunction.regla);*/
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("miBoton").addEventListener("click", async function() {
+        try {
+            event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
+            var codigoTermometro = $("#codigo-termometro").val();
+            var valor1 = $("#valor1").val();
+            var valor2 = $("#valor2").val();
+            var valor3 = $("#valor3").val();
+            var valor4 = $("#valor4").val();
+            var valor5 = $("#valor5").val();
+            var output1 = $("#outputx1").val();
+            var valor6 = $("#valor6").val();
+            var valor7 = $("#valor7").val();
+            var valor8 = $("#valor8").val();
+            var valor9 = $("#valor9").val();
+            var valor10 = $("#valor10").val();
+            var output2 = $("#outputx2").val();
+            var factan = $("#factan").val();
+            var output3 = $("#outputx3").val();
+            var output4 = $("#outputx4").val();
+            var regla = $('#regla').val();
+            var accionCorrectiva = $("#ac").val();
+            var verificacionAccionCorrectiva = $("#vac").val();
+
+            // agregar valores a datos
+
+            var datos = {
+                codigo_termometro: codigoTermometro,
+                valor_1: valor1,
+                valor_2: valor2,
+                valor_3: valor3,
+                valor_4: valor4,
+                valor_5: valor5,
+                promedio_prueba: output1,
+                valor_6: valor6,
+                valor_7: valor7,
+                valor_8: valor8,
+                valor_9: valor9,
+                valor_10: valor10,
+                promedio_patron: output2,
+                factor_anual: factan,
+                promedio_termometros: output3,
+                nivel_aceptacion: output4,
+                cumplimiento: regla,
+                accion_correctiva: accionCorrectiva,
+                verificacion_accion_correctiva: verificacionAccionCorrectiva
+            }
+            
+            // Obtener el CSRF token
+            var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+            var response = await fetch('/historial_termometro/vista_historial_termometro/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken // Aquí deberías agregar el csrf token para Django si es necesario
+                },
+                body: JSON.stringify({ dato: datos })
+            });
+            var data = await response.json();
+            debugger; // <-- Agrega esta línea
+            if (data.existe) {
+                alert("Datos guardados exitosamente!!");
+                location.reload();
+            } else {
+                alert("No se pudo guardar... revisa nuevamente!!");
+                return false;
+            }
+        } catch (error) {
+            console.error("Hubo un error:", error);
+            alert("Hubo un problema al cargar los datos, formatos no coinciden!!");
+        }
+    });
+});
