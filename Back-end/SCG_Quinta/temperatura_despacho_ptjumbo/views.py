@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
+import json
 
 # Create your views here.
 
@@ -16,35 +17,40 @@ def temperatura_despacho_ptjumbo(request):
 @login_required
 def vista_temperatura_despacho_ptjumbo(request):
     if request.method == 'POST':
-        nombre_tecnologo = request.user.nombre_completo
-        fecha_registro = timezone.now()
-        cadena = request.POST.get('cadena')
-        item = request.POST.get('item')
-        producto = request.POST.get('producto')
-        temperatura_producto = request.POST.get('temperatura_producto')
-        revision_etiquetado = request.POST.get('revision_etiquetado')
-        lote = request.POST.get('lote')
-        fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
-        accion_correctiva = request.POST.get('accion_correctiva')
-        verificacion_accion_correctiva = request.POST.get('verificacion_accion_correctiva')        
+        data = json.loads(request.body.decode('utf-8'))
+        dato = data.get('dato', None)
+        if dato:
+            nombre_tecnologo = request.user.nombre_completo
+            fecha_registro = timezone.now()
+            cadena = dato.get('cadena')
+            item = dato.get('item')
+            producto = dato.get('producto')
+            temperatura_producto = dato.get('temperatura_producto')
+            revision_etiquetado = dato.get('revision_etiquetado')
+            lote = dato.get('lote')
+            fecha_vencimiento = timezone.make_aware(datetime.strptime(dato.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
+            accion_correctiva = dato.get('accion_correctiva')
+            verificacion_accion_correctiva = dato.get('verificacion_accion_correctiva')        
 
 
-        datos = DatosFormularioTemperaturaDespachoJumbo(
-            nombre_tecnologo=nombre_tecnologo, 
-            fecha_registro=fecha_registro,
-            cadena=cadena,
-            item=item,
-            producto=producto,
-            temperatura_producto=temperatura_producto,
-            revision_etiquetado=revision_etiquetado,
-            lote=lote,
-            fecha_vencimiento=fecha_vencimiento,
-            accion_correctiva=accion_correctiva,
-            verificacion_accion_correctiva=verificacion_accion_correctiva
-            )
-        datos.save()
+            datos = DatosFormularioTemperaturaDespachoJumbo(
+                nombre_tecnologo=nombre_tecnologo, 
+                fecha_registro=fecha_registro,
+                cadena=cadena,
+                item=item,
+                producto=producto,
+                temperatura_producto=temperatura_producto,
+                revision_etiquetado=revision_etiquetado,
+                lote=lote,
+                fecha_vencimiento=fecha_vencimiento,
+                accion_correctiva=accion_correctiva,
+                verificacion_accion_correctiva=verificacion_accion_correctiva
+                )
+            datos.save()
 
-        return JsonResponse({'mensaje': 'Datos guardados exitosamente'})
+            return JsonResponse({'existe': True})
+        else:
+            return JsonResponse({'existe': False})
 
 @login_required
 def redireccionar_selecciones(request):
