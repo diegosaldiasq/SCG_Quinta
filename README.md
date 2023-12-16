@@ -35,6 +35,10 @@ Para hacer efectivos en el srevidor los cambios hechos a cualquier archivo que s
 
 Iniciar sesion de docker con el comando `docker login` y luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`. 
 
+## PGAdmin de postgres
+
+Para el acceso local se debe ingreaar a http://localhost:5050 e ingresar con usuario y contraseña.
+
 ## Como ejecutar las pruebas
 
 Para ejecutar las pruebas se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2. Luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Luego ejecutar el comando `npm run test` para ejecutar las pruebas. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`.
