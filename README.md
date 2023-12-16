@@ -20,16 +20,18 @@ Para instalar el proyecto se debe tener instalado python 3.12.0, pip 23.2.1, dja
 
 ## Como ejecutar el proyecto
 
-#### Comandos necesarios para Django
+### Comandos necesarios para Django
 
 ##### Entorno virtual
 Iniciar el entorno virtual en la carpeta `Back-end` (para linux) `source venv/bin/activate`, (para windows) `source venv/Scripts/activate`
 ##### Migraciones
-Correr en django el comando `python manage.py makemigrations`, si es necesario correrlo con el sufijo `app` para migrar las tablas a la base de datos. Luego corerr el comando `python manage.py migrate` para hacer efectivo los cambios.
+Correr en django el comando `python manage.py makemigrations`, si es necesario correrlo con el sufijo de cada `app` para migrar las tablas a la base de datos. Luego corerr el comando `python manage.py migrate` para hacer efectivo los cambios.
 ##### Superusuario
-Con el entorno altivo y funcionando, se puede correr el comando `python manage.py createsuperuser` y seguir las instrucciones de creacion de superusuario.
+Con el entorno activo y funcionando, se puede correr el comando de django `python manage.py createsuperuser` y seguir las instrucciones de creacion de superusuario.
+##### Para cambios en archivos static
+Para hacer efectivos en el srevidor los cambios hechos a cualquier archivo que se encuentre en la carpeta `static`, se debe correr el comando de django `python manage.py collectstatic` para hacer efectivos los cambios en el servidor antes de correr los contenedores.
 
-#### Comandos necesarios para Docker
+### Comandos necesarios para Docker
 
 Iniciar sesion de docker con el comando `docker login` y luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`. 
 
