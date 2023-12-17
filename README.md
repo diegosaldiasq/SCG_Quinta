@@ -11,17 +11,18 @@ Para ingresar a la aplicacion es necesario un dispositivo movil, ya sea celular 
 
 ## Herramientas y lenguajes de programacion utulizados
 
-Se ha utilizado para el desarrollo frontend HTML, CSS y JavaScript. Para el desarrollo backend se utiliza Python con Django. La base de datos se quiere trabajar con PosgreSQL (aun por definir).
-Se utiliza para el control de versiones y el manejor del flujo de trabajo git y github.
+Se ha utilizado para el desarrollo frontend HTML, CSS y JavaScript. Para el desarrollo backend se utiliza el framework de Python para aplicaciones web Django. La base de datos esta construida con PosgreSQL. EL servidor para uso proxy inverso se usa Nginx. Toda la aplicacion se conteneriza en 4 contenedores con la ayuda de `Docker` y `docker-compose`. El primero es de la aplicacion web, nombre contenedor `web`, donde se encuentra todo el codigo de la aplicacion y los archivos static. El segundo contenedores para la base de datos de postgres, nombre contenedor `db`, donde esta la logica de control para las tablas de la base, esta depende para el funcionamiento `web`. El tercer contenedor es para la adminstracion de `db` lo cual se usa `pgadmin4`, con el nombre de contenedor `pgadmin`, el cual depende de `db`. El cuarto contenedor es para el servidor de proxy inverso el cual funciona con `nginx`, con el nombre de `nginx`, este depende de `web`. Asi se conforma la arquitectura de contenedores de `docker-compose`.
+Se utiliza para el control de versiones y el manejor del flujo de trabajo git y github en el link https://github.com/diegosaldiasq/SCG_Quinta
 
 ## Recursos necesarios para el proyecto
 
-Para instalar el proyecto se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2.
+Para instalar el proyecto se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2. Esto es informativo ya que cuando se corre la instalacion de los contenedores, al crear el contenedor de web, se creara junto con los requerimietos alojados en el archivo `requirements.txt`. Destallada su su instalacion en `Dockerfile`.
 
 ## Como ejecutar el proyecto
 
 ### Comandos necesarios para Django
-
+##### Clonar el repositorio de Github
+Para tener el proyecto en tu maquina local o servidor de produccion, se debe clonar el repositorio de `Github`. Se debe tener `Git` instalado en la maquina donde se quiere clonar el repositorrio, luego correr el siguiente comando `git clone https://github.com/diegosaldiasq/SCG_Quinta` esto descargara todo lo necesario para correr el proyecto con los siguientes comandos. 
 ##### Entorno virtual
 Iniciar el entorno virtual en la carpeta `Back-end` (para linux) `source venv/bin/activate`, (para windows) `source venv/Scripts/activate`
 ##### Migraciones
@@ -33,7 +34,7 @@ Para hacer efectivos en el srevidor los cambios hechos a cualquier archivo que s
 
 ### Comandos necesarios para Docker
 
-Iniciar sesion de docker con el comando `docker login` y luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`. 
+Iniciar sesion de docker (se debebe tener Docker instalado) con el comando `docker login` y luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`. 
 
 ## PGAdmin de postgres
 
