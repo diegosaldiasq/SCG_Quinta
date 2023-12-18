@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
             var clasificacion = $("#clasificacion").val();
             var cantidadInvolucrada = $("#cantidad-inv").val();
             var unidadDeMedida = $("#udm").val();
-            var archivoFoto = $("#archivo-foto").val();
+            var archivoFoto = document.getElementById('archivo-foto').files[0]; // Objeto File
 
             // agregar valores a datos
 
@@ -33,13 +33,16 @@ document.addEventListener("DOMContentLoaded", function() {
             // Obtener el CSRF token
             var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
+            var formData = new FormData();
+            formData.append('dato', new Blob([JSON.stringify(datos)], {type: "application/json"}));
+            formData.append('archivo_foto', archivoFoto); // archivoFoto debe ser un objeto File
+
             var response = await fetch('/reclamo_a_proveedores/vista_reclamo_a_proveedores/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRFToken': csrfToken // Aquí deberías agregar el csrf token para Django si es necesario
                 },
-                body: JSON.stringify({ dato: datos })
+                body: formData
             });
             var data = await response.json();
             debugger; // <-- Agrega esta línea
