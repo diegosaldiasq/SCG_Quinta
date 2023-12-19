@@ -17,21 +17,22 @@ def reclamo_a_proveedores(request):
 @login_required
 def vista_reclamo_a_proveedores(request):
     if request.method == 'POST':
+        json_data = request.FILES['dato'].read().decode('utf-8')  # Accede al blob JSON
+        data = json.loads(json_data)  # Parsea el JSON
+
         nombre_tecnologo = request.user.nombre_completo
         fecha_registro = timezone.now()
-        nombre_proveedor = request.POST.get('nombre_proveedor')
-        fecha_reclamo = timezone.make_aware(datetime.strptime(request.POST.get('fecha_reclamo'), '%Y-%m-%d'), timezone=timezone.utc)
-        nombre_del_producto = request.POST.get('nombre_del_producto')
-        fecha_elaboracion = timezone.make_aware(datetime.strptime(request.POST.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
-        lote = request.POST.get('lote')
-        fecha_vencimiento = timezone.make_aware(datetime.strptime(request.POST.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
-        no_conformidad = request.POST.get('no_conformidad')
-        clasificacion = request.POST.get('clasificacion')
-        cantidad_involucrada = request.POST.get('cantidad_involucrada')
-        unidad_de_medida = request.POST.get('unidad_de_medida')
+        nombre_proveedor = data.get('nombre_proveedor')
+        fecha_reclamo = timezone.make_aware(datetime.strptime(data.get('fecha_reclamo'), '%Y-%m-%d'), timezone=timezone.utc)
+        nombre_del_producto = data.get('nombre_del_producto')
+        fecha_elaboracion = timezone.make_aware(datetime.strptime(data.get('fecha_elaboracion'), '%Y-%m-%d'), timezone=timezone.utc)
+        lote = data.get('lote')
+        fecha_vencimiento = timezone.make_aware(datetime.strptime(data.get('fecha_vencimiento'), '%Y-%m-%d'), timezone=timezone.utc)
+        no_conformidad = data.get('no_conformidad')
+        clasificacion = data.get('clasificacion')
+        cantidad_involucrada = data.get('cantidad_involucrada')
+        unidad_de_medida = data.get('unidad_de_medida')
         archivo_foto = request.FILES.get('archivo_foto')
-        
-        print(archivo_foto)
 
         datos = DatosFormularioReclamoProveedores(
             nombre_tecnologo=nombre_tecnologo,

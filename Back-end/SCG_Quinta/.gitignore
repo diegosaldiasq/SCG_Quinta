@@ -13,3 +13,4 @@ app/
 pgadmin-data/
 staticfiles/
 /*.pyc
+fotos_reclamos/

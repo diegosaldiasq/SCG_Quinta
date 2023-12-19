@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--^2f**zyj9i4&tn2@ytw(rk7si&z0qum#($#4c87a3o$^1t*5r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -107,10 +107,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'SCG_Quinta',
         'USER': 'postgres',
-        'PASSWORD': 'radcliffe', # Para Windows
-        #'PASSWORD': 'Dsal1212', # Para Linux
-        'HOST': 'localhost',  # Para servidor desarrollo Django
-        #'HOST': 'db', # Para Docker
+        #'PASSWORD': 'radcliffe', # Para Windows
+        'PASSWORD': 'Dsal1212', # Para Linux
+        #'HOST': 'localhost',  # Para servidor desarrollo Django
+        'HOST': 'db', # Para Docker
         'PORT': '5432',  # Puerto predeterminado de PostgreSQL.
     }
 }
