@@ -31,7 +31,7 @@
                         {% if nombre == 'verificado' %}
                             <input type="checkbox" class="checkbox_{{ config }}">
                         {% elif nombre == 'archivo_foto' %}
-                            <a href="{{ dato|getattribute:nombre }}">Ver foto</a>
+                            <a href="{{ dato.archivo_foto }}?id={{dato.id}}">Ver foto</a>
                         {% else %}
                             <span class="{{ nombre }}">{{ dato|getattribute:nombre }}</span>
                         {% endif %}
