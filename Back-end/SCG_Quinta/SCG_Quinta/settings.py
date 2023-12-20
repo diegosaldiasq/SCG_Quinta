@@ -107,8 +107,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'SCG_Quinta',
         'USER': 'postgres',
-        #'PASSWORD': 'radcliffe', # Para Windows
-        'PASSWORD': 'Dsal1212', # Para Linux
+        'PASSWORD': 'radcliffe', # Para Windows
+        #'PASSWORD': 'Dsal1212', # Para Linux
         #'HOST': 'localhost',  # Para servidor desarrollo Django
         'HOST': 'db', # Para Docker
         'PORT': '5432',  # Puerto predeterminado de PostgreSQL.
@@ -184,6 +184,8 @@ LOGIN_URL = '/login/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10 MB
