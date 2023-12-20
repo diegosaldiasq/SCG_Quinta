@@ -1,0 +1,35 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'inicio/estilos_sitio_en_construccion.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}" />
+    <title>Ver Foto {{config}}</title>
+</head>
+<body>
+    <div class="login">
+        <div class="form-container">
+            <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
+            <img src="{{ foto_archivo.url }}" alt="logo" class="gpt">            
+        </div>
+        <div class="button-container">
+            <form class="form" action="{% url 'verificar' %}?config={{config}}" method="post">
+                {% csrf_token %}
+                <button class="primary-button button">Volver</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        /*var config = "{{ config }}";
+        setTimeout(function() {
+            window.location.href = "/inicio/verificar/?config="+config+"";
+        }, 4000);  // 4000 milisegundos son 4 segundos */
+    </script>
+</body>
+</html>

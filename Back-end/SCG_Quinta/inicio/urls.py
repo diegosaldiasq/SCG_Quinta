@@ -17,5 +17,6 @@ urlpatterns = [
     path("verificar/", views.verificar, name="verificar"),
     path("verificar_registros/", views.verificar_registros, name="verificar_registros"),
     path("descargar_registros/", views.descargar_registros, name="descargar_registros"),
-    path("en_desarrollo/", views.en_desarrollo, name="en_desarrollo")
+    path("en_desarrollo/", views.en_desarrollo, name="en_desarrollo"),
+    path("ver_foto/", views.ver_foto, name="ver_foto")
 ]

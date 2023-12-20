@@ -221,3 +221,13 @@ def descargar_registros(request):
 def en_desarrollo(request):
     config = request.GET.get('config')
     return render(request, 'inicio/sitio_en_construccion.html', {'config': config})
+
+@login_required
+def ver_foto(request):
+    id = request.GET.get('id')
+    config = request.GET.get('config')
+    model_name = model_mapping.get(config)
+    model = apps.get_model(config , model_name)
+    objeto = model.objects.get(id=id)
+    foto_archivo = objeto.archivo_foto
+    return render(request, 'inicio/ver_foto.html', {'config': config, 'foto_archivo': foto_archivo})
