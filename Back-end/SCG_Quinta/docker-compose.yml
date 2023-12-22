@@ -8,8 +8,8 @@ services:
     environment:
       POSTGRES_DB: SCG_Quinta
       POSTGRES_USER: postgres
-      #POSTGRES_PASSWORD: radcliffe # Para widows
-      POSTGRES_PASSWORD: Dsal1212 # Para linux
+      POSTGRES_PASSWORD: radcliffe # Para widows
+      #POSTGRES_PASSWORD: Dsal1212 # Para linux
 
   pgadmin:
     image: dpage/pgadmin4
@@ -35,7 +35,7 @@ services:
       DATABASE_HOST: db
 
   nginx:
-    image: nginx:1.19
+    image: nginx
     ports:
       - "80:80" # http://localhost:80/login  entrada a la aplicacion SCG_Quinta
     volumes:
