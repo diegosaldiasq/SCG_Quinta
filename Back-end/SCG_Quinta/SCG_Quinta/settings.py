@@ -107,8 +107,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'SCG_Quinta',
         'USER': 'postgres',
-        'PASSWORD': 'radcliffe', # Para Windows
-        #'PASSWORD': 'Dsal1212', # Para Linux
+        #'PASSWORD': 'radcliffe', # Para Windows
+        'PASSWORD': 'Dsal1212', # Para Linux
         #'HOST': 'localhost',  # Para servidor desarrollo Django
         'HOST': 'db', # Para Docker
         'PORT': '5432',  # Puerto predeterminado de PostgreSQL.
@@ -150,7 +150,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/' 
+STATIC_URL = '/static/' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
