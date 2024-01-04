@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure--^2f**zyj9i4&tn2@ytw(rk7si&z0qum#($#4c87a3o$^1t*5r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -107,8 +107,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'SCG_Quinta',
         'USER': 'postgres',
-        'PASSWORD': 'radcliffe', # Para Windows
-        #'PASSWORD': 'Dsal1212', # Para Linux
+        #'PASSWORD': 'radcliffe', # Para Windows
+        'PASSWORD': 'Dsal1212', # Para Linux
         #'HOST': 'localhost',  # Para servidor desarrollo Django
         'HOST': 'db', # Para Docker
         'PORT': '5432',  # Puerto predeterminado de PostgreSQL.
@@ -184,8 +184,8 @@ LOGIN_URL = '/login/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10 MB
