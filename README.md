@@ -22,7 +22,19 @@ Para instalar el proyecto se debe tener instalado python 3.12.0, pip 23.2.1, dja
 
 ### Comandos necesarios para Django
 ##### Clonar el repositorio de Github
-Para tener el proyecto en tu maquina local o servidor de produccion, se debe clonar el repositorio de `Github`. Se debe tener `Git` instalado en la maquina donde se quiere clonar el repositorrio, luego correr el siguiente comando `git clone https://github.com/diegosaldiasq/SCG_Quinta` esto descargara todo lo necesario para correr el proyecto con los siguientes comandos. 
+Para tener el proyecto en tu maquina local o servidor de produccion, se debe clonar el repositorio de `Github`. Se debe tener `Git` instalado en la maquina donde se quiere clonar el repositorrio, luego correr el siguiente comando `git clone https://github.com/diegosaldiasq/SCG_Quinta` esto descargara todo lo necesario para correr el proyecto con los siguientes comando.
+##### Para agregar llave publica de Github (Uso Diego Saldias)
+ssh-keygen -t rsa -b 4096 -C "diego.saldias.quijada@gmail.com" - para generar la llave publica y privada
+eval $(ssh-agent -s) - para iniciar el agente ssh (para windows)
+eval "$(ssh-agent -s)" - para iniciar el agente ssh (para linux)
+ssh-add ~/.ssh/id_rsa - para agregar la llave privada al agente ssh
+##### Comandos GIT
+git push origin main - para subir los cambios al repositorio de github
+git pull origin main - para bajar los cambios del repositorio de github
+git add . - para agregar todos los cambios al repositorio local
+git commit -m "mensaje" - para hacer un commit con un mensaje
+git commit -am "mensaje" - para agregar y hacer commit al mismo tiempo
+git status - para ver el estado de los archivos en el repositorio local
 ##### Entorno virtual
 Iniciar el entorno virtual en la carpeta `Back-end` (para linux) `source venv/bin/activate`, (para windows) `source venv/Scripts/activate`
 ##### Migraciones
