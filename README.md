@@ -36,7 +36,7 @@ git commit -m "mensaje" - para hacer un commit con un mensaje
 git commit -am "mensaje" - para agregar y hacer commit al mismo tiempo
 git status - para ver el estado de los archivos en el repositorio local
 ##### Entorno virtual
-Iniciar el entorno virtual en la carpeta `Back-end` (para linux) `source venv/bin/activate`, (para windows) `source venv/Scripts/activate`
+Iniciar el entorno virtual en la carpeta `Back-end` (para linux) `source venv/bin/activate`, (para windows) `source venv/Scripts/activate`. Para salir del ambiente vistual se debe correr el comando `deactivate`.
 ##### Migraciones
 Correr en django el comando `python manage.py makemigrations`, si es necesario correrlo con el sufijo de cada `app` para migrar las tablas a la base de datos. Luego corerr el comando `python manage.py migrate` para hacer efectivo los cambios.
 ##### Superusuario
