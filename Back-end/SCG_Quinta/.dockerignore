@@ -11,3 +11,4 @@ pgadmin-data/
 Dockerfile
 docker-compose.yml
 fotos_reclamos/
+backup.sql

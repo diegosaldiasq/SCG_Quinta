@@ -14,3 +14,4 @@ pgadmin-data/
 staticfiles/
 /*.pyc
 fotos_reclamos/
+backup.sql

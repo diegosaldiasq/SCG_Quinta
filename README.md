@@ -46,6 +46,11 @@ Para hacer efectivos en el srevidor los cambios hechos a cualquier archivo que s
 
 ### Comandos necesarios para Docker
 
+docker login - Para conectarse con Docker Hub
+docker-compose up -d --build - Para construir las imagenes e iniciar los contenedores
+docker-compose up -d - Para iniciar los contenedores
+docker-compose down - Para terminar con los contenedores
+
 Iniciar sesion de docker (se debebe tener Docker instalado) con el comando `docker login` y luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`. 
 
 ## PGAdmin de postgres
