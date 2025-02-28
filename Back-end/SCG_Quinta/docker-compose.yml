@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   db:
-    image: postgres
+    image: postgres:16.0
     volumes:
       - ./app/db:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: SCG_Quinta
       POSTGRES_USER: postgres
-      #POSTGRES_PASSWORD: radcliffe # Para widows
-      POSTGRES_PASSWORD: Dsal1212 # Para linux
+      POSTGRES_PASSWORD: radcliffe # Para widows
+      #POSTGRES_PASSWORD: Dsal1212 # Para linux
 
   pgadmin:
     image: dpage/pgadmin4
