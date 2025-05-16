@@ -2,17 +2,17 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:16.0
+    image: postgres:latest
     volumes:
       - ./app/db:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: SCG_Quinta
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: radcliffe # Para widows
-      #POSTGRES_PASSWORD: Dsal1212 # Para linux
+      #POSTGRES_PASSWORD: radcliffe # Para widows
+      POSTGRES_PASSWORD: Dsal1212 # Para linux
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     environment:
       PGADMIN_DEFAULT_EMAIL: "diego.saldias.quijada@gmail.com"  # Cambia a tu email
       PGADMIN_DEFAULT_PASSWORD: "radcliffe"  # Cambia a tu contraseña
