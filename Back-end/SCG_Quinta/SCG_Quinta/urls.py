@@ -37,7 +37,8 @@ urlpatterns = [
     path("rechazo_mp_in_me/", include("rechazo_mp_in_me.urls")),
     path("reclamo_a_proveedores/", include("reclamo_a_proveedores.urls")),
     path("selecciones/", include("selecciones.urls")),
-    path("login/", include("login.urls"))
+    path("login/", include("login.urls")),
+    path("control_de_pesos/", include("control_de_pesos.urls"))
 ]
 
 if settings.DEBUG:
