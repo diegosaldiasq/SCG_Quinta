@@ -35,7 +35,7 @@
                 <option value="">-- Selecciona producto --</option>
             </select>
 
-            <!-- Campo que mostrará el peso -->
+            <!-- Campo que mostrará el peso receta -->
             <label for="peso">Peso receta (gr)</label>
             <input type="text" id="peso" class="input" readonly placeholder="–">
 
@@ -44,7 +44,7 @@
                 const productosPorCliente = {
                 Jumbo: [
                     { value: 'Torta Beatiz', text: 'Torta Beatriz', peso: '300' },
-                    { value: 'Torta Bom-Bom', text: 'Torta Bom Bom', peso: '400' },
+                    { value: 'Torta Bom Bom', text: 'Torta Bom Bom', peso: '400' },
                     { value: 'Torta tres leches', text: 'Torta tres leches', peso: '500' },
                     { value: 'Torta berlin', text: 'Torta Berlin', peso: '600' },
                     { value: 'Torta chocolate', text: 'Torta chocolate', peso: '700' },
@@ -99,12 +99,15 @@
                 inputPeso.value = peso;
                 });
             </script>
-            <!-- Campo que mostrará el peso -->
+
+            <!-- Campo que mostrará el peso real -->
             <label for="peso-real">Peso real (gr)</label>  
             <input type="text" id="peso-real" class="input" placeholder="-" required>
+
             <!-- Campo que mostrará el lote -->
             <label for"lote">Lote</label>
             <input type="text" id="lote" class="input" placeholder="-" required>
+
             <!-- Campo que mostrara el turno A-B-C -->
             <label for="turno">Turno</label>
             <select id="turno" class="input">
