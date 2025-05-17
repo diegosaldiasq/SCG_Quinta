@@ -63,6 +63,10 @@ Para el acceso local se debe ingreaar a http://localhost:5050 e ingresar con usu
 
 Para ejecutar las pruebas se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2. Luego ejecutar el comando `docker-compose up -d` para iniciar el servidor de desarrollo. Luego ejecutar el comando `npm run test` para ejecutar las pruebas. Para bajar el servidor de desarrollo ejecutar el comando `docker-compose down`. Para ejecutar el servidor de desarrollo en modo interactivo ejecutar el comando `docker-compose up`.
 
+## Para arrancar en AWS
+
+Conectar al contenedor `db` con el comando `docker-compose exec web python manage.py makemigrations` para crear las migraciones de la base de datos. Luego correr el comando `docker-compose exec web python manage.py migrate` para aplicar las migraciones a la base de datos. Luego correr el comando `docker-compose exec web python manage.py collectstatic` para recolectar los archivos static y hacerlos efectivos en el servidor. Crear el superusuario con `docker-compose exec web python manage.py createsuperuser` y seguir las instrucciones de creacion de superusuario.
+
 ## Como contribuir
 
 Para contribuir se debe tener instalado git, clonar el repositorio de https://github.com/diegosaldiasq/SCG_Quinta, hacer tus modificaciones y luego debes hacer un pull request en github al proyecto https://github.com/diegosaldiasq/SCG_Quinta y esperar a que sea aprobado por el administrador del proyecto.

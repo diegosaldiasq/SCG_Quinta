@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:latest
+    image: postgres:17.5
     volumes:
       - ./app/db:/var/lib/postgresql/data
     environment:
@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: Dsal1212 # Para linux
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:9.3
     environment:
       PGADMIN_DEFAULT_EMAIL: "diego.saldias.quijada@gmail.com"  # Cambia a tu email
       PGADMIN_DEFAULT_PASSWORD: "radcliffe"  # Cambia a tu contraseña
@@ -35,7 +35,7 @@ services:
       DATABASE_HOST: db
 
   nginx:
-    image: nginx
+    image: nginx:1.27.5
     ports:
       - "80:80" # http://localhost:80/login  entrada a la aplicacion SCG_Quinta
     volumes:
