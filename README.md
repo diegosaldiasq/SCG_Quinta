@@ -40,7 +40,7 @@ Iniciar el entorno virtual en la carpeta `Back-end` (para linux) `source venv/bi
 ##### Migraciones
 Correr en django el comando `python manage.py makemigrations`, si es necesario correrlo con el sufijo de cada `app` para migrar las tablas a la base de datos. Luego corerr el comando `python manage.py migrate` para hacer efectivo los cambios.
 ##### Aplicaciones
-Para crean una nueva aplicacion de django se debe correr el comando `python manage.py startapp nombre_app`, esto creara una nueva carpeta con el nombre de la aplicacion y los archivos necesarios para su funcionamiento. Luego se debe agregar la aplicacion en el archivo `settings.py` en la lista de `INSTALLED_APPS`.
+Para crear un aplicacion debe estar activo el entorno virtual y funcionando, luego se debe correr el comando `python manage.py startapp nombre_app`, esto creara una nueva carpeta con el nombre de la aplicacion y los archivos necesarios para su funcionamiento. Luego se debe agregar la aplicacion en el archivo `settings.py` en la lista de `INSTALLED_APPS`.
 ##### Superusuario
 Con el entorno activo y funcionando, se puede correr el comando de django `python manage.py createsuperuser` y seguir las instrucciones de creacion de superusuario.
 ##### Para cambios en archivos static

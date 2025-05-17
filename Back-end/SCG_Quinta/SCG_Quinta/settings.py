@@ -47,7 +47,8 @@ LOCAL_APPS = [
     "rechazo_mp_in_me.apps.RechazoMpInMeConfig",
     "reclamo_a_proveedores.apps.ReclamoAProveedoresConfig",
     "selecciones.apps.SeleccionesConfig",
-    "login.apps.LoginConfig"
+    "login.apps.LoginConfig",
+    "control_de_pesos.apps.ControlDePesosConfig"
 ]
 
 DJANGO_APPS = [
