@@ -19,6 +19,8 @@ urlpatterns = [
     path("informe_de_incidentes/", views.redireccionar_informe_de_incidentes, name="redireccionar_informe_de_incidentes"),
     path("control_material_extraño/", views.redireccionar_control_material_extraño, name="redireccionar_control_material_extraño"),
     path("index/", views.redireccionar_index, name="redireccionar_index"),
-    path("en_construccion/", views.en_construccion, name="en_construccion")
+    path("en_construccion/", views.en_construccion, name="en_construccion"),
+    path("control_de_pesos/", views.redireccionar_control_de_pesos, name="redireccionar_control_de_pesos"),
+    path("vista_selecciones_2/", views.vista_selecciones_2, name="vista_selecciones_2")
 ]
 

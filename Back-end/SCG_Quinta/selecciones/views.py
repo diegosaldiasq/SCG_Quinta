@@ -6,6 +6,17 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 @login_required
+def en_construccion(request):
+    return render(request, 'selecciones/sitio_en_construccion.html')
+
+@login_required
+def redireccionar_index(request):
+    url_intermedio = reverse('index')
+    return HttpResponseRedirect(url_intermedio)
+
+# SELECCIONES 1
+
+@login_required
 def vista_selecciones(request):
     return render(request, 'selecciones/selecciones.html')
 
@@ -79,11 +90,14 @@ def redireccionar_control_material_extraño(request):
     url_control_material_extraño = reverse('control_material_extraño')
     return HttpResponseRedirect(url_control_material_extraño)
 
-@login_required
-def redireccionar_index(request):
-    url_intermedio = reverse('index')
-    return HttpResponseRedirect(url_intermedio)
+
+# SELECCIONES 2
 
 @login_required
-def en_construccion(request):
-    return render(request, 'selecciones/sitio_en_construccion.html')
+def vista_selecciones_2(request):
+    return render(request, 'selecciones/selecciones_2.html')
+
+@login_required
+def redireccionar_control_de_pesos(request):
+    url_control_de_pesos = reverse('control_de_pesos')
+    return HttpResponseRedirect(url_control_de_pesos)

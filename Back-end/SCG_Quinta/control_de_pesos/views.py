@@ -12,7 +12,7 @@ import json
 
 @login_required
 def control_de_pesos(request):
-    return render(request, 'control_de_pesps/r_control_de_pesos.html')
+    return render(request, 'control_de_pesos/r_control_de_pesos.html')
 
 @login_required
 def vista_control_de_pesos(request):

@@ -29,6 +29,11 @@ def redireccionar_selecciones(request):
     return HttpResponseRedirect(url_selecciones)
 
 @login_required
+def redireccionar_selecciones_2(request):
+    url_selecciones = reverse('vista_selecciones_2')
+    return HttpResponseRedirect(url_selecciones)
+
+@login_required
 def permisos_faltante(request):
     return render(request, 'inicio/falta_permiso.html') 
 

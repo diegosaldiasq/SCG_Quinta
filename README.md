@@ -31,7 +31,7 @@ ssh-add ~/.ssh/id_rsa - para agregar la llave privada al agente ssh
 ##### Comandos GIT
 git push origin main - para subir los cambios al repositorio de github
 git pull origin main - para bajar los cambios del repositorio de github
-git add . - para agregar todos los cambios al repositorio local
+git add * - para agregar todos los cambios al repositorio local, menos lo de gitignore
 git commit -m "mensaje" - para hacer un commit con un mensaje
 git commit -am "mensaje" - para agregar y hacer commit al mismo tiempo
 git status - para ver el estado de los archivos en el repositorio local
