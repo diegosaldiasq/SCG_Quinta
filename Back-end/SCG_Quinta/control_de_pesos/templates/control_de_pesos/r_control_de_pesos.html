@@ -37,7 +37,7 @@
 
             <!-- Campo que mostrará el peso -->
             <label for="peso">Peso receta (gr)</label>
-            <input type="text" id="peso" readonly placeholder="–">
+            <input type="text" id="peso" class="input" readonly placeholder="–">
 
             <script>
                 // Definimos clientes → productos → peso
@@ -119,7 +119,7 @@
                 {% csrf_token %}
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
             </form>
-            <form class="form" action="{% url 'redireccionar_selecciones' %}">
+            <form class="form" action="{% url 'redireccionar_selecciones_2' %}">
                 <button class="primary-button login-button">Salir</button>
             </form>
         </div>
@@ -129,6 +129,6 @@
         // Definir el token CSRF para su uso en las solicitudes AJAX
         var csrftoken = "{{ csrf_token }}";
     </script>
-    <script src="{% static 'control_de_transporte/scrip_r_control_de_transporte.js' %}"></script>
+    <script src="{% static 'control_de_pesos/scrip_r_control_de_pesos.js' %}"></script>
 </body>
 </html>
