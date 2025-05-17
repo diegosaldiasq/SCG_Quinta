@@ -1,0 +1,129 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'control_de_pesos/estilos_r_control_de_pesos.css' %}">
+    <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
+    <title>Registro control Pesos R-POE-E-05-XX</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'control_de_pesos/images/logoquinta.png' %}" alt="logo" class="logo">
+        <div class="login-container">
+            <h1 class="title">Registro control de pesos R-POE-E-05-XX</h1>
+        </div>
+        <div class="login-container">
+            <label class="label">Producto</label>
+
+                <!-- Selección de Cliente -->
+                <label for="cliente">Cliente</label>
+                <select id="cliente" class="input">
+                    <option value="">-- Selecciona cliente --</option>
+                    <option value="clienteA">Jumbo</option>
+                    <option value="clienteB">Santa Isabel</option>
+                    <option value="clienteC">Walmart</option>
+                </select>
+
+                <!-- Selección de Producto -->
+                <label for="producto">Producto</label>
+                <select id="producto" class="input">
+                    <option value="">-- Selecciona producto --</option>
+                </select>
+
+                <!-- Campo que mostrará el peso -->
+                <label for="peso">Peso receta (gr)</label>
+                <input type="text" id="peso" readonly placeholder="–">
+
+                <script>
+                    // Definimos clientes → productos → peso
+                    const productosPorCliente = {
+                    clienteA: [
+                        { value: 'Torta-Beatiz', text: 'Torta Beatriz', peso: '300' },
+                        { value: 'Torta-Bom-Bom', text: 'Torta Bom Bom', peso: '400' },
+                        { value: 'Torta-tres-leches', text: 'Torta tres leches', peso: '500' },
+                        { value: 'Torta-berlin', text: 'Torta Berlin', peso: '600' },
+                        { value: 'Torta-chocolate', text: 'Torta chocolate', peso: '700' },
+                        { value: 'Torta-frutilla', text: 'Torta frutilla', peso: '800' },
+                        { value: 'Torta-manzana', text: 'Torta manzana', peso: '900' },
+                        { value: 'Torta-mora', text: 'Torta mora', peso: '1300' },
+                        { value: 'Torta-naranja', text: 'Torta naranja', peso: '1400' },
+                        { value: 'Torta-piña', text: 'Torta piña', peso: '1500' },
+                        { value: 'Torta-queso-frutilla', text: 'Torta queso frutilla', peso: '1600' },
+                        { value: 'Torta-queso-mora', text: 'Torta queso mora', peso: '1700' },
+                        { value: 'Torta-queso-naranja', text: 'Torta queso naranja', peso: '1800' },
+                        { value: 'Torta-queso-piña', text: 'Torta queso piña', peso: '1900' },
+                        { value: 'Torta-selva-negra', text: 'Torta selva negra', peso: '2000' }
+                    ],
+                    clienteB: [
+                        { value: 'berlin-pastelera', text: 'Berlin pastelera', peso: '300' },
+                        { value: 'chocolate',      text: 'Chocolate', peso: '300' }
+                    ],
+                    clienteC: [
+                        { value: 'vainilla',  text: 'Vainilla', peso: '300' },
+                        { value: 'frutilla',  text: 'Frutilla', peso: '300' }
+                    ]
+                    };
+
+                    const selectCliente  = document.getElementById('cliente');
+                    const selectProducto = document.getElementById('producto');
+                    const inputPeso      = document.getElementById('peso');
+
+                    // Cuando cambia el cliente, recargamos productos y deshabilitamos peso
+                    selectCliente.addEventListener('change', () => {
+                    const cliente = selectCliente.value;
+                    const lista   = productosPorCliente[cliente] || [];
+
+                    // Reiniciamos select producto
+                    selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
+                    selectProducto.disabled  = lista.length === 0;
+                    inputPeso.value          = '';
+
+                    // Creamos opciones
+                    lista.forEach(prod => {
+                        const opt = document.createElement('option');
+                        opt.value       = prod.value;
+                        opt.textContent = prod.text;
+                        // guardamos el peso en un atributo data-peso
+                        opt.setAttribute('data-peso', prod.peso);
+                        selectProducto.appendChild(opt);
+                    });
+                    });
+
+                    // Cuando cambia el producto, mostramos el peso
+                    selectProducto.addEventListener('change', () => {
+                    const optSeleccionada = selectProducto.selectedOptions[0];
+                    const peso = optSeleccionada
+                        ? optSeleccionada.getAttribute('data-peso') || ''
+                        : '';
+                    inputPeso.value = peso;
+                    });
+                </script>
+                <label for="peso">Peso real (gr)</label>  
+                <input type="text" id="peso" class="input" placeholder="Peso" required>
+        </div>
+        <div class="botones">
+            <form class="form">
+                {% csrf_token %}
+                <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
+            </form>
+            <form class="form" action="{% url 'redireccionar_selecciones' %}">
+                <button class="primary-button login-button">Salir</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'control_de_transporte/scrip_r_control_de_transporte.js' %}"></script>
+</body>
+</html>
