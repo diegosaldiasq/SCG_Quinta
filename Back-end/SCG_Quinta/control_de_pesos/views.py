@@ -46,8 +46,8 @@ def vista_control_de_pesos(request):
             return JsonResponse({'existe': False})
 
 @login_required
-def redireccionar_selecciones(request):
-    url_selecciones = reverse('vista_selecciones')
+def redireccionar_selecciones_2(request):
+    url_selecciones = reverse('vista_selecciones_2')
     return HttpResponseRedirect(url_selecciones)
 
 
