@@ -14,9 +14,20 @@ Para ingresar a la aplicacion es necesario un dispositivo movil, ya sea celular 
 Se ha utilizado para el desarrollo frontend HTML, CSS y JavaScript. Para el desarrollo backend se utiliza el framework de Python para aplicaciones web Django. La base de datos esta construida con PosgreSQL. EL servidor para uso proxy inverso se usa Nginx. Toda la aplicacion se conteneriza en 4 contenedores con la ayuda de `Docker` y `docker-compose`. El primero es de la aplicacion web, nombre contenedor `web`, donde se encuentra todo el codigo de la aplicacion y los archivos static. El segundo contenedores para la base de datos de postgres, nombre contenedor `db`, donde esta la logica de control para las tablas de la base, esta depende para el funcionamiento `web`. El tercer contenedor es para la adminstracion de `db` lo cual se usa `pgadmin4`, con el nombre de contenedor `pgadmin`, el cual depende de `db`. El cuarto contenedor es para el servidor de proxy inverso el cual funciona con `nginx`, con el nombre de `nginx`, este depende de `web`. Asi se conforma la arquitectura de contenedores de `docker-compose`.
 Se utiliza para el control de versiones y el manejor del flujo de trabajo git y github en el link https://github.com/diegosaldiasq/SCG_Quinta
 
+## Versiones de imagenes usadas en el proyecto para el build de los contenedores
+
+- Python 3.9.1
+- Django 4.2.4 
+- PostgreSQL 17.5
+- Nginx 1.27.5
+- pgAdmin 9.3
+- docker 24.0.5
+- docker-compose 2.20.2
+- git 2.15.0
+
 ## Recursos necesarios para el proyecto
 
-Para instalar el proyecto se debe tener instalado python 3.12.0, pip 23.2.1, django 4.2.6, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2. Esto es informativo ya que cuando se corre la instalacion de los contenedores, al crear el contenedor de web, se creara junto con los requerimietos alojados en el archivo `requirements.txt`. Destallada su su instalacion en `Dockerfile`.
+Para instalar el proyecto se debe tener instalado python 3.9.1, pip 23.3.1, django 4.2.4, docker 24.0.5, docker-compose 2.20.2, node 14.17.6, npm 10.1.0, git 2.39.2. Esto es informativo ya que cuando se corre la instalacion de los contenedores, al crear el contenedor de web, se creara junto con los requerimietos alojados en el archivo `requirements.txt`. Destallada su su instalacion en `Dockerfile`.
 
 ## Como ejecutar el proyecto
 
