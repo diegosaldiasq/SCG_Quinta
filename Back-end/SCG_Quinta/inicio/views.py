@@ -47,6 +47,10 @@ def descargas(request):
     return render(request, 'inicio/descargas.html')
 
 @login_required
+def descargas_2(request):
+    return render(request, 'inicio/descargas_2.html')
+
+@login_required
 def set_fechas(request):
     if request.method == 'POST':
         fecha_inicio = request.POST.get('fechainicio')
@@ -98,6 +102,10 @@ def intermedio(request):
 @login_required
 def intermedio_2(request):  
     return render(request, 'inicio/intermedio_2.html')
+
+@login_required
+def intermedio_3(request):  
+    return render(request, 'inicio/intermedio_3.html')
 
 @login_required
 def seleccion_verifica(request):

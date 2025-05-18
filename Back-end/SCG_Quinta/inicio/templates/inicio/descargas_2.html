@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'inicio/estilos_descargas.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}" />
+    <title>Seleccion de descargas procesos</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
+        <h1 class="title">Seleccionar registro a descargar</h1>
+        <form class="filtro-fechas">
+            <label class="label">Fecha inicio</label>
+            <input class="input" type="date" name="fecha-inicio" id="fecha-inicio">
+            <label class="label">Fecha fin</label>
+            <input class="input" type="date" name="fecha-fin" id="fecha-fin">
+            <button type="submit" class="primary-button2" id="filtrar-fechas">Filtrar</button>
+        </form>
+        <div class="login-container">
+            <p class="subtitle">POE</p>
+            <p class="registro">
+                <span>1.- Registro control de pesos</span>
+                <a href="{% url 'descargar_registros' %}?config=control_de_pesos">R-POE-E-02-01</a>
+            </p>
+        </div>
+        <form class="form" action="{% url 'redireccionar_inicio' %}">
+            <button class="primary-button login-button">Volver inicio</button>
+        </form>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'inicio/scrips_descargas.js' %}"></script>
+</body>
+</html>
