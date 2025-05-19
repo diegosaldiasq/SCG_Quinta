@@ -1,4 +1,18 @@
 document.addEventListener("DOMContentLoaded", function() {
+     // 1) Restaurar lote y turno guardados en sessionStorage
+    const loteGuardado  = sessionStorage.getItem('lote');
+    const turnoGuardado = sessionStorage.getItem('turno');
+
+    if (loteGuardado !== null) {
+        document.getElementById('lote').value = loteGuardado;
+        sessionStorage.removeItem('lote');
+    }
+    if (turnoGuardado !== null) {
+        document.getElementById('turno').value = turnoGuardado;
+        sessionStorage.removeItem('turno');
+    }
+
+    // 2) Listener para el botón
     document.getElementById("miBoton").addEventListener("click", async function() {
         try {
             event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
@@ -34,6 +48,10 @@ document.addEventListener("DOMContentLoaded", function() {
             var data = await response.json();
             debugger; // <-- Agrega esta línea
             if (data.existe) {
+                 // guardamos lote y turno en sessionStorage
+                sessionStorage.setItem('lote', lote);
+                sessionStorage.setItem('turno', turno);
+
                 alert("Datos guardados exitosamente!!");
                 location.reload();
             } else {
