@@ -50,7 +50,8 @@
             </div>
                 
             <div class="button-container">
-                <form id="miBoton" action="{% url 'cuenta_creada' %}">
+                <div id="mensaje" style="color: red; margin-bottom: 1em;"></div>
+                <form id="miBoton">
                     <button class="primary-button login-button">Confirmar</button>
                 </form>
                 <form action="{% url 'main' %}">

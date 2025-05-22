@@ -41,7 +41,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 success: function(response) {
                     // Hacer algo con la respuesta del servidor
                     console.log(response);
+                    // Aquí puedes manejar la respuesta del servidor
+                    window.location.href = "/login/cuenta_creada/";  // Redirigir a la URL proporcionada por el servidor
                     $("#mensaje").text(response.mensaje);
+                },
+                error: function(response) {
+                    // Manejar errores
+                    console.error("Error en la solicitud AJAX:", response);
+                    alert("Error al crear la cuenta. Por favor, inténtalo de nuevo.");
                 },
                 error: function() {
                     // Manejar errores
