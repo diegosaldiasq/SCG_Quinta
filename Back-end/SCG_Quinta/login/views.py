@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 import json
+from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
@@ -58,7 +59,8 @@ def vista_crear_cuenta(request):
             nombre_completo=nombre_completo, 
             perfil_usuario=perfil_usuario,
             rut=rut,
-            new_password=new_password
+            new_password=new_password,
+            fecha_creacion=timezone.now()
             )
         datos.set_password(password)
         datos.save()
