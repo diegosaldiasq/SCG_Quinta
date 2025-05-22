@@ -41,40 +41,29 @@ def crear_cuenta(request):
 
 def vista_crear_cuenta(request):
     if request.method == 'POST':
-        if request.method != 'POST':
-            return JsonResponse({'error': 'Método no permitido'}, status=405)
-
-        # Si mandas form-urlencoded:
         nombre_completo = request.POST.get('nombre_completo')
         perfil_usuario = request.POST.get('perfil_usuario')
         rut = request.POST.get('rut')
         password = request.POST.get('password')
         new_password = request.POST.get('new_password')
 
-        # 1) Validar contraseñas
         if password != new_password:
-            return JsonResponse({'error': 'Las contraseñas no coinciden'}, status=400)
+            messages.error(request, "Las contraseñas no coinciden")
 
-        # 2) Validar existencia de RUT
         if DatosFormularioCrearCuenta.objects.filter(rut=rut).exists():
-            return JsonResponse({'error': 'El RUT ya está registrado'}, status=400)
+            messages.error(request, "El RUT ya está registrado")
+            return redirect('crear_cuenta')
 
-        # 3) Validar existencia de username (o email, según tu campo)
-        #    Suponiendo que el campo usuario sea el nombre_completo o username separado:
-        if DatosFormularioCrearCuenta.objects.filter(username=nombre_completo).exists():
-            return JsonResponse({'error': 'El nombre de usuario ya existe'}, status=400)
-
-        # 4) Si todo OK, guardamos
         datos = DatosFormularioCrearCuenta(
-            nombre_completo=nombre_completo,
+            nombre_completo=nombre_completo, 
             perfil_usuario=perfil_usuario,
             rut=rut,
             new_password=new_password
-        )
+            )
         datos.set_password(password)
         datos.save()
 
-        return JsonResponse({'mensaje': 'Datos guardados exitosamente'}, status=200)
+        return HttpResponse("Datos guardados exitosamente")
         
 def cuenta_creada(request):
     return render(request, 'login/cuenta_creada.html')

@@ -23,12 +23,13 @@ class CustomUserManager(BaseUserManager):
 class DatosFormularioCrearCuenta(AbstractBaseUser, PermissionsMixin):
     nombre_completo = models.TextField(unique=True)
     perfil_usuario = models.CharField(max_length=20)
-    rut = models.CharField(max_length=12, unique=True)
+    rut = models.CharField(max_length=12)
     password = models.TextField()
     new_password = models.TextField()
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'nombre_completo'
     REQUIRED_FIELDS = ['rut', 'perfil_usuario']
