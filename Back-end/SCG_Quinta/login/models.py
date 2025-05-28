@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils import timezone
 
 # Create your models here.
 
@@ -17,6 +18,7 @@ class CustomUserManager(BaseUserManager):
         user.is_active = True
         user.is_staff = True
         user.is_superuser = True
+        user.fecha_creacion = timezone.now()
         user.save(using=self._db)
         return user
 
