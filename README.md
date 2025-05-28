@@ -82,7 +82,7 @@ Para ejecutar las pruebas se debe tener instalado python 3.12.0, pip 23.2.1, dja
 
 ## Para arrancar en AWS
 
-Conectar al contenedor `db` con el comando `docker-compose exec web python manage.py makemigrations` para crear las migraciones de la base de datos. Luego correr el comando `docker-compose exec web python manage.py migrate` para aplicar las migraciones a la base de datos. Luego correr el comando `docker-compose exec web python manage.py collectstatic` para recolectar los archivos static y hacerlos efectivos en el servidor. Crear el superusuario con `docker-compose exec web python manage.py createsuperuser` y seguir las instrucciones de creacion de superusuario.
+Para conectar con docker, con el comando `docker login -u diegosaldiasquijada -p <contraseña>`, luego correr el comando `docker-compose up -d --build` para construir las imagenes e iniciar los contenedores. Luego correr el comando `docker-compose exec web python manage.py makemigrations` para crear las migraciones de la base de datos. Luego correr el comando `docker-compose exec web python manage.py migrate` para aplicar las migraciones a la base de datos. Luego correr el comando `docker-compose exec web python manage.py collectstatic` para recolectar los archivos static y hacerlos efectivos en el servidor. Crear el superusuario con `docker-compose exec web python manage.py createsuperuser` y seguir las instrucciones de creacion de superusuario.
 
 ## Como contribuir
 
