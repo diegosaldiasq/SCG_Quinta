@@ -46,7 +46,7 @@ services:
       - ./media:/media
       # Montajes para Certbot:
       - scg_quinta_certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
+      - scg_quinta_certbot-var:/var/lib/letsencrypt
       # Webroot para Certbot:
       - ./config/certbot/www:/var/www/certbot
     #command: /bin/bash -c "chmod -R 775 /media && nginx -g 'daemon off;'"
@@ -58,7 +58,7 @@ services:
     image: certbot/certbot
     volumes:
       - scg_quinta_certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
+      - scg_quinta_certbot-var:/var/lib/letsencrypt
       - ./config/certbot/www:/var/www/certbot
     entrypoint: >
       sh -c "trap exit TERM;
@@ -70,5 +70,5 @@ services:
 volumes:
   pgdata:
   pgadmin:
-  certbot-etc:
-  certbot-var:
+  scg_quinta_certbot-etc:
+  scg_quinta_certbot-var:
