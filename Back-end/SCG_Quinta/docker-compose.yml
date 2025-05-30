@@ -45,7 +45,7 @@ services:
       - ./staticfiles:/static
       - ./media:/media
       # Montajes para Certbot:
-      - certbot-etc:/etc/letsencrypt
+      - scg_quinta_certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       # Webroot para Certbot:
       - ./config/certbot/www:/var/www/certbot
@@ -57,7 +57,7 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
-      - certbot-etc:/etc/letsencrypt
+      - scg_quinta_certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - ./config/certbot/www:/var/www/certbot
     entrypoint: >
