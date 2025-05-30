@@ -38,15 +38,35 @@ services:
     image: nginx:1.27.5
     ports:
       - "80:80" # http://localhost:80/login  entrada a la aplicacion SCG_Quinta
+      - "443:443" # https://localhost:443/login  entrada a la aplicacion SCG_Quinta
     volumes:
       - ./config/nginx/conf.d:/etc/nginx/conf.d
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./staticfiles:/static
       - ./media:/media
+      # Montajes para Certbot:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./config/certbot/www:/var/www/certbot
     #command: /bin/bash -c "chmod -R 775 /media && nginx -g 'daemon off;'"
     depends_on:
       - web
 
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./config/certbot/www:/var/www/certbot
+    entrypoint: >
+      sh -c "trap exit TERM;
+             while :; do
+               certbot renew --webroot -w /var/www/certbot --quiet;
+               sleep 12h & wait $${!};
+             done"
+
 volumes:
   pgdata:
   pgadmin:
+  certbot-etc:
+  certbot-var:
