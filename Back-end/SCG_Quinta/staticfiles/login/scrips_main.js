@@ -1,19 +1,20 @@
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-      // Si no es una petición GET/HEAD/OPTIONS o TRACE, agregamos el header
-      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      }
-    }
-  });
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("miBoton").addEventListener("click", async function() {
         try {
             event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
-            var nombreCompleto = document.getElementById("nombre-completo").value;
-            var perfilUsuario = document.getElementById("perfil-usuario").value;
-            var rut = document.getElementById("rut").value;
-            var pasword = document.getElementById("password").value;
+            var nombreCompleto = $("#nombre-completo").val();
+            var perfilUsuario = $("#perfil-usuario").val();
+            var rut = $("#rut").val();
+            var password = $("#pasword").val();
+
+            // agregar valores a datos
+
+            var datos = {
+                nombreCompleto: nombreCompleto,
+                perfilUsuario: perfilUsuario,
+                rut: rut,
+                password: password
+            }
             
             // Obtener el CSRF token
             var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
@@ -24,23 +25,20 @@ document.addEventListener("DOMContentLoaded", function() {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrfToken // Aquí deberías agregar el csrf token para Django si es necesario
                 },
-                body: JSON.stringify({
-                    nombreCompleto,
-                    perfilUsuario,
-                    rut,
-                    pasword
-                 })
+                body: JSON.stringify({ dato: datos })
             });
-            var responseData = await response.json();
-
-            if (responseData.existe) {
-                window.location.href = "/inicio/index/";
+            var data = await response.json();
+            debugger; // <-- Agrega esta línea
+            if (data.existe) {
+                alert("Ingreso correcto!!!");
+                location.reload();
             } else {
-                alert("No se pudo ingresar a la cuenta: datos incorrectos.");
+                alert("No se pudo entrar... revisa nuevamente!!");
+                return false;
             }
         } catch (error) {
             console.error("Hubo un error:", error);
-            alert("Hubo un problema al verificar el usuario.");
+            alert("Hubo un problema al cargar los datos, formatos no coinciden!!");
         }
     });
 });

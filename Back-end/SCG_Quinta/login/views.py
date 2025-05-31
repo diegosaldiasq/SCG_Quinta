@@ -18,21 +18,19 @@ def main(request):
 
 def vista_main(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
-        body_data = json.loads(body_unicode)
-        nombre_completo = body_data.get('nombreCompleto')
-        perfil_recibido = body_data.get('perfilUsuario')
-        rut_recibido = body_data.get('rut')
-        password = body_data.get('pasword')
+        data = json.loads(request.body.decode('utf-8'))
+        dato = data.get('dato', None)
+        if dato:
+            nombre_completo = dato.get('nombreCompleto')
+            perfil_usuario = dato.get('perfilUsuario')
+            rut = dato.get('rut')
+            password = dato.get('password')
 
-        usuario = authenticate(request, username=nombre_completo, password=password)
-        dato = None
-        if usuario is not None:
-            dato = True
+            usuario = authenticate(request, username=nombre_completo, password=password)
             login(request, usuario)
+            return JsonResponse({'existe': True})
         else:
-            dato = False
-        return JsonResponse({'existe': dato})
+            return JsonResponse({'existe': False})
 
 def ingresa_rut(request):
     return render(request, 'login/Ingresa_rut.html')
