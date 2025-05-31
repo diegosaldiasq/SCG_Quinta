@@ -33,6 +33,10 @@ services:
       - db
     environment:
       DATABASE_HOST: db
+      POSTGRES_DB: SCG_Quinta
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: radcliffe # Para widows y AWS
+      #POSTGRES_PASSWORD: Dsal1212 # Para linux
 
   nginx:
     image: nginx:1.27.5

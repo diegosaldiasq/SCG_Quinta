@@ -1,3 +1,11 @@
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      // Si no es una petición GET/HEAD/OPTIONS o TRACE, agregamos el header
+      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      }
+    }
+  });
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("miBoton").addEventListener("click", async function() {
         try {
