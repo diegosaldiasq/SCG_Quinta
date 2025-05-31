@@ -48,7 +48,8 @@ services:
       - scg_quinta_certbot-etc:/etc/letsencrypt
       - scg_quinta_certbot-var:/var/lib/letsencrypt
       # Webroot para Certbot:
-      - ./config/certbot/www:/var/www/certbot
+      - ./config/letsencrypt:/etc/letsencrypt:ro
+      - ./config/certbot/www:/var/www/certbot:ro
     #command: /bin/bash -c "chmod -R 775 /media && nginx -g 'daemon off;'"
     depends_on:
       - web
