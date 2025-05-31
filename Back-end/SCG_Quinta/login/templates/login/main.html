@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,21 +11,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'login/estilos_main.css' %}">
     <link rel="icon" href="{% static 'login/images/logoquinta2.png' %}">
-    <title>Principal</title>
+    <title>Ingreso cuenta SCGC Quinta</title>
 </head>
 <body>
     <div class="login">
         <div class="form-container">
             <img src="{% static 'login/images/logoquinta.png' %}" alt="logo" class="logo">
             <h1 class="title">Ingreso cuenta SCGC Quinta</h1>
-            <p class="subtitle">Ingresa tus datos para ingresar a tu cuenta</p>
-            <form action="./" class="form">
+            <p class="subtitle">Ingresa tus datos para iniciar sesión</p>
+
+            <!-- Formulario real que enviará JavaScript -->
+            <form id="miBoton" method="post" action="{% url 'vista_main' %}" class="form">
+                {% csrf_token %}
+
                 <label class="label">Nombre completo</label>
-                <input type="text" id="nombre-completo" class="input input-nombre-completo">
+                <input type="text" id="nombre-completo" name="nombre_completo" class="input input-nombre-completo">
 
                 <label class="label">Perfil de usuario</label>
-                <select class="input" id="perfil-usuario">
-                    <option value="blanco"> </option>
+                <select class="input" id="perfil-usuario" name="perfil_usuario">
+                    <option value="">–– Selecciona ––</option>
                     <option value="Tecnologo calidad">Tecnologo calidad</option>
                     <option value="Jefe calidad">Jefe calidad</option>
                     <option value="Devps">Devps</option>
@@ -34,30 +38,30 @@
 
                 <label class="label">RUT (sin puntos ni guion)</label>
                 <p class="subtitle-ej">Ejemplo: 12345678k</p>
-                <input type="text" id="rut" class="input input-rut">
+                <input type="text" id="rut" name="rut" class="input input-rut">
 
                 <label for="password" class="label">Contraseña</label>
-                <input type="password" id="password" placeholder="**********" class="input input-password">
+                <input type="password" id="password" name="password" placeholder="**********" class="input input-password">
 
-                
+                <button type="submit" class="primary-button login-button">Iniciar sesión</button>
+            </form>
 
-                <!--<button class="primary-button login-button" src="{% url 'ingresa_rut' %}">Iniciar sesion</button>-->
-            </form>
-            <form id="miBoton">
-                {% csrf_token %}
-                <button class="primary-button login-button" id="registrardatos">Iniciar sesion</button>
-            </form>
             <div class="span-container">
-                <span class="span">¿Olvidste tu contraseña?</span>
+                <span class="span">¿Olvidaste tu contraseña?</span>
                 <a href="{% url 'ingresa_rut' %}">Recuperar</a>
             </div>
+
             <form action="{% url 'crear_cuenta' %}">
                 <button class="crear-cuenta">Crear cuenta</button>
             </form>
         </div>
     </div>
+
+    <!-- jQuery (necesario para nuestro uso de $) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Nuestro script corregido -->
     <script src="{% static 'login/scrips_main.js' %}"></script>
+    <!-- Exponemos el token CSRF para fetch si es necesario -->
     <script>
         var csrftoken = '{{ csrf_token }}';
     </script>

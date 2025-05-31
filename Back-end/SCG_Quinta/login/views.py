@@ -9,6 +9,7 @@ from django.contrib import messages
 import json
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -17,20 +18,57 @@ def main(request):
     return render(request, 'login/main.html')
 
 def vista_main(request):
+    """
+    Vista que recibe un POST con JSON:
+    {
+      "nombreCompleto": "...",
+      "perfilUsuario": "...",
+      "rut": "...",
+      "pasword": "..."
+    }
+    Verifica que exista un objeto DatosFormularioCrearCuenta con ese RUT,
+    chequea la contraseña con el método check_password y, si coincide,
+    crea/obtiene un User y hace login(request, user). Devuelve {'existe': True/False}.
+    """
     if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
-        dato = data.get('dato', None)
-        if dato:
-            nombre_completo = dato.get('nombreCompleto')
-            perfil_usuario = dato.get('perfilUsuario')
-            rut = dato.get('rut')
-            password = dato.get('password')
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+        except json.JSONDecodeError:
+            # JSON mal formado
+            return JsonResponse({'existe': False}, status=400)
 
-            usuario = authenticate(request, username=nombre_completo, password=password)
-            login(request, usuario)
+        # Leemos las mismas claves que envía el JS
+        nombre_completo = body_data.get('nombreCompleto', '').strip()
+        perfil_usuario = body_data.get('perfilUsuario', '').strip()
+        rut = body_data.get('rut', '').strip()
+        password = body_data.get('pasword', '')
+
+        # Buscamos en nuestro modelo por RUT
+        try:
+            cuenta = DatosFormularioCrearCuenta.objects.get(rut=rut)
+        except DatosFormularioCrearCuenta.DoesNotExist:
+            return JsonResponse({'existe': False})
+
+        # Verificamos contraseña
+        if cuenta.check_password(password):
+            # Creamos o obtenemos un User en Django que tenga username = rut
+            user_django, creado = User.objects.get_or_create(
+                username=rut,
+                defaults={
+                    'first_name': cuenta.nombre_completo,
+                    'email': ''
+                }
+            )
+            # Forzamos el backend para que login() funcione aun si no usamos authenticate()
+            user_django.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user_django)
             return JsonResponse({'existe': True})
         else:
             return JsonResponse({'existe': False})
+
+    # Si no es POST, devolvemos 405
+    return JsonResponse({'existe': False}, status=405)
 
 def ingresa_rut(request):
     return render(request, 'login/Ingresa_rut.html')
