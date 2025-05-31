@@ -16,8 +16,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: "diego.saldias.quijada@gmail.com"  # Cambia a tu email
       PGADMIN_DEFAULT_PASSWORD: "radcliffe"  # Cambia a tu contraseña
-    ports:
-      - "5050:80"  # pgAdmin estará disponible en el puerto 5050 de tu máquina host http://localhost:5050
+    #ports:
+      #- "5050:80"  # pgAdmin estará disponible en el puerto 5050 de tu máquina host http://localhost:5050
     volumes:
       - ./pgadmin-data:/var/lib/pgadmin
     depends_on:
