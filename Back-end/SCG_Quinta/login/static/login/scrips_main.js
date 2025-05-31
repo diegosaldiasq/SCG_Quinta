@@ -25,10 +25,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     'X-CSRFToken': csrfToken // Aquí deberías agregar el csrf token para Django si es necesario
                 },
                 body: JSON.stringify({
-                    nombreCompleto: nombreCompleto,
-                    perfilUsuario: perfilUsuario,
-                    rut: rut,
-                    pasword: pasword
+                    nombreCompleto,
+                    perfilUsuario,
+                    rut,
+                    pasword
                  })
             });
             var responseData = await response.json();
