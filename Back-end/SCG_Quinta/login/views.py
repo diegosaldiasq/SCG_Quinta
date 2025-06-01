@@ -29,7 +29,7 @@ def vista_main(request):
         nombre_completo = body_data.get('nombreCompleto', '').strip()
         perfil_usuario = body_data.get('perfilUsuario', '').strip()
         rut = body_data.get('rut', '').strip()
-        password = body_data.get('password', '')
+        password = body_data.get('pasword', '')
     except json.JSONDecodeError:
         return JsonResponse({'existe': False}, status=400)
 
