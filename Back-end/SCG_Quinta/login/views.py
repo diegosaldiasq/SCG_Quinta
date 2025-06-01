@@ -65,8 +65,7 @@ def vista_main(request):
             user_django, creado = User.objects.get_or_create(
                 username=rut,
                 defaults={
-                    'first_name': cuenta.nombre_completo,
-                    'email': '',
+                    'nombre_completo': cuenta.nombre_completo
                     # Si tu modelo custom (DatosFormularioCrearCuenta) tiene campos adicionales
                     # que sean required, podrías pasarlos aquí en defaults.
                 }
