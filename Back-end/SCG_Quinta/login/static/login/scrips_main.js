@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
             };
 
             // Enviamos la petición fetch al endpoint /login/vista_main/
-            var response = await fetch("{% url 'vista_main' %}", {
+            var response = await fetch("/login/vista_main/", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
