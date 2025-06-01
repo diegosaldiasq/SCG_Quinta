@@ -23,10 +23,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Creamos el objeto JSON con las mismas claves que leerá la vista Django
             var datos = {
-                nombreCompleto: nombreCompleto,
-                perfilUsuario: perfilUsuario,
-                rut: rut,
-                pasword: password
+                nombreCompleto:nombreCompleto,
+                perfilUsuario:perfilUsuario,
+                rut:rut,
+                pasword:password
             };
 
             // Enviamos la petición fetch al endpoint /login/vista_main/
