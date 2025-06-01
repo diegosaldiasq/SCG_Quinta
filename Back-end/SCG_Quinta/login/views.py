@@ -10,6 +10,7 @@ import json
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -17,6 +18,7 @@ def main(request):
     logout(request)
     return render(request, 'login/main.html')
 
+@csrf_exempt
 def vista_main(request):
     """
     Vista que recibe un POST con JSON:
