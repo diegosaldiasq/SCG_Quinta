@@ -7,6 +7,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -14,7 +15,8 @@ import json
 def control_de_pesos(request):
     return render(request, 'control_de_pesos/r_control_de_pesos.html')
 
-@login_required
+@csrf_exempt
+@login_required 
 def vista_control_de_pesos(request):
      if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
