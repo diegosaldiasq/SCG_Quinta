@@ -63,9 +63,10 @@ def vista_main(request):
         # Si la contraseña coincide, creamos/obtenemos un usuario usando el User swapped
         try:
             user_django, creado = User.objects.get_or_create(
-                username=rut,
+                username=cuenta.nombre_completo,
                 defaults={
-                    'nombre_completo': cuenta.nombre_completo
+                    'rut': cuenta.rut,
+                    'perfil_usuario': cuenta.perfil_usuario
                     # Si tu modelo custom (DatosFormularioCrearCuenta) tiene campos adicionales
                     # que sean required, podrías pasarlos aquí en defaults.
                 }
