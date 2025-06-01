@@ -1,3 +1,12 @@
+// Configuración global de jQuery para incluir CSRF en todas las peticiones POST/AJAX
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 document.addEventListener("DOMContentLoaded", function() {
      // 1) Restaurar lote y turno guardados en sessionStorage
     const loteGuardado  = sessionStorage.getItem('lote');
