@@ -50,7 +50,7 @@ def vista_main(request):
         try:
             cuenta = DatosFormularioCrearCuenta.objects.get(rut=rut)
         except DatosFormularioCrearCuenta.DoesNotExist:
-            return JsonResponse({'existe': False})
+            return JsonResponse({'existe': False}, status=404)
 
         # Verificamos contraseña
         if cuenta.check_password(password):
@@ -66,7 +66,7 @@ def vista_main(request):
             login(request, user_django)
             return JsonResponse({'existe': True})
         else:
-            return JsonResponse({'existe': False})
+            return JsonResponse({'existe': False}, status=401)
 
     # Si no es POST, devolvemos 405
     return JsonResponse({'existe': False}, status=405)
