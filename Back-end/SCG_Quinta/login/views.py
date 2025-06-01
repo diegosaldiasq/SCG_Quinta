@@ -32,7 +32,7 @@ def vista_main(request):
         return JsonResponse({'existe': False}, status=400)
 
     # Autenticar usando el backend de Django
-    user = authenticate(request, username=nombre_completo, password=password)
+    user = authenticate(request, nombre_completo=nombre_completo, password=password)
     if user is not None:
         login(request, user)
         return JsonResponse({'existe': True})
