@@ -28,12 +28,13 @@ def vista_main(request):
         body_data = json.loads(request.body.decode('utf-8'))
         nombre_completo = body_data.get('nombreCompleto', '').strip()
         perfil_usuario = body_data.get('perfilUsuario', '').strip()
+        rut = body_data.get('rut', '').strip()
         password = body_data.get('password', '')
     except json.JSONDecodeError:
         return JsonResponse({'existe': False}, status=400)
 
     # Autenticar usando el backend de Django
-    user = authenticate(request, username=nombre_completo, password=password, perfil_usuario=perfil_usuario)
+    user = authenticate(request, username=nombre_completo, password=password,rut=rut ,perfil_usuario=perfil_usuario)
     if user is not None:
         login(request, user)
         return JsonResponse({'existe': True})
