@@ -58,8 +58,7 @@ def vista_main(request):
             user_django, creado = User.objects.get_or_create(
                 username=rut,
                 defaults={
-                    'first_name': cuenta.nombre_completo,
-                    'email': ''
+                    'first_name': cuenta.nombre_completo
                 }
             )
             # Forzamos el backend para que login() funcione aun si no usamos authenticate()
