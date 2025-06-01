@@ -39,7 +39,7 @@ def vista_main(request):
         login(request, user)
         return JsonResponse({'existe': True})
     else:
-        return JsonResponse({'existe': False})
+        return JsonResponse({'existe': False}, status=401)
 
 def ingresa_rut(request):
     return render(request, 'login/Ingresa_rut.html')
