@@ -8,8 +8,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 import json, traceback, logging
 from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
@@ -18,52 +17,71 @@ def main(request):
     logout(request)
     return render(request, 'login/main.html')
 
-logger = logging.getLogger(__name__)
+User = get_user_model()
 
 @csrf_exempt
 def vista_main(request):
+    """
+    Vista que recibe un POST con JSON:
+    {
+      "nombreCompleto": "...",
+      "perfilUsuario": "...",
+      "rut": "...",
+      "pasword": "..."
+    }
+    Verifica que exista un objeto DatosFormularioCrearCuenta con ese RUT,
+    chequea la contraseña con el método check_password y, si coincide,
+    crea/obtiene un User (tu modelo custom) y hace login(request, user).
+    Devuelve {'existe': True/False}.
+    """
     if request.method != 'POST':
         return JsonResponse({'existe': False}, status=405)
 
     # 1) Leer y parsear JSON
     try:
-        body_data = json.loads(request.body.decode('utf-8'))
-    except Exception:
-        tb = traceback.format_exc()
-        logger.error("Error parseando JSON en vista_main:\n%s", tb)
-        return JsonResponse({'existe': False, 'error': 'JSON mal formado'}, status=400)
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+    except json.JSONDecodeError:
+        # JSON mal formado
+        return JsonResponse({'existe': False}, status=400)
 
+    # 2) Extraer campos
     nombre_completo = body_data.get('nombreCompleto', '').strip()
-    perfil_usuario = body_data.get('perfilUsuario', '').strip()
-    rut = body_data.get('rut', '').strip()
-    password = body_data.get('pasword', '')
+    perfil_usuario  = body_data.get('perfilUsuario', '').strip()
+    rut             = body_data.get('rut', '').strip()
+    password        = body_data.get('pasword', '')
 
-    # 2) Buscar en el modelo
+    # 3) Buscar en tu modelo de datos (antes de crear el User de Django)
     try:
         cuenta = DatosFormularioCrearCuenta.objects.get(rut=rut)
     except DatosFormularioCrearCuenta.DoesNotExist:
+        # No existe ninguna cuenta con ese RUT
         return JsonResponse({'existe': False})
-    except Exception:
-        tb = traceback.format_exc()
-        logger.error("Error buscando Cuenta con rut=%s:\n%s", rut, tb)
-        return JsonResponse({'existe': False, 'error': 'Error BD'}, status=500)
 
-    # 3) Verificar contraseña y hacer login
-    try:
-        if cuenta.check_password(password):
+    # 4) Verificar contraseña
+    if cuenta.check_password(password):
+        # Si la contraseña coincide, creamos/obtenemos un usuario usando el User swapped
+        try:
             user_django, creado = User.objects.get_or_create(
                 username=rut,
-                defaults={'first_name': cuenta.nombre_completo}
+                defaults={
+                    'first_name': cuenta.nombre_completo,
+                    'email': '',
+                    # Si tu modelo custom (DatosFormularioCrearCuenta) tiene campos adicionales
+                    # que sean required, podrías pasarlos aquí en defaults.
+                }
             )
-            user_django.backend = 'django.contrib.auth.backends.ModelBackend'
-            login(request, user_django)
-            return JsonResponse({'existe': True})
-        else:
-            return JsonResponse({'existe': False})
-    except Exception:
-        tb = traceback.format_exc()
-        logger.error("Error autenticando usuario rut=%s:\n%s", rut, tb)
-        return JsonResponse({'existe': False, 'error': 'Error autenticación'}, status=500)
+        except Exception as exc:
+            # Por ejemplo, si tu modelo User swapped requiere otros campos obligatorios,
+            # aquí se podría producir un error. Maneja según convenga.
+            return JsonResponse({'existe': False, 'error': 'No se pudo crear/obtener usuario'}, status=500)
+
+        # Forzar el backend para login (si no usas authenticate())
+        user_django.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user_django)
+        return JsonResponse({'existe': True})
+    else:
+        return JsonResponse({'existe': False})
 
 def ingresa_rut(request):
     return render(request, 'login/Ingresa_rut.html')
