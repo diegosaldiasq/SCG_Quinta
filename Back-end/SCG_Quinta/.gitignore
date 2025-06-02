@@ -15,3 +15,5 @@ staticfiles/
 /*.pyc
 fotos_reclamos/
 backup.sql
+Back-end/SCG_Quinta/letsencrypt/
+var/
