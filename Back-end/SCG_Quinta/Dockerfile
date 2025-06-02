@@ -2,7 +2,6 @@ FROM python:3.8
 
 WORKDIR /app
 
-COPY . /app
 COPY requirements.txt /app
 RUN pip install --upgrade pip 
 #crear ambiente virtual
@@ -10,6 +9,7 @@ RUN pip install --upgrade pip
 #RUN virtualenv venv 
 #RUN . venv/bin/activate
 RUN pip install --no-cache-dir -r requirements.txt
+COPY . /app
 
 #RUN python manage.py collectstatic --noinput
 

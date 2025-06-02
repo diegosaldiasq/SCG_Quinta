@@ -16,3 +16,7 @@ backup.sql
 *.sqlite3
 *.db
 *.env
+html
+config/letsencrypt
+var/lib/letsencrypt
+var/log/letsencrypt
