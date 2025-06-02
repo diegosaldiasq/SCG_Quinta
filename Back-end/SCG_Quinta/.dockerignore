@@ -12,3 +12,7 @@ Dockerfile
 docker-compose.yml
 fotos_reclamos/
 backup.sql
+*.log
+*.sqlite3
+*.db
+*.env
