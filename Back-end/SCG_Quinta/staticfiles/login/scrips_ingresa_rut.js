@@ -1,3 +1,11 @@
+// Envio de datos a Django
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("miBoton").addEventListener("click", async function() {
         try {
