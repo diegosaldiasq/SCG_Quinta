@@ -70,6 +70,10 @@
     <script type="text/javascript">
         let config = "{{ config }}";  // Asignando el valor de Django 'config' a una variable JS
     </script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'inicio/scrips_verificar.js' %}"></script>
 </body>
 </html>
