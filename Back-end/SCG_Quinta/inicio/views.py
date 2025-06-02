@@ -75,6 +75,7 @@ def permisos(request):
     else:
         return render(request, 'inicio/falta_permiso.html')
 
+@csrf_exempt
 @login_required
 def vista_permisos(request):
     try:
