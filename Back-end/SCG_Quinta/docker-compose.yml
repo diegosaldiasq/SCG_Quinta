@@ -24,7 +24,9 @@ services:
       - db
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: gunicorn SCG_Quinta.wsgi:application --bind 0.0.0.0:8000 --workers 10 --threads 4 --timeout 60
     volumes:
       - .:/code
