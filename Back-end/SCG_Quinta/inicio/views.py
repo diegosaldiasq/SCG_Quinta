@@ -14,6 +14,7 @@ from datetime import datetime
 from django.db.models.fields import Field
 from django.apps import apps
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
@@ -50,6 +51,7 @@ def descargas(request):
 def descargas_2(request):
     return render(request, 'inicio/descargas_2.html')
 
+@csrf_exempt
 @login_required
 def set_fechas(request):
     if request.method == 'POST':
@@ -133,6 +135,7 @@ model_mapping = {
         'control_de_pesos': 'DatosFormularioControlDePesos'
     }
 
+@csrf_exempt
 @login_required
 def verificar(request):
     if request.user.is_staff or request.user.is_superuser:
@@ -158,7 +161,8 @@ def verificar(request):
         return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
     else:
         return render(request, 'inicio/falta_permiso.html')
-    
+
+@csrf_exempt
 @login_required
 def verificar_2(request):
     if request.user.is_staff or request.user.is_superuser:
@@ -185,6 +189,7 @@ def verificar_2(request):
     else:
         return render(request, 'inicio/falta_permiso.html')
 
+@csrf_exempt
 @login_required
 def verificar_registros(request):
     try:
@@ -211,6 +216,7 @@ def verificar_registros(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 # Función para descargar los datos de los formularios, reemplaza los anteriormente creados
+@csrf_exempt
 @login_required
 def descargar_registros(request):
     fecha_inicio_str = request.session.get('fechainicio')

@@ -1,3 +1,11 @@
+// Configuración global de jQuery para incluir CSRF en todas las peticiones POST/AJAX
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
 document.getElementById("miBoton").addEventListener("click", async function() {
     try {
         event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
