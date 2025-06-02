@@ -33,6 +33,9 @@
                     {% csrf_token %}
                     <button class="primary-button login-button">Confirmar</button>
                 </form>
+                <form action="{% url 'main' %}">
+                    <button class="primary-button login-button">Salir</button>
+                </form>
             </div>
         </div>
     </div>
