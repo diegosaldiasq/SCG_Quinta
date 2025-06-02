@@ -52,6 +52,7 @@
             <div class="button-container">
                 <div id="mensaje" style="color: red; margin-bottom: 1em;"></div>
                 <form id="miBoton">
+                    {% csrf_token %}
                     <button class="primary-button login-button">Confirmar</button>
                 </form>
                 <form action="{% url 'main' %}">

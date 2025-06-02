@@ -47,6 +47,7 @@ def ingresa_rut(request):
 def crear_cuenta(request):
     return render(request, 'login/crear_cuenta.html')
 
+@csrf_exempt
 def vista_crear_cuenta(request):
     if request.method == 'POST':
         nombre_completo = request.POST.get('nombre_completo')
@@ -77,6 +78,7 @@ def vista_crear_cuenta(request):
 def cuenta_creada(request):
     return render(request, 'login/cuenta_creada.html')
 
+@csrf_exempt
 def vista_ingresa_rut(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -91,6 +93,7 @@ def vista_ingresa_rut(request):
 def pasword(request):
     return render(request, 'login/pasword.html')
 
+@csrf_exempt
 def vista_pasword(request):
     rut_temporal_recibido = request.session.get('rut', default=None)
     if request.method == 'POST':

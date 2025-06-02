@@ -36,6 +36,10 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'login/scrips_ingresa_rut.js' %}"></script>
 </body>
 </html>
