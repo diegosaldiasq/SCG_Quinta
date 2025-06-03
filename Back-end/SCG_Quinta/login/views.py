@@ -58,10 +58,11 @@ def vista_crear_cuenta(request):
 
         if password != new_password:
             messages.error(request, "Las contraseñas no coinciden")
+            return JsonResponse({'existe': False}, status=400)
 
         if DatosFormularioCrearCuenta.objects.filter(rut=rut).exists():
             messages.error(request, "El RUT ya está registrado")
-            return redirect('crear_cuenta')
+            return JsonResponse({'existe': False}, status=400)
 
         datos = DatosFormularioCrearCuenta(
             nombre_completo=nombre_completo, 
@@ -73,7 +74,9 @@ def vista_crear_cuenta(request):
         datos.set_password(password)
         datos.save()
 
-        return HttpResponse("Datos guardados exitosamente")
+        return JsonResponse({'existe': True})
+    else:
+        return JsonResponse({'existe': False}, status=405)
         
 def cuenta_creada(request):
     return render(request, 'login/cuenta_creada.html')
