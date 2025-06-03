@@ -50,33 +50,36 @@ def crear_cuenta(request):
 @csrf_exempt
 def vista_crear_cuenta(request):
     if request.method == 'POST':
-        nombre_completo = request.POST.get('nombre_completo')
-        perfil_usuario = request.POST.get('perfil_usuario')
-        rut = request.POST.get('rut')
-        password = request.POST.get('password')
-        new_password = request.POST.get('new_password')
+        data = json.loads(request.body.decode('utf-8'))
+        dato = data.get('dato', None)
+        if dato:
+            nombre_completo = dato.get('nombre_completo')
+            perfil_usuario = dato.get('perfil_usuario')
+            rut = dato.get('rut')
+            password = dato.get('password')
+            new_password = dato.get('new_password')
 
-        if password != new_password:
-            messages.error(request, "Las contraseñas no coinciden")
-            return JsonResponse({'existe': False}, status=400)
+            if password != new_password:
+                messages.error(request, "Las contraseñas no coinciden")
+                return JsonResponse({'existe': False}, status=400)
 
-        if DatosFormularioCrearCuenta.objects.filter(rut=rut).exists():
-            messages.error(request, "El RUT ya está registrado")
-            return JsonResponse({'existe': False}, status=400)
+            if DatosFormularioCrearCuenta.objects.filter(rut=rut).exists():
+                messages.error(request, "El RUT ya está registrado")
+                return JsonResponse({'existe': False}, status=400)
 
-        datos = DatosFormularioCrearCuenta(
-            nombre_completo=nombre_completo, 
-            perfil_usuario=perfil_usuario,
-            rut=rut,
-            new_password=new_password,
-            fecha_creacion=timezone.now()
-            )
-        datos.set_password(password)
-        datos.save()
+            datos = DatosFormularioCrearCuenta(
+                nombre_completo=nombre_completo, 
+                perfil_usuario=perfil_usuario,
+                rut=rut,
+                new_password=new_password,
+                fecha_creacion=timezone.now()
+                )
+            datos.set_password(password)
+            datos.save()
 
-        return JsonResponse({'existe': True})
-    else:
-        return JsonResponse({'existe': False}, status=405)
+            return JsonResponse({'existe': True})
+        else:
+            return JsonResponse({'existe': False}, status=405)
         
 def cuenta_creada(request):
     return render(request, 'login/cuenta_creada.html')
