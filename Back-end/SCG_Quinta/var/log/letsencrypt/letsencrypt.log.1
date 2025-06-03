@@ -1,36 +1,36 @@
-2025-06-03 15:26:36,735:DEBUG:certbot._internal.main:certbot version: 4.0.0
-2025-06-03 15:26:36,736:DEBUG:certbot._internal.main:Location of certbot entry point: /usr/local/bin/certbot
-2025-06-03 15:26:36,736:DEBUG:certbot._internal.main:Arguments: ['--webroot', '--webroot-path=/var/www/certbot', '--agree-tos', '--email', 'diego.saldias.quijada@gmail.com', '-d', 'pgadmin.controldeprocesosquinta.com']
-2025-06-03 15:26:36,736:DEBUG:certbot._internal.main:Discovered plugins: PluginsRegistry(PluginEntryPoint#manual,PluginEntryPoint#null,PluginEntryPoint#standalone,PluginEntryPoint#webroot)
-2025-06-03 15:26:36,765:DEBUG:certbot._internal.log:Root logging level set at 30
-2025-06-03 15:26:36,770:DEBUG:certbot._internal.plugins.selection:Requested authenticator webroot and installer None
-2025-06-03 15:26:36,771:DEBUG:certbot._internal.plugins.selection:Single candidate plugin: * webroot
+2025-06-03 15:36:57,424:DEBUG:certbot._internal.main:certbot version: 4.0.0
+2025-06-03 15:36:57,426:DEBUG:certbot._internal.main:Location of certbot entry point: /usr/local/bin/certbot
+2025-06-03 15:36:57,426:DEBUG:certbot._internal.main:Arguments: ['--webroot', '--webroot-path=/var/www/certbot', '--agree-tos', '--email', 'diego.saldias.quijada@gmail.com', '-d', 'pgadmin.controldeprocesosquinta.com']
+2025-06-03 15:36:57,426:DEBUG:certbot._internal.main:Discovered plugins: PluginsRegistry(PluginEntryPoint#manual,PluginEntryPoint#null,PluginEntryPoint#standalone,PluginEntryPoint#webroot)
+2025-06-03 15:36:57,453:DEBUG:certbot._internal.log:Root logging level set at 30
+2025-06-03 15:36:57,458:DEBUG:certbot._internal.plugins.selection:Requested authenticator webroot and installer None
+2025-06-03 15:36:57,458:DEBUG:certbot._internal.plugins.selection:Single candidate plugin: * webroot
 Description: Saves the necessary validation files to a .well-known/acme-challenge/ directory within the nominated webroot path. A separate HTTP server must be running and serving files from the webroot path. HTTP challenge only (wildcards not supported).
 Interfaces: Authenticator, Plugin
 Entry point: EntryPoint(name='webroot', value='certbot._internal.plugins.webroot:Authenticator', group='certbot.plugins')
-Initialized: <certbot._internal.plugins.webroot.Authenticator object at 0x7372887cd0d0>
+Initialized: <certbot._internal.plugins.webroot.Authenticator object at 0x7676083aa5a0>
 Prep: True
-2025-06-03 15:26:36,771:DEBUG:certbot._internal.plugins.selection:Selected authenticator <certbot._internal.plugins.webroot.Authenticator object at 0x7372887cd0d0> and installer None
-2025-06-03 15:26:36,771:INFO:certbot._internal.plugins.selection:Plugins selected: Authenticator webroot, Installer None
-2025-06-03 15:26:36,844:DEBUG:certbot._internal.main:Picked account: <Account(RegistrationResource(body=Registration(key=None, contact=(), agreement=None, status=None, terms_of_service_agreed=None, only_return_existing=None, external_account_binding=None), uri='https://acme-v02.api.letsencrypt.org/acme/acct/2433112377', new_authzr_uri=None, terms_of_service=None), b0b2ef532c4eb54439aad29ae6a1952e, Meta(creation_dt=datetime.datetime(2025, 5, 30, 23, 57, 18, tzinfo=datetime.timezone.utc), creation_host='eb839d63f696', register_to_eff=None))>
-2025-06-03 15:26:36,845:DEBUG:acme.client:Sending GET request to https://acme-v02.api.letsencrypt.org/directory.
-2025-06-03 15:26:36,849:DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): acme-v02.api.letsencrypt.org:443
-2025-06-03 15:26:36,989:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "GET /directory HTTP/1.1" 502 190
-2025-06-03 15:26:36,990:DEBUG:acme.client:Received response:
+2025-06-03 15:36:57,458:DEBUG:certbot._internal.plugins.selection:Selected authenticator <certbot._internal.plugins.webroot.Authenticator object at 0x7676083aa5a0> and installer None
+2025-06-03 15:36:57,458:INFO:certbot._internal.plugins.selection:Plugins selected: Authenticator webroot, Installer None
+2025-06-03 15:36:57,532:DEBUG:certbot._internal.main:Picked account: <Account(RegistrationResource(body=Registration(key=None, contact=(), agreement=None, status=None, terms_of_service_agreed=None, only_return_existing=None, external_account_binding=None), uri='https://acme-v02.api.letsencrypt.org/acme/acct/2433112377', new_authzr_uri=None, terms_of_service=None), b0b2ef532c4eb54439aad29ae6a1952e, Meta(creation_dt=datetime.datetime(2025, 5, 30, 23, 57, 18, tzinfo=datetime.timezone.utc), creation_host='eb839d63f696', register_to_eff=None))>
+2025-06-03 15:36:57,533:DEBUG:acme.client:Sending GET request to https://acme-v02.api.letsencrypt.org/directory.
+2025-06-03 15:36:57,539:DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): acme-v02.api.letsencrypt.org:443
+2025-06-03 15:36:57,675:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "GET /directory HTTP/1.1" 502 190
+2025-06-03 15:36:57,676:DEBUG:acme.client:Received response:
 HTTP 502
 Server: nginx
-Date: Tue, 03 Jun 2025 15:26:36 GMT
+Date: Tue, 03 Jun 2025 15:36:57 GMT
 Content-Type: application/problem+json
 Content-Length: 190
 Connection: keep-alive
-ETag: "6836146d-be"
+ETag: "6835e706-be"
 
 {
   "type": "urn:ietf:params:acme:error:serverInternal",
   "detail": "The service is down for maintenance or had an internal error. Check https://letsencrypt.status.io/ for more details."
 }
 
-2025-06-03 15:26:36,992:DEBUG:certbot._internal.log:Exiting abnormally:
+2025-06-03 15:36:57,679:DEBUG:certbot._internal.log:Exiting abnormally:
 Traceback (most recent call last):
   File "/usr/local/bin/certbot", line 33, in <module>
     sys.exit(load_entry_point('certbot', 'console_scripts', 'certbot')())
@@ -62,5 +62,5 @@ Traceback (most recent call last):
   File "/opt/certbot/src/acme/acme/client.py", line 605, in _check_response
     raise messages.Error.from_json(jobj)
 acme.messages.Error: urn:ietf:params:acme:error:serverInternal :: The server experienced an internal error :: The service is down for maintenance or had an internal error. Check https://letsencrypt.status.io/ for more details.
-2025-06-03 15:26:37,000:ERROR:certbot._internal.log:An unexpected error occurred:
-2025-06-03 15:26:37,001:ERROR:certbot._internal.log:The service is down for maintenance or had an internal error. Check https://letsencrypt.status.io/ for more details.
+2025-06-03 15:36:57,687:ERROR:certbot._internal.log:An unexpected error occurred:
+2025-06-03 15:36:57,688:ERROR:certbot._internal.log:The service is down for maintenance or had an internal error. Check https://letsencrypt.status.io/ for more details.
