@@ -1,25 +1,25 @@
-2025-06-03 15:54:52,333:DEBUG:certbot._internal.main:certbot version: 4.0.0
-2025-06-03 15:54:52,335:DEBUG:certbot._internal.main:Location of certbot entry point: /usr/local/bin/certbot
-2025-06-03 15:54:52,335:DEBUG:certbot._internal.main:Arguments: ['--webroot', '--webroot-path=/var/www/certbot', '--agree-tos', '--email', 'diego.saldias.quijada@gmail.com', '-d', 'pgadmin.controldeprocesosquinta.com']
-2025-06-03 15:54:52,335:DEBUG:certbot._internal.main:Discovered plugins: PluginsRegistry(PluginEntryPoint#manual,PluginEntryPoint#null,PluginEntryPoint#standalone,PluginEntryPoint#webroot)
-2025-06-03 15:54:52,374:DEBUG:certbot._internal.log:Root logging level set at 30
-2025-06-03 15:54:52,380:DEBUG:certbot._internal.plugins.selection:Requested authenticator webroot and installer None
-2025-06-03 15:54:52,380:DEBUG:certbot._internal.plugins.selection:Single candidate plugin: * webroot
+2025-06-03 16:24:00,157:DEBUG:certbot._internal.main:certbot version: 4.0.0
+2025-06-03 16:24:00,159:DEBUG:certbot._internal.main:Location of certbot entry point: /usr/local/bin/certbot
+2025-06-03 16:24:00,160:DEBUG:certbot._internal.main:Arguments: ['--webroot', '--webroot-path=/var/www/certbot', '--agree-tos', '--email', 'diego.saldias.quijada@gmail.com', '-d', 'pgadmin.controldeprocesosquinta.com']
+2025-06-03 16:24:00,160:DEBUG:certbot._internal.main:Discovered plugins: PluginsRegistry(PluginEntryPoint#manual,PluginEntryPoint#null,PluginEntryPoint#standalone,PluginEntryPoint#webroot)
+2025-06-03 16:24:00,216:DEBUG:certbot._internal.log:Root logging level set at 30
+2025-06-03 16:24:00,222:DEBUG:certbot._internal.plugins.selection:Requested authenticator webroot and installer None
+2025-06-03 16:24:00,223:DEBUG:certbot._internal.plugins.selection:Single candidate plugin: * webroot
 Description: Saves the necessary validation files to a .well-known/acme-challenge/ directory within the nominated webroot path. A separate HTTP server must be running and serving files from the webroot path. HTTP challenge only (wildcards not supported).
 Interfaces: Authenticator, Plugin
 Entry point: EntryPoint(name='webroot', value='certbot._internal.plugins.webroot:Authenticator', group='certbot.plugins')
-Initialized: <certbot._internal.plugins.webroot.Authenticator object at 0x7ddfcf3a3350>
+Initialized: <certbot._internal.plugins.webroot.Authenticator object at 0x777189634650>
 Prep: True
-2025-06-03 15:54:52,381:DEBUG:certbot._internal.plugins.selection:Selected authenticator <certbot._internal.plugins.webroot.Authenticator object at 0x7ddfcf3a3350> and installer None
-2025-06-03 15:54:52,381:INFO:certbot._internal.plugins.selection:Plugins selected: Authenticator webroot, Installer None
-2025-06-03 15:54:52,509:DEBUG:certbot._internal.main:Picked account: <Account(RegistrationResource(body=Registration(key=None, contact=(), agreement=None, status=None, terms_of_service_agreed=None, only_return_existing=None, external_account_binding=None), uri='https://acme-v02.api.letsencrypt.org/acme/acct/2433112377', new_authzr_uri=None, terms_of_service=None), b0b2ef532c4eb54439aad29ae6a1952e, Meta(creation_dt=datetime.datetime(2025, 5, 30, 23, 57, 18, tzinfo=datetime.timezone.utc), creation_host='eb839d63f696', register_to_eff=None))>
-2025-06-03 15:54:52,510:DEBUG:acme.client:Sending GET request to https://acme-v02.api.letsencrypt.org/directory.
-2025-06-03 15:54:52,515:DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): acme-v02.api.letsencrypt.org:443
-2025-06-03 15:54:52,712:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "GET /directory HTTP/1.1" 200 1012
-2025-06-03 15:54:52,712:DEBUG:acme.client:Received response:
+2025-06-03 16:24:00,224:DEBUG:certbot._internal.plugins.selection:Selected authenticator <certbot._internal.plugins.webroot.Authenticator object at 0x777189634650> and installer None
+2025-06-03 16:24:00,224:INFO:certbot._internal.plugins.selection:Plugins selected: Authenticator webroot, Installer None
+2025-06-03 16:24:00,370:DEBUG:certbot._internal.main:Picked account: <Account(RegistrationResource(body=Registration(key=None, contact=(), agreement=None, status=None, terms_of_service_agreed=None, only_return_existing=None, external_account_binding=None), uri='https://acme-v02.api.letsencrypt.org/acme/acct/2433112377', new_authzr_uri=None, terms_of_service=None), b0b2ef532c4eb54439aad29ae6a1952e, Meta(creation_dt=datetime.datetime(2025, 5, 30, 23, 57, 18, tzinfo=datetime.timezone.utc), creation_host='eb839d63f696', register_to_eff=None))>
+2025-06-03 16:24:00,383:DEBUG:acme.client:Sending GET request to https://acme-v02.api.letsencrypt.org/directory.
+2025-06-03 16:24:00,404:DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): acme-v02.api.letsencrypt.org:443
+2025-06-03 16:24:00,618:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "GET /directory HTTP/1.1" 200 1012
+2025-06-03 16:24:00,619:DEBUG:acme.client:Received response:
 HTTP 200
 Server: nginx
-Date: Tue, 03 Jun 2025 15:54:52 GMT
+Date: Tue, 03 Jun 2025 16:24:00 GMT
 Content-Type: application/json
 Content-Length: 1012
 Connection: keep-alive
@@ -28,7 +28,7 @@ X-Frame-Options: DENY
 Strict-Transport-Security: max-age=604800
 
 {
-  "0MLukLXhxJ8": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
+  "-KrTwW1oZL8": "https://community.letsencrypt.org/t/adding-random-entries-to-the-directory/33417",
   "keyChange": "https://acme-v02.api.letsencrypt.org/acme/key-change",
   "meta": {
     "caaIdentities": [
@@ -48,231 +48,51 @@ Strict-Transport-Security: max-age=604800
   "renewalInfo": "https://acme-v02.api.letsencrypt.org/draft-ietf-acme-ari-03/renewalInfo",
   "revokeCert": "https://acme-v02.api.letsencrypt.org/acme/revoke-cert"
 }
-2025-06-03 15:54:52,729:DEBUG:certbot._internal.display.obj:Notifying user: Requesting a certificate for pgadmin.controldeprocesosquinta.com
-2025-06-03 15:54:52,736:DEBUG:acme.client:Requesting fresh nonce
-2025-06-03 15:54:52,736:DEBUG:acme.client:Sending HEAD request to https://acme-v02.api.letsencrypt.org/acme/new-nonce.
-2025-06-03 15:54:52,800:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "HEAD /acme/new-nonce HTTP/1.1" 200 0
-2025-06-03 15:54:52,800:DEBUG:acme.client:Received response:
+2025-06-03 16:24:00,663:DEBUG:certbot._internal.display.obj:Notifying user: Requesting a certificate for pgadmin.controldeprocesosquinta.com
+2025-06-03 16:24:00,700:DEBUG:acme.client:Requesting fresh nonce
+2025-06-03 16:24:00,700:DEBUG:acme.client:Sending HEAD request to https://acme-v02.api.letsencrypt.org/acme/new-nonce.
+2025-06-03 16:24:00,776:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "HEAD /acme/new-nonce HTTP/1.1" 200 0
+2025-06-03 16:24:00,777:DEBUG:acme.client:Received response:
 HTTP 200
 Server: nginx
-Date: Tue, 03 Jun 2025 15:54:52 GMT
+Date: Tue, 03 Jun 2025 16:24:00 GMT
 Connection: keep-alive
 Cache-Control: public, max-age=0, no-cache
 Link: <https://acme-v02.api.letsencrypt.org/directory>;rel="index"
-Replay-Nonce: Yja0J4uhQNDfpDBkB6Rm342hLn6pZeFXSsRpBdwaFq5w3B-Hzpc
+Replay-Nonce: Yja0J4uheb6f7BcH0WzegJFeVEL4SLvKN_0JF5-jXtF1Aw1GHiw
 X-Frame-Options: DENY
 Strict-Transport-Security: max-age=604800
 
 
-2025-06-03 15:54:52,801:DEBUG:acme.client:Storing nonce: Yja0J4uhQNDfpDBkB6Rm342hLn6pZeFXSsRpBdwaFq5w3B-Hzpc
-2025-06-03 15:54:52,801:DEBUG:acme.client:JWS payload:
+2025-06-03 16:24:00,781:DEBUG:acme.client:Storing nonce: Yja0J4uheb6f7BcH0WzegJFeVEL4SLvKN_0JF5-jXtF1Aw1GHiw
+2025-06-03 16:24:00,781:DEBUG:acme.client:JWS payload:
 b'{\n  "identifiers": [\n    {\n      "type": "dns",\n      "value": "pgadmin.controldeprocesosquinta.com"\n    }\n  ]\n}'
-2025-06-03 15:54:52,806:DEBUG:acme.client:Sending POST request to https://acme-v02.api.letsencrypt.org/acme/new-order:
+2025-06-03 16:24:00,796:DEBUG:acme.client:Sending POST request to https://acme-v02.api.letsencrypt.org/acme/new-order:
 {
-  "protected": "eyJhbGciOiAiUlMyNTYiLCAia2lkIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2FjY3QvMjQzMzExMjM3NyIsICJub25jZSI6ICJZamEwSjR1aFFORGZwREJrQjZSbTM0MmhMbjZwWmVGWFNzUnBCZHdhRnE1dzNCLUh6cGMiLCAidXJsIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL25ldy1vcmRlciJ9",
-  "signature": "tm7nCBWoD_WQN-V3UZzEgPgOl-ORpWbkKKs4WTeUF_laMwo7zaKHALkeapAZsscgWGoj-gvzAOTNg37M66tQJkMRs-Rg42BGZzjQ2DUyEeZLVqI6m9gU7Z_DtfO21ahPRm5tDJqtRvQMdjZeTL4QU3-PEv1dvf1ZYHRaan1dNTs9_fpAbJoXJxfMuFbY_u1eDNWnNlQVx-uQ6Q8hpy1b4juC9g8gEU6PSRrVhDgBYrb5eVcagL74geH4JGvjvYTrdJPyBBrLoEqKrUiSSOZ3iS66TFMQpn357q-xlZzDQhXE0XrmaYsUp7maWbqpkbvV0OjbwsALpCT5_SQPq0nWnQ",
+  "protected": "eyJhbGciOiAiUlMyNTYiLCAia2lkIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2FjY3QvMjQzMzExMjM3NyIsICJub25jZSI6ICJZamEwSjR1aGViNmY3QmNIMFd6ZWdKRmVWRUw0U0x2S05fMEpGNS1qWHRGMUF3MUdIaXciLCAidXJsIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL25ldy1vcmRlciJ9",
+  "signature": "JZjbc0WbLkNkHQZdCnktOeRzpwmHOuhW-5UqS2PkMQEHKDsIMxCNGGeG7LSjlWJMO0BqwtU3a5PhXav90r_iLyPEK_95E6nLA2sA0CHRmnrX5sY3yUDZwACiSuhWhnCpZhTD6z9rb8NHj3l2dt51M8joeETan2TqxvMZ2xC2ECU8e6Uhy3RZMZ291zokq1IzHqk8KtKSgj1ylvG34S1hmZ4AH0gKm8cmYsIilIxKGi5TTyXszc5-qUDv9EZ1vZi2PIZKHbF_XUPL0D3VXqGMFJk7WiqlotxeeyNWIb0jqct_J3ZuHB1kl5YFoBh46iY_-bhnofXQ0ss9SYZWIoIHhA",
   "payload": "ewogICJpZGVudGlmaWVycyI6IFsKICAgIHsKICAgICAgInR5cGUiOiAiZG5zIiwKICAgICAgInZhbHVlIjogInBnYWRtaW4uY29udHJvbGRlcHJvY2Vzb3NxdWludGEuY29tIgogICAgfQogIF0KfQ"
 }
-2025-06-03 15:54:52,913:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "POST /acme/new-order HTTP/1.1" 201 369
-2025-06-03 15:54:52,913:DEBUG:acme.client:Received response:
-HTTP 201
+2025-06-03 16:24:00,894:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "POST /acme/new-order HTTP/1.1" 429 316
+2025-06-03 16:24:00,894:DEBUG:acme.client:Received response:
+HTTP 429
 Server: nginx
-Date: Tue, 03 Jun 2025 15:54:52 GMT
-Content-Type: application/json
-Content-Length: 369
+Date: Tue, 03 Jun 2025 16:24:00 GMT
+Content-Type: application/problem+json
+Content-Length: 316
 Connection: keep-alive
 Boulder-Requester: 2433112377
 Cache-Control: public, max-age=0, no-cache
-Link: <https://acme-v02.api.letsencrypt.org/directory>;rel="index"
-Location: https://acme-v02.api.letsencrypt.org/acme/order/2433112377/390823994827
-Replay-Nonce: 0DNJCd6cx3bl9JBEuWfR-ZcnCbYFjy322zMBLJ4EFWAALxGb1SU
-X-Frame-Options: DENY
-Strict-Transport-Security: max-age=604800
+Link: <https://acme-v02.api.letsencrypt.org/directory>;rel="index", <https://letsencrypt.org/docs/rate-limits>;rel="help"
+Replay-Nonce: Yja0J4uhaGo8joxk8vsr6Sl40GczZo9dsjCJ3q36s4ekmpeyHOM
+Retry-After: 416
 
 {
-  "status": "pending",
-  "expires": "2025-06-10T15:54:52Z",
-  "identifiers": [
-    {
-      "type": "dns",
-      "value": "pgadmin.controldeprocesosquinta.com"
-    }
-  ],
-  "authorizations": [
-    "https://acme-v02.api.letsencrypt.org/acme/authz/2433112377/530299745457"
-  ],
-  "finalize": "https://acme-v02.api.letsencrypt.org/acme/finalize/2433112377/390823994827"
+  "type": "urn:ietf:params:acme:error:rateLimited",
+  "detail": "too many failed authorizations (5) for \"pgadmin.controldeprocesosquinta.com\" in the last 1h0m0s, retry after 2025-06-03 16:30:56 UTC: see https://letsencrypt.org/docs/rate-limits/#authorization-failures-per-hostname-per-account",
+  "status": 429
 }
-2025-06-03 15:54:52,914:DEBUG:acme.client:Storing nonce: 0DNJCd6cx3bl9JBEuWfR-ZcnCbYFjy322zMBLJ4EFWAALxGb1SU
-2025-06-03 15:54:52,914:DEBUG:acme.client:JWS payload:
-b''
-2025-06-03 15:54:52,919:DEBUG:acme.client:Sending POST request to https://acme-v02.api.letsencrypt.org/acme/authz/2433112377/530299745457:
-{
-  "protected": "eyJhbGciOiAiUlMyNTYiLCAia2lkIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2FjY3QvMjQzMzExMjM3NyIsICJub25jZSI6ICIwRE5KQ2Q2Y3gzYmw5SkJFdVdmUi1aY25DYllGankzMjJ6TUJMSjRFRldBQUx4R2IxU1UiLCAidXJsIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2F1dGh6LzI0MzMxMTIzNzcvNTMwMjk5NzQ1NDU3In0",
-  "signature": "02T2YvaMBeZoKahy0KqXespQpP-DERxd72AiQIYJHhILmY0Qu3-7a5PhdHi3lI7XGcju0D5V0s-1kKCMpOOVgvwL4MYivxJlOMpNXrFfTzOywvZQEqqDO0vF73ViljmudS1iEP59c1zmE1i9xILBM9PEqQjAziQUn712JFKS-oMZFWi-NwVANgTZ_cZp7sQ0-INz8c3np0sMcGmwmceN75sUJOcJYYGh7416Bj1478C8Ke555WogDQyVKVqlh-CdLqWUCk8lBlJ_2JDW_CChc4RXA0HLEqqI40ejPreD7FK4cYaWHamnmHTnGUzvK8yGhxC8xk123z2NCCwT3216sg",
-  "payload": ""
-}
-2025-06-03 15:54:52,988:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "POST /acme/authz/2433112377/530299745457 HTTP/1.1" 200 843
-2025-06-03 15:54:52,989:DEBUG:acme.client:Received response:
-HTTP 200
-Server: nginx
-Date: Tue, 03 Jun 2025 15:54:52 GMT
-Content-Type: application/json
-Content-Length: 843
-Connection: keep-alive
-Boulder-Requester: 2433112377
-Cache-Control: public, max-age=0, no-cache
-Link: <https://acme-v02.api.letsencrypt.org/directory>;rel="index"
-Replay-Nonce: Yja0J4uhlJ1PQO0vJ_dyElz4rDYkqRQWyJRv7OzGdVuIzSGLguU
-X-Frame-Options: DENY
-Strict-Transport-Security: max-age=604800
-
-{
-  "identifier": {
-    "type": "dns",
-    "value": "pgadmin.controldeprocesosquinta.com"
-  },
-  "status": "pending",
-  "expires": "2025-06-10T15:54:52Z",
-  "challenges": [
-    {
-      "type": "http-01",
-      "url": "https://acme-v02.api.letsencrypt.org/acme/chall/2433112377/530299745457/Fpydkw",
-      "status": "pending",
-      "token": "PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M"
-    },
-    {
-      "type": "dns-01",
-      "url": "https://acme-v02.api.letsencrypt.org/acme/chall/2433112377/530299745457/vxlkoQ",
-      "status": "pending",
-      "token": "PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M"
-    },
-    {
-      "type": "tls-alpn-01",
-      "url": "https://acme-v02.api.letsencrypt.org/acme/chall/2433112377/530299745457/8xhXFQ",
-      "status": "pending",
-      "token": "PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M"
-    }
-  ]
-}
-2025-06-03 15:54:52,989:DEBUG:acme.client:Storing nonce: Yja0J4uhlJ1PQO0vJ_dyElz4rDYkqRQWyJRv7OzGdVuIzSGLguU
-2025-06-03 15:54:52,989:INFO:certbot._internal.auth_handler:Performing the following challenges:
-2025-06-03 15:54:52,990:INFO:certbot._internal.auth_handler:http-01 challenge for pgadmin.controldeprocesosquinta.com
-2025-06-03 15:54:52,990:INFO:certbot._internal.plugins.webroot:Using the webroot path /var/www/certbot for all unmatched domains.
-2025-06-03 15:54:52,990:DEBUG:certbot._internal.plugins.webroot:Creating root challenges validation dir at /var/www/certbot/.well-known/acme-challenge
-2025-06-03 15:54:52,993:DEBUG:certbot._internal.plugins.webroot:Attempting to save validation to /var/www/certbot/.well-known/acme-challenge/PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M
-2025-06-03 15:54:52,995:DEBUG:acme.client:JWS payload:
-b'{}'
-2025-06-03 15:54:52,996:DEBUG:acme.client:Sending POST request to https://acme-v02.api.letsencrypt.org/acme/chall/2433112377/530299745457/Fpydkw:
-{
-  "protected": "eyJhbGciOiAiUlMyNTYiLCAia2lkIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2FjY3QvMjQzMzExMjM3NyIsICJub25jZSI6ICJZamEwSjR1aGxKMVBRTzB2Sl9keUVsejRyRFlrcVJRV3lKUnY3T3pHZFZ1SXpTR0xndVUiLCAidXJsIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2NoYWxsLzI0MzMxMTIzNzcvNTMwMjk5NzQ1NDU3L0ZweWRrdyJ9",
-  "signature": "NA3YnB_Or7ybwA-AY3MGA86mJYX9AiH3NnGFP8GguSS9cQ7PzeqLV9I1kCVfN3LAnQyCMx5EpOPcE8RYPPwQpk7ESvYdzj5a9-NZI6Kno8tyMleU3Ko9bR2jKcWtT-CkU6hkxOwskgD60WdP1XtRc0WWdiB_W8s5AvAuTls5m-AvX_unvH7_3Y9J6IUSXewWzvngO4V0oVZHbYOKnCn9aWmfzt8_CFEo2Y9zyHEUkwuJkw_1mouD2sZeAWucVXgaA29514NMJ6PpBKSSvHjL5x0G82Hja2ixDslbTutQGkzzEVY7W0TFcFBALq0u-IlcjGRlVqnunfGBRo9qfcF69Q",
-  "payload": "e30"
-}
-2025-06-03 15:54:53,065:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "POST /acme/chall/2433112377/530299745457/Fpydkw HTTP/1.1" 200 195
-2025-06-03 15:54:53,066:DEBUG:acme.client:Received response:
-HTTP 200
-Server: nginx
-Date: Tue, 03 Jun 2025 15:54:53 GMT
-Content-Type: application/json
-Content-Length: 195
-Connection: keep-alive
-Boulder-Requester: 2433112377
-Cache-Control: public, max-age=0, no-cache
-Link: <https://acme-v02.api.letsencrypt.org/directory>;rel="index", <https://acme-v02.api.letsencrypt.org/acme/authz/2433112377/530299745457>;rel="up"
-Location: https://acme-v02.api.letsencrypt.org/acme/chall/2433112377/530299745457/Fpydkw
-Replay-Nonce: Yja0J4uhzZIbrn95gWx_4ZRLrSUEQiz3g-xsZJmJq9L_5pxxLYw
-X-Frame-Options: DENY
-Strict-Transport-Security: max-age=604800
-
-{
-  "type": "http-01",
-  "url": "https://acme-v02.api.letsencrypt.org/acme/chall/2433112377/530299745457/Fpydkw",
-  "status": "pending",
-  "token": "PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M"
-}
-2025-06-03 15:54:53,066:DEBUG:acme.client:Storing nonce: Yja0J4uhzZIbrn95gWx_4ZRLrSUEQiz3g-xsZJmJq9L_5pxxLYw
-2025-06-03 15:54:53,066:INFO:certbot._internal.auth_handler:Waiting for verification...
-2025-06-03 15:54:54,068:DEBUG:acme.client:JWS payload:
-b''
-2025-06-03 15:54:54,071:DEBUG:acme.client:Sending POST request to https://acme-v02.api.letsencrypt.org/acme/authz/2433112377/530299745457:
-{
-  "protected": "eyJhbGciOiAiUlMyNTYiLCAia2lkIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2FjY3QvMjQzMzExMjM3NyIsICJub25jZSI6ICJZamEwSjR1aHpaSWJybjk1Z1d4XzRaUkxyU1VFUWl6M2cteHNaSm1KcTlMXzVweHhMWXciLCAidXJsIjogImh0dHBzOi8vYWNtZS12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2F1dGh6LzI0MzMxMTIzNzcvNTMwMjk5NzQ1NDU3In0",
-  "signature": "WSFDssKP1dteE7G8M9DfDhrFmWkshM3NwZBDWYZULTzPRzH066jBBI7IdkBMT8jBf_iejYbH4k-J2FSlEaSZX9cBQ1nlql0P7AbSwyPfyx-Tv9vr6UVVlXEzYibwv91UMTXE3tEMlUJM8dnGiUs4L_D_uU-UmZrKD7KkdHjO8N_AEl_hgKkqbAC21ZNOuFWIDDn_plMbaVGpcoKE__FY0Ir8PTBSG4jtCwwIggFq8CxhsgNnMOL7MelpmZteLg0utMs80rX9KdNuTRhP_nx1WVUQXGAX-KUoiEL72oKyh1I4h3o6UkWyI-oYTQK_4DltmZ2KMmT-5p5GpjbPUTYKbg",
-  "payload": ""
-}
-2025-06-03 15:54:54,143:DEBUG:urllib3.connectionpool:https://acme-v02.api.letsencrypt.org:443 "POST /acme/authz/2433112377/530299745457 HTTP/1.1" 200 1119
-2025-06-03 15:54:54,144:DEBUG:acme.client:Received response:
-HTTP 200
-Server: nginx
-Date: Tue, 03 Jun 2025 15:54:54 GMT
-Content-Type: application/json
-Content-Length: 1119
-Connection: keep-alive
-Boulder-Requester: 2433112377
-Cache-Control: public, max-age=0, no-cache
-Link: <https://acme-v02.api.letsencrypt.org/directory>;rel="index"
-Replay-Nonce: 0DNJCd6cAO6W_lhWM35gBMpm6oaAdR499GvV6rzI7p5YVBEcIrk
-X-Frame-Options: DENY
-Strict-Transport-Security: max-age=604800
-
-{
-  "identifier": {
-    "type": "dns",
-    "value": "pgadmin.controldeprocesosquinta.com"
-  },
-  "status": "invalid",
-  "expires": "2025-06-10T15:54:52Z",
-  "challenges": [
-    {
-      "type": "http-01",
-      "url": "https://acme-v02.api.letsencrypt.org/acme/chall/2433112377/530299745457/Fpydkw",
-      "status": "invalid",
-      "validated": "2025-06-03T15:54:53Z",
-      "error": {
-        "type": "urn:ietf:params:acme:error:unauthorized",
-        "detail": "35.174.221.108: Invalid response from http://pgadmin.controldeprocesosquinta.com/.well-known/acme-challenge/PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M: 404",
-        "status": 403
-      },
-      "token": "PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M",
-      "validationRecord": [
-        {
-          "url": "http://pgadmin.controldeprocesosquinta.com/.well-known/acme-challenge/PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M",
-          "hostname": "pgadmin.controldeprocesosquinta.com",
-          "port": "80",
-          "addressesResolved": [
-            "35.174.221.108"
-          ],
-          "addressUsed": "35.174.221.108"
-        }
-      ]
-    }
-  ]
-}
-2025-06-03 15:54:54,144:DEBUG:acme.client:Storing nonce: 0DNJCd6cAO6W_lhWM35gBMpm6oaAdR499GvV6rzI7p5YVBEcIrk
-2025-06-03 15:54:54,145:INFO:certbot._internal.auth_handler:Challenge failed for domain pgadmin.controldeprocesosquinta.com
-2025-06-03 15:54:54,145:INFO:certbot._internal.auth_handler:http-01 challenge for pgadmin.controldeprocesosquinta.com
-2025-06-03 15:54:54,146:DEBUG:certbot._internal.display.obj:Notifying user: 
-Certbot failed to authenticate some domains (authenticator: webroot). The Certificate Authority reported these problems:
-  Domain: pgadmin.controldeprocesosquinta.com
-  Type:   unauthorized
-  Detail: 35.174.221.108: Invalid response from http://pgadmin.controldeprocesosquinta.com/.well-known/acme-challenge/PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M: 404
-
-Hint: The Certificate Authority failed to download the temporary challenge files created by Certbot. Ensure that the listed domains serve their content from the provided --webroot-path/-w and that files created there can be downloaded from the internet.
-
-2025-06-03 15:54:54,148:DEBUG:certbot._internal.error_handler:Encountered exception:
-Traceback (most recent call last):
-  File "/opt/certbot/src/certbot/certbot/_internal/auth_handler.py", line 108, in handle_authorizations
-    self._poll_authorizations(authzrs, max_retries, max_time_mins, best_effort)
-  File "/opt/certbot/src/certbot/certbot/_internal/auth_handler.py", line 212, in _poll_authorizations
-    raise errors.AuthorizationError('Some challenges have failed.')
-certbot.errors.AuthorizationError: Some challenges have failed.
-
-2025-06-03 15:54:54,148:DEBUG:certbot._internal.error_handler:Calling registered functions
-2025-06-03 15:54:54,149:INFO:certbot._internal.auth_handler:Cleaning up challenges
-2025-06-03 15:54:54,149:DEBUG:certbot._internal.plugins.webroot:Removing /var/www/certbot/.well-known/acme-challenge/PK1Dds4wXcHhBHU6fBbFPDiLIb_fG3SAlDH6ybRZv7M
-2025-06-03 15:54:54,149:DEBUG:certbot._internal.plugins.webroot:All challenges cleaned up
-2025-06-03 15:54:54,154:DEBUG:certbot._internal.log:Exiting abnormally:
+2025-06-03 16:24:00,898:DEBUG:certbot._internal.log:Exiting abnormally:
 Traceback (most recent call last):
   File "/usr/local/bin/certbot", line 33, in <module>
     sys.exit(load_entry_point('certbot', 'console_scripts', 'certbot')())
@@ -295,12 +115,23 @@ Traceback (most recent call last):
   File "/opt/certbot/src/certbot/certbot/_internal/client.py", line 424, in obtain_certificate
     orderr = self._get_order_and_authorizations(csr.data, self.config.allow_subset_of_names)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/certbot/src/certbot/certbot/_internal/client.py", line 502, in _get_order_and_authorizations
-    authzr = self.auth_handler.handle_authorizations(orderr, self.config, best_effort)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/certbot/src/certbot/certbot/_internal/auth_handler.py", line 108, in handle_authorizations
-    self._poll_authorizations(authzrs, max_retries, max_time_mins, best_effort)
-  File "/opt/certbot/src/certbot/certbot/_internal/auth_handler.py", line 212, in _poll_authorizations
-    raise errors.AuthorizationError('Some challenges have failed.')
-certbot.errors.AuthorizationError: Some challenges have failed.
-2025-06-03 15:54:54,160:ERROR:certbot._internal.log:Some challenges have failed.
+  File "/opt/certbot/src/certbot/certbot/_internal/client.py", line 484, in _get_order_and_authorizations
+    orderr = self.acme.new_order(csr_pem, profile=profile)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/certbot/src/acme/acme/client.py", line 143, in new_order
+    response = self._post(self.directory['newOrder'], order)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/certbot/src/acme/acme/client.py", line 369, in _post
+    return self.net.post(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/certbot/src/acme/acme/client.py", line 741, in post
+    return self._post_once(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/certbot/src/acme/acme/client.py", line 754, in _post_once
+    response = self._check_response(response, content_type=content_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/certbot/src/acme/acme/client.py", line 605, in _check_response
+    raise messages.Error.from_json(jobj)
+acme.messages.Error: urn:ietf:params:acme:error:rateLimited :: There were too many requests of a given type :: too many failed authorizations (5) for "pgadmin.controldeprocesosquinta.com" in the last 1h0m0s, retry after 2025-06-03 16:30:56 UTC: see https://letsencrypt.org/docs/rate-limits/#authorization-failures-per-hostname-per-account
+2025-06-03 16:24:00,927:ERROR:certbot._internal.log:An unexpected error occurred:
+2025-06-03 16:24:00,927:ERROR:certbot._internal.log:too many failed authorizations (5) for "pgadmin.controldeprocesosquinta.com" in the last 1h0m0s, retry after 2025-06-03 16:30:56 UTC: see https://letsencrypt.org/docs/rate-limits/#authorization-failures-per-hostname-per-account
