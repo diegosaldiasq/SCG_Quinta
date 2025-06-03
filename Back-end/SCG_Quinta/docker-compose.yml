@@ -10,6 +10,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: radcliffe # Para widows y AWS
       #POSTGRES_PASSWORD: Dsal1212 # Para linux
+    restart: always
 
   pgadmin:
     image: dpage/pgadmin4:9.3
@@ -22,6 +23,7 @@ services:
       - ./pgadmin-data:/var/lib/pgadmin
     depends_on:
       - db
+    restart: always
 
   web:
     build:
@@ -31,6 +33,7 @@ services:
     volumes:
       - .:/code
       - ./media:/code/media
+    restart: always
     depends_on:
       - db
     environment:
@@ -58,6 +61,7 @@ services:
       - ./config/letsencrypt:/etc/letsencrypt:ro
       - ./config/certbot/www:/var/www/certbot:ro
     #command: /bin/bash -c "chmod -R 775 /media && nginx -g 'daemon off;'"
+    restart: always
     depends_on:
       - web
       - certbot
@@ -74,6 +78,7 @@ services:
                certbot renew --webroot -w /var/www/certbot --quiet;
                sleep 12h & wait $${!};
              done"
+    restart: always
 
 volumes:
   pgdata:
