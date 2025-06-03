@@ -105,8 +105,10 @@ def vista_pasword(request):
         usuario.new_password = nueva_contraseña
         usuario.save()
         
-        data = DatosFormularioCrearCuenta.objects.filter(password=nueva_contraseña).exists()
-        return JsonResponse({'existe': data})
+        #data = DatosFormularioCrearCuenta.objects.filter(password=nueva_contraseña).exists()
+        return JsonResponse({'existe': True})
+    else:
+        return JsonResponse({'existe': False}, status=405)  
 
 def pasword_creado(request):
     return render(request, 'login/pasword_creado.html')
