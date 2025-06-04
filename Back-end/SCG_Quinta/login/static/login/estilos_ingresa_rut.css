@@ -92,16 +92,20 @@ body {
     margin-bottom: 30px;
 }
 @media (max-width: 650px) {
-    .login {
-        width: 100%;
+    .form-container {
+        width: 300px;
     }
     .logo {
-        width: 100%;
+        width: 150px;
     }
     .title {
         font-size: var(--lg);
     }
     .subtitle {
         font-size: var(--sm);
+    }
+    .primary-button {
+        width: 80px;
+        font-size: var(--bsm);
     }
 }

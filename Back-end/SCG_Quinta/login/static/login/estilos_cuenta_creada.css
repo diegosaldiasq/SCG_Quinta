@@ -55,14 +55,20 @@ body {
     text-align: center;
 }
 @media (max-width: 650px) {
-    .login-container {
+    .form-container {
         width: 300px;
-        height: 400px;
-    }
-    .login {
-        width: 100%;
     }
     .logo {
-        width: 100%;
+        width: 150px;
+    }
+    .title {
+        font-size: var(--lg);
+    }
+    .subtitle {
+        font-size: var(--sm);
+    }
+    .primary-button {
+        width: 80px;
+        font-size: var(--bsm);
     }
 }

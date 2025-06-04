@@ -9,6 +9,7 @@
     --azul-quinta: #2c5fb4;
     --white: #FFFFFF;
     --black: #000000;
+    --bsm: 12px;
     --sm: 14px;
     --md: 16px;
     --lg: 18px;
@@ -106,6 +107,6 @@ body {
     }
     .primary-button {
         width: 80px;
-        font-size: var(--sm);
+        font-size: var(--bsm);
     }
 }
