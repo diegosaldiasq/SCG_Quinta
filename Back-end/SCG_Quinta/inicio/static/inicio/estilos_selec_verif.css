@@ -98,4 +98,7 @@ body {
     .subtitle {
         font-size: var(--sm);
     }
+    .registro {
+        font-size: var(--sm);
+    }
 }
