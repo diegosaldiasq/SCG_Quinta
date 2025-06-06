@@ -119,12 +119,18 @@ body {
 }
 @media (max-width: 650px) {
     .login-container {
-        width: 100%;
+        width: 300px;
     }
     .registro {
-        font-size: 8px;   
+        font-size: 12px;   
     }
     .title {
         font-size: var(--md);
+    }
+    .filtro-fechas {
+        width: 300px; /* Ajustar el ancho del filtro para pantallas pequeñas */
+    }
+    .filtro-fechas .input {
+        font-size: var(--sm);
     }
 }
