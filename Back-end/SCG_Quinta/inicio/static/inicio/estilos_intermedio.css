@@ -83,12 +83,15 @@ body {
 }
 @media (max-width: 650px) {
     .login-container {
-        width: 100%;
+        width: 300px;
     }
     .registro {
-        font-size: 8px;   
+        font-size: var(--sm);   
     }
     .title {
+        font-size: var(--md);
+    }
+    .subtitle {
         font-size: var(--md);
     }
 }
