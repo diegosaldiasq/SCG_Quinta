@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         try {
             event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
             var cliente = $("#cliente").val();
+            var codigoProducto = $("#codigo").val();
             var producto = $("#producto").val();
             var pesoReceta = $("#peso").val();
             var pesoReal = $("#peso-real").val();
@@ -37,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
             var datos = {
                 cliente: cliente,
                 producto: producto,
+                codigo_producto: codigoProducto,
                 peso_receta: pesoReceta,
                 peso_real: pesoReal,
                 lote: lote,

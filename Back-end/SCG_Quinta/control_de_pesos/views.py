@@ -25,6 +25,7 @@ def vista_control_de_pesos(request):
             nombre_tecnologo = request.user.nombre_completo
             fecha_registro = timezone.now()
             cliente = dato.get('cliente')
+            codigo_producto = dato.get('codigo_producto')
             producto = dato.get('producto')
             peso_receta = dato.get('peso_receta')
             peso_real = dato.get('peso_real')
@@ -35,6 +36,7 @@ def vista_control_de_pesos(request):
                 nombre_tecnologo=nombre_tecnologo,
                 fecha_registro=fecha_registro,
                 cliente=cliente,
+                codigo_producto=codigo_producto,
                 producto=producto,
                 peso_receta=peso_receta,
                 peso_real=peso_real,
