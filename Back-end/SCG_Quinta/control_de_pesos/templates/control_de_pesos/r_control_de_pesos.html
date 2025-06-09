@@ -136,6 +136,7 @@
                 const selectCliente  = document.getElementById('cliente');
                 const selectProducto = document.getElementById('producto');
                 const inputPeso      = document.getElementById('peso');
+                const inputCodigo    = document.getElementById('codigo');
 
                 // Cuando cambia el cliente, recargamos productos y deshabilitamos peso
                 selectCliente.addEventListener('change', () => {
@@ -159,17 +160,16 @@
                 });
                 });
 
-                // Cuando cambia el producto, mostramos el peso
                 selectProducto.addEventListener('change', () => {
-                const optSeleccionada = selectProducto.selectedOptions[0];
-                const peso = optSeleccionada
-                    ? optSeleccionada.getAttribute('data-peso') || ''
-                    : '';
-                inputPeso.value = peso;
-                });
-                const codigoInput = document.getElementById('codigo');
-                const codigo      = optSeleccionada ? optSeleccionada.getAttribute('data-codigo') : '';
-                codigoInput.value = codigo;
+                const opt = selectProducto.selectedOptions[0];
+                if (opt) {
+                inputPeso.value   = opt.getAttribute('data-peso')   || '';
+                inputCodigo.value = opt.getAttribute('data-codigo') || '';
+                } else {
+                inputPeso.value   = '';
+                inputCodigo.value = '';
+                }
+            });
             </script>
 
             <!-- Campo que mostrará el peso real -->
