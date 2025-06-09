@@ -6,7 +6,7 @@ class DatosFormularioControlDePesos(models.Model):
     nombre_tecnologo = models.CharField(max_length=100)
     fecha_registro = models.DateTimeField()
     cliente = models.TextField()
-    codigo_producto = models.CharField(max_length=20)
+    codigo_producto = models.CharField(max_length=20, null=True, blank=True)
     producto = models.TextField()
     peso_receta = models.IntegerField()
     peso_real = models.IntegerField()
