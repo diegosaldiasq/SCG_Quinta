@@ -53,7 +53,7 @@ services:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./staticfiles:/static
       - ./media:/media
-      - ./html:/var/www/html   # <— aquí montas el webroot
+      #- ./html:/var/www/html   # <— aquí montas el webroot
       # Montajes para Certbot:
       - scg_quinta_certbot-etc:/etc/letsencrypt
       - scg_quinta_certbot-var:/var/lib/letsencrypt
