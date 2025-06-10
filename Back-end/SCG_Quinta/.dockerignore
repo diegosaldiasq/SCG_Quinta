@@ -20,4 +20,4 @@ html
 config/letsencrypt
 var/lib/letsencrypt
 var/log/letsencrypt
-config/nginx/conf.d/pgadmin.conf
+pgadmin.conf
