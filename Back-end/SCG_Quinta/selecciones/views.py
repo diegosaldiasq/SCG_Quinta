@@ -101,3 +101,8 @@ def vista_selecciones_2(request):
 def redireccionar_control_de_pesos(request):
     url_control_de_pesos = reverse('control_de_pesos')
     return HttpResponseRedirect(url_control_de_pesos)
+
+@login_required
+def redireccionar_control_parametros_gorreri(request):
+    url_control_parametros_gorreri = reverse('control_parametros_gorreri')
+    return HttpResponseRedirect(url_control_parametros_gorreri)
