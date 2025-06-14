@@ -6,7 +6,7 @@ class DatosFormularioControlParametrosGorreri(models.Model):
     nombre_tecnologo = models.CharField(max_length=100)
     fecha_registro = models.DateTimeField()
     cliente = models.CharField()
-    codigo_producto = models.IntegerField()
+    codigo_producto = models.CharField()
     producto = models.CharField()
     numero_tm = models.IntegerField()
     velocidad_bomba = models.IntegerField()
