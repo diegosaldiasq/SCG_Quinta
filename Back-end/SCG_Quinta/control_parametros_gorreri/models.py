@@ -11,7 +11,7 @@ class DatosFormularioControlParametrosGorreri(models.Model):
     numero_tm = models.IntegerField()
     velocidad_bomba = models.IntegerField()
     velocidad_turbo = models.IntegerField()
-    contrapresion = models.IntegerField
+    contrapresion = models.FloatField
     inyeccion_de_aire = models.IntegerField()
     densidad = models.FloatField()
     t_final = models.FloatField()
