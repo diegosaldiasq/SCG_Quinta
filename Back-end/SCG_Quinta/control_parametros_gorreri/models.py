@@ -5,13 +5,13 @@ from django.db import models
 class DatosFormularioControlParametrosGorreri(models.Model):
     nombre_tecnologo = models.CharField(max_length=100)
     fecha_registro = models.DateTimeField()
-    cliente = models.CharField()
-    codigo_producto = models.CharField()
-    producto = models.CharField()
+    cliente = models.CharField(max_length=100)
+    codigo_producto = models.CharField(max_length=50)
+    producto = models.CharField(max_length=100)
     numero_tm = models.IntegerField()
     velocidad_bomba = models.IntegerField()
     velocidad_turbo = models.IntegerField()
-    contrapresion = models.FloatField
+    contrapresion = models.FloatField()
     inyeccion_de_aire = models.IntegerField()
     densidad = models.FloatField()
     t_final = models.FloatField()
