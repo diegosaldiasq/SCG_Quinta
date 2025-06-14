@@ -38,7 +38,8 @@ urlpatterns = [
     path("reclamo_a_proveedores/", include("reclamo_a_proveedores.urls")),
     path("selecciones/", include("selecciones.urls")),
     path("login/", include("login.urls")),
-    path("control_de_pesos/", include("control_de_pesos.urls"))
+    path("control_de_pesos/", include("control_de_pesos.urls")),
+    path("control_parametros_gorreri/", include("control_parametros_gorreri.urls"))
 ]
 
 if settings.DEBUG:
