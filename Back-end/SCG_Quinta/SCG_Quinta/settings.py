@@ -48,7 +48,8 @@ LOCAL_APPS = [
     "reclamo_a_proveedores.apps.ReclamoAProveedoresConfig",
     "selecciones.apps.SeleccionesConfig",
     "login.apps.LoginConfig",
-    "control_de_pesos.apps.ControlDePesosConfig"
+    "control_de_pesos.apps.ControlDePesosConfig",
+    "control_parametros_gorreri.apps.ControlParametrosGorreriConfig"
 ]
 
 DJANGO_APPS = [

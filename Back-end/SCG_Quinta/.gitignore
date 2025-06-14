@@ -11,7 +11,6 @@ media
 __pycache__/*.pyc
 app/
 pgadmin-data/
-staticfiles/
 /*.pyc
 fotos_reclamos/
 backup.sql

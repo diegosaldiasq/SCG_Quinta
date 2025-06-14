@@ -10,15 +10,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'control_de_pesos/estilos_r_control_de_pesos.css' %}">
-    <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
-    <title>Registro control Pesos Tortas R-POE-Q-04-XX</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'control_parametros_gorreri/estilos_r_control_parametros_gorreri.css' %}">
+    <link rel="icon" href="{% static 'control_parametros_gorreri/images/logoquinta2.png' %}" />
+    <title>Registro control Parametros Gorreri R-POE-Q-04-XX</title>
 </head>
 <body>
     <div class="login">
-        <img src="{% static 'control_de_pesos/images/logoquinta.png' %}" alt="logo" class="logo">
+        <img src="{% static 'control_parametros_gorreri/images/logoquinta.png' %}" alt="logo" class="logo">
         <div class="login-container">
-            <h1 class="title">Registro control de pesos Tortas R-POE-Q-04-XX</h1>
+            <h1 class="title">Registro control Parametos Gorreri R-POE-Q-04-XX</h1>
         </div>
         <div class="login-container">
             <!-- Selección de Cliente -->
@@ -41,19 +41,15 @@
             <label for="codigo">Código producto</label>
             <input type="text" id="codigo" class="input" readonly placeholder="–">
 
-            <!-- Campo que mostrará el peso receta -->
-            <label for="peso">Peso receta (gr)</label>
-            <input type="text" id="peso" class="input" readonly placeholder="–">
-
             <script>
                 // Definimos clientes → productos → peso
                 const productosPorCliente = {
                 Jumbo: [
-                    { codigo: '393241', value: 'Torta Beatiz', text: 'Torta Beatriz', peso: '1891' },
-                    { codigo: '393240', value: 'Torta Bom Bom', text: 'Torta Bom Bom', peso: '1356' },
-                    { codigo: '393149', value: 'Torta tres leches', text: 'Torta tres leches', peso: '1644' },
-                    { codigo: '393191', value: 'Torta cuatro leches', text: 'Torta cuatro leches', peso: '1720' },
-                    { codigo: '393129', value: 'Torta piña', text: 'Torta piña', peso: '1582' },
+                    { codigo: '393241', value: 'Torta Beatiz', text: 'Torta Beatriz' },
+                    { codigo: '393240', value: 'Torta Bom Bom', text: 'Torta Bom Bom' },
+                    { codigo: '393149', value: 'Torta tres leches', text: 'Torta tres leches' },
+                    { codigo: '393191', value: 'Torta cuatro leches', text: 'Torta cuatro leches' },
+                    { codigo: '393129', value: 'Torta piña', text: 'Torta piña' },
                     { codigo: '393141', value: 'Torta lucuma', text: 'Torta lucuma', peso: '1388' },
                     { codigo: '393171', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1815' },
                     { codigo: '393145', value: 'Torta selva negra', text: 'Torta selva negra', peso: '1563' },
@@ -135,7 +131,6 @@
                 // Obtenemos los elementos del DOM
                 const selectCliente  = document.getElementById('cliente');
                 const selectProducto = document.getElementById('producto');
-                const inputPeso      = document.getElementById('peso');
                 const inputCodigo    = document.getElementById('codigo');
 
                 // Cuando cambia el cliente, recargamos productos y deshabilitamos peso
@@ -146,7 +141,6 @@
                 // Reiniciamos select producto
                 selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
                 selectProducto.disabled  = lista.length === 0;
-                inputPeso.value          = '';
                 inputCodigo.value = '';
 
                 // Creamos opciones
@@ -155,7 +149,6 @@
                     opt.value       = prod.value;
                     opt.textContent = prod.text;
                     // guardamos el peso en un atributo data-peso
-                    opt.setAttribute('data-peso', prod.peso);
                     opt.setAttribute('data-codigo', prod.codigo);
                     selectProducto.appendChild(opt);
                 });
@@ -164,18 +157,44 @@
                 selectProducto.addEventListener('change', () => {
                 const opt = selectProducto.selectedOptions[0];
                 if (opt) {
-                inputPeso.value   = opt.getAttribute('data-peso')   || '';
                 inputCodigo.value = opt.getAttribute('data-codigo') || '';
                 } else {
-                inputPeso.value   = '';
                 inputCodigo.value = '';
                 }
             });
             </script>
 
-            <!-- Campo que mostrará el peso real -->
-            <label for="peso-real">Peso real (gr)</label>  
-            <input type="text" id="peso-real" class="input" placeholder="-" required>
+            <!-- Campo que mostrara numero turbomixer 1-2 -->
+            <label for="turno">Numero Turbomixer</label>
+            <select id="numero-tm" class="input">
+                <option value="">-- Selecciona numero --</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+
+            <!-- Campo que mostrará la velocidad bomba -->
+            <label for="velocidad-bomba">Velocidad Bomba (RPM)</label>  
+            <input type="text" id="velocidad-bomba" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la velocidad turbo -->
+            <label for="velocidad-turbo">Velocidad Turbo (RPM)</label>  
+            <input type="text" id="velocidad-turbo" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la contrapresion -->
+            <label for="contrapresion">Contrapresion (Bar)</label>  
+            <input type="text" id="contrapresion" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la inyeccion de aire -->
+            <label for="inyeccion-de-aire">Inyeccion de aire (mm)</label>  
+            <input type="text" id="inyeccion-de-aire" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la desnidad -->
+            <label for="densidad">Densidad (g/ml)</label>
+            <input type="number" id="densidad" class="input" placeholder="-" required min="0" step="0.01" value="0">
+
+            <!-- Campo que mostrará la temperatura -->
+            <label for="t-final">Temperatura (°C)</label>
+            <input type="number" id="t-final" class="input" placeholder="-" required min="-5" max="40" step="0.1" value="0">
 
             <!-- Campo que mostrará el lote -->
             <label for"lote">Lote</label>
@@ -205,6 +224,6 @@
         // Definir el token CSRF para su uso en las solicitudes AJAX
         var csrftoken = "{{ csrf_token }}";
     </script>
-    <script src="{% static 'control_de_pesos/scrip_r_control_de_pesos.js' %}"></script>
+    <script src="{% static 'control_parametros_gorreri/scrip_r_control_parametros_gorreri.js' %}"></script>
 </body>
 </html>
