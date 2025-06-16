@@ -25,7 +25,6 @@
             <label for="cliente">Cliente</label>
             <select id="cliente" class="input">
                 <option value="">-- Selecciona cliente --</option>
-                <option value="Jumbo">Jumbo</option>
                 <option value="SISA">Santa Isabel</option>
                 <option value="Walmart">Walmart</option>
                 <option value="Unimarc">Unimarc</option>
@@ -44,87 +43,34 @@
             <script>
                 // Definimos clientes → productos → peso
                 const productosPorCliente = {
-                Jumbo: [
-                    { codigo: '393241', value: 'Torta Beatiz', text: 'Torta Beatriz' },
-                    { codigo: '393240', value: 'Torta Bom Bom', text: 'Torta Bom Bom' },
-                    { codigo: '393149', value: 'Torta tres leches', text: 'Torta tres leches' },
-                    { codigo: '393191', value: 'Torta cuatro leches', text: 'Torta cuatro leches' },
-                    { codigo: '393129', value: 'Torta piña', text: 'Torta piña' },
-                    { codigo: '393141', value: 'Torta lucuma', text: 'Torta lucuma', peso: '1388' },
-                    { codigo: '393171', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1815' },
-                    { codigo: '393145', value: 'Torta selva negra', text: 'Torta selva negra', peso: '1563' },
-                    { codigo: '393167', value: 'Torta truffa', text: 'Torta truffa', peso: '1813' },
-                    { codigo: '393153', value: 'Torta viena', text: 'Torta viena', peso: '1743' },
-                    { codigo: '393396', value: 'Torta San Jorge lucuma', text: 'Torta San Jorge lucuma', peso: '2105' },
-                    { codigo: '393397', value: 'Torta San Jorge guinda', text: 'Torta San Jorge guinda', peso: '2232' },
-                    { codigo: '393398', value: 'Torta San Jorge chocolate', text: 'Torta San Jorge chocolate', peso: '2232' },
-                    { codigo: '405220', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '1170' },
-                    { codigo: '405217', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '1470' },
-                    { codigo: '393443', value: 'Torta merengue nugat', text: 'Media merengue nugat', peso: '1200' },
-                    { codigo: '405458', value: 'Torta merengue manzana frambuesa', text: 'Torta merengue manzana frambuesa', peso: '1200' },
-                    { codigo: '405254', value: 'Torta chocolate real', text: 'Torta chocolate real', peso: '900' },
-                    { codigo: '393414', value: 'Torta caluga', text: 'Torta caluga', peso: '1150' },
-                    { codigo: '405258', value: 'Torta selva negra vegana', text: 'Torta selva negra vegana', peso: '1175' },
-                    { codigo: '405260', value: 'Torta piña vegana', text: 'Torta piña vegana', peso: '1470' },
-                    { codigo: '402261', value: 'Torta panqueque guinda chocolate', text: 'Torta panqueque guinda chocolate', peso: '1814' },
-                    { codigo: '393429', value: 'Pie de frambuesa familiar', text: 'Pie de frambuesa familiar', peso: '835' },
-                    { codigo: '393430', value: 'Pie de maracuya familiar', text: 'Pie de maracuya familiar', peso: '880' },
-                    { codigo: '393431', value: 'Pie de limon familiar', text: 'Pie de limon familiar', peso: '785' },
-                    { codigo: '405414', value: 'Media torta San Jorge lucuma', text: 'Media torta San Jorge lucuma', peso: '1000' },
-                    { codigo: '393433', value: 'Tarta soft familiar', text: 'Tarta soft familiar', peso: '500' },
-                    { codigo: '393432', value: 'Tartaleta fruta mixta familiar', text: 'Tartaleta fruta mixta familiar', peso: '1400' }
-                ],
                 SISA: [
-                    { codigo: '393266', value: 'Torta amor', text: 'Torta amor', peso: '1373' },
-                    { codigo: '392518', value: 'Torta crema manjar mediana', text: 'Torta crema manjar mediana', peso: '920' },
-                    { codigo: '393011', value: 'Torta crema piña', text: 'Torta crema piña', peso: '1220' },
-                    { codigo: '393013', value: 'Torta crema selva negra', text: 'Torta crema selva negra', peso: '1230' },
-                    { codigo: '393036', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '930' },
-                    { codigo: '393212', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '970' },
-                    { codigo: '353253', value: 'Torta mocaccino mediana', text: 'Torta mocaccino mediana', peso: '700' },
-                    { codigo: '393018', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1765' },
-                    { codigo: '393015', value: 'Torta tres leches', text: 'Torta tres leches', peso: '1340' },
-                    { codigo: '393017', value: 'Torta yogurt', text: 'Torta yogurt', peso: '1695' },
-                    { codigo: '393019', value: 'Torta viena', text: 'Torta viena', peso: '1526' },
-                    { codigo: '393362', value: 'Torta guinda chocolate', text: 'Torta guinda chocolate', peso: '1180' },
-                    { codigo: '393356', value: 'Torta sabor lucuma', text: 'Torta sabor lucuma', peso: '1190' },
-                    { codigo: '393354', value: 'Torta sacher', text: 'Torta sacher', peso: '1110' },
-                    { codigo: '405256', value: 'Torta doña Isabel', text: 'Torta doña Isabel', peso: '1425' },
-                    { codigo: '405295', value: 'Torta cookies & cream', text: 'Torta cookies & cream', peso: '735' },
-                    { codigo: '405294', value: 'Torta caramel macchiato', text: 'Torta caramel macchiato', peso: '780' },
-                    { codigo: '405292', value: 'Torta piña colada', text: 'Torta piña colada', peso: '775' },
-                    { codigo: '393270', value: 'Tartaleta fruta mixta mediana', text: 'Tartaleta fruta mixta mediana', peso: '826' },
-                    { codigo: '393000', value: 'Pie de limon familiar', text: 'Pie de limon familiar', peso: '950' },
-                    { codigo: '405396', value: 'Pie de limon mediano', text: 'Pie de limon mediano', peso: '1000' },
-                    { codigo: '405397', value: 'Pie de maracuya mediano', text: 'Pie de maracuya mediano', peso: '1000' }
+                    { codigo: '392518', value: 'Torta crema manjar mediana', text: 'Torta crema manjar mediana' },
+                    { codigo: '393011', value: 'Torta crema piña', text: 'Torta crema piña' },
+                    { codigo: '393013', value: 'Torta crema selva negra', text: 'Torta crema selva negra' },
+                    { codigo: '353253', value: 'Torta mocaccino mediana', text: 'Torta mocaccino mediana' },
+                    { codigo: '393362', value: 'Torta guinda chocolate', text: 'Torta guinda chocolate' },
+                    { codigo: '393356', value: 'Torta sabor lucuma', text: 'Torta sabor lucuma' },
+                    { codigo: '393354', value: 'Torta sacher', text: 'Torta sacher' },
+                    { codigo: '405295', value: 'Torta cookies & cream', text: 'Torta cookies & cream' },
+                    { codigo: '405294', value: 'Torta caramel macchiato', text: 'Torta caramel macchiato' },
+                    { codigo: '405292', value: 'Torta piña colada', text: 'Torta piña colada' }
                 ],
                 Walmart: [
-                    { codigo: '393058', value: 'Torta chocoguinda', text: 'Torta chocoguinda', peso: '1180' },
-                    { codigo: '393347', value: 'Torta chocolate manjar', text: 'Torta chocolate manjar', peso: '1410' },
-                    { codigo: '393275', value: 'Torta chocolate 8pp', text: 'Torta chocolate 8pp', peso: '783' },
-                    { codigo: '393402', value: 'Torta crema frambuesa', text: 'Torta crema frambuesa', peso: '1045' },
-                    { codigo: '392500', value: 'Torta crema moka 15pp', text: 'Torta crema moka 15pp', peso: '1120' },
-                    { codigo: '393033', value: 'Torta crema piña 15pp', text: 'Torta crema piña 15pp', peso: '1250' },
-                    { codigo: '392498', value: 'Torta holandesa 15pp', text: 'Torta holandesa 15pp', peso: '1180' },
-                    { codigo: '392495', value: 'Torta mousse manjar 15pp', text: 'Torta mousse manjar 15pp', peso: '1130' },
-                    { codigo: '393295', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1400' },
-                    { codigo: '393250', value: 'Torta san jorge 15pp', text: 'Torta san jorge 15pp', peso: '1380' },
-                    { codigo: '393020', value: 'Torta selva negra 15pp', text: 'Torta selva negra 15pp', peso: '1180' },
-                    { codigo: '392494', value: 'Torta tres leches 15pp', text: 'Torta tres leches 15pp', peso: '1250' },
-                    { codigo: '405262', value: 'Torta hoja manjar chocolate artesanal', text: 'Torta hoja manjar chocolate artesanal', peso: '1300' },
-                    { codigo: '405315', value: 'Torta frutos del bosque', text: 'Torta frutos del bosque', peso: '750' },
-                    { codigo: '393445', value: 'Torta chocolate avellana', text: 'Torta chocolate avellana', peso: '850' },
-                    { codigo: '405488', value: 'Torta selva negra crema lactea', text: 'Torta selva negra crema lactea', peso: '1350' },
-                    { codigo: '405487', value: 'Torta piña crema lactea', text: 'Torta piña crema lactea', peso: '1510' }
+                    { codigo: '393058', value: 'Torta chocoguinda', text: 'Torta chocoguinda' },
+                    { codigo: '393347', value: 'Torta chocolate manjar', text: 'Torta chocolate manjar' },
+                    { codigo: '393275', value: 'Torta chocolate 8pp', text: 'Torta chocolate 8pp' },
+                    { codigo: '393402', value: 'Torta crema frambuesa', text: 'Torta crema frambuesa' },
+                    { codigo: '392500', value: 'Torta crema moka 15pp', text: 'Torta crema moka 15pp' },
+                    { codigo: '393033', value: 'Torta crema piña 15pp', text: 'Torta crema piña 15pp' },
+                    { codigo: '392495', value: 'Torta mousse manjar 15pp', text: 'Torta mousse manjar 15pp' },
+                    { codigo: '393020', value: 'Torta selva negra 15pp', text: 'Torta selva negra 15pp' },
+                    { codigo: '405315', value: 'Torta frutos del bosque', text: 'Torta frutos del bosque' },
+                    { codigo: '405488', value: 'Torta selva negra crema lactea', text: 'Torta selva negra crema lactea' },
+                    { codigo: '405487', value: 'Torta piña crema lactea', text: 'Torta piña crema lactea' }
                 ],
                 Unimarc: [
-                    { codigo: '393272', value: 'Torta crema manjar mini', text: 'Torta crema manjar mini', peso: '742' },
-                    { codigo: '393273', value: 'Torta guinda mini', text: 'Torta guinda mini', peso: '725' },
-                    { codigo: '392332', value: 'Torta hoja manjar 15p', text: 'Torta hoja manjar 15p', peso: '1200' },
-                    { codigo: '393391', value: 'Torta holandesa smu', text: 'Torta holandesa smu', peso: '1180' },
-                    { codigo: '393409', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1400' },
-                    { codigo: '393441', value: 'Torta yogurt frutilla', text: 'Torta yogurt frutilla', peso: '1500' },
-                    { codigo: '393440', value: 'Torta cuatro leches', text: 'Torta cuatro leches', peso: '1800' }
+                    { codigo: '393272', value: 'Torta crema manjar mini', text: 'Torta crema manjar mini' },
+                    { codigo: '393273', value: 'Torta guinda mini', text: 'Torta guinda mini' }
                 ]
                 };
 

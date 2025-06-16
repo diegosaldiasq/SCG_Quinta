@@ -5,9 +5,9 @@ from django.db import models
 class DatosFormularioControlParametrosGorreri(models.Model):
     nombre_tecnologo = models.CharField(max_length=100)
     fecha_registro = models.DateTimeField()
-    cliente = models.CharField(max_length=100)
+    cliente = models.TextField()
     codigo_producto = models.CharField(max_length=50)
-    producto = models.CharField(max_length=100)
+    producto = models.TextField()
     numero_tm = models.IntegerField()
     velocidad_bomba = models.IntegerField()
     velocidad_turbo = models.IntegerField()
@@ -22,4 +22,4 @@ class DatosFormularioControlParametrosGorreri(models.Model):
     fecha_de_verificacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.producto} - {self.numero_tm} - {self.fecha_registro.strftime('%Y-%m-%d %H:%M:%S')}"
+        return self.nombre_tecnologo + " " + str(self.fecha_registro)
