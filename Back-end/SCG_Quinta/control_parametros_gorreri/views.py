@@ -22,42 +22,46 @@ def vista_control_parametros_gorreri(request):
         data = json.loads(request.body.decode('utf-8'))
         dato = data.get('dato', None)
         if dato:
-            nombre_tecnologo = request.user.nombre_completo
-            fecha_registro = timezone.now()
-            cliente = dato.get('cliente')
-            codigo_producto = dato.get('codigo_producto')
-            producto = dato.get('producto')
-            numero_tm = int(dato.get('numero_tm'))
-            velocidad_bomba = int(dato.get('velocidad_bomba'))
-            velocidad_turbo = int(dato.get('velocidad_turbo'))
-            contrapresion = float(dato.get('contrapresion'))
-            inyeccion_de_aire = int(dato.get('inyeccion_de_aire'))
-            densidad = float(dato.get('densidad'))
-            t_final = float(dato.get('t_final'))
-            lote = dato.get('lote')
-            turno = dato.get('turno')
+            try:
+                nombre_tecnologo = request.user.nombre_completo
+                fecha_registro = timezone.now()
+                cliente = dato.get('cliente')
+                codigo_producto = dato.get('codigo_producto')
+                producto = dato.get('producto')
+                numero_tm = int(dato.get('numero_tm'))
+                velocidad_bomba = int(dato.get('velocidad_bomba'))
+                velocidad_turbo = int(dato.get('velocidad_turbo'))
+                contrapresion = float(dato.get('contrapresion'))
+                inyeccion_de_aire = int(dato.get('inyeccion_de_aire'))
+                densidad = float(dato.get('densidad'))
+                t_final = float(dato.get('t_final'))
+                lote = dato.get('lote')
+                turno = dato.get('turno')
 
-            datos = DatosFormularioControlParametrosGorreri(
-                nombre_tecnologo=nombre_tecnologo,
-                fecha_registro=fecha_registro,
-                cliente=cliente,
-                codigo_producto=codigo_producto,
-                producto=producto,
-                numero_tm=numero_tm,
-                velocidad_bomba=velocidad_bomba,
-                velocidad_turbo=velocidad_turbo,
-                contrapresion=contrapresion,
-                inyeccion_de_aire=inyeccion_de_aire,
-                densidad=densidad,
-                t_final=t_final,
-                lote=lote,
-                turno=turno
-                )
-            datos.save()
+                datos = DatosFormularioControlParametrosGorreri(
+                    nombre_tecnologo=nombre_tecnologo,
+                    fecha_registro=fecha_registro,
+                    cliente=cliente,
+                    codigo_producto=codigo_producto,
+                    producto=producto,
+                    numero_tm=numero_tm,
+                    velocidad_bomba=velocidad_bomba,
+                    velocidad_turbo=velocidad_turbo,
+                    contrapresion=contrapresion,
+                    inyeccion_de_aire=inyeccion_de_aire,
+                    densidad=densidad,
+                    t_final=t_final,
+                    lote=lote,
+                    turno=turno
+                    )
+                datos.save()
 
-            return JsonResponse({'existe': True})
+                return JsonResponse({'existe': True})
+
+            except Exception as e:
+                return JsonResponse({'existe': False, 'error': str(e)})
         else:
-            return JsonResponse({'existe': False})
+            return JsonResponse({'existe': False, 'error': 'No se recibió ningún dato válido.'})
 
 @login_required
 def redireccionar_selecciones_2(request):
