@@ -76,8 +76,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 alert("Datos guardados exitosamente!!");
                 location.reload();
             } else {
-                alert("No se pudo guardar... revisa nuevamente!!");
-                return false;
+                //alert("No se pudo guardar... revisa nuevamente!!");
+                //return false;
+                const mensajeError = data.error ? `Error del servidor: ${data.error}` : "No se pudo guardar... revisa nuevamente!!";
+                console.error("Respuesta del servidor:", data);
+                alert(mensajeError);
             }
         } catch (error) {
             console.error("Hubo un error:", error);
