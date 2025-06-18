@@ -133,7 +133,8 @@ model_mapping = {
         'rechazo_mp_in_me': 'DatosFormularioRechazoMpInMe',
         'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
         'control_material_extraño': 'DatosFormularioControlMaterialExtraño',
-        'control_de_pesos': 'DatosFormularioControlDePesos'
+        'control_de_pesos': 'DatosFormularioControlDePesos',
+        'control_parametros_gorreri': 'DatosFormularioControlParametrosGorreri'
     }
 
 @csrf_exempt
