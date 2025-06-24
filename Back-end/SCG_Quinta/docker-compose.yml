@@ -67,7 +67,7 @@ services:
       - certbot
 
   certbot:
-    image: certbot/certbot
+    image: certbot/certbot #:4.0.0
     volumes:
       - scg_quinta_certbot-etc:/etc/letsencrypt
       - scg_quinta_certbot-var:/var/lib/letsencrypt
