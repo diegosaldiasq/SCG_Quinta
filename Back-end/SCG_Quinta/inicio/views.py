@@ -134,7 +134,8 @@ model_mapping = {
         'informe_de_incidentes': 'DatosFormularioInformeDeIncidentes',
         'control_material_extraño': 'DatosFormularioControlMaterialExtraño',
         'control_de_pesos': 'DatosFormularioControlDePesos',
-        'control_parametros_gorreri': 'DatosFormularioControlParametrosGorreri'
+        'control_parametros_gorreri': 'DatosFormularioControlParametrosGorreri',
+        'control_de_pesos_prelistos': 'DatosFormularioControlDePesosPrelistos'
     }
 
 @csrf_exempt

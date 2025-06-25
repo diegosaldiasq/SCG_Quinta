@@ -39,7 +39,8 @@ urlpatterns = [
     path("selecciones/", include("selecciones.urls")),
     path("login/", include("login.urls")),
     path("control_de_pesos/", include("control_de_pesos.urls")),
-    path("control_parametros_gorreri/", include("control_parametros_gorreri.urls"))
+    path("control_parametros_gorreri/", include("control_parametros_gorreri.urls")),
+    path("control_de_pesos_prelistos/", include("control_de_pesos_prelistos.urls"))
 ]
 
 if settings.DEBUG:

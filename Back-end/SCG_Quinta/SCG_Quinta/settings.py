@@ -49,7 +49,8 @@ LOCAL_APPS = [
     "selecciones.apps.SeleccionesConfig",
     "login.apps.LoginConfig",
     "control_de_pesos.apps.ControlDePesosConfig",
-    "control_parametros_gorreri.apps.ControlParametrosGorreriConfig"
+    "control_parametros_gorreri.apps.ControlParametrosGorreriConfig",
+    "control_de_pesos_prelistos.apps.ControlDePesosPrelistosConfig"
 ]
 
 DJANGO_APPS = [
