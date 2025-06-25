@@ -106,3 +106,8 @@ def redireccionar_control_de_pesos(request):
 def redireccionar_control_parametros_gorreri(request):
     url_control_parametros_gorreri = reverse('control_parametros_gorreri')
     return HttpResponseRedirect(url_control_parametros_gorreri)
+
+@login_required
+def redireccionar_control_de_pesos_prelistos(request):
+    url_control_de_pesos_prelistos = reverse('control_de_pesos_prelistos')
+    return HttpResponseRedirect(url_control_de_pesos_prelistos)
