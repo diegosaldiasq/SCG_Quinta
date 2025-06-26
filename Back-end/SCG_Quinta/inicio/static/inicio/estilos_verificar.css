@@ -851,3 +851,48 @@ body {
 .usuario_control_de_pesos_prelistos input[type="checkbox"]:hover {
     cursor: pointer;
 }
+
+.control_de_pesos_insumos_kuchen {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: var(--sm);
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.control_de_pesos_insumos_kuchen span {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_control_de_pesos_insumos_kuchen {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_control_de_pesos_insumos_kuchen li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_control_de_pesos_insumos_kuchen span, .usuario_control_de_pesos_insumos_kuchen input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_control_de_pesos_insumos_kuchen input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_control_de_pesos_insumos_kuchen input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_control_de_pesos_insumos_kuchen input[type="checkbox"]:hover {
+    cursor: pointer;
+}
