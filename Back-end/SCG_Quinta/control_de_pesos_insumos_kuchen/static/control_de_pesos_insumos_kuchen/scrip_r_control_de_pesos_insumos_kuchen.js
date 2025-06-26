@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Obtener el CSRF token
             var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
-            var response = await fetch('/control_de_pesos_insumos_kuchen/vista_control_de_pesos_prelistos_insumos_kuchen/', {
+            var response = await fetch('/control_de_pesos_insumos_kuchen/vista_control_de_pesos_insumos_kuchen/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
