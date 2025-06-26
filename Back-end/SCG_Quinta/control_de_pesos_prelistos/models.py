@@ -4,7 +4,7 @@ from django.db import models
 
 class DatosFormularioControlDePesosPrelistos(models.Model):
     nombre_tecnologo = models.CharField(max_length=100)
-    fecha_registro = models.DateTimeField()
+    fecha_registro = models.DateTimeField(unique=True, null=False, blank=False)
     cliente = models.TextField()
     codigo_producto = models.CharField(max_length=20, null=True, blank=True)
     producto = models.TextField()
