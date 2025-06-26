@@ -1,0 +1,76 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_r_crear_turno.css' %}">
+    <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
+    <title>Registrar Turno OEE</title>
+    <script>
+        function agregarFilaDetencion() {
+            const fila = `
+                <tr>
+                    <td><input type="text" name="motivo_det[]" required></td>
+                    <td><input type="number" name="duracion_det[]" min="0" required></td>
+                    <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
+                </tr>`;
+            document.getElementById("tabla-detenciones").querySelector("tbody").insertAdjacentHTML("beforeend", fila);
+        }
+
+        function agregarFilaReproceso() {
+            const fila = `
+                <tr>
+                    <td><input type="text" name="motivo_rep[]" required></td>
+                    <td><input type="number" name="cantidad_rep[]" min="0" required></td>
+                    <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
+                </tr>`;
+            document.getElementById("tabla-reprocesos").querySelector("tbody").insertAdjacentHTML("beforeend", fila);
+        }
+    </script>
+</head>
+<body>
+    <h1>Registro de Turno OEE</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Datos del Turno</legend>
+            <table>
+                {{ form.as_table }}
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>Detenciones</legend>
+            <table id="tabla-detenciones" border="1">
+                <thead>
+                    <tr><th>Motivo</th><th>Duración (min)</th><th>Acción</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button type="button" onclick="agregarFilaDetencion()">Agregar Detención</button>
+        </fieldset>
+
+        <fieldset>
+            <legend>Reprocesos</legend>
+            <table id="tabla-reprocesos" border="1">
+                <thead>
+                    <tr><th>Motivo</th><th>Cantidad</th><th>Acción</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button type="button" onclick="agregarFilaReproceso()">Agregar Reproceso</button>
+        </fieldset>
+
+        <br>
+        <button type="submit">Guardar Turno</button>
+    </form>
+</body>
+</html>

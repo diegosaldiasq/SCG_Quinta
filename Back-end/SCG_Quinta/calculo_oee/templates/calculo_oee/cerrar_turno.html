@@ -1,0 +1,27 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_r_calculo_oee.css' %}">
+    <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
+    <title>Cerrar Turno - Producción Real</title>
+</head>
+<body>
+    <h2>Cerrar Turno {{ turno.turno }} - {{ turno.fecha }} - Línea {{ turno.linea }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>
+            <label for="id_produccion_real">Producción Real (unidades):</label>
+            {{ form.produccion_real }}
+        </p>
+        <button type="submit">Guardar y Ver Resumen</button>
+    </form>
+</body>
+</html>
