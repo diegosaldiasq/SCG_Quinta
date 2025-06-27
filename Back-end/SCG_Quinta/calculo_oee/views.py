@@ -34,7 +34,7 @@ def crear_turno(request):
             for motivo, cantidad in zip(motivos_rep, cantidades_rep):
                 Reproceso.objects.create(turno=turno, motivo=motivo, cantidad=int(cantidad))
 
-            return redirect('cerrar_turno') # Redirige a una vista de éxito
+            return render(request, 'calculo_oee/cerrar_turno.html') # Redirige a una vista de éxito
 
     else:
         form = TurnoOEEForm()
