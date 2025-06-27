@@ -15,18 +15,29 @@
     <title>Resumen del Turno</title>
 </head>
 <body>
-    <h1>Resumen del Turno {{ turno.turno }} - Línea {{ turno.linea }} - {{ turno.fecha }}</h1>
-    <ul>
-        <li><strong>Tiempo planeado:</strong> {{ turno.tiempo_planeado }} min</li>
-        <li><strong>Tiempo de paro:</strong> {{ tiempo_paro }} min</li>
-        <li><strong>Producción teórica:</strong> {{ produccion_teorica }} unidades</li>
-        <li><strong>Producción real:</strong> {{ produccion_real }} unidades</li>
-        <li><strong>Productos buenos:</strong> {{ productos_buenos }}</li>
-        <li><strong>Productos malos:</strong> {{ productos_malos }}</li>
-        <li><strong>Disponibilidad:</strong> {{ disponibilidad }}%</li>
-        <li><strong>Rendimiento:</strong> {{ rendimiento }}%</li>
-        <li><strong>Calidad:</strong> {{ calidad }}%</li>
-        <li><strong><u>OEE:</u></strong> {{ oee }}%</li>
-    </ul>
+    <div class="login">
+        <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="logo" class="logo">
+            <div class="login-container">
+                <h1 class="title">Resumen del Turno</h1>
+            </div>
+        <h1>Resumen del Turno {{ turno.turno }} - Línea {{ turno.linea }} - {{ turno.fecha }}</h1>
+        <ul>
+            <li><strong>Tiempo planeado:</strong> {{ turno.tiempo_planeado }} min</li>
+            <li><strong>Tiempo de paro:</strong> {{ tiempo_paro }} min</li>
+            <li><strong>Producción teórica:</strong> {{ produccion_teorica }} unidades</li>
+            <li><strong>Producción real:</strong> {{ produccion_real }} unidades</li>
+            <li><strong>Productos buenos:</strong> {{ productos_buenos }}</li>
+            <li><strong>Productos malos:</strong> {{ productos_malos }}</li>
+            <li><strong>Disponibilidad:</strong> {{ disponibilidad }}%</li>
+            <li><strong>Rendimiento:</strong> {{ rendimiento }}%</li>
+            <li><strong>Calidad:</strong> {{ calidad }}%</li>
+            <li><strong><u>OEE:</u></strong> {{ oee }}%</li>
+        </ul>
+    </div>
+    <div class="botones">
+        <form class="form" action="{% url 'redireccionar_selecciones_2' %}">
+            <button class="primary-button login-button">Salir</button>
+        </form>
+    </div>
 </body>
 </html>

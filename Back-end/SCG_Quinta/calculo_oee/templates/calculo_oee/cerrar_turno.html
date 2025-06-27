@@ -9,19 +9,31 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_r_calculo_oee.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_cerrar_turno.css' %}">
     <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
     <title>Cerrar Turno - Producción Real</title>
 </head>
 <body>
-    <h2>Cerrar Turno {{ turno.turno }} - {{ turno.fecha }} - Línea {{ turno.linea }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        <p>
-            <label for="id_produccion_real">Producción Real (unidades):</label>
-            {{ form.produccion_real }}
-        </p>
-        <button type="submit">Guardar y Ver Resumen</button>
-    </form>
+    <div class="login">
+        <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="logo" class="logo">
+            <div class="login-container">
+                <h1 class="title">Cerrar Turno - Producción Real</h1>
+            </div>
+        <h2>Cerrar Turno {{ turno.turno }} - {{ turno.fecha }} - Línea {{ turno.linea }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <p>
+                <label for="id_produccion_real">Producción Real (unidades):</label>
+                {{ form.produccion_real }}
+            </p>
+            <button type="submit">Guardar y Ver Resumen</button>
+        </form>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'calculo_oee/scrip_cerrar_turno.js' %}"></script>
 </body>
 </html>

@@ -4,7 +4,15 @@ from .models import TurnoOEE, Detencion, Reproceso
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .forms import ProduccionRealForm
+from django.contrib.auth.decorators import login_required
+import json
+from django.views.decorators.csrf import csrf_exempt
 
+
+# Create your views here.
+
+@login_required
+#@csrf_exempt
 def crear_turno(request):
     if request.method == 'POST':
         form = TurnoOEEForm(request.POST)
@@ -23,13 +31,15 @@ def crear_turno(request):
             for motivo, cantidad in zip(motivos_rep, cantidades_rep):
                 Reproceso.objects.create(turno=turno, motivo=motivo, cantidad=int(cantidad))
 
-            return redirect('turno_exito')
+            return redirect('cerrar_turno') # Redirige a una vista de éxito
 
     else:
         form = TurnoOEEForm()
 
-    return render(request, 'crear_turno.html', {'form': form})
+    return render(request, 'calculo_oee/crear_turno.html', {'form': form})
 
+@login_required
+@csrf_exempt
 def resumen_turno(request, turno_id):
     turno = get_object_or_404(TurnoOEE, id=turno_id)
 
@@ -64,6 +74,7 @@ def resumen_turno(request, turno_id):
     }
     return render(request, 'resumen_turno.html', contexto)
 
+@login_required
 def cerrar_turno(request, turno_id):
     turno = get_object_or_404(TurnoOEE, id=turno_id)
 

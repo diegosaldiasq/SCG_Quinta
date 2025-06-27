@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_r_crear_turno.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_crear_turno.css' %}">
     <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
     <title>Registrar Turno OEE</title>
     <script>
@@ -36,41 +36,61 @@
     </script>
 </head>
 <body>
-    <h1>Registro de Turno OEE</h1>
+    <div class="login">
+        <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="logo" class="logo">
+            <div class="login-container">
+                <h1 class="title">Crear Turno OEE</h1>
+            </div>
+        <h1>Registro de Turno OEE</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        <fieldset>
-            <legend>Datos del Turno</legend>
-            <table>
-                {{ form.as_table }}
-            </table>
-        </fieldset>
+        <form method="post">
+            {% csrf_token %}
+            <fieldset>
+                <legend>Datos del Turno</legend>
+                <table>
+                    {{ form.as_table }}
+                </table>
+            </fieldset>
 
-        <fieldset>
-            <legend>Detenciones</legend>
-            <table id="tabla-detenciones" border="1">
-                <thead>
-                    <tr><th>Motivo</th><th>Duración (min)</th><th>Acción</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <button type="button" onclick="agregarFilaDetencion()">Agregar Detención</button>
-        </fieldset>
+            <fieldset>
+                <legend>Detenciones</legend>
+                <table id="tabla-detenciones" border="1">
+                    <thead>
+                        <tr><th>Motivo</th><th>Duración (min)</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <button type="button" onclick="agregarFilaDetencion()">Agregar Detención</button>
+            </fieldset>
 
-        <fieldset>
-            <legend>Reprocesos</legend>
-            <table id="tabla-reprocesos" border="1">
-                <thead>
-                    <tr><th>Motivo</th><th>Cantidad</th><th>Acción</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <button type="button" onclick="agregarFilaReproceso()">Agregar Reproceso</button>
-        </fieldset>
+            <fieldset>
+                <legend>Reprocesos</legend>
+                <table id="tabla-reprocesos" border="1">
+                    <thead>
+                        <tr><th>Motivo</th><th>Cantidad</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <button type="button" onclick="agregarFilaReproceso()">Agregar Reproceso</button>
+            </fieldset>
 
-        <br>
-        <button type="submit">Guardar Turno</button>
-    </form>
+            <br>
+        </form>
+        <div class="botones">
+            <form class="form">
+                {% csrf_token %}
+                <button class="primary-button login-button" id="miBoton">Guardar Turno</button>
+            </form>
+            <form class="form" action="{% url 'redireccionar_selecciones_2' %}">
+                <button class="primary-button login-button">Salir</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'calculo_oee/scrip_crear_turno.js' %}"></script>
 </body>
 </html>
