@@ -14,10 +14,32 @@
     <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
     <title>Registrar Turno OEE</title>
     <script>
+        const motivosDetenciones = [
+        "Falla mecánica",
+        "Cambio de formato",
+        "Espera de insumos",
+        "Aseo de línea",
+        "Mantención preventiva"
+        ];
+
+        const motivosReprocesos = [
+            "Producto mal cerrado",
+            "Defecto visual",
+            "Error en etiquetado",
+            "Desviación de peso",
+            "Contaminación cruzada"
+        ];
+
         function agregarFilaDetencion() {
+            let opciones = motivosDetenciones.map(m => `<option value="${m}">${m}</option>`).join('');
             const fila = `
                 <tr>
-                    <td><input type="text" name="motivo_det[]" required></td>
+                    <td>
+                        <select name="motivo_det[]" required>
+                            <option value="">-- Seleccionar --</option>
+                            ${opciones}
+                        </select>
+                    </td>
                     <td><input type="number" name="duracion_det[]" min="0" required></td>
                     <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
                 </tr>`;
@@ -25,9 +47,15 @@
         }
 
         function agregarFilaReproceso() {
+            let opciones = motivosReprocesos.map(m => `<option value="${m}">${m}</option>`).join('');
             const fila = `
                 <tr>
-                    <td><input type="text" name="motivo_rep[]" required></td>
+                    <td>
+                        <select name="motivo_rep[]" required>
+                            <option value="">-- Seleccionar --</option>
+                            ${opciones}
+                        </select>
+                    </td>
                     <td><input type="number" name="cantidad_rep[]" min="0" required></td>
                     <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
                 </tr>`;
@@ -77,7 +105,7 @@
             <br>
         </form>
         <div class="botones">
-            <form class="form">
+            <form class="form" action="{% url 'crear_turno' %}">
                 {% csrf_token %}
                 <button class="primary-button login-button" id="miBoton">Guardar Turno</button>
             </form>

@@ -15,6 +15,9 @@ class TurnoOEE(models.Model):
     tiempo_planeado = models.PositiveIntegerField(help_text="En minutos")
     produccion_planeada = models.PositiveIntegerField(help_text="Producción planeada en unidades")
     produccion_real = models.PositiveIntegerField(null=True, blank=True)
+    verificado = models.BooleanField(default=False)
+    verificado_por = models.CharField(max_length=50 ,null=True, blank=True)
+    fecha_de_verificacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.fecha} - {self.linea} - {self.turno}"

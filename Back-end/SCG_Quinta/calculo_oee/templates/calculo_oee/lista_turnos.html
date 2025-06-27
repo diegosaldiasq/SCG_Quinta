@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Turnos</title>
+</head>
+<body>
+    <h1>Turnos Registrados</h1>
+    <form method="get">
+        <label>Fecha:
+            <input type="date" name="fecha" value="{{ filtro_fecha }}">
+        </label>
+        <label>Línea:
+            <input type="text" name="linea" value="{{ filtro_linea }}">
+        </label>
+        <button type="submit">Filtrar</button>
+        <a href="{% url 'lista_turnos' %}">Limpiar</a>
+    </form>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Línea</th>
+                <th>Turno</th>
+                <th>Hora inicio</th>
+                <th>Hora fin</th>
+                <th>Producción Real</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in turnos %}
+            <tr>
+                <td>{{ t.fecha }}</td>
+                <td>{{ t.linea }}</td>
+                <td>{{ t.turno }}</td>
+                <td>{{ t.hora_inicio }}</td>
+                <td>{{ t.hora_fin }}</td>
+                <td>{{ t.produccion_real|default:'-' }}</td>
+                <td>
+                    {% if not t.produccion_real %}
+                        <a href="{% url 'cerrar_turno' t.id %}">Cerrar Turno</a>
+                    {% else %}
+                        <a href="{% url 'resumen_turno' t.id %}">Ver Resumen</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No hay turnos registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div>
+        {% if turnos.has_previous %}
+            <a href="?{% if filtro_fecha %}fecha={{ filtro_fecha }}&{% endif %}{% if filtro_linea %}linea={{ filtro_linea }}&{% endif %}page={{ turnos.previous_page_number }}">Anterior</a>
+        {% endif %}
+
+        Página {{ turnos.number }} de {{ turnos.paginator.num_pages }}
+
+        {% if turnos.has_next %}
+            <a href="?{% if filtro_fecha %}fecha={{ filtro_fecha }}&{% endif %}{% if filtro_linea %}linea={{ filtro_linea }}&{% endif %}page={{ turnos.next_page_number }}">Siguiente</a>
+        {% endif %}
+    </div>
+    <br>
+    <a href="{% url 'crear_turno' %}">Registrar nuevo turno</a>
+</body>
+</html>
