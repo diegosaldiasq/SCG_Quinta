@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import TurnoOEEForm
-from .models import TurnoOEE, Detencion, Reproceso
+from .models import TurnoOEE, Detencion, Reproceso, ResumenTurnoOee
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .forms import ProduccionRealForm
@@ -34,7 +34,7 @@ def crear_turno(request):
             for motivo, cantidad in zip(motivos_rep, cantidades_rep):
                 Reproceso.objects.create(turno=turno, motivo=motivo, cantidad=int(cantidad))
 
-            return render(request, 'calculo_oee/cerrar_turno.html') # Redirige a una vista de éxito
+            return render(request, 'calculo_oee/lista_turnos.html') # Redirige a una vista de éxito
 
     else:
         form = TurnoOEEForm()
@@ -53,6 +53,7 @@ def resumen_turno(request, turno_id):
 
     # Detenciones asociadas (usamos el related_name 'detenciones')
     tiempo_paro = sum(d.duracion for d in turno.detenciones.all())
+    tiempo_planeado = turno.tiempo_planeado
 
     # Reprocesos asociados (usamos el related_name 'reprocesos')
     productos_malos = sum(r.cantidad for r in turno.reprocesos.all())
@@ -85,11 +86,33 @@ def resumen_turno(request, turno_id):
         'calidad': round(calidad * 100, 2),
         'oee': round(oee, 2),
         'tiempo_paro': tiempo_paro,
+        'tiempo_planeado': tiempo_planeado,
         'productos_malos': productos_malos,
         'produccion_teorica': round(produccion_teorica),
         'produccion_real': produccion_real,
         'productos_buenos': productos_buenos,
     }
+
+    datos = ResumenTurnoOee(
+        fecha=turno.fecha,
+        lote=turno,
+        cliente=cliente,
+        codigo=codigo,
+        producto=producto,
+        linea=turno.linea,
+        turno=turno.turno,
+        tiempo_paro=tiempo_paro,
+        tiempo_planeado=tiempo_planeado,
+        produccion_teorica=round(produccion_teorica),
+        produccion_real=produccion_real,
+        productos_malos=productos_malos,
+        productos_buenos=productos_buenos,
+        eficiencia=round(rendimiento * 100, 2),
+        disponibilidad=round(disponibilidad * 100, 2),
+        calidad=round(calidad * 100, 2),
+        oee=oee
+    )
+    datos.save()
 
     return render(request, 'calculo_oee/resumen_turno.html', contexto)
 

@@ -15,9 +15,6 @@ class TurnoOEE(models.Model):
     tiempo_planeado = models.PositiveIntegerField(help_text="En minutos")
     produccion_planeada = models.PositiveIntegerField(help_text="Producción planeada en unidades")
     produccion_real = models.PositiveIntegerField(null=True, blank=True)
-    verificado = models.BooleanField(default=False)
-    verificado_por = models.CharField(max_length=50 ,null=True, blank=True)
-    fecha_de_verificacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.fecha} - {self.linea} - {self.turno}"
@@ -33,3 +30,28 @@ class Reproceso(models.Model):
     linea = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos_linea')
     motivo = models.CharField(max_length=100)
     cantidad = models.PositiveIntegerField()
+
+class ResumenTurnoOee(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno')
+    cliente = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=20, null=True, blank=True)
+    producto = models.CharField(max_length=100)
+    linea = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_linea')
+    turno = models.CharField(max_length=20)
+    tiempo_paro = models.PositiveIntegerField(help_text="Tiempo de paro en minutos")
+    tiempo_planeado = models.PositiveIntegerField(help_text="Tiempo planeado en minutos")
+    produccion_teorica = models.PositiveIntegerField(help_text="Producción teórica en unidades")
+    produccion_real = models.PositiveIntegerField(help_text="Producción real en unidades")
+    productos_malos = models.PositiveIntegerField(help_text="Cantidad de productos malos")
+    productos_buenos = models.PositiveIntegerField(help_text="Cantidad de productos buenos")
+    eficiencia = models.FloatField(help_text="Eficiencia del turno en porcentaje")
+    disponibilidad = models.FloatField(help_text="Disponibilidad del turno en porcentaje")
+    calidad = models.FloatField(help_text="Calidad del turno en porcentaje")
+    oee = models.FloatField(help_text="OEE del turno en porcentaje")
+    verificado = models.BooleanField(default=False)
+    verificado_por = models.CharField(max_length=50 ,null=True, blank=True)
+    fecha_de_verificacion = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Resumen OEE - {self.turno} - Eficiencia: {self.eficiencia}%"

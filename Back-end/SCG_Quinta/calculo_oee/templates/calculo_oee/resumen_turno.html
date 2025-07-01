@@ -20,23 +20,24 @@
             <div class="login-container">
                 <h1 class="title">Resumen del Turno</h1>
             </div>
-        <h1>Resumen del Turno {{ turno.turno }} - Línea {{ turno.linea }} - {{ turno.fecha }}</h1>
+        <h1>Resumen del Turno {{ contexto.turno }} - Línea {{ contexto.linea }} - {{ contexto.fecha }}</h1>
         <ul>
-            <li><strong>Fecha:</strong> {{ turno.fecha }} min</li>
-            <li><strong>Cliente:</strong> {{ turno.cliente }} </li>
-            <li><strong>Codigo:</strong> {{ turno.codigo }}</li>
-            <li><strong>Producto:</strong> {{ turno.producto }}</li>
-            <li><strong>Linea:</strong> {{ turno.linea }}</li>
-            <li><strong>Turno:</strong> {{ turno.turno }}</li>
-            <li><strong>Tiempo de paro:</strong> {{ tiempo_paro }} min</li>
-            <li><strong>Producción teórica:</strong> {{ produccion_teorica }} unidades</li>
-            <li><strong>Producción real:</strong> {{ produccion_real }} unidades</li>
-            <li><strong>Productos buenos:</strong> {{ productos_buenos }}</li>
-            <li><strong>Productos malos:</strong> {{ productos_malos }}</li>
-            <li><strong>Disponibilidad:</strong> {{ disponibilidad }}%</li>
-            <li><strong>Rendimiento:</strong> {{ rendimiento }}%</li>
-            <li><strong>Calidad:</strong> {{ calidad }}%</li>
-            <li><strong><u>OEE:</u></strong> {{ oee }}%</li>
+            <li><strong>Fecha:</strong> {{ contexto.fecha }} min</li>
+            <li><strong>Cliente:</strong> {{ contexto.cliente }} </li>
+            <li><strong>Codigo:</strong> {{ contexto.codigo }}</li>
+            <li><strong>Producto:</strong> {{ contexto.producto }}</li>
+            <li><strong>Linea:</strong> {{ contexto.linea }}</li>
+            <li><strong>Turno:</strong> {{ contexto.turno }}</li>
+            <li><strong>Tiempo planeado:</strong> {{ contexto.tiempo_planeado }}</li>
+            <li><strong>Tiempo de paro:</strong> {{ contexto.tiempo_paro }} min</li>
+            <li><strong>Producción teórica:</strong> {{ contexto.produccion_teorica }} unidades</li>
+            <li><strong>Producción real:</strong> {{ contexto.produccion_real }} unidades</li>
+            <li><strong>Productos buenos:</strong> {{ contexto.productos_buenos }}</li>
+            <li><strong>Productos malos:</strong> {{ contexto.productos_malos }}</li>
+            <li><strong>Disponibilidad:</strong> {{ contexto.disponibilidad }}%</li>
+            <li><strong>Rendimiento:</strong> {{ contexto.rendimiento }}%</li>
+            <li><strong>Calidad:</strong> {{ contexto.calidad }}%</li>
+            <li><strong><u>OEE:</u></strong> {{ contexto.oee }}%</li>
         </ul>
     </div>
     <div class="botones">
