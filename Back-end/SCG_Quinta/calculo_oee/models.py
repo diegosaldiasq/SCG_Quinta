@@ -9,7 +9,6 @@ class TurnoOEE(models.Model):
     producto = models.CharField(max_length=100)
     linea = models.CharField(max_length=50)
     turno = models.CharField(max_length=20)
-    lote = models.CharField(max_length=50, null=False, blank=False)
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
     tiempo_planeado = models.PositiveIntegerField(help_text="En minutos")
@@ -20,25 +19,22 @@ class TurnoOEE(models.Model):
         return f"{self.fecha} - {self.linea} - {self.turno}"
 
 class Detencion(models.Model):
-    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')
-    linea = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones_linea')
+    turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')
     motivo = models.CharField(max_length=100)
     duracion = models.PositiveIntegerField(help_text="Duración en minutos")
 
 class Reproceso(models.Model):
-    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos')
-    linea = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos_linea')
+    turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos')
     motivo = models.CharField(max_length=100)
     cantidad = models.PositiveIntegerField()
 
 class ResumenTurnoOee(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
-    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno')
     cliente = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, null=True, blank=True)
     producto = models.CharField(max_length=100)
     linea = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_linea')
-    turno = models.CharField(max_length=20)
+    turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno')
     tiempo_paro = models.PositiveIntegerField(help_text="Tiempo de paro en minutos")
     tiempo_planeado = models.PositiveIntegerField(help_text="Tiempo planeado en minutos")
     produccion_teorica = models.PositiveIntegerField(help_text="Producción teórica en unidades")

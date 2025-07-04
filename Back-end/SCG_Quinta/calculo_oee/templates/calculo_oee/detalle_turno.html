@@ -1,0 +1,82 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detenciones y Reprocesos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- CSS corporativo -->
+    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}">
+    <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+
+        <div class="login-container">
+            <h1 class="title">📑 Detalles del Turno</h1>
+            <h2>{{ turno.turno }} - Línea {{ turno.linea }}</h2>
+
+            <!-- 🛑 Tabla de Detenciones -->
+            <h3>⛔ Detenciones</h3>
+            <div class="tabla-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Motivo</th>
+                            <th>Duración (min)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for det in detenciones %}
+                        <tr>
+                            <td>{{ det.motivo }}</td>
+                            <td>{{ det.duracion }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">⚠️ No hay detenciones registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ♻️ Tabla de Reprocesos -->
+            <h3>♻️ Reprocesos</h3>
+            <div class="tabla-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Motivo</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rep in reprocesos %}
+                        <tr>
+                            <td>{{ rep.motivo }}</td>
+                            <td>{{ rep.cantidad }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">⚠️ No hay reprocesos registrados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 🔙 Botón volver -->
+            <div class="botones">
+                <a href="{% url 'resumen_turno' turno.id %}" class="primary-button">⬅️ Volver al Resumen</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

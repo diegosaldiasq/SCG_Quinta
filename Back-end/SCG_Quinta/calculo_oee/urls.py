@@ -9,5 +9,7 @@ urlpatterns = [
     path('turno-exito/', lambda request: HttpResponse("Turno registrado con éxito."), name='turno_exito'),
     path('resumen/<int:turno_id>/', views.resumen_turno, name='resumen_turno'),
     path('cerrar-turno/<int:turno_id>/', views.cerrar_turno, name='cerrar_turno'),
-    path('turnos/', views.lista_turnos, name='lista_turnos')
+    path('turnos/', views.lista_turnos, name='lista_turnos'),
+    path('detalle-turno/<int:turno_id>/', views.detalle_turno, name='detalle_turno'),
+    path('marcar-verificado/<int:turno_id>/', views.marcar_verificado, name='marcar_verificado')
 ]

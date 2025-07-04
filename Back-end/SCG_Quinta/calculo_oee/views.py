@@ -10,12 +10,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.utils.dateparse import parse_date
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 
 # Create your views here.
 
 @login_required
-#@csrf_exempt
 def crear_turno(request):
     if request.method == 'POST':
         form = TurnoOEEForm(request.POST)
@@ -34,87 +34,56 @@ def crear_turno(request):
             for motivo, cantidad in zip(motivos_rep, cantidades_rep):
                 Reproceso.objects.create(turno=turno, motivo=motivo, cantidad=int(cantidad))
 
-            return render(request, 'calculo_oee/lista_turnos.html') # Redirige a una vista de éxito
+            return redirect('lista_turnos')  # Redirige al listado
 
     else:
         form = TurnoOEEForm()
 
     return render(request, 'calculo_oee/crear_turno.html', {'form': form})
 
+
 @login_required
 def resumen_turno(request, turno_id):
     turno = get_object_or_404(TurnoOEE, id=turno_id)
 
-    fecha = turno.fecha
-    cliente = turno.cliente
-    codigo = turno.codigo
-    producto = turno.producto
-    linea = turno.linea
+    # Evitar duplicados en ResumenTurnoOee
+    if not ResumenTurnoOee.objects.filter(turno=turno).exists():
+        tiempo_paro = sum(d.duracion for d in turno.detenciones.all())
+        productos_malos = sum(r.cantidad for r in turno.reprocesos.all())
 
-    # Detenciones asociadas (usamos el related_name 'detenciones')
-    tiempo_paro = sum(d.duracion for d in turno.detenciones.all())
-    tiempo_planeado = turno.tiempo_planeado
+        tiempo_operativo = turno.tiempo_planeado - tiempo_paro
+        tasa_nominal = turno.produccion_planeada / turno.tiempo_planeado if turno.tiempo_planeado else 0
+        produccion_teorica = tiempo_operativo * tasa_nominal
 
-    # Reprocesos asociados (usamos el related_name 'reprocesos')
-    productos_malos = sum(r.cantidad for r in turno.reprocesos.all())
+        produccion_real = turno.produccion_real or 0
+        productos_buenos = produccion_real - productos_malos
 
-    tiempo_operativo = turno.tiempo_planeado - tiempo_paro
+        disponibilidad = tiempo_operativo / turno.tiempo_planeado if turno.tiempo_planeado else 0
+        rendimiento = produccion_real / produccion_teorica if produccion_teorica else 0
+        calidad = productos_buenos / produccion_real if produccion_real else 0
+        oee = disponibilidad * rendimiento * calidad * 100  # en %
 
-    # Tasa de producción nominal (puedes personalizar esto o almacenarlo en el modelo si es variable)
-    tasa_nominal = turno.produccion_planeada / turno.tiempo_planeado if turno.tiempo_planeado else 0
-    produccion_teorica = tiempo_operativo * tasa_nominal
+        ResumenTurnoOee.objects.create(
+            turno=turno,
+            cliente=turno.cliente,
+            codigo=turno.codigo,
+            producto=turno.producto,
+            linea=turno.linea,
+            tiempo_paro=tiempo_paro,
+            tiempo_planeado=turno.tiempo_planeado,
+            produccion_teorica=round(produccion_teorica),
+            produccion_real=produccion_real,
+            productos_malos=productos_malos,
+            productos_buenos=productos_buenos,
+            eficiencia=round(rendimiento * 100, 2),
+            disponibilidad=round(disponibilidad * 100, 2),
+            calidad=round(calidad * 100, 2),
+            oee=round(oee, 2)
+        )
 
-    # Producción real desde el modelo
-    produccion_real = turno.produccion_real or 0
-    productos_buenos = produccion_real - productos_malos
+    resumen = ResumenTurnoOee.objects.get(turno=turno)
 
-    # Cálculos OEE
-    disponibilidad = tiempo_operativo / turno.tiempo_planeado if turno.tiempo_planeado else 0
-    rendimiento = produccion_real / produccion_teorica if produccion_teorica else 0
-    calidad = productos_buenos / produccion_real if produccion_real else 0
-    oee = disponibilidad * rendimiento * calidad * 100  # en %
-
-    contexto = {
-        'fecha': fecha,
-        'cliente': cliente,
-        'codigo': codigo,
-        'producto': producto,
-        'linea': linea,
-        'turno': turno,
-        'disponibilidad': round(disponibilidad * 100, 2),
-        'rendimiento': round(rendimiento * 100, 2),
-        'calidad': round(calidad * 100, 2),
-        'oee': round(oee, 2),
-        'tiempo_paro': tiempo_paro,
-        'tiempo_planeado': tiempo_planeado,
-        'productos_malos': productos_malos,
-        'produccion_teorica': round(produccion_teorica),
-        'produccion_real': produccion_real,
-        'productos_buenos': productos_buenos,
-    }
-
-    datos = ResumenTurnoOee(
-        fecha=turno.fecha,
-        lote=turno,
-        cliente=cliente,
-        codigo=codigo,
-        producto=producto,
-        linea=turno.linea,
-        turno=turno.turno,
-        tiempo_paro=tiempo_paro,
-        tiempo_planeado=tiempo_planeado,
-        produccion_teorica=round(produccion_teorica),
-        produccion_real=produccion_real,
-        productos_malos=productos_malos,
-        productos_buenos=productos_buenos,
-        eficiencia=round(rendimiento * 100, 2),
-        disponibilidad=round(disponibilidad * 100, 2),
-        calidad=round(calidad * 100, 2),
-        oee=oee
-    )
-    datos.save()
-
-    return render(request, 'calculo_oee/resumen_turno.html', contexto)
+    return render(request, 'calculo_oee/resumen_turno.html', {'resumen': resumen})
 
 @login_required
 def cerrar_turno(request, turno_id):
@@ -137,18 +106,48 @@ def lista_turnos(request):
     # filtros
     fecha = request.GET.get('fecha')
     linea = request.GET.get('linea')
+    cliente = request.GET.get('cliente')
+    producto = request.GET.get('producto')
+
     if fecha:
-        turnos_queryset = turnos_queryset.filter(fecha=parse_date(fecha))
+        turnos = turnos.filter(fecha__date=parse_date(fecha))
     if linea:
-        turnos_queryset = turnos_queryset.filter(linea__icontains=linea)
+        turnos = turnos.filter(linea__icontains=linea)
+    if cliente:
+        turnos = turnos.filter(cliente__icontains=cliente)
+    if producto:
+        turnos = turnos.filter(producto__icontains=producto)
 
     # paginación
-    paginator = Paginator(turnos_queryset, 10)  # 10 por página
+    paginator = Paginator(turnos, 10)
     page_number = request.GET.get('page')
-    turnos = paginator.get_page(page_number)
+    turnos_pag = paginator.get_page(page_number)
 
-    return render(request, 'lista_turnos.html', {
-        'turnos': turnos,
+    return render(request, 'calculo_oee/lista_turnos.html', {
+        'turnos': turnos_pag,
         'filtro_fecha': fecha,
-        'filtro_linea': linea
+        'filtro_linea': linea,
+        'filtro_cliente': cliente,
+        'filtro_producto': producto,
     })
+
+@login_required
+def detalle_turno(request, turno_id):
+    turno = get_object_or_404(TurnoOEE, id=turno_id)
+    detenciones = turno.detenciones.all()
+    reprocesos = turno.reprocesos.all()
+    return render(request, 'calculo_oee/detalle_turno.html', {
+        'turno': turno,
+        'detenciones': detenciones,
+        'reprocesos': reprocesos
+    })
+
+@login_required
+def marcar_verificado(request, turno_id):
+    if request.method == 'POST':
+        resumen = get_object_or_404(ResumenTurnoOee, turno_id=turno_id)
+        resumen.verificado = True
+        resumen.verificado_por = request.user.username
+        resumen.fecha_de_verificacion = timezone.now()
+        resumen.save()
+        return redirect('resumen_turno', turno_id=turno_id)
