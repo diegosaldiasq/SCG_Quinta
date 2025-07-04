@@ -98,6 +98,10 @@ def vista_selecciones_2(request):
     return render(request, 'selecciones/selecciones_2.html')
 
 @login_required
+def vista_selecciones_3(request):
+    return render(request, 'selecciones/selecciones_3.html')
+
+@login_required
 def redireccionar_control_de_pesos(request):
     url_control_de_pesos = reverse('control_de_pesos')
     return HttpResponseRedirect(url_control_de_pesos)
@@ -116,3 +120,8 @@ def redireccionar_control_de_pesos_prelistos(request):
 def redireccionar_control_de_pesos_insumos_kuchen(request):
     url_control_de_pesos_insumos_kuchen = reverse('control_de_pesos_insumos_kuchen')
     return HttpResponseRedirect(url_control_de_pesos_insumos_kuchen)
+
+@login_required
+def redireccionar_crear_turno(request):
+    url_crear_turno = reverse('crear_turno')
+    return HttpResponseRedirect(url_crear_turno)

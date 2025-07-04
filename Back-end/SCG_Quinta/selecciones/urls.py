@@ -22,8 +22,10 @@ urlpatterns = [
     path("en_construccion/", views.en_construccion, name="en_construccion"),
     path("control_de_pesos/", views.redireccionar_control_de_pesos, name="redireccionar_control_de_pesos"),
     path("vista_selecciones_2/", views.vista_selecciones_2, name="vista_selecciones_2"),
+    path("vista_selecciones_3/", views.vista_selecciones_3, name="vista_selecciones_3"),
     path("control_parametros_gorreri/", views.redireccionar_control_parametros_gorreri, name="redireccionar_control_parametros_gorreri"),
     path("control_de_pesos_prelistos/", views.redireccionar_control_de_pesos_prelistos, name="redireccionar_control_de_pesos_prelistos"),
-    path("control_de_pesos_insumos_kuchen/", views.redireccionar_control_de_pesos_insumos_kuchen, name="redireccionar_control_de_pesos_insumos_kuchen")
+    path("control_de_pesos_insumos_kuchen/", views.redireccionar_control_de_pesos_insumos_kuchen, name="redireccionar_control_de_pesos_insumos_kuchen"),
+    path("crear_turno/", views.redireccionar_crear_turno, name="redireccionar_crear_turno")
 ]
 

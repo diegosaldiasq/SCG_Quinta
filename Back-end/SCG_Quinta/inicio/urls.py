@@ -6,6 +6,7 @@ urlpatterns = [
     path("index/", views.index, name="index"),
     path("selecciones/", views.redireccionar_selecciones, name="redireccionar_selecciones"),
     path("selecciones_2/", views.redireccionar_selecciones_2, name="redireccionar_selecciones_2"),
+    path("selecciones_3/", views.redireccionar_selecciones_3, name="redireccionar_selecciones_3"),
     path("main/", views.redireccionar_main, name="redireccionar_main"),
     path("descargas/", views.descargas, name="descargas"),
     path("descargas_2/", views.descargas_2, name="descargas_2"),
