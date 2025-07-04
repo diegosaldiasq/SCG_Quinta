@@ -1,0 +1,136 @@
+:root {
+    --very-light-pink: #C7C7C7;
+    --text-input-field: #F7F7F7;
+    --hospital-green: #ACD9B2;
+    --rojo-quinta: #B43C2C;
+    --amarillo-quinta: #f3ba14;
+    --naranjo-quinta: #d07020;
+    --naranjo-claro-quinta: #d4841c;
+    --white: #FFFFFF;
+    --black: #000000;
+    --sm: 14px;
+    --md: 16px;
+    --lg: 20px;
+}
+
+body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    background-image: url(../images/Fondo.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+h1, h2, h3 {
+    color: var(--rojo-quinta);
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--white);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table th {
+    background-color: var(--naranjo-claro-quinta);
+    color: var(--white);
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+table td {
+    text-align: center;
+    padding: 8px;
+    border-bottom: 1px solid var(--very-light-pink);
+}
+
+table tr:hover {
+    background-color: var(--text-input-field);
+}
+
+form {
+    display: grid;
+    gap: 16px;
+    max-width: 600px;
+    margin: auto;
+    background-color: var(--naranjo-quinta);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select {
+    background-color: var(--text-input-field);
+    border: 1px solid var(--very-light-pink);
+    border-radius: 8px;
+    height: 36px;
+    font-size: var(--md);
+    padding: 6px 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+button, .primary-button {
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: var(--md);
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover, .primary-button:hover {
+    background-color: var(--naranjo-quinta);
+}
+
+a.primary-button {
+    text-decoration: none;
+    display: inline-block;
+    background-color: var(--amarillo-quinta);
+    color: var(--black);
+}
+
+a.primary-button:hover {
+    background-color: var(--naranjo-claro-quinta);
+    color: var(--white);
+}
+
+.botones {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+@media (max-width: 700px) {
+    table th, table td {
+        font-size: var(--sm);
+        padding: 6px;
+    }
+
+    form {
+        width: 90%;
+        padding: 15px;
+    }
+
+    button, .primary-button {
+        width: 100%;
+    }
+
+    .botones {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
