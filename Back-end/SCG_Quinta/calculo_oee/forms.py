@@ -6,10 +6,11 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.DateInput(attrs={
             'type': 'date',  # Calendario nativo del navegador
             'class': 'input',
-            'placeholder': 'dd-mm-yyyy',
-        },
-        input_formats=['%d-%m-%Y']  # Formato de fecha esperado
-        ))
+            'placeholder': 'dd-mm-yyyy'
+        }), 
+        input_formats=['%d-%m-%Y'],  # Formato de entrada para el campo de fecha
+        help_text="Fecha del turno (formato: DD-MM-YYYY)"
+    )
     class Meta:
         model = TurnoOEE
         fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'hora_inicio', 'hora_fin', 'tiempo_planeado', 'produccion_planeada']
