@@ -160,6 +160,6 @@ def marcar_verificado(request, turno_id):
         return redirect('resumen_turno', turno_id=turno_id)
     
 @login_required
-def imtermedio(request):
+def intermedio(request):
     url_inicio = reverse('intermedio')
     return HttpResponseRedirect(url_inicio)
