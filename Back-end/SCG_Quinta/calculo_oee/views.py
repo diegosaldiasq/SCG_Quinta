@@ -11,10 +11,12 @@ from django.db.models import Q
 from django.utils.dateparse import parse_date
 from django.core.paginator import Paginator
 from django.utils import timezone
-
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 # Create your views here.
 
+@csrf_exempt
 @login_required
 def crear_turno(request):
     if request.method == 'POST':
@@ -88,6 +90,7 @@ def resumen_turno(request, turno_id):
 
     return render(request, 'calculo_oee/resumen_turno.html', {'resumen': resumen})
 
+@csrf_exempt
 @login_required
 def cerrar_turno(request, turno_id):
     turno = get_object_or_404(TurnoOEE, id=turno_id)
@@ -145,6 +148,7 @@ def detalle_turno(request, turno_id):
         'reprocesos': reprocesos
     })
 
+@csrf_exempt
 @login_required
 def marcar_verificado(request, turno_id):
     if request.method == 'POST':
@@ -154,3 +158,8 @@ def marcar_verificado(request, turno_id):
         resumen.fecha_de_verificacion = timezone.now()
         resumen.save()
         return redirect('resumen_turno', turno_id=turno_id)
+    
+@login_required
+def imtermedio(request):
+    url_selecciones = reverse('intermedio')
+    return HttpResponseRedirect(url_selecciones)

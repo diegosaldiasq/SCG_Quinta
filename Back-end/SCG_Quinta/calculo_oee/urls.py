@@ -12,5 +12,6 @@ urlpatterns = [
     path('cerrar_turno/<int:turno_id>/', views.cerrar_turno, name='cerrar_turno'),
     path('lista_turnos/', views.lista_turnos, name='lista_turnos'),
     path('detalle-turno/<int:turno_id>/', views.detalle_turno, name='detalle_turno'),
-    path('marcar-verificado/<int:turno_id>/', views.marcar_verificado, name='marcar_verificado')
+    path('marcar-verificado/<int:turno_id>/', views.marcar_verificado, name='marcar_verificado'),
+    path('intermedio/', views.imtermedio, name='intermedio')
 ]
