@@ -19,6 +19,13 @@ body {
     background-image: url(./images/Fondo.png);
 }
 
+.login {
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    justify-content: center;
+}
+
 .logo {
     width: 200px;
     margin-bottom: 16px;
