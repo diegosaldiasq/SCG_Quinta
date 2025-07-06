@@ -48,6 +48,8 @@ def resumen_turno(request, turno_id):
 
     # Evitar duplicados en ResumenTurnoOee
     if not ResumenTurnoOee.objects.filter(turno=turno).exists():
+        fecha = timezone.now()
+
         tiempo_paro = sum(d.duracion for d in turno.detenciones.all())
         productos_malos = sum(r.cantidad for r in turno.reprocesos.all())
 
@@ -64,6 +66,7 @@ def resumen_turno(request, turno_id):
         oee = disponibilidad * rendimiento * calidad * 100  # en %
 
         ResumenTurnoOee.objects.create(
+            fecha=fecha,
             turno=turno,
             cliente=turno.cliente,
             codigo=turno.codigo,
