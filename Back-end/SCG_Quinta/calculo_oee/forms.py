@@ -17,7 +17,7 @@ class TurnoOEEForm(forms.ModelForm):
         ('Cliente C', 'Cliente C'),
     ]
     cliente = forms.ChoiceField(
-        choices=CLIENTE_CHOICES,
+        choices=[('', '--Seleccionar cliente--')] + CLIENTE_CHOICES,
         widget=forms.Select(attrs={'id': 'id_cliente'})
     )
     producto = forms.ChoiceField(
