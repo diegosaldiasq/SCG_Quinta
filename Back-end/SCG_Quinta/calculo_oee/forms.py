@@ -31,6 +31,9 @@ class TurnoOEEForm(forms.ModelForm):
             'placeholder': 'Se autocompleta'
         })
     )
+    turno = forms.ChoiceField(
+        help_text="Turno es igual al lote del turno, ej:123BCA"
+    )
     LINEA_CHOICES = [
         ('Línea 1', 'Línea 1'),
         ('Línea 2', 'Línea 2'),
