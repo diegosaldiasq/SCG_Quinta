@@ -61,6 +61,53 @@
             document.querySelector("#tabla-reprocesos tbody").insertAdjacentHTML("beforeend", fila);
         }
     </script>
+    <script>
+        // catálogo estático: cliente → lista de {producto, código}
+        const catalogo = {
+            'Cliente A': [
+                { producto: 'Prod A1', codigo: 'COD-A1' },
+                { producto: 'Prod A2', codigo: 'COD-A2' },
+            ],
+            'Cliente B': [
+                { producto: 'Prod B1', codigo: 'COD-B1' },
+                { producto: 'Prod B2', codigo: 'COD-B2' },
+            ],
+            'Cliente C': [
+                { producto: 'Prod C1', codigo: 'COD-C1' },
+                { producto: 'Prod C2', codigo: 'COD-C2' },
+            ],
+        };
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const clienteSelect  = document.getElementById('id_cliente');
+        const productoSelect = document.getElementById('id_producto');
+        const codigoInput    = document.getElementById('id_codigo');
+
+        // Al cambiar el cliente, recarga los productos
+        clienteSelect.addEventListener('change', function() {
+            const lista = catalogo[this.value] || [];
+            // resetea dropdown de productos
+            productoSelect.innerHTML = '<option value="">-- Seleccionar --</option>';
+            // rellena con las opciones correspondientes
+            lista.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.producto;
+                opt.textContent = item.producto;
+                productoSelect.append(opt);
+            });
+            // limpia el código
+            codigoInput.value = '';
+        });
+
+        // Al cambiar el producto, busca su código
+        productoSelect.addEventListener('change', function() {
+            const lista = catalogo[clienteSelect.value] || [];
+            const sel   = lista.find(item => item.producto === this.value);
+            codigoInput.value = sel ? sel.codigo : '';
+        });
+    });
+    </script>
 </head>
 <body>
     <div class="login">
