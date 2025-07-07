@@ -108,6 +108,34 @@
         });
     });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const inicio = document.getElementById('id_hora_inicio');
+    const fin    = document.getElementById('id_hora_fin');
+    const plano  = document.getElementById('id_tiempo_planeado');
+
+    function calcularMinutos() {
+        if (!inicio.value || !fin.value) {
+        plano.value = '';
+        return;
+        }
+        // parseamos HH:MM
+        const [h1, m1] = inicio.value.split(':').map(n => parseInt(n, 10));
+        const [h2, m2] = fin.value.split(':').map(n => parseInt(n, 10));
+        let minutosInicio = h1 * 60 + m1;
+        let minutosFin    = h2 * 60 + m2;
+        // si fin es antes de inicio, asumimos paso de medianoche
+        if (minutosFin < minutosInicio) {
+        minutosFin += 24 * 60;
+        }
+        const diff = minutosFin - minutosInicio;
+        plano.value = diff;
+    }
+
+    inicio.addEventListener('change', calcularMinutos);
+    fin.   addEventListener('change', calcularMinutos);
+    });
+    </script>
 </head>
 <body>
     <div class="login">

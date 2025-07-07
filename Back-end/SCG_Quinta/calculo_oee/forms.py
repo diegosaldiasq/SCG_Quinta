@@ -42,6 +42,20 @@ class TurnoOEEForm(forms.ModelForm):
     class Meta:
         model = TurnoOEE
         fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'hora_inicio', 'hora_fin', 'tiempo_planeado', 'produccion_planeada']
+        widgets = {
+            'hora_inicio': forms.TimeInput(format='%H:%M', attrs={
+                'type': 'time', 'id': 'id_hora_inicio'
+            }),
+            'hora_fin':    forms.TimeInput(format='%H:%M', attrs={
+                'type': 'time', 'id': 'id_hora_fin'
+            }),
+            'tiempo_planeado': forms.NumberInput(attrs={
+                'readonly': 'readonly',
+                'id': 'id_tiempo_planeado',
+                'placeholder': 'Se calcula automáticamente'
+            }),
+            # … otros widgets …
+        }
 
 class ProduccionRealForm(forms.ModelForm):
     class Meta:
