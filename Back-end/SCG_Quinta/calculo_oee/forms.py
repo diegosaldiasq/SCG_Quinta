@@ -31,6 +31,14 @@ class TurnoOEEForm(forms.ModelForm):
             'placeholder': 'Se autocompleta'
         })
     )
+    LINEA_CHOICES = [
+        ('Línea 1', 'Línea 1'),
+        ('Línea 2', 'Línea 2'),
+        ('Línea 3', 'Línea 3'),
+    ]
+    linea    = forms.ChoiceField(
+        choices= [('', '--Seleccionar linea--')] + LINEA_CHOICES,
+        widget=forms.Select(attrs={'id': 'id_linea'}))
     class Meta:
         model = TurnoOEE
         fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'hora_inicio', 'hora_fin', 'tiempo_planeado', 'produccion_planeada']
