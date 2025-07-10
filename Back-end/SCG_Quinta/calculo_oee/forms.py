@@ -12,9 +12,10 @@ class TurnoOEEForm(forms.ModelForm):
         help_text="Fecha del turno (formato: DD-MM-YYYY)"
     )
     CLIENTE_CHOICES = [
-        ('Cliente A', 'Cliente A'),
-        ('Cliente B', 'Cliente B'),
-        ('Cliente C', 'Cliente C'),
+        ('Jumbo', 'Jumbo'),
+        ('SISA', 'SISA'),
+        ('Walmart', 'Walmart'),
+        ('Unimarc', 'Unimarc'),
     ]
     cliente = forms.ChoiceField(
         choices=[('', '--Seleccionar cliente--')] + CLIENTE_CHOICES,
