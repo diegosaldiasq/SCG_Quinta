@@ -4,13 +4,11 @@ from .models import TurnoOEE
 class TurnoOEEForm(forms.ModelForm):
     fecha = forms.DateField(
         widget=forms.DateInput(attrs={
-            'type': 'date',  # Calendario nativo del navegador
+            'type': 'date',
             'class': 'input',
-            'placeholder': 'dd-mm-yyyy',
             'id': 'id_fecha',
-        }), 
-        input_formats=['%d-%m-%Y'],  # Formato de entrada para el campo de fecha
-        help_text="Fecha del turno (formato: DD-MM-YYYY)"
+        }),
+        help_text="Fecha del turno"
     )
     CLIENTE_CHOICES = [
         ('Jumbo', 'Jumbo'),
