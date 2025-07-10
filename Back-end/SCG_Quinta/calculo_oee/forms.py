@@ -6,7 +6,8 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.DateInput(attrs={
             'type': 'date',  # Calendario nativo del navegador
             'class': 'input',
-            'placeholder': 'dd-mm-yyyy'
+            'placeholder': 'dd-mm-yyyy',
+            'id': 'id_fecha',
         }), 
         input_formats=['%d-%m-%Y'],  # Formato de entrada para el campo de fecha
         help_text="Fecha del turno (formato: DD-MM-YYYY)"
@@ -39,6 +40,11 @@ class TurnoOEEForm(forms.ModelForm):
         ('Línea 1', 'Línea 1'),
         ('Línea 2', 'Línea 2'),
         ('Línea 3', 'Línea 3'),
+        ('Línea 3A', 'Línea 3A'),
+        ('Línea 3B', 'Línea 3B'),
+        ('Isla', 'Isla'),
+        ('Gorreri pasteleria', 'Gorreri pasteleria'),
+        ('Gorreri kuchen', 'Gorreri kuchen'),
     ]
     linea    = forms.ChoiceField(
         choices= [('', '--Seleccionar linea--')] + LINEA_CHOICES,
