@@ -50,7 +50,7 @@ def resumen_turno(request, turno_id):
 
     # Evitar duplicados en ResumenTurnoOee
     if not ResumenTurnoOee.objects.filter(turno=turno).exists():
-        fecha = timezone.now() #este no va
+        fecha = turno.fecha
 
         tiempo_paro = sum(d.duracion for d in turno.detenciones.all())
         productos_malos = sum(r.cantidad for r in turno.reprocesos.all())
