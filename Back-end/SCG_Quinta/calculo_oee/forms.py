@@ -97,7 +97,7 @@ class TurnoOEEForm(forms.ModelForm):
         }),
         help_text="Fecha del turno"
     )
-    CLIENTE_CHOICES = [(c, c) for c in CATALOGO.keys()]
+    #CLIENTE_CHOICES = [(c, c) for c in CATALOGO.keys()]
     cliente = forms.ChoiceField(
         choices=[('', '--Seleccionar cliente--')] + CLIENTE_CHOICES,
         widget=forms.Select(attrs={'id': 'id_cliente'})
@@ -164,10 +164,10 @@ class ProduccionRealForm(forms.ModelForm):
             })
         }
 
-def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+#def __init__(self, *args, **kwargs):
+#        super().__init__(*args, **kwargs)
         # Si llega un POST con cliente, rellenamos producto
-        cliente_sel = self.data.get('cliente')
-        if cliente_sel in CATALOGO:
-            opciones = [(p['producto'], p['producto']) for p in CATALOGO[cliente_sel]]
-            self.fields['producto'].choices = [('', '--Seleccionar producto--')] + opciones
+#        cliente_sel = self.data.get('cliente')
+#        if cliente_sel in CATALOGO:
+#            opciones = [(p['producto'], p['producto']) for p in CATALOGO[cliente_sel]]
+#            self.fields['producto'].choices = [('', '--Seleccionar producto--')] + opciones
