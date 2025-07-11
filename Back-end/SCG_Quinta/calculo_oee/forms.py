@@ -98,6 +98,12 @@ class TurnoOEEForm(forms.ModelForm):
         help_text="Fecha del turno"
     )
     #CLIENTE_CHOICES = [(c, c) for c in CATALOGO.keys()]
+    CLIENTE_CHOICES = [
+        ('Jumbo', 'Jumbo'),
+        ('SISA', 'SISA'),
+        ('Walmart', 'Walmart'),
+        ('Unimarc', 'Unimarc'),
+    ]
     cliente = forms.ChoiceField(
         choices=[('', '--Seleccionar cliente--')] + CLIENTE_CHOICES,
         widget=forms.Select(attrs={'id': 'id_cliente'})
