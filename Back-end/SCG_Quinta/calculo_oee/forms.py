@@ -1,6 +1,10 @@
 from django import forms
 from .models import TurnoOEE
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> b77b85f6b743719e389a9c0e3bed7fc4b5ee741a
 class TurnoOEEForm(forms.ModelForm):
     fecha = forms.DateField(
         widget=forms.DateInput(attrs={
@@ -73,4 +77,15 @@ class TurnoOEEForm(forms.ModelForm):
 class ProduccionRealForm(forms.ModelForm):
     class Meta:
         model = TurnoOEE
+<<<<<<< HEAD
         fields = ['produccion_real']
+=======
+        fields = ['produccion_real']
+        widget = {
+            'produccion_real': forms.NumberInput(attrs={
+                'readonly': 'readonly',
+                'id': 'id_produccion_real',
+                'placeholder': 'Ingrese producción real'
+            })
+        }
+>>>>>>> b77b85f6b743719e389a9c0e3bed7fc4b5ee741a
