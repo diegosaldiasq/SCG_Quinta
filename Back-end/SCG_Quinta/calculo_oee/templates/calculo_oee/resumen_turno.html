@@ -19,7 +19,7 @@
         
         <div class="login-container">
             <h1 class="title">Resumen del Turno</h1>
-            <h2>{{ resumen.turno.turno }} - Línea {{ resumen.linea }} - {{ resumen.fecha|date:'Y-m-d H:i' }}</h2>
+            <h2>{{ resumen.turno.turno }} - {{ resumen.linea }} - {{ resumen.fecha|date:'Y-m-d H:i' }}</h2>
             
             <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left;">
                 <li><strong>📅 Fecha:</strong> {{ resumen.fecha|date:'Y-m-d H:i' }}</li>
@@ -31,9 +31,12 @@
                 <li><strong>⏳ Tiempo planeado:</strong> {{ resumen.tiempo_planeado }} min</li>
                 <li><strong>⛔ Tiempo de paro:</strong> {{ resumen.tiempo_paro }} min</li>
                 <li><strong>📈 Producción teórica:</strong> {{ resumen.produccion_teorica }} unidades</li>
+                <li><strong>📝 Produccion planificada:</strong> {{ resumen.produccion_planificada }} unidades</li>
                 <li><strong>✅ Producción real:</strong> {{ resumen.produccion_real }} unidades</li>
                 <li><strong>👍 Productos buenos:</strong> {{ resumen.productos_buenos }}</li>
                 <li><strong>❌ Productos malos:</strong> {{ resumen.productos_malos }}</li>
+                <li><strong>👥 Personas en el turno:</strong> {{ resumen.numero_personas }}</li>
+                <li><strong>👤 Unidades por persona:</strong> {{ resumen.unidades_por_persona }}</li>
                 <li><strong>📊 Disponibilidad:</strong> {{ resumen.disponibilidad }}%</li>
                 <li><strong>⚙️ Rendimiento:</strong> {{ resumen.eficiencia }}%</li>
                 <li><strong>🎯 Calidad:</strong> {{ resumen.calidad }}%</li>

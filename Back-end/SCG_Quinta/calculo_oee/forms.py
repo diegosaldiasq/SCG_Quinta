@@ -128,6 +128,14 @@ class TurnoOEEForm(forms.ModelForm):
             'placeholder': '123BCA'
         })
     )
+    numero_personas = forms.IntegerField(
+        required=True,
+        help_text="Número de personas que trabajan en la linea durante el turno",
+        widget=forms.NumberInput(attrs={
+            'id': 'id_numero_personas',
+            'placeholder': 'Número de personas'
+        })
+    )
     LINEA_CHOICES = [
         ('Línea 1', 'Línea 1'),
         ('Línea 2', 'Línea 2'),
@@ -143,7 +151,7 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'id_linea'}))
     class Meta:
         model = TurnoOEE
-        fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'hora_inicio', 'hora_fin', 'tiempo_planeado', 'produccion_planeada']
+        fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'numero_personas','hora_inicio', 'hora_fin', 'tiempo_planeado', 'produccion_planeada']
         widgets = {
             'hora_inicio': forms.TimeInput(format='%H:%M', attrs={
                 'type': 'time', 'id': 'id_hora_inicio'
