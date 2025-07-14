@@ -1,6 +1,6 @@
 from django import forms
 from .models import TurnoOEE
-from .forms import CATALOGO
+#from .forms import CATALOGO
 
 CATALOGO = {
   'Jumbo': [
