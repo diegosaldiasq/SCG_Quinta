@@ -33,7 +33,7 @@ class ResumenTurnoOee(models.Model):
     cliente = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, null=True, blank=True)
     producto = models.CharField(max_length=100)
-    linea = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_linea')
+    linea   = models.CharField(max_length=50)
     turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno')
     tiempo_paro = models.PositiveIntegerField(help_text="Tiempo de paro en minutos")
     tiempo_planeado = models.PositiveIntegerField(help_text="Tiempo planeado en minutos")
