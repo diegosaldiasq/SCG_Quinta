@@ -97,6 +97,7 @@ def resumen_turno(request, turno_id):
             productos_buenos=productos_buenos,
             numero_personas=turno.numero_personas,
             unidades_por_persona=round(produccion_real / turno.numero_personas, 2) if turno.numero_personas else 0,
+            unidades_pp_hora=round(produccion_real / (turno.tiempo_planeado / 60) / turno.numero_personas, 2) if turno.numero_personas and turno.tiempo_planeado else 0,
             eficiencia=round(rendimiento * 100, 2),
             disponibilidad=round(disponibilidad * 100, 2),
             calidad=round(calidad * 100, 2),

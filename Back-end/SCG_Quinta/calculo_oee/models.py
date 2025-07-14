@@ -45,6 +45,7 @@ class ResumenTurnoOee(models.Model):
     productos_buenos = models.PositiveIntegerField(help_text="Cantidad de productos buenos")
     numero_personas = models.PositiveIntegerField(help_text="Número de personas que trabajaron en el turno", null=True, blank=True)
     unidades_por_persona = models.FloatField(help_text="Unidades producidas por persona", null=True, blank=True)
+    unidades_pp_hora = models.FloatField(help_text="Unidades producidas por persona por hora", null=True, blank=True)
     eficiencia = models.FloatField(help_text="Eficiencia del turno en porcentaje")
     disponibilidad = models.FloatField(help_text="Disponibilidad del turno en porcentaje")
     calidad = models.FloatField(help_text="Calidad del turno en porcentaje")
