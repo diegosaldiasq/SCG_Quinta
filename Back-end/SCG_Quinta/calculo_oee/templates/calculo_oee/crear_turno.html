@@ -30,19 +30,37 @@
         ];
 
         function agregarFilaDetencion() {
-            let opciones = motivosDetenciones.map(m => `<option value="${m}">${m}</option>`).join('');
-            const fila = `
-                <tr>
-                    <td>
-                        <select name="motivo_det[]" required>
-                            <option value="">-- Seleccionar --</option>
-                            ${opciones}
-                        </select>
-                    </td>
-                    <td><input type="number" name="duracion_det[]" min="0" required></td>
-                    <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
-                </tr>`;
-            document.querySelector("#tabla-detenciones tbody").insertAdjacentHTML("beforeend", fila);
+            const opciones = motivosDetenciones
+            .map(m => `<option value="${m}">${m}</option>`)
+            .join('');
+
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+            <td>
+                <select name="motivo_det[]" required>
+                <option value="">-- Seleccionar --</option>
+                ${opciones}
+                </select>
+            </td>
+            <td><input type="time" name="hora_inicio_det[]" required></td>
+            <td><input type="time" name="hora_fin_det[]" required></td>
+            <td><input type="number" name="duracion_det[]" readonly></td>
+            <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
+            `;
+            document.querySelector("#tabla-detenciones tbody").append(fila);
+
+            // cada vez que cambie inicio o fin, recalcula
+            const [hi, hf, dur] = fila.querySelectorAll('input');
+            function recalcular() {
+            if (!hi.value || !hf.value) { dur.value = ''; return; }
+            let [h1,m1] = hi.value.split(':').map(n=>+n);
+            let [h2,m2] = hf.value.split(':').map(n=>+n);
+            let t1 = h1*60 + m1, t2 = h2*60 + m2;
+            if (t2 < t1) t2 += 24*60; 
+            dur.value = t2 - t1;
+            }
+            hi.addEventListener('change', recalcular);
+            hf.addEventListener('change', recalcular);
         }
 
         function agregarFilaReproceso() {
@@ -233,6 +251,8 @@
                         <thead>
                             <tr>
                                 <th>Motivo</th>
+                                <th>Hora inicio</th>
+                                <th>Hora fin</th>
                                 <th>Duración (min)</th>
                                 <th>Acción</th>
                             </tr>

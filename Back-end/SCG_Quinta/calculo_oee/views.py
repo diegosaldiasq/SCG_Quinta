@@ -25,10 +25,24 @@ def crear_turno(request):
             turno = form.save()
 
             # Guardar detenciones
-            motivos_det = request.POST.getlist('motivo_det[]')
-            duraciones_det = request.POST.getlist('duracion_det[]')
-            for motivo, duracion in zip(motivos_det, duraciones_det):
-                Detencion.objects.create(turno=turno, motivo=motivo, duracion=int(duracion))
+            motivos   = request.POST.getlist('motivo_det[]')
+            inicios   = request.POST.getlist('hora_inicio_det[]')
+            finales   = request.POST.getlist('hora_fin_det[]')
+
+            from datetime import datetime, timedelta
+            for mot, hi, hf in zip(motivos, inicios, finales):
+                fmt = "%H:%M"
+                t1 = datetime.strptime(hi, fmt)
+                t2 = datetime.strptime(hf, fmt)
+                # si pasa de medianoche
+                if t2 < t1:
+                    t2 += timedelta(days=1)
+                dur = int((t2 - t1).total_seconds() // 60)
+                Detencion.objects.create(
+                    turno=turno,
+                    motivo=mot,
+                    duracion=dur
+                )
 
             # Guardar reprocesos
             motivos_rep = request.POST.getlist('motivo_rep[]')
