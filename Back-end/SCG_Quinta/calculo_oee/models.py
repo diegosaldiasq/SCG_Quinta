@@ -26,6 +26,8 @@ class TurnoOEE(models.Model):
 class Detencion(models.Model):
     turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')
     motivo = models.CharField(max_length=100)
+    hora_inicio = models.TimeField(null=True, blank=True)  # Puede ser null si aún está en curso
+    hora_fin = models.TimeField(null=True, blank=True)  # Puede ser null si aún está en curso
     duracion = models.PositiveIntegerField(help_text="Duración en minutos")
 
 class Reproceso(models.Model):
