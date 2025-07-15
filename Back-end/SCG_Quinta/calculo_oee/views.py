@@ -125,36 +125,36 @@ def cerrar_turno(request, turno_id):
 
 @login_required
 def lista_turnos(request):
-    turnos = TurnoOEE.objects.all().order_by('-fecha', '-hora_inicio')
+    qs = TurnoOEE.objects.all().order_by('-fecha')
 
-    # filtros
+    # --- 1. Aplicar filtros GET si vienen ---
     fecha = request.GET.get('fecha')
     linea = request.GET.get('linea')
     cliente = request.GET.get('cliente')
     producto = request.GET.get('producto')
 
     if fecha:
-        turnos = turnos.filter(fecha__date=parse_date(fecha))
+        # filtra por día (fecha es datetime en TurnoOEE)
+        qs = qs.filter(fecha__date=fecha)
     if linea:
-        turnos = turnos.filter(linea__icontains=linea)
+        qs = qs.filter(linea=linea)
     if cliente:
-        turnos = turnos.filter(cliente__icontains=cliente)
+        qs = qs.filter(cliente=cliente)
     if producto:
-        turnos = turnos.filter(producto__icontains=producto)
+        qs = qs.filter(producto=producto)
 
-    # paginación
-    paginator = Paginator(turnos, 10)
-    page_number = request.GET.get('page')
-    turnos_pag = paginator.get_page(page_number)
+    # --- 2. Obtener valores únicos para los desplegables ---
+    lineas    = TurnoOEE.objects.values_list('linea', flat=True).distinct()
+    clientes  = TurnoOEE.objects.values_list('cliente', flat=True).distinct()
+    productos = TurnoOEE.objects.values_list('producto', flat=True).distinct()
 
     return render(request, 'calculo_oee/lista_turnos.html', {
-        'turnos': turnos_pag,
-        'filtro_fecha': fecha,
-        'filtro_linea': linea,
-        'filtro_cliente': cliente,
-        'filtro_producto': producto,
+        'turnos':    qs,
+        'lineas':    lineas,
+        'clientes':  clientes,
+        'productos': productos,
     })
-
+    
 @login_required
 def detalle_turno(request, turno_id):
     turno = get_object_or_404(TurnoOEE, id=turno_id)

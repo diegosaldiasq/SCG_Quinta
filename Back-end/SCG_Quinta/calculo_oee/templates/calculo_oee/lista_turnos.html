@@ -22,21 +22,55 @@
             <h1 class="title">📋 Listado de Turnos OEE</h1>
 
             <!-- 🔎 Filtros -->
-            <form method="get" class="filtros-form">
-                <div class="filtros">
-                    <label>📅 Fecha:
-                        <input type="date" name="fecha" value="{{ filtro_fecha }}">
-                    </label>
-                    <label>🏭 Línea:
-                        <input type="text" name="linea" value="{{ filtro_linea }}">
-                    </label>
-                    <label>🏢 Cliente:
-                        <input type="text" name="cliente" value="{{ filtro_cliente }}">
-                    </label>
-                    <label>📦 Producto:
-                        <input type="text" name="producto" value="{{ filtro_producto }}">
-                    </label>
+            <form method="get" class="filtros">
+                <div class="campo-filtro">
+                    <label>📅 Fecha:</label>
+                    <input
+                    type="date"
+                    name="fecha"
+                    value="{{ request.GET.fecha }}"
+                    >
                 </div>
+
+                <div class="campo-filtro">
+                    <label>🏭 Línea:</label>
+                    <select name="linea">
+                    <option value="">--Todas--</option>
+                    {% for lin in lineas %}
+                        <option
+                        value="{{ lin }}"
+                        {% if request.GET.linea == lin %}selected{% endif %}
+                        >{{ lin }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-filtro">
+                    <label>🏢 Cliente:</label>
+                    <select name="cliente">
+                    <option value="">--Todos--</option>
+                    {% for cli in clientes %}
+                        <option
+                        value="{{ cli }}"
+                        {% if request.GET.cliente == cli %}selected{% endif %}
+                        >{{ cli }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-filtro">
+                    <label>📦 Producto:</label>
+                    <select name="producto">
+                    <option value="">--Todos--</option>
+                    {% for prod in productos %}
+                        <option
+                        value="{{ prod }}"
+                        {% if request.GET.producto == prod %}selected{% endif %}
+                        >{{ prod }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+
                 <div class="botones">
                     <button type="submit" class="primary-button">Filtrar</button>
                     <a href="{% url 'lista_turnos' %}" class="primary-button">Limpiar</a>
@@ -63,7 +97,7 @@
                     <tbody>
                         {% for t in turnos %}
                         <tr>
-                            <td>{{ t.fecha|date:'Y-m-d H:i' }}</td>
+                            <td>{{ t.fecha|date:'d-m-Y' }}</td>
                             <td>{{ t.cliente }}</td>
                             <td>{{ t.codigo }}</td>
                             <td>{{ t.producto }}</td>
