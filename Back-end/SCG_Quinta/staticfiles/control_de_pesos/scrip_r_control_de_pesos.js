@@ -9,8 +9,29 @@ $.ajaxSetup({
 
 document.addEventListener("DOMContentLoaded", function() {
      // 1) Restaurar lote y turno guardados en sessionStorage
+    const clienteGuardado = sessionStorage.getItem('cliente');
+    const codigoGuardado = sessionStorage.getItem('codigo');
+    const productoGuardado = sessionStorage.getItem('producto');
+    const pesoRecetaGuardado = sessionStorage.getItem('peso');
     const loteGuardado  = sessionStorage.getItem('lote');
     const turnoGuardado = sessionStorage.getItem('turno');
+
+    if (clienteGuardado !== null) {
+        document.getElementById('cliente').value = clienteGuardado; 
+        sessionStorage.removeItem('cliente');
+    }
+    if (codigoGuardado !== null) {
+        document.getElementById('codigo').value = codigoGuardado;
+        sessionStorage.removeItem('codigo');
+    }
+    if (productoGuardado !== null) {
+        document.getElementById('producto').value = productoGuardado;
+        sessionStorage.removeItem('producto');
+    }
+    if (pesoRecetaGuardado !== null) {
+        document.getElementById('peso').value = pesoRecetaGuardado; 
+        sessionStorage.removeItem('peso');
+    }
 
     if (loteGuardado !== null) {
         document.getElementById('lote').value = loteGuardado;
