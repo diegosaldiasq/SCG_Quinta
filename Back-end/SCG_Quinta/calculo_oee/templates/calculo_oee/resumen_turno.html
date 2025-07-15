@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}">
+    <link rel="stylesheet" href="{% static 'calculo_oee/estilos_oee.css' %}">
     <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
     <title>Resumen del Turno</title>
 </head>
@@ -19,44 +19,55 @@
         
         <div class="login-container">
             <h1 class="title">Resumen del Turno</h1>
-            <h2>{{ resumen.turno.turno }} - {{ resumen.linea }} - {{ resumen.fecha|date:'Y-m-d H:i' }}</h2>
-            
-            <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left;">
-                <li><strong>📅 Fecha:</strong> {{ resumen.fecha|date:'Y-m-d H:i' }}</li>
-                <li><strong>🏢 Cliente:</strong> {{ resumen.cliente }}</li>
-                <li><strong>🆔 Código:</strong> {{ resumen.codigo }}</li>
-                <li><strong>📦 Producto:</strong> {{ resumen.producto }}</li>
-                <li><strong>🏭 Línea:</strong> {{ resumen.linea }}</li>
-                <li><strong>⏱️ Turno:</strong> {{ resumen.turno.turno }}</li>
-                <li><strong>⏳ Tiempo planeado:</strong> {{ resumen.tiempo_planeado }} min</li>
-                <li><strong>⛔ Tiempo de paro:</strong> {{ resumen.tiempo_paro }} min</li>
-                <li><strong>📈 Producción teórica:</strong> {{ resumen.produccion_teorica }} unidades</li>
-                <li><strong>📝 Produccion planificada:</strong> {{ resumen.produccion_planificada }} unidades</li>
-                <li><strong>✅ Producción real:</strong> {{ resumen.produccion_real }} unidades</li>
-                <li><strong>👍 Productos buenos:</strong> {{ resumen.productos_buenos }}</li>
-                <li><strong>❌ Productos malos:</strong> {{ resumen.productos_malos }}</li>
-                <li><strong>👥 Personas en el turno:</strong> {{ resumen.numero_personas }}</li>
-                <li><strong>👤 Unidades por persona:</strong> {{ resumen.unidades_por_persona }}</li>
-                <li><strong>📊 Unidades por persona por hora:</strong> {{ resumen.unidades_pp_hora }}</li>
-                <li><strong>📊 Disponibilidad:</strong> {{ resumen.disponibilidad }}%</li>
-                <li><strong>⚙️ Rendimiento:</strong> {{ resumen.eficiencia }}%</li>
-                <li><strong>🎯 Calidad:</strong> {{ resumen.calidad }}%</li>
-                <li><strong><u>🔥 OEE:</u></strong> {{ resumen.oee }}%</li>
-            </ul>
+            <h2 class="subtitle">
+                {{ resumen.turno.turno }} – {{ resumen.linea }} – {{ resumen.fecha|date:'d-m-Y H:i' }}
+            </h2>
 
-            <div class="botones">
-                <a href="{% url 'lista_turnos' %}" class="primary-button login-button">Volver al listado</a>
-                <a href="{% url 'detalle_turno' resumen.turno.id %}" class="primary-button login-button">Ver Detenciones y Reprocesos</a>
-                
+            <!-- Nuevo contenedor con fondo semitransparente -->
+            <div class="resumen-box">
+                <ul class="resumen-list">
+                    <li><strong>📅 Fecha:</strong> {{ resumen.fecha|date:'Y-m-d H:i' }}</li>
+                    <li><strong>🏢 Cliente:</strong> {{ resumen.cliente }}</li>
+                    <li><strong>🆔 Código:</strong> {{ resumen.codigo }}</li>
+                    <li><strong>📦 Producto:</strong> {{ resumen.producto }}</li>
+                    <li><strong>🏭 Línea:</strong> {{ resumen.linea }}</li>
+                    <li><strong>⏱️ Turno:</strong> {{ resumen.turno.turno }}</li>
+                    <li><strong>⏳ Tiempo planeado:</strong> {{ resumen.tiempo_planeado }} min</li>
+                    <li><strong>⛔ Tiempo de paro:</strong> {{ resumen.tiempo_paro }} min</li>
+                    <li><strong>📈 Producción teórica:</strong> {{ resumen.produccion_teorica }} unidades</li>
+                    <li><strong>📝 Producción planificada:</strong> {{ resumen.produccion_planificada }} unidades</li>
+                    <li><strong>✅ Producción real:</strong> {{ resumen.produccion_real }} unidades</li>
+                    <li><strong>👍 Productos buenos:</strong> {{ resumen.productos_buenos }}</li>
+                    <li><strong>❌ Productos malos:</strong> {{ resumen.productos_malos }}</li>
+                    <li><strong>👥 Personas en el turno:</strong> {{ resumen.numero_personas }}</li>
+                    <li><strong>👤 Unidades por persona:</strong> {{ resumen.unidades_por_persona }}</li>
+                    <li><strong>📊 Unidades por persona por hora:</strong> {{ resumen.unidades_pp_hora }}</li>
+                    <li><strong>📊 Disponibilidad:</strong> {{ resumen.disponibilidad }}%</li>
+                    <li><strong>⚙️ Rendimiento:</strong> {{ resumen.eficiencia }}%</li>
+                    <li><strong>🎯 Calidad:</strong> {{ resumen.calidad }}%</li>
+                    <li><strong>🔥 OEE:</strong> {{ resumen.oee }}%</li>
+                </ul>
+
+                {% if resumen.verificado %}
+                <div class="verificado-info">
+                    ✅ Turno verificado por <strong>{{ resumen.verificado_por }}</strong>
+                    el {{ resumen.fecha_de_verificacion|date:'d-m-Y H:i' }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Botones bajo el resumen -->
+            <div class="botones-resumen">
+                <a href="{% url 'lista_turnos' %}" class="primary-button">Volver al listado</a>
+                <a href="{% url 'detalle_turno' resumen.turno.id %}" class="primary-button">
+                  Ver Detenciones y Reprocesos
+                </a>
+
                 {% if not resumen.verificado %}
-                <form method="post" action="{% url 'marcar_verificado' resumen.turno.id %}">
+                <form method="post" action="{% url 'marcar_verificado' resumen.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="primary-button login-button">Marcar como Verificado</button>
+                    <button type="submit" class="primary-button">Marcar como Verificado</button>
                 </form>
-                {% else %}
-                <p style="color: var(--hospital-green); font-weight: bold;">
-                    ✅ Turno Verificado por {{ resumen.verificado_por }} el {{ resumen.fecha_de_verificacion|date:'d-m-Y H:i' }}
-                </p>
                 {% endif %}
             </div>
         </div>
