@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class TurnoOEE(models.Model):
-    fecha = models.DateTimeField(unique=True, null=False, blank=False)
+    fecha = models.DateTimeField(null=False, blank=False)
     cliente = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, null=True, blank=True) 
     producto = models.CharField(max_length=100)
@@ -15,6 +15,10 @@ class TurnoOEE(models.Model):
     tiempo_planeado = models.PositiveIntegerField(help_text="En minutos")
     produccion_planeada = models.PositiveIntegerField(help_text="Producción planeada en unidades")
     produccion_real = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        # opción A: unique_together (deprecated pero sencillo)
+        unique_together = ('fecha', 'linea', 'producto')
 
     def __str__(self):
         return f"{self.fecha} - {self.linea} - {self.turno}"
