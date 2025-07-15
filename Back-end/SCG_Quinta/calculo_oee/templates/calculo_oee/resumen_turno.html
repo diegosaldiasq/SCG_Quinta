@@ -64,7 +64,7 @@
                 </a>
 
                 {% if not resumen.verificado %}
-                <form method="post" action="{% url 'marcar_verificado' resumen.id %}">
+                <form method="post" action="{% url 'marcar_verificado' resumen.turno.id %}">
                     {% csrf_token %}
                     <button type="submit" class="primary-button">Marcar como Verificado</button>
                 </form>
