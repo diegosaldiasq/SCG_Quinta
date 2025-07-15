@@ -30,18 +30,21 @@ def crear_turno(request):
             finales   = request.POST.getlist('hora_fin_det[]')
 
             from datetime import datetime, timedelta
+            fmt = "%H:%M"
             for mot, hi, hf in zip(motivos, inicios, finales):
-                fmt = "%H:%M"
+                # parseamos las horas
                 t1 = datetime.strptime(hi, fmt)
                 t2 = datetime.strptime(hf, fmt)
-                # si pasa de medianoche
                 if t2 < t1:
                     t2 += timedelta(days=1)
                 dur = int((t2 - t1).total_seconds() // 60)
+
                 Detencion.objects.create(
                     turno=turno,
                     motivo=mot,
-                    duracion=dur
+                    hora_inicio=t1.time(),   # <-- aquí
+                    hora_fin=   t2.time(),   # <-- y aquí
+                    duracion=   dur
                 )
 
             # Guardar reprocesos
