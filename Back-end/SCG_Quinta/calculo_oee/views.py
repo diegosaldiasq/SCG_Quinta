@@ -172,7 +172,7 @@ def marcar_verificado(request, turno_id):
     if request.method == 'POST':
         resumen = get_object_or_404(ResumenTurnoOee, turno_id=turno_id)
         resumen.verificado = True
-        resumen.verificado_por = request.user.username
+        resumen.verificado_por = request.user.nombre_completo
         resumen.fecha_de_verificacion = timezone.now()
         resumen.save()
         return redirect('resumen_turno', turno_id=turno_id)
