@@ -9,38 +9,46 @@ $.ajaxSetup({
 
 document.addEventListener("DOMContentLoaded", function() {
      // 1) Restaurar lote y turno guardados en sessionStorage
-    const clienteGuardado = sessionStorage.getItem('cliente');
-    const codigoGuardado = sessionStorage.getItem('codigo');
-    const productoGuardado = sessionStorage.getItem('producto');
-    const pesoRecetaGuardado = sessionStorage.getItem('peso');
-    const loteGuardado  = sessionStorage.getItem('lote');
-    const turnoGuardado = sessionStorage.getItem('turno');
+    const campos = ['cliente','producto','codigo','peso','lote','turno'];
+    campos.forEach(key => {
+        const val = sessionStorage.getItem(key);
+        if (val !== null) {
+        const el = document.getElementById(
+            key === 'pesoReal' ? 'peso-real' : key
+        );
+        if (el) el.value = val;
+        // para <select> de cliente/turno
+        if (el && el.tagName === 'SELECT') el.value = val;
+        sessionStorage.removeItem(key);
+        }
+    });
 
-    if (clienteGuardado !== null) {
-        document.getElementById('cliente').value = clienteGuardado; 
-        sessionStorage.removeItem('cliente');
-    }
-    if (codigoGuardado !== null) {
-        document.getElementById('codigo').value = codigoGuardado;
-        sessionStorage.removeItem('codigo');
-    }
-    if (productoGuardado !== null) {
-        document.getElementById('producto').value = productoGuardado;
-        sessionStorage.removeItem('producto');
-    }
-    if (pesoRecetaGuardado !== null) {
-        document.getElementById('peso').value = pesoRecetaGuardado; 
-        sessionStorage.removeItem('peso');
-    }
+    // 2) Listeners para guardar estado al cambiar campos
+    // Cliente → repuebla producto y guarda cliente
+    document.getElementById('cliente').addEventListener('change', () => {
+        sessionStorage.setItem('cliente', this.value);
+        // (reutiliza tu función de JS para repoblar productos)
+    });
 
-    if (loteGuardado !== null) {
-        document.getElementById('lote').value = loteGuardado;
-        sessionStorage.removeItem('lote');
-    }
-    if (turnoGuardado !== null) {
-        document.getElementById('turno').value = turnoGuardado;
-        sessionStorage.removeItem('turno');
-    }
+    // Producto → guarda producto, código y peso receta
+    document.getElementById('producto').addEventListener('change', () => {
+        const sel = this.selectedOptions[0];
+        const codigo = sel?.dataset.codigo || '';
+        const peso   = sel?.dataset.peso   || '';
+        document.getElementById('codigo').value = codigo;
+        document.getElementById('peso').value   = peso;
+        sessionStorage.setItem('producto', sel.value);
+        sessionStorage.setItem('codigo',   codigo);
+        sessionStorage.setItem('peso',     peso);
+    });
+
+    // Lote y turno
+    document.getElementById('lote').addEventListener('input', function() {
+        sessionStorage.setItem('lote', this.value);
+    });
+    document.getElementById('turno').addEventListener('change', function() {
+        sessionStorage.setItem('turno', this.value);
+    });
 
     // 2) Listener para el botón
     document.getElementById("miBoton").addEventListener("click", async function() {
