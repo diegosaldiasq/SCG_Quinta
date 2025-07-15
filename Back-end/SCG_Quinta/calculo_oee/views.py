@@ -166,7 +166,6 @@ def detalle_turno(request, turno_id):
         'reprocesos': reprocesos
     })
 
-@csrf_exempt
 @login_required
 def marcar_verificado(request, turno_id):
     if request.method == 'POST':
