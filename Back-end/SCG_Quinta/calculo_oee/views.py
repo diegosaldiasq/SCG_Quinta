@@ -128,13 +128,12 @@ def lista_turnos(request):
     qs = TurnoOEE.objects.all().order_by('-fecha')
 
     # --- 1. Aplicar filtros GET si vienen ---
-    fecha = request.GET.get('fecha')
-    linea = request.GET.get('linea')
-    cliente = request.GET.get('cliente')
-    producto = request.GET.get('producto')
+    fecha    = request.GET.get('fecha', '')
+    linea    = request.GET.get('linea', '')
+    cliente  = request.GET.get('cliente', '')
+    producto = request.GET.get('producto', '')
 
     if fecha:
-        # filtra por día (fecha es datetime en TurnoOEE)
         qs = qs.filter(fecha__date=fecha)
     if linea:
         qs = qs.filter(linea=linea)
@@ -148,11 +147,20 @@ def lista_turnos(request):
     clientes  = TurnoOEE.objects.values_list('cliente', flat=True).distinct()
     productos = TurnoOEE.objects.values_list('producto', flat=True).distinct()
 
+    # --- 3. Paginación ---
+    paginator   = Paginator(qs, 10)               # 10 turnos por página
+    page_number = request.GET.get('page', 1)
+    page_obj    = paginator.get_page(page_number)
+
     return render(request, 'calculo_oee/lista_turnos.html', {
-        'turnos':    qs,
-        'lineas':    lineas,
-        'clientes':  clientes,
-        'productos': productos,
+        'turnos':           page_obj,    # ahora es un Page object
+        'lineas':           lineas,
+        'clientes':         clientes,
+        'productos':        productos,
+        'filtro_fecha':     fecha,
+        'filtro_linea':     linea,
+        'filtro_cliente':   cliente,
+        'filtro_producto':  producto,
     })
     
 @login_required

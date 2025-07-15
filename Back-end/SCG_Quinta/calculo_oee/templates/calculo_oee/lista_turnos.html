@@ -125,15 +125,29 @@
 
             <!-- ⬅️➡️ Paginador -->
             <div class="pagination">
-                {% if turnos.has_previous %}
-                    <a href="?{% if filtro_fecha %}fecha={{ filtro_fecha }}&{% endif %}{% if filtro_linea %}linea={{ filtro_linea }}&{% endif %}page={{ turnos.previous_page_number }}">⬅️ Anterior</a>
-                {% endif %}
+            {% if turnos.has_previous %}
+                <a href="?{% if filtro_fecha %}fecha={{ filtro_fecha }}&{% endif %}
+                        {% if filtro_linea %}linea={{ filtro_linea }}&{% endif %}
+                        {% if filtro_cliente %}cliente={{ filtro_cliente }}&{% endif %}
+                        {% if filtro_producto %}producto={{ filtro_producto }}&{% endif %}
+                        page={{ turnos.previous_page_number }}">
+                ⬅️ Anterior
+                </a>
+            {% endif %}
 
-                <span class="current">Página {{ turnos.number }} de {{ turnos.paginator.num_pages }}</span>
+            <span class="current">
+                Página {{ turnos.number }} de {{ turnos.paginator.num_pages }}
+            </span>
 
-                {% if turnos.has_next %}
-                    <a href="?{% if filtro_fecha %}fecha={{ filtro_fecha }}&{% endif %}{% if filtro_linea %}linea={{ filtro_linea }}&{% endif %}page={{ turnos.next_page_number }}">Siguiente ➡️</a>
-                {% endif %}
+            {% if turnos.has_next %}
+                <a href="?{% if filtro_fecha %}fecha={{ filtro_fecha }}&{% endif %}
+                        {% if filtro_linea %}linea={{ filtro_linea }}&{% endif %}
+                        {% if filtro_cliente %}cliente={{ filtro_cliente }}&{% endif %}
+                        {% if filtro_producto %}producto={{ filtro_producto }}&{% endif %}
+                        page={{ turnos.next_page_number }}">
+                Siguiente ➡️
+                </a>
+            {% endif %}
             </div>
 
             <!-- ➕ Botón registrar -->
