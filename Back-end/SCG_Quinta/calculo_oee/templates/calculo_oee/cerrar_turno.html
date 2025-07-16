@@ -20,7 +20,7 @@
         <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
         <div class="login-container">
             <h1 class="title">🔒 Cerrar Turno - Producción Real</h1>
-            <h2>{{ turno.turno }} - {{ turno.fecha|date:'Y-m-d H:i' }} - Línea {{ turno.linea }}</h2>
+            <h2>{{ turno.turno }} - {{ turno.fecha|date:'d-m-Y H:i' }} - {{ turno.linea }}</h2>
 
             <form method="post" onsubmit="return confirmarEnvio()">
                 {% csrf_token %}

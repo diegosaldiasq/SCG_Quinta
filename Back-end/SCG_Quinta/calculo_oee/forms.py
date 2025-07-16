@@ -183,6 +183,14 @@ class TurnoOEEForm(forms.ModelForm):
             self.fields['producto'].choices = [('', '--Seleccionar producto--')] + opciones
 
 class ProduccionRealForm(forms.ModelForm):
+    produccion_real = forms.IntegerField(
+        required=True,
+        help_text="Producción real en unidades",
+        widget=forms.NumberInput(attrs={
+            'id': 'id_produccion_real',
+            'placeholder': 'Producción real'
+        })
+    )
     class Meta:
         model = TurnoOEE
         fields = ['produccion_real']
