@@ -18,7 +18,7 @@ class TurnoOEE(models.Model):
 
     class Meta:
         # opción A: unique_together (deprecated pero sencillo)
-        unique_together = ('fecha', 'linea', 'producto')
+        unique_together = ('fecha', 'linea', 'producto', 'turno')
 
     def __str__(self):
         return f"{self.fecha} - {self.linea} - {self.turno}"
