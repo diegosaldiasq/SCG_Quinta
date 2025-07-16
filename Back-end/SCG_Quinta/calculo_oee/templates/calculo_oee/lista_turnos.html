@@ -90,6 +90,7 @@
                             <th>⏱️ Turno</th>
                             <th>🕒 Inicio</th>
                             <th>🕔 Fin</th>
+                            <th>📈 Producción Plan</th>
                             <th>✅ Producción Real</th>
                             <th>⚙️ Acciones</th>
                         </tr>
@@ -105,6 +106,7 @@
                             <td>{{ t.turno }}</td>
                             <td>{{ t.hora_inicio }}</td>
                             <td>{{ t.hora_fin }}</td>
+                            <td>{{ t.produccion_planeada|default:'-' }}</td>
                             <td>{{ t.produccion_real|default:'-' }}</td>
                             <td>
                                 {% if not t.produccion_real %}
