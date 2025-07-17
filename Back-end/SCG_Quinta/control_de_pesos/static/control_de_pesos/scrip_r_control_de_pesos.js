@@ -9,46 +9,17 @@ $.ajaxSetup({
 
 document.addEventListener("DOMContentLoaded", function() {
      // 1) Restaurar lote y turno guardados en sessionStorage
-    const campos = ['cliente','producto','codigo','peso','lote','turno'];
-    campos.forEach(key => {
-        const val = sessionStorage.getItem(key);
-        if (val !== null) {
-        const el = document.getElementById(
-            key === 'pesoReal' ? 'peso-real' : key
-        );
-        if (el) el.value = val;
-        // para <select> de cliente/turno
-        if (el && el.tagName === 'SELECT') el.value = val;
-        sessionStorage.removeItem(key);
-        }
-    });
+    const loteGuardado  = sessionStorage.getItem('lote');
+    const turnoGuardado = sessionStorage.getItem('turno');
 
-    // 2) Listeners para guardar estado al cambiar campos
-    // Cliente → repuebla producto y guarda cliente
-    document.getElementById('cliente').addEventListener('change', () => {
-        sessionStorage.setItem('cliente', this.value);
-        // (reutiliza tu función de JS para repoblar productos)
-    });
-
-    // Producto → guarda producto, código y peso receta
-    document.getElementById('producto').addEventListener('change', () => {
-        const sel = this.selectedOptions[0];
-        const codigo = sel?.dataset.codigo || '';
-        const peso   = sel?.dataset.peso   || '';
-        document.getElementById('codigo').value = codigo;
-        document.getElementById('peso').value   = peso;
-        sessionStorage.setItem('producto', sel.value);
-        sessionStorage.setItem('codigo',   codigo);
-        sessionStorage.setItem('peso',     peso);
-    });
-
-    // Lote y turno
-    document.getElementById('lote').addEventListener('input', function() {
-        sessionStorage.setItem('lote', this.value);
-    });
-    document.getElementById('turno').addEventListener('change', function() {
-        sessionStorage.setItem('turno', this.value);
-    });
+    if (loteGuardado !== null) {
+        document.getElementById('lote').value = loteGuardado;
+        sessionStorage.removeItem('lote');
+    }
+    if (turnoGuardado !== null) {
+        document.getElementById('turno').value = turnoGuardado;
+        sessionStorage.removeItem('turno');
+    }
 
     // 2) Listener para el botón
     document.getElementById("miBoton").addEventListener("click", async function() {
