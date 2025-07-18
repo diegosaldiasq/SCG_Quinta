@@ -200,7 +200,7 @@ def redireccionar_intermedio(request):
 @csrf_exempt
 @login_required
 def descargar_resumenturnooee(request):
-    registros = ResumenTurnoOee.objects.all()
+    registros = ResumenTurnoOee.objects.select_related('turno').all()
 
     if not registros.exists():
         return render(request, 'inicio/no_hay_datos.html')
