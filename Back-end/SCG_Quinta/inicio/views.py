@@ -146,7 +146,7 @@ model_mapping = {
         'control_parametros_gorreri': 'DatosFormularioControlParametrosGorreri',
         'control_de_pesos_prelistos': 'DatosFormularioControlDePesosPrelistos',
         'control_de_pesos_insumos_kuchen': 'DatosFormularioControlDePesosInsumosKuchen',
-        'calculo_oee': 'ResumenTurnoOee'
+        'calculo_oee': 'calculo_oee.ResumenTurnoOee',
     }
 
 @csrf_exempt
