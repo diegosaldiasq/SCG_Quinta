@@ -56,6 +56,10 @@ def descargas(request):
 def descargas_2(request):
     return render(request, 'inicio/descargas_2.html')
 
+@login_required
+def descargas_3(request):
+    return render(request, 'inicio/descargas_3.html')
+
 @csrf_exempt
 @login_required
 def set_fechas(request):
@@ -141,7 +145,8 @@ model_mapping = {
         'control_de_pesos': 'DatosFormularioControlDePesos',
         'control_parametros_gorreri': 'DatosFormularioControlParametrosGorreri',
         'control_de_pesos_prelistos': 'DatosFormularioControlDePesosPrelistos',
-        'control_de_pesos_insumos_kuchen': 'DatosFormularioControlDePesosInsumosKuchen'
+        'control_de_pesos_insumos_kuchen': 'DatosFormularioControlDePesosInsumosKuchen',
+        'calculo_oee': 'ResumenTurnoOee'
     }
 
 @csrf_exempt
