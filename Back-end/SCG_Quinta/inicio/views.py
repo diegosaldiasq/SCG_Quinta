@@ -236,14 +236,8 @@ def descargar_registros(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
     config = request.GET['config']
-    if not config:
-        return render(request, 'inicio/no_hay_datos.html')
     model_name = model_mapping.get(config)
-    #if not model_name:
-    #    return render(request, 'inicio/no_hay_datos.html')
     model = apps.get_model(config , model_name)
-    #if not model:
-    #    return render(request, 'inicio/no_hay_datos.html')
     
     objeto_filtrado = None
     if fecha_inicio_str == None or fecha_fin_str == None:
@@ -251,12 +245,7 @@ def descargar_registros(request):
     else:
         fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
         fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
-        if model_name == 'ResumenTurnoOee':
-            # Para ResumenTurnoOee, se filtra por fecha
-            objeto_filtrado = model.objects.filter(fecha__range=[fecha_inicio, fecha_fin])  
-        else:
-            # Para otros modelos, se filtra por fecha_registro
-            objeto_filtrado = model.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+        objeto_filtrado = model.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     filename = str(config) + '.xlsx'
     if not objeto_filtrado.exists():

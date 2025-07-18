@@ -69,6 +69,11 @@
                     <button type="submit" class="primary-button">Marcar como Verificado</button>
                 </form>
                 {% endif %}
+                <!-- Botón para descargar el resumen completo -->
+                <form method="post" action="{% url 'descargar_resumenturnooee' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="primary-button">Descargar Resumen</button>
+                </form>
             </div>
         </div>
     </div>

@@ -195,3 +195,30 @@ def marcar_verificado(request, turno_id):
 def redireccionar_intermedio(request):
     url_inicio = reverse('intermedio')
     return HttpResponseRedirect(url_inicio)
+
+# Descargar registros de ResumenTurnoOee
+@login_required
+def descargar_resumenturnooee(request):
+    registros = ResumenTurnoOee.objects.all()
+
+    if not registros.exists():
+        return render(request, 'inicio/no_hay_datos.html')
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="resumen_turno_oee.xlsx"'
+
+    from openpyxl import Workbook
+    wb = Workbook()
+    ws = wb.active
+
+    # Escribir encabezados
+    headers = [field.name for field in ResumenTurnoOee._meta.fields]
+    ws.append(headers)
+
+    # Escribir datos
+    for registro in registros:
+        ws.append([getattr(registro, field) for field in headers])
+
+    wb.save(response)
+    
+    return response
