@@ -197,6 +197,7 @@ def redireccionar_intermedio(request):
     return HttpResponseRedirect(url_inicio)
 
 # Descargar registros de ResumenTurnoOee
+@csrf_exempt
 @login_required
 def descargar_resumenturnooee(request):
     registros = ResumenTurnoOee.objects.all()
