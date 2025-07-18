@@ -245,7 +245,12 @@ def descargar_registros(request):
     else:
         fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
         fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
-        objeto_filtrado = model.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+        if model_name == 'ResumenTurnoOee':
+            # Para ResumenTurnoOee, se filtra por fecha
+            objeto_filtrado = model.objects.filter(fecha__range=[fecha_inicio, fecha_fin])  
+        else:
+            # Para otros modelos, se filtra por fecha_registro
+            objeto_filtrado = model.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
     filename = str(config) + '.xlsx'
     if not objeto_filtrado.exists():
