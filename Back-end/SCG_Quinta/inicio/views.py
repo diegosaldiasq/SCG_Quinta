@@ -237,9 +237,11 @@ def descargar_registros(request):
     fecha_fin_str = request.session.get('fechafin')
     config = request.GET['config']
     model_name = model_mapping.get(config)
-    model = apps.get_model(config , model_name)
-    if not model:
+    if not model_name:
         return render(request, 'inicio/no_hay_datos.html')
+    model = apps.get_model(config , model_name)
+    #if not model:
+    #    return render(request, 'inicio/no_hay_datos.html')
     
     objeto_filtrado = None
     if fecha_inicio_str == None or fecha_fin_str == None:
