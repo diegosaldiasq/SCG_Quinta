@@ -13,6 +13,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from .constants import TASA_NOMINAL_POR_PRODUCTO, TASA_NOMINAL_DEFECTO
 
 # Create your views here.
 
@@ -75,8 +76,10 @@ def resumen_turno(request, lote_id):
         productos_malos = sum(r.cantidad for r in lote.reprocesos.all())
 
         tiempo_operativo = lote.tiempo_planeado - tiempo_paro
-        tasa_nominal = lote.produccion_planeada / lote.tiempo_planeado if lote.tiempo_planeado else 0
-        produccion_teorica = tiempo_operativo * tasa_nominal
+        clave = (lote.producto, lote.codigo)
+        tasa_nominal = TASA_NOMINAL_POR_PRODUCTO.get(clave, TASA_NOMINAL_DEFECTO) # valores en constants.py
+        num_personas = lote.numero_personas or 0
+        produccion_teorica = tasa_nominal * num_personas
 
         produccion_real = lote.produccion_real or 0
         productos_buenos = produccion_real - productos_malos

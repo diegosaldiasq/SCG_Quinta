@@ -1,0 +1,63 @@
+TASA_NOMINAL_POR_PRODUCTO = {
+    # ('producto', 'código'): tasa_nominal_por_persona # unidades/persona/turno(8 horas) (equivalencia)
+    # …añade todos los que necesites…
+    # JUMBO 
+    ('Torta Beatriz','393241'):  80,
+    ('Torta Bom Bom','393240'):  100,
+    ('Torta tres leches','393149'):  100,  
+    ('Torta cuatro leches','393191'):  100,
+    ('Torta piña','393129'):  100,
+    ('Torta lucuma','393141'):  100,
+    ('Torta panqueque naranja','393171'):  100,
+    ('Torta selva negra','393145'):  100,
+    ('Torta truffa','393167'):  100,
+    ('Torta viena','393153'):  100,
+    ('Torta San Jorge lucuma','393396'):  100,
+    ('Torta San Jorge guinda','393397'):  25,
+    ('Torta San Jorge chocolate','393398'):  25,
+    ('Torta merengue lucuma','405220'):  80,
+    ('Torta merengue frambuesa','405217'):  80,
+    ('Torta merengue nugat','393443'):  80,
+    ('Torta merengue manzana frambuesa','405458'):  80,
+    ('Torta chocolate real','405254'):  25,
+    ('Torta caluga frambuesa','393414'):  25,
+    ('Torta caluga nuez','405548'):  25,
+    ('Torta selva negra vegana','405258'):  80,
+    ('Torta piña vegana','405260'):  80,
+    ('Torta panqueque guinda chocolate','402261'):  25,
+    ('Pie de frambuesa familiar','393429'):  80,
+    ('Pie de maracuya familiar','393430'):  80,
+    ('Pie de limon familiar','393431'):  100,
+    ('Media torta San Jorge lucuma','405414'):  50,
+    ('Tarta soft familiar','393433'):  80,
+    ('Tartaleta fruta mixta familiar','393432'):  80,
+    # SISA
+    ('Torta amor','393266'):  100,
+    ('Torta crema manjar mediana','392518'):  200,
+    ('Torta crema piña','393011'):  200,
+    ('Torta crema selva negra','393013'):  200,
+    ('Torta chocolate mediana','405523'):  80,
+    ('Torta merengue frambuesa','393036'):  80,
+    ('Torta merengue lucuma','393212'):  80,
+    ('Torta mocaccino mediana','353253'):  200,
+    ('Torta panqueque naranja','393018'):  100,
+    ('Torta tres leches','393015'):  100,
+    ('Torta yogurt','393017'):  100,
+    ('Torta viena','393019'):  100,
+    ('Torta guinda chocolate','393362'):  200,
+    ('Torta sabor lucuma','393356'):  200,
+    ('Torta sacher','393354'):  200,
+    ('Torta doña isabel','405256'):  100,
+    ('Torta cookies & cream','405295'):  200,
+    ('Torta caramel macchiato','405294'):  80,
+    ('Torta piña colada','405292'):  80,
+    ('Tartaleta fruta mixta mediana','393270'):  80,
+    ('Pie de limon familiar','393000'):  100,
+    ('Pie de limon mediano','405396'):  100,
+    ('Pie de maracuya mediano','405397'):  80,
+    # WALMART
+    # UNIMARC
+}
+    
+# Una tasa por defecto si no encuentras la clave
+TASA_NOMINAL_DEFECTO = 80  # por ejemplo
