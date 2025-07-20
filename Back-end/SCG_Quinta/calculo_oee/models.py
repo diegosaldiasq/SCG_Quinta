@@ -41,7 +41,7 @@ class ResumenTurnoOee(models.Model):
     codigo = models.CharField(max_length=20, null=True, blank=True)
     producto = models.CharField(max_length=100)
     linea   = models.CharField(max_length=50)
-    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno')
+    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno', null=True, blank=True)
     turno = models.CharField(max_length=20)
     supervisor = models.CharField(max_length=50, null=True, blank=True)
     tiempo_paro = models.PositiveIntegerField(help_text="Tiempo de paro en minutos")
