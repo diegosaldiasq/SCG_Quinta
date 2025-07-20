@@ -36,7 +36,7 @@ class Reproceso(models.Model):
     cantidad = models.PositiveIntegerField()
 
 class ResumenTurnoOee(models.Model):
-    fecha = models.DateTimeField(auto_now_add=True)
+    fecha = models.DateTimeField(auto_now_add=False)
     cliente = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, null=True, blank=True)
     producto = models.CharField(max_length=100)
