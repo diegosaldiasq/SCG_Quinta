@@ -22,7 +22,7 @@ def crear_turno(request):
     if request.method == 'POST':
         form = TurnoOEEForm(request.POST)
         if form.is_valid():
-            turno = form.save()
+            lote = form.save()
 
             # Guardar detenciones
             motivos   = request.POST.getlist('motivo_det[]')
@@ -40,7 +40,7 @@ def crear_turno(request):
                 dur = int((t2 - t1).total_seconds() // 60)
 
                 Detencion.objects.create(
-                    turno=turno,
+                    lote=lote,
                     motivo=mot,
                     hora_inicio=t1.time(),   # <-- aquí
                     hora_fin=   t2.time(),   # <-- y aquí
@@ -51,7 +51,7 @@ def crear_turno(request):
             motivos_rep = request.POST.getlist('motivo_rep[]')
             cantidades_rep = request.POST.getlist('cantidad_rep[]')
             for motivo, cantidad in zip(motivos_rep, cantidades_rep):
-                Reproceso.objects.create(turno=turno, motivo=motivo, cantidad=int(cantidad))
+                Reproceso.objects.create(lote=lote, motivo=motivo, cantidad=int(cantidad))
 
             return redirect('lista_turnos')  # Redirige al listado
 
@@ -62,24 +62,26 @@ def crear_turno(request):
 
 
 @login_required
-def resumen_turno(request, turno_id):
-    turno = get_object_or_404(TurnoOEE, id=turno_id)
+def resumen_turno(request, lote_id):
+    lote = get_object_or_404(TurnoOEE, id=lote_id)
 
     # Evitar duplicados en ResumenTurnoOee
-    if not ResumenTurnoOee.objects.filter(turno=turno).exists():
-        fecha = turno.fecha
+    if not ResumenTurnoOee.objects.filter(lote=lote).exists():
+        fecha = lote.fecha
+        turno = lote.turno
+        supervisor = lote.supervisor
 
-        tiempo_paro = sum(d.duracion for d in turno.detenciones.all())
-        productos_malos = sum(r.cantidad for r in turno.reprocesos.all())
+        tiempo_paro = sum(d.duracion for d in lote.detenciones.all())
+        productos_malos = sum(r.cantidad for r in lote.reprocesos.all())
 
-        tiempo_operativo = turno.tiempo_planeado - tiempo_paro
-        tasa_nominal = turno.produccion_planeada / turno.tiempo_planeado if turno.tiempo_planeado else 0
+        tiempo_operativo = lote.tiempo_planeado - tiempo_paro
+        tasa_nominal = lote.produccion_planeada / lote.tiempo_planeado if lote.tiempo_planeado else 0
         produccion_teorica = tiempo_operativo * tasa_nominal
 
-        produccion_real = turno.produccion_real or 0
+        produccion_real = lote.produccion_real or 0
         productos_buenos = produccion_real - productos_malos
 
-        disponibilidad = tiempo_operativo / turno.tiempo_planeado if turno.tiempo_planeado else 0
+        disponibilidad = tiempo_operativo / lote.tiempo_planeado if lote.tiempo_planeado else 0
         rendimiento = produccion_real / produccion_teorica if produccion_teorica else 0
         calidad = productos_buenos / produccion_real if produccion_real else 0
         oee = disponibilidad * rendimiento * calidad * 100  # en %
@@ -87,44 +89,46 @@ def resumen_turno(request, turno_id):
         ResumenTurnoOee.objects.create(
             fecha=fecha,
             turno=turno,
-            cliente=turno.cliente,
-            codigo=turno.codigo,
-            producto=turno.producto,
-            linea=turno.linea,
+            supervisor=supervisor,
+            lote=lote,
+            cliente=lote.cliente,
+            codigo=lote.codigo,
+            producto=lote.producto,
+            linea=lote.linea,
             tiempo_paro=tiempo_paro,
-            tiempo_planeado=turno.tiempo_planeado,
+            tiempo_planeado=lote.tiempo_planeado,
             produccion_teorica=round(produccion_teorica),
-            produccion_planificada=turno.produccion_planeada,
+            produccion_planificada=lote.produccion_planeada,
             produccion_real=produccion_real,
             productos_malos=productos_malos,
             productos_buenos=productos_buenos,
-            numero_personas=turno.numero_personas,
-            unidades_por_persona=round(produccion_real / turno.numero_personas, 2) if turno.numero_personas else 0,
-            unidades_pp_hora=round(produccion_real / (turno.tiempo_planeado / 60) / turno.numero_personas, 2) if turno.numero_personas and turno.tiempo_planeado else 0,
+            numero_personas=lote.numero_personas,
+            unidades_por_persona=round(produccion_real / lote.numero_personas, 2) if lote.numero_personas else 0,
+            unidades_pp_hora=round(produccion_real / (lote.tiempo_planeado / 60) / lote.numero_personas, 2) if lote.numero_personas and lote.tiempo_planeado else 0,
             eficiencia=round(rendimiento * 100, 2),
             disponibilidad=round(disponibilidad * 100, 2),
             calidad=round(calidad * 100, 2),
             oee=round(oee, 2)
         )
 
-    resumen = ResumenTurnoOee.objects.get(turno=turno)
+    resumen = ResumenTurnoOee.objects.get(lote=lote)
 
     return render(request, 'calculo_oee/resumen_turno.html', {'resumen': resumen})
 
 @csrf_exempt
 @login_required
-def cerrar_turno(request, turno_id):
-    turno = get_object_or_404(TurnoOEE, id=turno_id)
+def cerrar_turno(request, lote_id):
+    lote = get_object_or_404(TurnoOEE, id=lote_id)
 
     if request.method == 'POST':
-        form = ProduccionRealForm(request.POST, instance=turno)
+        form = ProduccionRealForm(request.POST, instance=lote)
         if form.is_valid():
             form.save()
-            return redirect('resumen_turno', turno_id=turno.id)
+            return redirect('resumen_turno', lote_id=lote.id)
     else:
-        form = ProduccionRealForm(instance=turno)
+        form = ProduccionRealForm(instance=lote)
 
-    return render(request, 'calculo_oee/cerrar_turno.html', {'form': form, 'turno': turno})
+    return render(request, 'calculo_oee/cerrar_turno.html', {'form': form, 'lote': lote})
 
 @login_required
 def lista_turnos(request):
@@ -167,29 +171,29 @@ def lista_turnos(request):
     })
     
 @login_required
-def detalle_turno(request, turno_id):
-    turno = get_object_or_404(TurnoOEE, id=turno_id)
-    detenciones = turno.detenciones.all()
-    reprocesos = turno.reprocesos.all()
+def detalle_turno(request, lote_id):
+    lote = get_object_or_404(TurnoOEE, id=lote_id)
+    detenciones = lote.detenciones.all()
+    reprocesos = lote.reprocesos.all()
     return render(request, 'calculo_oee/detalle_turno.html', {
-        'turno': turno,
+        'lote': lote,
         'detenciones': detenciones,
         'reprocesos': reprocesos
     })
 
 @csrf_exempt
 @login_required
-def marcar_verificado(request, turno_id):
+def marcar_verificado(request, lote_id):
     if request.user.is_staff or request.user.is_superuser:
         if request.method == 'POST':
-            resumen = get_object_or_404(ResumenTurnoOee, turno_id=turno_id)
+            resumen = get_object_or_404(ResumenTurnoOee, lote_id=lote_id)
             resumen.verificado = True
             resumen.verificado_por = request.user.nombre_completo
             resumen.fecha_de_verificacion = timezone.now()
             resumen.save()
-            return redirect('resumen_turno', turno_id=turno_id)
+            return redirect('resumen_turno', lote_id=lote_id)
     else:
-        return redirect('resumen_turno', turno_id=turno_id)
+        return redirect('resumen_turno', lote_id=lote_id)
     
 @login_required
 def redireccionar_intermedio(request):

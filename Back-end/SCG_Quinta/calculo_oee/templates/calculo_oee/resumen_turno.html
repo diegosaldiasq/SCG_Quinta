@@ -20,7 +20,7 @@
         <div class="login-container">
             <h1 class="title">Resumen del Turno</h1>
             <h2 class="subtitle">
-                {{ resumen.turno.turno }} – {{ resumen.linea }} – {{ resumen.fecha|date:'d-m-Y H:i' }}
+                {{ resumen.lote.lote }} – {{ resumen.linea }} – {{ resumen.fecha|date:'d-m-Y H:i' }}
             </h2>
 
             <!-- Nuevo contenedor con fondo semitransparente -->
@@ -32,6 +32,8 @@
                     <li><strong>📦 Producto:</strong> {{ resumen.producto }}</li>
                     <li><strong>🏭 Línea:</strong> {{ resumen.linea }}</li>
                     <li><strong>⏱️ Turno:</strong> {{ resumen.turno.turno }}</li>
+                    <li><strong>🏷️ Lote:</strong> {{ resumen.lote }}</li>
+                    <li><strong>👤 Supervisor:</strong> {{ resumen.supervisor }}</li>
                     <li><strong>⏳ Tiempo planeado:</strong> {{ resumen.tiempo_planeado }} min</li>
                     <li><strong>⛔ Tiempo de paro:</strong> {{ resumen.tiempo_paro }} min</li>
                     <li><strong>📈 Producción teórica:</strong> {{ resumen.produccion_teorica }} unidades</li>
@@ -59,12 +61,12 @@
             <!-- Botones bajo el resumen -->
             <div class="botones-resumen">
                 <a href="{% url 'lista_turnos' %}" class="primary-button">Volver al listado</a>
-                <a href="{% url 'detalle_turno' resumen.turno.id %}" class="primary-button">
+                <a href="{% url 'detalle_turno' resumen.lote.id %}" class="primary-button">
                   Ver Detenciones y Reprocesos
                 </a>
 
                 {% if not resumen.verificado %}
-                <form method="post" action="{% url 'marcar_verificado' resumen.turno.id %}">
+                <form method="post" action="{% url 'marcar_verificado' resumen.lote.id %}">
                     {% csrf_token %}
                     <button type="submit" class="primary-button">Marcar como Verificado</button>
                 </form>

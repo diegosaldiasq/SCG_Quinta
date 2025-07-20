@@ -10,28 +10,28 @@ class TurnoOEE(models.Model):
     linea = models.CharField(max_length=50)
     turno = models.CharField(max_length=20)
     numero_personas = models.PositiveIntegerField(help_text="Número de personas que trabajan en el turno", null=True, blank=True)
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
+    lote = models.CharField(max_length=20, null=True, blank=True)
+    supervisor = models.CharField(max_length=50, null=True, blank=True)
     tiempo_planeado = models.PositiveIntegerField(help_text="En minutos")
     produccion_planeada = models.PositiveIntegerField(help_text="Producción planeada en unidades")
     produccion_real = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         # opción A: unique_together (deprecated pero sencillo)
-        unique_together = ('fecha', 'linea', 'producto', 'turno')
+        unique_together = ('fecha', 'linea', 'producto', 'lote', 'turno')
 
     def __str__(self):
         return f"{self.fecha} - {self.linea} - {self.turno}"
 
 class Detencion(models.Model):
-    turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')
+    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')
     motivo = models.CharField(max_length=100)
     hora_inicio = models.TimeField(null=True, blank=True)  # Puede ser null si aún está en curso
     hora_fin = models.TimeField(null=True, blank=True)  # Puede ser null si aún está en curso
     duracion = models.PositiveIntegerField(help_text="Duración en minutos")
 
 class Reproceso(models.Model):
-    turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos')
+    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos')
     motivo = models.CharField(max_length=100)
     cantidad = models.PositiveIntegerField()
 
@@ -41,7 +41,9 @@ class ResumenTurnoOee(models.Model):
     codigo = models.CharField(max_length=20, null=True, blank=True)
     producto = models.CharField(max_length=100)
     linea   = models.CharField(max_length=50)
-    turno = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno')
+    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno')
+    turno = models.CharField(max_length=20)
+    supervisor = models.CharField(max_length=50, null=True, blank=True)
     tiempo_paro = models.PositiveIntegerField(help_text="Tiempo de paro en minutos")
     tiempo_planeado = models.PositiveIntegerField(help_text="Tiempo planeado en minutos")
     produccion_teorica = models.PositiveIntegerField(help_text="Producción teórica en unidades")

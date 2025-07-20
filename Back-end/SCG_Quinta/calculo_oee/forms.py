@@ -120,9 +120,9 @@ class TurnoOEEForm(forms.ModelForm):
             'placeholder': 'Se autocompleta'
         })
     )
-    turno = forms.CharField(
+    lote = forms.CharField(
         required=True,
-        help_text="Turno es igual al lote del turno, ej: 123BCA",
+        help_text="Lote del turno, ej: 123BCA",
         widget=forms.TextInput(attrs={
             'id': 'id_turno',
             'placeholder': '123BCA'
@@ -135,6 +135,27 @@ class TurnoOEEForm(forms.ModelForm):
             'id': 'id_numero_personas',
             'placeholder': 'Número de personas'
         })
+    )
+    TURNOS_CHOICES = [
+        ('Turno A', 'Turno A'),
+        ('Turno B', 'Turno B'),
+        ('Turno C', 'Turno C'),
+    ]
+    turno = forms.ChoiceField(
+        choices=[('', '--Seleccionar turno--')] + TURNOS_CHOICES,
+        widget=forms.Select(attrs={'id': 'id_turno'})
+    )
+    SUPERVISOR_CHOICES = [
+        ('Diego Saldias', 'Diego Saldias'),
+        ('Cristian Gorreri', 'Cristian Gorreri'),
+        ('Cristian Vera', 'Cristian Vera'),
+        ('Felipe Vera', 'Felipe Vera'),
+        ('Jorge Vera', 'Jorge Vera'),
+        ('Luis Vera', 'Luis Vera'),
+    ]
+    supervisor = forms.ChoiceField(
+        choices=[('', '--Seleccionar supervisor--')] + SUPERVISOR_CHOICES,
+        widget=forms.Select(attrs={'id': 'id_supervisor'})
     )
     LINEA_CHOICES = [
         ('Línea 1', 'Línea 1'),
@@ -151,18 +172,13 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'id_linea'}))
     class Meta:
         model = TurnoOEE
-        fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'numero_personas','hora_inicio', 'hora_fin', 'tiempo_planeado', 'produccion_planeada']
+        fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado', 'produccion_planeada']
         widgets = {
-            'hora_inicio': forms.TimeInput(format='%H:%M', attrs={
-                'type': 'time', 'id': 'id_hora_inicio'
-            }),
-            'hora_fin':    forms.TimeInput(format='%H:%M', attrs={
-                'type': 'time', 'id': 'id_hora_fin'
-            }),
             'tiempo_planeado': forms.NumberInput(attrs={
-                'readonly': 'readonly',
+                # Valor fijo de 480 minutos (8 horas)
+                'value': 480,
                 'id': 'id_tiempo_planeado',
-                'placeholder': 'Se calcula automáticamente'
+                'placeholder': 'Tiempo planeado (en minutos)'
             }),
             # … otros widgets …
         }

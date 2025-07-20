@@ -20,7 +20,7 @@
 
         <div class="login-container">
             <h1 class="title">📑 Detalles del Turno</h1>
-            <h2>{{ turno.turno }} - {{ turno.linea }}</h2>
+            <h2>{{ lote.lote }} - {{ lote.linea }}</h2>
 
             <!-- 🛑 Tabla de Detenciones -->
             <h3>⛔ Detenciones</h3>
@@ -78,7 +78,7 @@
 
             <!-- 🔙 Botón volver -->
             <div class="botones">
-                <a href="{% url 'resumen_turno' turno.id %}" class="primary-button">⬅️ Volver al Resumen</a>
+                <a href="{% url 'resumen_turno' lote.id %}" class="primary-button">⬅️ Volver al Resumen</a>
             </div>
         </div>
     </div>
