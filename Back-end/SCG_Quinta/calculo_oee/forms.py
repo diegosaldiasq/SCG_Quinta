@@ -178,7 +178,8 @@ class TurnoOEEForm(forms.ModelForm):
                 # Valor fijo de 480 minutos (8 horas)
                 'value': 480,
                 'id': 'id_tiempo_planeado',
-                'placeholder': 'Tiempo planeado (en minutos)'
+                'placeholder': 'Tiempo planeado (en minutos)',
+                'readonly': 'readonly'
             }),
             # … otros widgets …
         }
