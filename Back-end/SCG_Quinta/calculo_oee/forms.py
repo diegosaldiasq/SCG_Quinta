@@ -146,12 +146,9 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'id_turno'})
     )
     SUPERVISOR_CHOICES = [
-        ('Diego Saldias', 'Diego Saldias'),
-        ('Cristian Gorreri', 'Cristian Gorreri'),
-        ('Cristian Vera', 'Cristian Vera'),
-        ('Felipe Vera', 'Felipe Vera'),
-        ('Jorge Vera', 'Jorge Vera'),
-        ('Luis Vera', 'Luis Vera'),
+        ('Fabian Moncada', 'Fabian Moncada'),
+        ('Angela Tacon', 'Angela Tacon'),
+        ('Felipe Campos', 'Felipe Campos')
     ]
     supervisor = forms.ChoiceField(
         choices=[('', '--Seleccionar supervisor--')] + SUPERVISOR_CHOICES,
