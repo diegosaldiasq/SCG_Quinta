@@ -14,6 +14,8 @@ from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .constants import TASA_NOMINAL_POR_PRODUCTO, TASA_NOMINAL_DEFECTO
+from django.forms.models import model_to_dict
+from openpyxl import Workbook
 
 # Create your views here.
 
@@ -207,26 +209,31 @@ def redireccionar_intermedio(request):
 @csrf_exempt
 @login_required
 def descargar_resumenturnooee(request):
-    registros = ResumenTurnoOee.objects.select_related('turno').all()
-
-    if not registros.exists():
+    registros = ResumenTurnoOee.objects.all()
+    if not registros:
         return render(request, 'inicio/no_hay_datos.html')
 
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     response['Content-Disposition'] = 'attachment; filename="resumen_turno_oee.xlsx"'
 
-    from openpyxl import Workbook
     wb = Workbook()
     ws = wb.active
 
-    # Escribir encabezados
-    headers = [field.name for field in ResumenTurnoOee._meta.fields]
-    ws.append(headers)
+    fields = [f.name for f in ResumenTurnoOee._meta.fields]
+    ws.append(fields)
 
-    # Escribir datos
-    for registro in registros:
-        ws.append([getattr(registro, field) for field in headers])
+    for obj in registros:
+        data = model_to_dict(obj, fields=fields)
+        # si tienes DateTimeField y quieres formatear:
+        fila = []
+        for field in fields:
+            val = data[field]
+            if hasattr(val, 'isoformat'):  # p.ej. datetime / date
+                val = val.isoformat(sep=' ')
+            fila.append(val)
+        ws.append(fila)
 
     wb.save(response)
-    
     return response
