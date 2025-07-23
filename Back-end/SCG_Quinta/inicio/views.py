@@ -328,7 +328,7 @@ def descargar_resumenturnooee(request):
     ws.append(fields)
 
     def convertir_fecha(fecha):
-            return fecha.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None) if fecha else None
+        return fecha.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None) if fecha else None
     
     for obj in registros:
         data = model_to_dict(obj, fields=fields)
