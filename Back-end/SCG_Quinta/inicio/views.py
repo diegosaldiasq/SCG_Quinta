@@ -15,6 +15,8 @@ from django.db.models.fields import Field
 from django.apps import apps
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
+from calculo_oee.models import ResumenTurnoOee
+from django.forms.models import model_to_dict
 
 
 # Create your views here.
@@ -145,8 +147,7 @@ model_mapping = {
         'control_de_pesos': 'DatosFormularioControlDePesos',
         'control_parametros_gorreri': 'DatosFormularioControlParametrosGorreri',
         'control_de_pesos_prelistos': 'DatosFormularioControlDePesosPrelistos',
-        'control_de_pesos_insumos_kuchen': 'DatosFormularioControlDePesosInsumosKuchen',
-        'calculo_oee': 'ResumenTurnoOee'
+        'control_de_pesos_insumos_kuchen': 'DatosFormularioControlDePesosInsumosKuchen'
     }
 
 @csrf_exempt
@@ -299,3 +300,50 @@ def ver_foto(request):
     objeto = model.objects.get(id=id)
     foto_archivo = objeto.archivo_foto
     return render(request, 'inicio/ver_foto.html', {'config': config, 'foto_archivo': foto_archivo})
+
+@csrf_exempt
+@login_required
+def descargar_resumenturnooee(request):
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
+    registros = None
+    if fecha_inicio_str == None or fecha_fin_str == None:
+        registros = ResumenTurnoOee.objects.all()
+    else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+        registros = ResumenTurnoOee.objects.filter(fecha__range=[fecha_inicio, fecha_fin])
+    if not registros:
+        return render(request, 'inicio/no_hay_datos.html')
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="resumen_turno_oee.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+
+    fields = [f.name for f in ResumenTurnoOee._meta.fields]
+    ws.append(fields)
+
+    def convertir_fecha(fecha):
+            return fecha.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None) if fecha else None
+    
+    for obj in registros:
+        data = model_to_dict(obj, fields=fields)
+        # si tienes DateTimeField y quieres formatear:
+        if isinstance(data['fecha'], datetime):
+            data['fecha'] = convertir_fecha(data['fecha'])
+        if isinstance(data['fecha_de_verificacion'], datetime):
+            data['fecha_de_verificacion'] = convertir_fecha(data['fecha_de_verificacion'])
+        fila = []
+        for field in fields:
+            val = data[field]
+            #if hasattr(val, 'isoformat'):  # p.ej. datetime / date
+            #    val = val.isoformat(sep=' ')
+            fila.append(val)
+        ws.append(fila)
+
+    wb.save(response)
+    return response
