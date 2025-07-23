@@ -174,7 +174,7 @@ a.primary-button:hover {
 }
 .resumen-list li {
   margin-bottom: 8px;
-  font-size: var(--md);
+  font-size: 25px;
 }
 
 /* Estilo para la zona de verificación */
