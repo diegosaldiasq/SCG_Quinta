@@ -333,10 +333,8 @@ def descargar_resumenturnooee(request):
     for obj in registros:
         data = model_to_dict(obj, fields=fields)
         # si tienes DateTimeField y quieres formatear:
-        if isinstance(data['fecha'], datetime):
-            data['fecha'] = convertir_fecha(data['fecha'])
-        if isinstance(data['fecha_de_verificacion'], datetime):
-            data['fecha_de_verificacion'] = convertir_fecha(data['fecha_de_verificacion'])
+        if isinstance(data, datetime):
+            data = convertir_fecha(data)
         fila = []
         for field in fields:
             val = data[field]
