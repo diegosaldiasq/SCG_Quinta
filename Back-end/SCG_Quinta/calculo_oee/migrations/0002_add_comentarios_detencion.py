@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('calculo_oee', '0002_rename_turno_detencion_lote_and_more'),  # ajusta al último número
+        ('calculo_oee', '0001_initial'),  # ajusta al último número
     ]
 
     operations = [
