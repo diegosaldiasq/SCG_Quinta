@@ -32,6 +32,7 @@
                             <th>Inicio</th>
                             <th>Fin</th>
                             <th>Duración (min)</th>
+                            <th>Comentarios</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,6 +42,7 @@
                             <td>{{ det.hora_inicio|time:"H:i" }}</td>
                             <td>{{ det.hora_fin   |time:"H:i" }}</td>
                             <td>{{ det.duracion }}</td>
+                            <td>{{ det.comentarios }}</td>
                         </tr>
                         {% empty %}
                         <tr>

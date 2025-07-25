@@ -26,9 +26,10 @@ class TurnoOEE(models.Model):
 class Detencion(models.Model):
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')
     motivo = models.CharField(max_length=100)
-    hora_inicio = models.TimeField(null=True, blank=True)  # Puede ser null si aún está en curso
-    hora_fin = models.TimeField(null=True, blank=True)  # Puede ser null si aún está en curso
+    hora_inicio = models.TimeField(null=False, blank=False)  # Puede ser null si aún está en curso
+    hora_fin = models.TimeField(null=False, blank=False)  # Puede ser null si aún está en curso
     duracion = models.PositiveIntegerField(help_text="Duración en minutos")
+    comentarios = models.TextField(null=True, blank=True, max_length=200, help_text="Comentarios adicionales sobre la detención")
 
 class Reproceso(models.Model):
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos')
@@ -43,17 +44,17 @@ class ResumenTurnoOee(models.Model):
     linea   = models.CharField(max_length=50)
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno', null=True, blank=True)
     turno = models.CharField(max_length=20)
-    supervisor = models.CharField(max_length=50, null=True, blank=True)
+    supervisor = models.CharField(max_length=50, null=False, blank=False)
     tiempo_paro = models.PositiveIntegerField(help_text="Tiempo de paro en minutos")
     tiempo_planeado = models.PositiveIntegerField(help_text="Tiempo planeado en minutos")
     produccion_teorica = models.PositiveIntegerField(help_text="Producción teórica en unidades")
-    produccion_planificada = models.PositiveIntegerField(help_text="Producción planificada en unidades", null=True, blank=True)
+    produccion_planificada = models.PositiveIntegerField(help_text="Producción planificada en unidades", null=False, blank=False)
     produccion_real = models.PositiveIntegerField(help_text="Producción real en unidades")
     productos_malos = models.PositiveIntegerField(help_text="Cantidad de productos malos")
     productos_buenos = models.PositiveIntegerField(help_text="Cantidad de productos buenos")
-    numero_personas = models.PositiveIntegerField(help_text="Número de personas que trabajaron en el turno", null=True, blank=True)
-    unidades_por_persona = models.FloatField(help_text="Unidades producidas por persona", null=True, blank=True)
-    unidades_pp_hora = models.FloatField(help_text="Unidades producidas por persona por hora", null=True, blank=True)
+    numero_personas = models.PositiveIntegerField(help_text="Número de personas que trabajaron en el turno", null=False, blank=False)
+    unidades_por_persona = models.FloatField(help_text="Unidades producidas por persona", null=False, blank=False)
+    unidades_pp_hora = models.FloatField(help_text="Unidades producidas por persona por hora", null=False, blank=False)
     eficiencia = models.FloatField(help_text="Eficiencia del turno en porcentaje")
     disponibilidad = models.FloatField(help_text="Disponibilidad del turno en porcentaje")
     calidad = models.FloatField(help_text="Calidad del turno en porcentaje")

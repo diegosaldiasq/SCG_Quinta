@@ -58,6 +58,7 @@
             <td><input type="time" name="hora_inicio_det[]" required></td>
             <td><input type="time" name="hora_fin_det[]" required></td>
             <td><input type="number" name="duracion_det[]" readonly></td>
+            <td><input type="text" name="comentarios_det[]" maxlength="200" placeholder="Comentarios adicionales"></td>
             <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
             `;
             document.querySelector("#tabla-detenciones tbody").append(fila);
@@ -239,6 +240,7 @@
                                 <th>Hora inicio</th>
                                 <th>Hora fin</th>
                                 <th>Duración (min)</th>
+                                <th>Comentarios</th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
