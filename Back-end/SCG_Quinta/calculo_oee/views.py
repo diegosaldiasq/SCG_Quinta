@@ -31,10 +31,11 @@ def crear_turno(request):
             motivos   = request.POST.getlist('motivo_det[]')
             inicios   = request.POST.getlist('hora_inicio_det[]')
             finales   = request.POST.getlist('hora_fin_det[]')
+            comentarios = request.POST.getlist('comentarios_det[]')  # <-- nuevo campo
 
             from datetime import datetime, timedelta
             fmt = "%H:%M"
-            for mot, hi, hf in zip(motivos, inicios, finales):
+            for mot, hi, hf, com in zip(motivos, inicios, finales, comentarios):
                 # parseamos las horas
                 t1 = datetime.strptime(hi, fmt)
                 t2 = datetime.strptime(hf, fmt)
@@ -48,7 +49,7 @@ def crear_turno(request):
                     hora_inicio=t1.time(),   # <-- aquí
                     hora_fin=   t2.time(),   # <-- y aquí
                     duracion=   dur,
-                    comentarios=request.POST.get('comentarios_det[]') # <-- nuevo campo
+                    comentarios= com # <-- nuevo campo
                 )
 
             # Guardar reprocesos
