@@ -48,7 +48,7 @@ def crear_turno(request):
                     hora_inicio=t1.time(),   # <-- aquí
                     hora_fin=   t2.time(),   # <-- y aquí
                     duracion=   dur,
-                    comentarios=request.POST.get('comentarios_det', '') # <-- nuevo campo
+                    comentarios=request.POST.get('comentarios_det[]') # <-- nuevo campo
                 )
 
             # Guardar reprocesos
