@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from .constants import TASA_NOMINAL_POR_PRODUCTO, TASA_NOMINAL_DEFECTO
 from django.forms.models import model_to_dict
 from openpyxl import Workbook
+from datetime import datetime
 
 # Create your views here.
 
@@ -233,9 +234,14 @@ def descargar_resumenturnooee(request):
     fields = [f.name for f in ResumenTurnoOee._meta.fields]
     ws.append(fields)
 
+    def convertir_fecha(fecha):
+        return fecha.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None) if fecha else None
+
     for obj in registros:
         data = model_to_dict(obj, fields=fields)
         # si tienes DateTimeField y quieres formatear:
+        if isinstance(data, datetime):
+            data = convertir_fecha(data)
         fila = []
         for field in fields:
             val = data[field]
