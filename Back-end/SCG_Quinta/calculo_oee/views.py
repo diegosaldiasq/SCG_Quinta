@@ -262,4 +262,7 @@ def descargar_resumenturnooee(request):
         ws.append(fila)
 
     wb.save(response)
+    if fecha_inicio_str != None or fecha_fin_str != None:
+        del request.session['fechainicio']
+        del request.session['fechafin']
     return response
