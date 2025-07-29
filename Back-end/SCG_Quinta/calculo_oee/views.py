@@ -220,7 +220,15 @@ def redireccionar_intermedio(request):
 @csrf_exempt
 @login_required
 def descargar_resumenturnooee(request):
-    registros = ResumenTurnoOee.objects.all()
+    fecha_inicio_str = request.session.get('fechainicio')
+    fecha_fin_str = request.session.get('fechafin')
+    registros = None
+    if fecha_inicio_str == None or fecha_fin_str == None:
+        registros = ResumenTurnoOee.objects.all()
+    else:
+        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
+        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
+        registros = ResumenTurnoOee.objects.filter(fecha__range=[fecha_inicio, fecha_fin])
     if not registros:
         return render(request, 'inicio/no_hay_datos.html')
 
