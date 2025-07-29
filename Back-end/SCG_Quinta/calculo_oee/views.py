@@ -243,6 +243,8 @@ def descargar_resumenturnooee(request):
         # si tienes DateTimeField y quieres formatear:
         if 'fecha' in data:
             data['fecha'] = convertir_fecha(data['fecha'])
+        if 'fecha_de_verificacion' in data:
+            data['fecha_de_verificacion'] = convertir_fecha(data['fecha_de_verificacion'])
         fila = []
         for field in fields:
             val = data[field]
