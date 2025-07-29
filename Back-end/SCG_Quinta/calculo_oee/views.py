@@ -213,3 +213,36 @@ def marcar_verificado(request, lote_id):
 def redireccionar_intermedio(request):
     url_inicio = reverse('intermedio')
     return HttpResponseRedirect(url_inicio)
+
+# Descargar registros de ResumenTurnoOee
+@csrf_exempt
+@login_required
+def descargar_resumenturnooee(request):
+    registros = ResumenTurnoOee.objects.all()
+    if not registros:
+        return render(request, 'inicio/no_hay_datos.html')
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="resumen_turno_oee.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+
+    fields = [f.name for f in ResumenTurnoOee._meta.fields]
+    ws.append(fields)
+
+    for obj in registros:
+        data = model_to_dict(obj, fields=fields)
+        # si tienes DateTimeField y quieres formatear:
+        fila = []
+        for field in fields:
+            val = data[field]
+            if hasattr(val, 'isoformat'):  # p.ej. datetime / date
+                val = val.isoformat(sep=' ')
+            fila.append(val)
+        ws.append(fila)
+
+    wb.save(response)
+    return response

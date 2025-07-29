@@ -13,5 +13,6 @@ urlpatterns = [
     path('lista_turnos/', views.lista_turnos, name='lista_turnos'),
     path('detalle_turno/<int:lote_id>/', views.detalle_turno, name='detalle_turno'),
     path('marcar_verificado/<int:lote_id>/', views.marcar_verificado, name='marcar_verificado'),
-    path('redireccionar_intermedio/', views.redireccionar_intermedio, name='redireccionar_intermedio')
+    path('redireccionar_intermedio/', views.redireccionar_intermedio, name='redireccionar_intermedio'),
+    path('descargar_resumenturnooee/', views.descargar_resumenturnooee, name='descargar_resumenturnooee')
 ]
