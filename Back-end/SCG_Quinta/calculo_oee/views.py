@@ -162,19 +162,26 @@ def lista_turnos(request):
     productos = TurnoOEE.objects.values_list('producto', flat=True).distinct()
 
     # --- 3. Paginación ---
-    paginator   = Paginator(qs, 10)               # 10 turnos por página
+    paginator = Paginator(qs, 10)
     page_number = request.GET.get('page', 1)
-    page_obj    = paginator.get_page(page_number)
+    page_obj = paginator.get_page(page_number)
+
+    # Construimos un querystring sin el parámetro page:
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        del query_params['page']
+    querystring = query_params.urlencode()
 
     return render(request, 'calculo_oee/lista_turnos.html', {
-        'turnos':           page_obj,    # ahora es un Page object
-        'lineas':           lineas,
-        'clientes':         clientes,
-        'productos':        productos,
-        'filtro_fecha':     fecha,
-        'filtro_linea':     linea,
-        'filtro_cliente':   cliente,
-        'filtro_producto':  producto,
+        'turnos': page_obj,
+        'lineas': lineas,
+        'clientes': clientes,
+        'productos': productos,
+        'filtro_fecha': fecha,
+        'filtro_linea': linea,
+        'filtro_cliente': cliente,
+        'filtro_producto': producto,
+        'querystring': querystring,   # <-- nuevo
     })
     
 @login_required

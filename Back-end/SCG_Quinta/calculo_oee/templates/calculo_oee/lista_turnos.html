@@ -128,10 +128,7 @@
             <!-- ⬅️➡️ Paginador -->
             <div class="pagination">
                 {% if turnos.has_previous %}
-                    <a
-                    href="?page={{ turnos.previous_page_number }}&{{ request.GET.urlencode }}"
-                    class="btn-prev"
-                    >
+                    <a href="?page={{ turnos.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
                     ⬅️ Anterior
                     </a>
                 {% endif %}
@@ -141,10 +138,7 @@
                 </span>
 
                 {% if turnos.has_next %}
-                    <a
-                    href="?page={{ turnos.next_page_number }}&{{ request.GET.urlencode }}"
-                    class="btn-next"
-                    >
+                    <a href="?page={{ turnos.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
                     Siguiente ➡️
                     </a>
                 {% endif %}
