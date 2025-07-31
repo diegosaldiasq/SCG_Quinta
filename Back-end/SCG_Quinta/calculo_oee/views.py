@@ -185,12 +185,13 @@ def lista_turnos(request):
         'turnos': page_obj,
         'lineas': lineas,
         'clientes': clientes,
-        'turnos_disponibles': turnos,
         'productos': productos,
         'filtro_fecha': fecha,
         'filtro_linea': linea,
         'filtro_cliente': cliente,
         'filtro_producto': producto,
+        'turnos_disponibles': turnos,
+        'filtro_produccion_real': produccion_real,
         'querystring': querystring,   # <-- nuevo
     })
     

@@ -88,7 +88,7 @@
                     <label>✅ Producción Real:</label>
                     <select name="produccion_real">
                         <option value="">--Todos--</option>
-                        <option value="null" selected>Sin Producción Real</option>
+                        <option value="null" {% if filtro_produccion_real == "null" %}selected{% endif %}>Sin Producción Real</option>
                     </select>
                 </div>
 
