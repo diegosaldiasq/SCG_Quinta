@@ -88,8 +88,9 @@
                     <label>✅ Producción Real:</label>
                     <select name="produccion_real">
                         <option value="">--Todos--</option>
-                        <option value="" {% if request.GET.produccion_real == '' %}selected{% endif %}>Sin Producción Real</option>
-                        <option value="0" {% if request.GET.produccion_real == '0' %}selected{% endif %}>0</option>
+                        <option value="">Sin Producción Real</option>
+                        <option value="0">0</option>
+                        <option value="null">Nulo</option>
                     </select>
                 </div>
 
