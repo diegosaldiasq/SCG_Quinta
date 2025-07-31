@@ -148,6 +148,7 @@ def lista_turnos(request):
     linea    = request.GET.get('linea', '')
     cliente  = request.GET.get('cliente', '')
     producto = request.GET.get('producto', '')
+    turno   = request.GET.get('turno', '')
 
     if fecha:
         qs = qs.filter(fecha__date=fecha)
@@ -157,11 +158,14 @@ def lista_turnos(request):
         qs = qs.filter(cliente=cliente)
     if producto:
         qs = qs.filter(producto=producto)
+    if turno:
+        qs = qs.filter(turno=turno)
 
     # --- 2. Obtener valores únicos para los desplegables ---
     lineas    = TurnoOEE.objects.values_list('linea', flat=True).distinct()
     clientes  = TurnoOEE.objects.values_list('cliente', flat=True).distinct()
     productos = TurnoOEE.objects.values_list('producto', flat=True).distinct()
+    turnos   = TurnoOEE.objects.values_list('turno', flat=True).distinct()
 
     # --- 3. Paginación ---
     paginator = Paginator(qs, 10)
@@ -178,6 +182,7 @@ def lista_turnos(request):
         'turnos': page_obj,
         'lineas': lineas,
         'clientes': clientes,
+        'turnos_disponibles': turnos,
         'productos': productos,
         'filtro_fecha': fecha,
         'filtro_linea': linea,

@@ -71,6 +71,18 @@
                     </select>
                 </div>
 
+                <div class="campo-filtro">
+                    <label>⏱️ Turno:</label>
+                    <select name="turno">
+                    <option value="">--Todos--</option>
+                    {% for tur in turnos_disponibles %}
+                        <option
+                        value="{{ tur }}"
+                        {% if request.GET.turno == tur %}selected{% endif %}
+                        >{{ tur }}</option>
+                    {% endfor %}
+                    </select>
+
                 <div class="botones">
                     <button type="submit" class="primary-button">Filtrar</button>
                     <a href="{% url 'lista_turnos' %}" class="primary-button">Limpiar</a>
