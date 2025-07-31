@@ -161,8 +161,8 @@ def lista_turnos(request):
         qs = qs.filter(producto=producto)
     if turno:
         qs = qs.filter(turno=turno)
-    if produccion_real:
-        qs = qs.filter(produccion_real__gte=int(produccion_real))
+    if produccion_real == 'null':
+        qs = qs.filter(produccion_real__isnull=True)
 
     # --- 2. Obtener valores únicos para los desplegables ---
     lineas    = TurnoOEE.objects.values_list('linea', flat=True).distinct()
