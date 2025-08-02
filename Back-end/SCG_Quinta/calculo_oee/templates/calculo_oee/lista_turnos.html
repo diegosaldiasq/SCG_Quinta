@@ -131,9 +131,13 @@
                             <td>{{ t.produccion_real|default:'-' }}</td>
                             <td>
                                 {% if not t.produccion_real %}
-                                    <a href="{% url 'cerrar_turno' t.id %}" class="primary-button">Cerrar Turno</a>
+                                    <a href="{% url 'cerrar_turno' t.id %}?next={% url 'lista_turnos' %}?page={{ turnos.number }}{% if querystring %}&{{ querystring }}{% endif %}" class="primary-button">
+                                        Cerrar Turno
+                                    </a>
                                 {% else %}
-                                    <a href="{% url 'resumen_turno' t.id %}" class="primary-button">Ver Resumen</a>
+                                    <a href="{% url 'resumen_turno' t.id %}?next={% url 'lista_turnos' %}?page={{ turnos.number }}{% if querystring %}&{{ querystring }}{% endif %}" class="primary-button">
+                                        Ver Resumen
+                                    </a>
                                 {% endif %}
                             </td>
                         </tr>

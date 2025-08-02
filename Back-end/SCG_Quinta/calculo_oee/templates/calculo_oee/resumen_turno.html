@@ -60,9 +60,11 @@
 
             <!-- Botones bajo el resumen -->
             <div class="botones-resumen">
-                <a href="{% url 'lista_turnos' %}" class="primary-button">Volver al listado</a>
+                <a href="{% url 'cerrar_turno' t.id %}?next={% url 'lista_turnos' %}?page={{ turnos.number }}{% if querystring %}&{{ querystring }}{% endif %}" class="primary-button">
+                    Cerrar Turno
+                </a>
                 <a href="{% url 'detalle_turno' resumen.lote.id %}" class="primary-button">
-                  Ver Detenciones y Mermas
+                    Ver Detenciones y Mermas
                 </a>
 
                 {% if not resumen.verificado %}
