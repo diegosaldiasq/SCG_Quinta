@@ -18,6 +18,7 @@ from django.forms.models import model_to_dict
 from openpyxl import Workbook
 from datetime import datetime
 import pytz
+from urllib.parse import unquote
 
 # Create your views here.
 
@@ -122,7 +123,17 @@ def resumen_turno(request, lote_id):
 
     resumen = ResumenTurnoOee.objects.get(lote=lote)
 
-    return render(request, 'calculo_oee/resumen_turno.html', {'resumen': resumen})
+    raw_next = request.GET.get('next', '')
+    if raw_next:
+        # decode para que vuelva como estaba
+        next_url = unquote(raw_next)
+    else:
+        next_url = reverse('lista_turnos')
+
+    return render(request, 'calculo_oee/resumen_turno.html', {
+        'resumen': resumen,
+        'next_url': next_url,
+        })
 
 @csrf_exempt
 @login_required
