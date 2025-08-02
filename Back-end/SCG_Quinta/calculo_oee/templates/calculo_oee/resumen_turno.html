@@ -61,7 +61,7 @@
             <!-- Botones bajo el resumen -->
             <div class="botones-resumen">
                 <a href="{{ next_url }}" class="primary-button">← Volver</a>
-                <a href="{% url 'detalle_turno' resumen.lote.id %}" class="primary-button">
+                <a href="{% url 'detalle_turno' t.id %}?next={{ request.get_full_path|urlencode }}">
                     Ver Detenciones y Mermas
                 </a>
 

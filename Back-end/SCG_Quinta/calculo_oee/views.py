@@ -211,10 +211,13 @@ def detalle_turno(request, lote_id):
     lote = get_object_or_404(TurnoOEE, id=lote_id)
     detenciones = lote.detenciones.all()
     reprocesos = lote.reprocesos.all()
+
+    next_param = request.GET.get('next', '')
     return render(request, 'calculo_oee/detalle_turno.html', {
         'lote': lote,
         'detenciones': detenciones,
-        'reprocesos': reprocesos
+        'reprocesos': reprocesos,
+        'next_url': next_param or reverse('lista_turnos'),
     })
 
 @csrf_exempt
