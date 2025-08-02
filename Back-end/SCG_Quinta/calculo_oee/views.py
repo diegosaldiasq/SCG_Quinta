@@ -220,6 +220,7 @@ def detalle_turno(request, lote_id):
 @csrf_exempt
 @login_required
 def marcar_verificado(request, lote_id):
+    next_param = request.GET.get('next') or request.POST.get('next', '')
     if request.user.is_staff or request.user.is_superuser:
         if request.method == 'POST':
             resumen = get_object_or_404(ResumenTurnoOee, lote_id=lote_id)
@@ -227,9 +228,10 @@ def marcar_verificado(request, lote_id):
             resumen.verificado_por = request.user.nombre_completo
             resumen.fecha_de_verificacion = timezone.now()
             resumen.save()
-            return redirect('resumen_turno', lote_id=lote_id)
-    else:
-        return redirect('resumen_turno', lote_id=lote_id)
+    base = reverse('resumen_turno', args=[lote_id])
+    if next_param:
+        return redirect(f"{base}?next={next_param}")
+    return redirect(base)
     
 @login_required
 def redireccionar_intermedio(request):

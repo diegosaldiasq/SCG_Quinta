@@ -66,10 +66,11 @@
                 </a>
 
                 {% if not resumen.verificado %}
-                <form method="post" action="{% url 'marcar_verificado' resumen.lote.id %}">
+                    <form method="post" action="{% url 'marcar_verificado' resumen.lote.id %}?next={{ next_url|urlencode }}">
                     {% csrf_token %}
-                    <button type="submit" class="primary-button">Marcar como Verificado</button>
-                </form>
+                    <input type="hidden" name="next" value="{{ next_url }}">
+                        <button type="submit" class="primary-button">Marcar verificado</button>
+                    </form>
                 {% endif %}
             </div>
         </div>
