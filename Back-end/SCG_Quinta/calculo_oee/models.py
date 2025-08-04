@@ -34,7 +34,7 @@ class Producto(models.Model):
     comentarios = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.turno} - {self.producto}"
+        return f"{self.lote} - {self.producto}"
 
 class Detencion(models.Model):
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')
