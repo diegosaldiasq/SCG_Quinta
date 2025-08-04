@@ -11,10 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}" />
   <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
-  <title>Registrar Turno OEE</title>
 
   <style>
-    /* Ajustes rápidos para que la tabla de productos quede alineada */
     .tabla-productos, #tabla-detenciones, #tabla-reprocesos {
       width: 100%;
       border-collapse: separate;
@@ -116,7 +114,7 @@
             </thead>
             <tbody></tbody>
           </table>
-          <button type="button" onclick="agregarFilaDetencion()" class="primary-button">➕ Agregar Detención</button>
+          <button type="button" class="primary-button" onclick="agregarFilaDetencion()">➕ Agregar Detención</button>
         </fieldset>
 
         <!-- ♻️ Reprocesos -->
@@ -132,7 +130,7 @@
             </thead>
             <tbody></tbody>
           </table>
-          <button type="button" onclick="agregarFilaReproceso()" class="primary-button">➕ Agregar Reproceso</button>
+          <button type="button" class="primary-button" onclick="agregarFilaReproceso()">➕ Agregar Reproceso</button>
         </fieldset>
 
         <!-- ✅ Botones -->
@@ -168,9 +166,8 @@
     </tr>
   </template>
 
-  <!-- JS: catálogo, detenciones, reprocesos y productos -->
+  <!-- JS: catálogo, detenciones, reprocesos y sincronización principal -->
   <script>
-    // catálogo estático (puedes sacarlo a contexto si lo prefieres)
     const catalogo = {
       'Jumbo': [
         { producto: 'Torta Beatriz', codigo: '393241' },
@@ -258,7 +255,6 @@
       ],
     };
 
-    // motivos (puedes externalizar)
     const motivosDetenciones = [
       "1-Colacion",
       "2-Falta insumo (bizcocho, panqueque, discos de hoja, hojarasca, etc.)",
@@ -288,12 +284,47 @@
     ];
 
     document.addEventListener('DOMContentLoaded', function() {
-      // DETENCIONES
-      function agregarFilaDetencion() {
-        const opciones = motivosDetenciones
-          .map(m => `<option value="${m}">${m}</option>`)
-          .join('');
+      // ---------------------- lógica principal cliente/producto/código ----------------------
+      const mainCliente = document.getElementById('id_cliente');
+      const mainProducto = document.getElementById('id_producto');
+      const mainCodigo = document.getElementById('id_codigo');
 
+      function poblarProductosCliente(cliente, select, seleccionado = "") {
+        select.innerHTML = '<option value="">--Seleccionar--</option>';
+        const lista = catalogo[cliente] || [];
+        lista.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.producto;
+          opt.textContent = item.producto;
+          if (item.producto === seleccionado) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+
+      if (mainCliente && mainProducto && mainCodigo) {
+        mainCliente.addEventListener('change', () => {
+          poblarProductosCliente(mainCliente.value, mainProducto);
+          mainCodigo.value = '';
+        });
+        mainProducto.addEventListener('change', () => {
+          const lista = catalogo[mainCliente.value] || [];
+          const sel = lista.find(i => i.producto === mainProducto.value);
+          mainCodigo.value = sel ? sel.codigo : '';
+        });
+        // inicializar si venía seleccionado
+        if (mainCliente.value) {
+          poblarProductosCliente(mainCliente.value, mainProducto, mainProducto.value);
+          if (mainProducto.value) {
+            const lista = catalogo[mainCliente.value] || [];
+            const sel = lista.find(i => i.producto === mainProducto.value);
+            mainCodigo.value = sel ? sel.codigo : '';
+          }
+        }
+      }
+
+      // ---------------------- detenciones ----------------------
+      function agregarFilaDetencion() {
+        const opciones = motivosDetenciones.map(m => `<option value="${m}">${m}</option>`).join('');
         const fila = document.createElement('tr');
         fila.innerHTML = `
           <td>
@@ -325,7 +356,7 @@
         hf.addEventListener('change', recalcular);
       }
 
-      // REPROCESOS
+      // ---------------------- reprocesos ----------------------
       function agregarFilaReproceso() {
         let opciones = motivosReprocesos.map(m => `<option value="${m}">${m}</option>`).join('');
         const fila = document.createElement('tr');
@@ -342,7 +373,7 @@
         document.querySelector("#tabla-reprocesos tbody").append(fila);
       }
 
-      // PRODUCTOS
+      // ---------------------- productos múltiples ----------------------
       const tablaBodyProd = document.querySelector('#tabla-productos tbody');
       const templateProd = document.getElementById('fila-producto-template').content;
       const btnAgregarProd = document.getElementById('btn-agregar-producto');
@@ -404,9 +435,8 @@
         tablaBodyProd.appendChild(fila);
       }
 
-      // ganchos de botones
-      document.getElementById('btn-agregar-producto').addEventListener('click', agregarFilaProductoInterna);
-      // También dejar disponibles funciones globales si se usan en HTML inline:
+      // ganchos
+      btnAgregarProd.addEventListener('click', agregarFilaProductoInterna);
       window.agregarFilaDetencion = agregarFilaDetencion;
       window.agregarFilaReproceso = agregarFilaReproceso;
       window.agregarFilaProducto = agregarFilaProductoInterna;
