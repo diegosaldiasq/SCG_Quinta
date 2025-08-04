@@ -98,17 +98,44 @@ def resumen_turno(request, lote_id):
         turno = lote.turno
         supervisor = lote.supervisor
 
+        # Productos asociados (pueden ser múltiples)
+        productos_qs = lote.productos.all()
+        if productos_qs.exists():
+            # Suma planeada y real desde productos
+            produccion_planificada = sum(p.produccion_planeada or 0 for p in productos_qs)
+            produccion_real = sum(p.produccion_real or 0 for p in productos_qs)
+            # Concatenar nombres y códigos únicos
+            productos_concat = ", ".join(
+                dict.fromkeys(p.producto for p in productos_qs if p.producto)
+            )
+            codigos_concat = ", ".join(
+                dict.fromkeys(p.codigo for p in productos_qs if p.codigo)
+            )
+            cliente = lote.cliente  # asumimos que cliente del turno es válido
+            # Tasa nominal promedio (promedio simple)
+            tasas = []
+            for p in productos_qs:
+                clave = (p.producto, p.codigo)
+                tasas.append(TASA_NOMINAL_POR_PRODUCTO.get(clave, TASA_NOMINAL_DEFECTO))
+            tasa_nominal = sum(tasas) / len(tasas) if tasas else TASA_NOMINAL_DEFECTO
+        else:
+            # Caída a lógica previa de un solo producto en el turno
+            produccion_planificada = lote.produccion_planeada or 0
+            produccion_real = lote.produccion_real or 0
+            productos_concat = lote.producto
+            codigos_concat = lote.codigo or ""
+            cliente = lote.cliente
+            clave = (lote.producto, lote.codigo)
+            tasa_nominal = TASA_NOMINAL_POR_PRODUCTO.get(clave, TASA_NOMINAL_DEFECTO)
+
         tiempo_paro = sum(d.duracion for d in lote.detenciones.all())
         productos_malos = sum(r.cantidad for r in lote.reprocesos.all())
 
         tiempo_operativo = lote.tiempo_planeado - tiempo_paro
-        clave = (lote.producto, lote.codigo)
-        tasa_nominal = TASA_NOMINAL_POR_PRODUCTO.get(clave, TASA_NOMINAL_DEFECTO) # valores en constants.py
         num_personas = lote.numero_personas or 0
         produccion_teorica = tasa_nominal * num_personas
 
-        produccion_real = lote.produccion_real or 0
-        productos_buenos = produccion_real - productos_malos
+        productos_buenos = produccion_real - productos_malos if produccion_real else 0
 
         disponibilidad = tiempo_operativo / lote.tiempo_planeado if lote.tiempo_planeado else 0
         rendimiento = produccion_real / produccion_teorica if produccion_teorica else 0
@@ -120,14 +147,14 @@ def resumen_turno(request, lote_id):
             turno=turno,
             supervisor=supervisor,
             lote=lote,
-            cliente=lote.cliente,
-            codigo=lote.codigo,
-            producto=lote.producto,
+            cliente=cliente,
+            codigo=codigos_concat,
+            producto=productos_concat,
             linea=lote.linea,
             tiempo_paro=tiempo_paro,
             tiempo_planeado=lote.tiempo_planeado,
             produccion_teorica=round(produccion_teorica),
-            produccion_planificada=lote.produccion_planeada,
+            produccion_planificada=produccion_planificada,
             produccion_real=produccion_real,
             productos_malos=productos_malos,
             productos_buenos=productos_buenos,
@@ -144,7 +171,6 @@ def resumen_turno(request, lote_id):
 
     raw_next = request.GET.get('next', '')
     if raw_next:
-        # decode para que vuelva como estaba
         next_url = unquote(raw_next)
     else:
         next_url = reverse('lista_turnos')
@@ -152,7 +178,7 @@ def resumen_turno(request, lote_id):
     return render(request, 'calculo_oee/resumen_turno.html', {
         'resumen': resumen,
         'next_url': next_url,
-        })
+    })
 
 @csrf_exempt
 @login_required
