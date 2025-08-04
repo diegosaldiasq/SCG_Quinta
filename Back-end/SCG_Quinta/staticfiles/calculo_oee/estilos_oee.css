@@ -48,7 +48,7 @@ table {
 
 table th {
     background-color: var(--naranjo-claro-quinta);
-    color: var(--white);
+    color: var(--black);
     padding: 10px;
     text-align: center;
     font-weight: bold;
