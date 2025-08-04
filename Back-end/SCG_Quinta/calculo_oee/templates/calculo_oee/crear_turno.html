@@ -212,81 +212,96 @@
     });
     </script>
     <script>
-    // helper: construye las <option> para un cliente dado
-    function opcionesProductoParaCliente(cliente, productoSeleccionado = "") {
-    const lista = catalogo[cliente] || [];
-    let html = `<option value="">--Seleccionar--</option>`;
-    lista.forEach(item => {
-        const sel = item.producto === productoSeleccionado ? " selected" : "";
-        html += `<option value="${item.producto}"${sel}>${item.producto}</option>`;
-    });
-    return html;
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+    const clienteSelect  = document.getElementById('id_cliente');
+    const productoSelect = document.getElementById('id_producto');
+    const codigoInput    = document.getElementById('id_codigo');
 
-    // actualiza todas las filas existentes cuando cambia el cliente
-    function actualizarFilasProductoPorCliente(cliente) {
-    document.querySelectorAll('#tabla-productos tbody tr').forEach(row => {
-        const prodSelect = row.querySelector('.producto-en-turno');
-        const inputCodigo = row.querySelector('.codigo-en-turno');
-        const productoPrevio = prodSelect.value;
-
-        // reemplaza las opciones y trata de conservar si aún existe
-        prodSelect.innerHTML = opcionesProductoParaCliente(cliente, productoPrevio);
-
+    // Helpers
+    function construirOpcionesProducto(cliente, seleccionado = "") {
         const lista = catalogo[cliente] || [];
-        if (productoPrevio) {
-        const encontrado = lista.find(i => i.producto === productoPrevio);
-        if (encontrado) {
-            prodSelect.value = productoPrevio;
-            inputCodigo.value = encontrado.codigo;
-        } else {
-            prodSelect.value = "";
-            inputCodigo.value = "";
-        }
-        } else {
-        inputCodigo.value = "";
-        }
-    });
+        let html = `<option value="">--Seleccionar--</option>`;
+        lista.forEach(item => {
+        const sel = item.producto === seleccionado ? ' selected' : '';
+        html += `<option value="${item.producto}"${sel}>${item.producto}</option>`;
+        });
+        return html;
     }
 
-    // cuando cambia el cliente: actualiza filas existentes
-    document.getElementById('id_cliente').addEventListener('change', function () {
-    const cliente = this.value;
-    actualizarFilasProductoPorCliente(cliente);
+    function obtenerCodigo(cliente, producto) {
+        const lista = catalogo[cliente] || [];
+        const encontrado = lista.find(i => i.producto === producto);
+        return encontrado ? encontrado.codigo : '';
+    }
+
+    // Actualiza selects en el formulario principal
+    clienteSelect.addEventListener('change', function() {
+        const cliente = this.value;
+        productoSelect.innerHTML = construirOpcionesProducto(cliente);
+        codigoInput.value = '';
+        // También actualizar filas de productos adicionales
+        actualizarFilasProductoPorCliente(cliente);
     });
 
-    // función para agregar una nueva fila de producto
-    function agregarFilaProducto() {
-    const cliente = document.getElementById('id_cliente').value;
-    const fila = document.createElement('tr');
+    productoSelect.addEventListener('change', function() {
+        const cliente = clienteSelect.value;
+        codigoInput.value = obtenerCodigo(cliente, this.value);
+    });
 
-    fila.innerHTML = `
+    // Múltiples productos
+    function actualizarFilasProductoPorCliente(cliente) {
+        document.querySelectorAll('#tabla-productos tbody tr').forEach(row => {
+        const prodSelect = row.querySelector('.producto-en-turno');
+        const codigoField = row.querySelector('.codigo-en-turno');
+        const previo = prodSelect.value;
+
+        prodSelect.innerHTML = construirOpcionesProducto(cliente, previo);
+        if (previo) {
+            codigoField.value = obtenerCodigo(cliente, previo);
+        } else {
+            codigoField.value = '';
+        }
+        });
+    }
+
+    // Agregar fila nueva
+    window.agregarFilaProducto = function() {
+        const cliente = clienteSelect.value;
+        const tablaBody = document.querySelector('#tabla-productos tbody');
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
         <td>
-        <select name="producto[]" class="producto-en-turno" required>
-            ${opcionesProductoParaCliente(cliente)}
-        </select>
+            <select name="producto[]" class="producto-en-turno" required>
+            ${construirOpcionesProducto(cliente)}
+            </select>
         </td>
         <td>
-        <input type="text" name="codigo[]" readonly class="codigo-en-turno" placeholder="Autocompleta">
+            <input type="text" name="codigo[]" readonly class="codigo-en-turno" placeholder="Autocompleta">
         </td>
         <td><input type="number" name="produccion_planeada[]" min="0" placeholder="Planeada"></td>
         <td><input type="number" name="produccion_real[]" min="0" placeholder="Real"></td>
         <td><input type="text" name="comentarios_producto[]" placeholder="Comentarios"></td>
-        <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
-    `;
+        <td><button type="button" class="btn-eliminar">Eliminar</button></td>
+        `;
+        tablaBody.appendChild(fila);
 
-    // enlazar cambio de producto dentro de la nueva fila
-    const selectProducto = fila.querySelector('.producto-en-turno');
-    const inputCodigo = fila.querySelector('.codigo-en-turno');
+        const selectProducto = fila.querySelector('.producto-en-turno');
+        const inputCodigo = fila.querySelector('.codigo-en-turno');
 
-    selectProducto.addEventListener('change', function () {
-        const lista = catalogo[cliente] || [];
-        const sel = lista.find(item => item.producto === this.value);
-        inputCodigo.value = sel ? sel.codigo : '';
+        selectProducto.addEventListener('change', function() {
+        inputCodigo.value = obtenerCodigo(cliente, this.value);
+        });
+
+        fila.querySelector('.btn-eliminar').addEventListener('click', function() {
+        fila.remove();
+        });
+    };
+
+    // Si el cliente cambia después y hay filas previas:
+    clienteSelect.addEventListener('change', function() {
+        actualizarFilasProductoPorCliente(this.value);
     });
-
-    document.querySelector('#tabla-productos tbody').appendChild(fila);
-    }
+    });
     </script>
 </head>
 <body>
