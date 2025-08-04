@@ -31,7 +31,7 @@ def crear_turno(request):
             lote = form.save()
 
             # Guardar productos
-            cliente = lote.POST.get('cliente[]', '')
+            cliente = request.POST.get('cliente[]', '')
             productos = request.POST.getlist('producto[]')
             codigos = request.POST.getlist('codigo[]')
             planeadas = request.POST.getlist('produccion_planeada[]')
