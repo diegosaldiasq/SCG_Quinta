@@ -3,388 +3,414 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}">
-    <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
-    <title>Registrar Turno OEE</title>
-    <script>
-        const motivosDetenciones = [
-            "1-Colacion",
-            "2-Falta insumo (bizcocho, panqueque, discos de hoja, hojarasca, etc.)",
-            "3-Falta de prelistos",
-            "4-Falta de crema, manjar o pastelera",
-            "5-Falla mecanica",
-            "6-Equipos fuera de servicio",
-            "7-Preparacion de insumos",
-            "8-Tortas reparadas",
-            "9-Cambio de formato/producto",
-            "10-Aseo de linea",
-            "11-Mantencion preventiva",
-            "12-Medicion de laboratorio",
-            "13-Capacitación",
-            "14-Falta de personal",
-            "15-Limpieza cabezal",
-            "16-Ajuste de modulo"
-        ];
+  <meta charset="UTF-8" />
+  <title>Registrar Turno OEE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}" />
+  <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
+  <title>Registrar Turno OEE</title>
 
-        const motivosReprocesos = [
-            "1-Defecto visual",
-            "2-Error en etiquetado",
-            "3-Desviación de peso",
-            "4-Contaminación cruzada",
-            "5-Caida al piso",
-            "6-Insumo en mal estado"
-        ];
-
-        function agregarFilaDetencion() {
-            const opciones = motivosDetenciones
-            .map(m => `<option value="${m}">${m}</option>`)
-            .join('');
-
-            const fila = document.createElement('tr');
-            fila.innerHTML = `
-            <td>
-                <select name="motivo_det[]" required>
-                <option value="">-- Seleccionar --</option>
-                ${opciones}
-                </select>
-            </td>
-            <td><input type="time" name="hora_inicio_det[]" required></td>
-            <td><input type="time" name="hora_fin_det[]" required></td>
-            <td><input type="number" name="duracion_det[]" readonly></td>
-            <td><input type="text" name="comentarios_det[]" maxlength="200" placeholder="Comentarios adicionales"></td>
-            <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
-            `;
-            document.querySelector("#tabla-detenciones tbody").append(fila);
-
-            // cada vez que cambie inicio o fin, recalcula
-            const [hi, hf, dur] = fila.querySelectorAll('input');
-            function recalcular() {
-            if (!hi.value || !hf.value) { dur.value = ''; return; }
-            let [h1,m1] = hi.value.split(':').map(n=>+n);
-            let [h2,m2] = hf.value.split(':').map(n=>+n);
-            let t1 = h1*60 + m1, t2 = h2*60 + m2;
-            if (t2 < t1) t2 += 24*60; 
-            dur.value = t2 - t1;
-            }
-            hi.addEventListener('change', recalcular);
-            hf.addEventListener('change', recalcular);
-        }
-
-        function agregarFilaReproceso() {
-            let opciones = motivosReprocesos.map(m => `<option value="${m}">${m}</option>`).join('');
-            const fila = `
-                <tr>
-                    <td>
-                        <select name="motivo_rep[]" required>
-                            <option value="">-- Seleccionar --</option>
-                            ${opciones}
-                        </select>
-                    </td>
-                    <td><input type="number" name="cantidad_rep[]" min="0" required></td>
-                    <td><button type="button" onclick="this.closest('tr').remove()">Eliminar</button></td>
-                </tr>`;
-            document.querySelector("#tabla-reprocesos tbody").insertAdjacentHTML("beforeend", fila);
-        }
-    </script>
-    <script>
-        // catálogo estático: cliente → lista de {producto, código}
-        const catalogo = {
-            'Jumbo': [
-                { producto: 'Torta Beatriz', codigo: '393241' },
-                { producto: 'Torta Bom Bom', codigo: '393240' },
-                { producto: 'Torta tres leches', codigo: '393149' },
-                { producto: 'Torta cuatro leches', codigo: '393191' },
-                { producto: 'Torta piña', codigo: '393129' },
-                { producto: 'Torta lucuma', codigo: '393141' },
-                { producto: 'Torta panqueque naranja', codigo: '393171' },
-                { producto: 'Torta selva negra', codigo: '393145' },
-                { producto: 'Torta truffa', codigo: '393167' },
-                { producto: 'Torta viena', codigo: '393153' },
-                { producto: 'Torta San Jorge lucuma', codigo: '393396' },
-                { producto: 'Torta San Jorge guinda', codigo: '393397' },
-                { producto: 'Torta San Jorge chocolate', codigo: '393398' },
-                { producto: 'Torta merengue lucuma', codigo: '405220' },
-                { producto: 'Torta merengue frambuesa', codigo: '405217' },
-                { producto: 'Torta merengue nugat', codigo: '393443' },
-                { producto: 'Torta merengue manzana frambuesa', codigo: '405458' },
-                { producto: 'Torta chocolate real', codigo: '405254' },
-                { producto: 'Torta caluga frambuesa', codigo: '393414' },
-                { producto: 'Torta caluga nuez', codigo: '405548' },
-                { producto: 'Torta selva negra vegana', codigo: '405258' },
-                { producto: 'Torta piña vegana', codigo: '405260' },
-                { producto: 'Torta panqueque guinda chocolate', codigo: '402261' },
-                { producto: 'Pie de frambuesa familiar', codigo: '393429' },
-                { producto: 'Pie de maracuya familiar', codigo: '393430' },
-                { producto: 'Pie de limon familiar', codigo: '393431' },
-                { producto: 'Media torta San Jorge lucuma', codigo: '405414' },
-                { producto: 'Tarta soft familiar', codigo: '393433' },
-                { producto: 'Tartaleta fruta mixta familiar', codigo: '393432' },
-            ],
-            'SISA': [
-                { producto: 'Torta amor', codigo: '393266' },
-                { producto: 'Torta crema manjar mediana', codigo: '392518' },
-                { producto: 'Torta crema piña', codigo: '393011' },
-                { producto: 'Torta crema selva negra', codigo: '393013' },
-                { producto: 'Torta chocolate mediana', codigo: '405523' },
-                { producto: 'Torta merengue frambuesa', codigo: '393036' },
-                { producto: 'Torta merengue lucuma', codigo: '393212' },
-                { producto: 'Torta mocaccino mediana', codigo: '353253' },
-                { producto: 'Torta panqueque naranja', codigo: '393018' },
-                { producto: 'Torta tres leches', codigo: '393015' },
-                { producto: 'Torta yogurt', codigo: '393017' },
-                { producto: 'Torta viena', codigo: '393019' },
-                { producto: 'Torta guinda chocolate', codigo: '393362' },
-                { producto: 'Torta sabor lucuma', codigo: '393356' },
-                { producto: 'Torta sacher', codigo: '393354' },
-                { producto: 'Torta doña isabel', codigo: '405256' },
-                { producto: 'Torta cookies & cream', codigo: '405295' },
-                { producto: 'Torta caramel macchiato', codigo: '405294' },
-                { producto: 'Torta piña colada', codigo: '405292' },
-                { producto: 'Tartaleta fruta mixta mediana', codigo: '393270' },
-                { producto: 'Pie de limon familiar', codigo: '393000' },
-                { producto: 'Pie de limon mediano', codigo: '405396' },
-                { producto: 'Pie de maracuya mediano', codigo: '405397' },
-            ],
-            'Walmart': [
-                { producto: 'Torta chocoguinda', codigo: '393058' },
-                { producto: 'Torta chocolate manjar', codigo: '393347' },
-                { producto: 'Torta chocolate 8pp', codigo: '393275' },
-                { producto: 'Torta crema frambuesa', codigo: '393402' },
-                { producto: 'Torta crema moka 15pp', codigo: '392500' },
-                { producto: 'Torta crema piña 15pp', codigo: '393033' },
-                { producto: 'Torta holandesa 15pp', codigo: '392498' },
-                { producto: 'Torta mousse manjar 15pp', codigo: '392495' },
-                { producto: 'Torta panqueque naranja', codigo: '393295' },
-                { producto: 'Torta san jorge 15pp', codigo: '393250' },
-                { producto: 'Torta selva negra 15pp', codigo: '393020' },
-                { producto: 'Torta tres leches 15pp', codigo: '392494' },
-                { producto: 'Torta hoja manjar chocolate artesanal', codigo: '405262' },
-                { producto: 'Torta frutos del bosque', codigo: '405315' },
-                { producto: 'Torta chocolate avellana', codigo: '393445' },
-                { producto: 'Torta selva negra crema lactea', codigo: '405488' },
-                { producto: 'Torta piña crema lactea', codigo: '405487' },
-            ],
-            'Unimarc': [
-                { producto: 'Torta crema manjar mini', codigo: '393272' },
-                { producto: 'Torta guinda mini', codigo: '393273' },
-                { producto: 'Torta hoja manjar 15pp', codigo: '392332' },
-                { producto: 'Torta holandesa smu', codigo: '393391' },
-                { producto: 'Torta panqueque naranja', codigo: '393409' },
-                { producto: 'Torta yogurt frutilla', codigo: '393441' },
-                { producto: 'Torta cuatro leches', codigo: '393440' },
-            ],
-        };
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const clienteSelect  = document.getElementById('id_cliente');
-        const productoSelect = document.getElementById('id_producto');
-        const codigoInput    = document.getElementById('id_codigo');
-
-        // Al cambiar el cliente, recarga los productos
-        clienteSelect.addEventListener('change', function() {
-            const lista = catalogo[this.value] || [];
-            // resetea dropdown de productos
-            productoSelect.innerHTML = '<option value="">-- Seleccionar --</option>';
-            // rellena con las opciones correspondientes
-            lista.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.producto;
-                opt.textContent = item.producto;
-                productoSelect.append(opt);
-            });
-            // limpia el código
-            codigoInput.value = '';
-        });
-
-        // Al cambiar el producto, busca su código
-        productoSelect.addEventListener('change', function() {
-            const lista = catalogo[clienteSelect.value] || [];
-            const sel   = lista.find(item => item.producto === this.value);
-            codigoInput.value = sel ? sel.codigo : '';
-        });
-    });
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const clienteSelect  = document.getElementById('id_cliente');
-    const productoSelect = document.getElementById('id_producto');
-    const codigoInput    = document.getElementById('id_codigo');
-
-    // Helpers
-    function construirOpcionesProducto(cliente, seleccionado = "") {
-        const lista = catalogo[cliente] || [];
-        let html = `<option value="">--Seleccionar--</option>`;
-        lista.forEach(item => {
-        const sel = item.producto === seleccionado ? ' selected' : '';
-        html += `<option value="${item.producto}"${sel}>${item.producto}</option>`;
-        });
-        return html;
+  <style>
+    /* Ajustes rápidos para que la tabla de productos quede alineada */
+    .tabla-productos, #tabla-detenciones, #tabla-reprocesos {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 0.75rem;
     }
+    .tabla-productos th,
+    .tabla-productos td,
+    #tabla-detenciones th,
+    #tabla-detenciones td,
+    #tabla-reprocesos th,
+    #tabla-reprocesos td {
+      padding: 6px 8px;
+      border: 1px solid #d1a14d;
+      vertical-align: middle;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+    .tabla-productos select,
+    .tabla-productos input,
+    #tabla-detenciones select,
+    #tabla-detenciones input,
+    #tabla-reprocesos select,
+    #tabla-reprocesos input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      font-size: 0.9rem;
+    }
+    .btn-eliminar {
+      background: #b33a2d;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .small-select {
+      min-width: 120px;
+    }
+  </style>
+</head>
 
-    function obtenerCodigo(cliente, producto) {
+<body>
+  <div class="login">
+    <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo" />
+    <div class="login_container">
+      <h1 class="title">📋 Crear Turno OEE</h1>
+
+      <form method="post" action="{% url 'crear_turno' %}">
+        {% csrf_token %}
+
+        <!-- 📑 Datos del Turno -->
+        <fieldset>
+          <legend>📑 Datos del Turno</legend>
+          <table>
+            {{ form.as_table }}
+          </table>
+        </fieldset>
+
+        <!-- 🏭 Productos del Turno -->
+        <fieldset>
+          <legend>🍰 Productos</legend>
+
+          <table id="tabla-productos" class="tabla-productos">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Código</th>
+                <th>Planeado</th>
+                <th>Real</th>
+                <th>Comentarios</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <button type="button" class="primary-button" id="btn-agregar-producto">➕ Agregar Producto</button>
+        </fieldset>
+
+        <!-- ⛔ Detenciones -->
+        <fieldset>
+          <legend>⛔ Detenciones</legend>
+          <table id="tabla-detenciones">
+            <thead>
+              <tr>
+                <th>Motivo</th>
+                <th>Hora inicio</th>
+                <th>Hora fin</th>
+                <th>Duración (min)</th>
+                <th>Comentarios</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <button type="button" onclick="agregarFilaDetencion()" class="primary-button">➕ Agregar Detención</button>
+        </fieldset>
+
+        <!-- ♻️ Reprocesos -->
+        <fieldset>
+          <legend>♻️ Mermas</legend>
+          <table id="tabla-reprocesos">
+            <thead>
+              <tr>
+                <th>Motivo</th>
+                <th>Cantidad</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <button type="button" onclick="agregarFilaReproceso()" class="primary-button">➕ Agregar Reproceso</button>
+        </fieldset>
+
+        <!-- ✅ Botones -->
+        <div class="botones">
+          <button type="submit" class="primary-button login-button" onclick="return confirm('¿Estás seguro de guardar este turno?')">💾 Guardar Turno</button>
+          <a href="{% url 'lista_turnos' %}" class="primary-button login-button">🚪 Turnos Registrados</a>
+          <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Templates invisibles -->
+  <template id="fila-producto-template">
+    <tr>
+      <td>
+        <select name="cliente_producto[]" class="cliente-en-producto" required>
+          <option value="">--Seleccionar cliente--</option>
+        </select>
+      </td>
+      <td>
+        <select name="producto[]" class="producto-en-turno" required>
+          <option value="">--Seleccionar producto--</option>
+        </select>
+      </td>
+      <td>
+        <input type="text" name="codigo[]" readonly class="codigo-en-turno" placeholder="Autocompleta" />
+      </td>
+      <td><input type="number" name="produccion_planeada[]" min="0" placeholder="Planeada" /></td>
+      <td><input type="number" name="produccion_real[]" min="0" placeholder="Real" /></td>
+      <td><input type="text" name="comentarios_producto[]" placeholder="Comentarios" /></td>
+      <td><button type="button" class="btn-eliminar">Eliminar</button></td>
+    </tr>
+  </template>
+
+  <!-- JS: catálogo, detenciones, reprocesos y productos -->
+  <script>
+    // catálogo estático (puedes sacarlo a contexto si lo prefieres)
+    const catalogo = {
+      'Jumbo': [
+        { producto: 'Torta Beatriz', codigo: '393241' },
+        { producto: 'Torta Bom Bom', codigo: '393240' },
+        { producto: 'Torta tres leches', codigo: '393149' },
+        { producto: 'Torta cuatro leches', codigo: '393191' },
+        { producto: 'Torta piña', codigo: '393129' },
+        { producto: 'Torta lucuma', codigo: '393141' },
+        { producto: 'Torta panqueque naranja', codigo: '393171' },
+        { producto: 'Torta selva negra', codigo: '393145' },
+        { producto: 'Torta truffa', codigo: '393167' },
+        { producto: 'Torta viena', codigo: '393153' },
+        { producto: 'Torta San Jorge lucuma', codigo: '393396' },
+        { producto: 'Torta San Jorge guinda', codigo: '393397' },
+        { producto: 'Torta San Jorge chocolate', codigo: '393398' },
+        { producto: 'Torta merengue lucuma', codigo: '405220' },
+        { producto: 'Torta merengue frambuesa', codigo: '405217' },
+        { producto: 'Torta merengue nugat', codigo: '393443' },
+        { producto: 'Torta merengue manzana frambuesa', codigo: '405458' },
+        { producto: 'Torta chocolate real', codigo: '405254' },
+        { producto: 'Torta caluga frambuesa', codigo: '393414' },
+        { producto: 'Torta caluga nuez', codigo: '405548' },
+        { producto: 'Torta selva negra vegana', codigo: '405258' },
+        { producto: 'Torta piña vegana', codigo: '405260' },
+        { producto: 'Torta panqueque guinda chocolate', codigo: '402261' },
+        { producto: 'Pie de frambuesa familiar', codigo: '393429' },
+        { producto: 'Pie de maracuya familiar', codigo: '393430' },
+        { producto: 'Pie de limon familiar', codigo: '393431' },
+        { producto: 'Media torta San Jorge lucuma', codigo: '405414' },
+        { producto: 'Tarta soft familiar', codigo: '393433' },
+        { producto: 'Tartaleta fruta mixta familiar', codigo: '393432' },
+      ],
+      'SISA': [
+        { producto: 'Torta amor', codigo: '393266' },
+        { producto: 'Torta crema manjar mediana', codigo: '392518' },
+        { producto: 'Torta crema piña', codigo: '393011' },
+        { producto: 'Torta crema selva negra', codigo: '393013' },
+        { producto: 'Torta chocolate mediana', codigo: '405523' },
+        { producto: 'Torta merengue frambuesa', codigo: '393036' },
+        { producto: 'Torta merengue lucuma', codigo: '393212' },
+        { producto: 'Torta mocaccino mediana', codigo: '353253' },
+        { producto: 'Torta panqueque naranja', codigo: '393018' },
+        { producto: 'Torta tres leches', codigo: '393015' },
+        { producto: 'Torta yogurt', codigo: '393017' },
+        { producto: 'Torta viena', codigo: '393019' },
+        { producto: 'Torta guinda chocolate', codigo: '393362' },
+        { producto: 'Torta sabor lucuma', codigo: '393356' },
+        { producto: 'Torta sacher', codigo: '393354' },
+        { producto: 'Torta doña isabel', codigo: '405256' },
+        { producto: 'Torta cookies & cream', codigo: '405295' },
+        { producto: 'Torta caramel macchiato', codigo: '405294' },
+        { producto: 'Torta piña colada', codigo: '405292' },
+        { producto: 'Tartaleta fruta mixta mediana', codigo: '393270' },
+        { producto: 'Pie de limon familiar', codigo: '393000' },
+        { producto: 'Pie de limon mediano', codigo: '405396' },
+        { producto: 'Pie de maracuya mediano', codigo: '405397' },
+      ],
+      'Walmart': [
+        { producto: 'Torta chocoguinda', codigo: '393058' },
+        { producto: 'Torta chocolate manjar', codigo: '393347' },
+        { producto: 'Torta chocolate 8pp', codigo: '393275' },
+        { producto: 'Torta crema frambuesa', codigo: '393402' },
+        { producto: 'Torta crema moka 15pp', codigo: '392500' },
+        { producto: 'Torta crema piña 15pp', codigo: '393033' },
+        { producto: 'Torta holandesa 15pp', codigo: '392498' },
+        { producto: 'Torta mousse manjar 15pp', codigo: '392495' },
+        { producto: 'Torta panqueque naranja', codigo: '393295' },
+        { producto: 'Torta san jorge 15pp', codigo: '393250' },
+        { producto: 'Torta selva negra 15pp', codigo: '393020' },
+        { producto: 'Torta tres leches 15pp', codigo: '392494' },
+        { producto: 'Torta hoja manjar chocolate artesanal', codigo: '405262' },
+        { producto: 'Torta frutos del bosque', codigo: '405315' },
+        { producto: 'Torta chocolate avellana', codigo: '393445' },
+        { producto: 'Torta selva negra crema lactea', codigo: '405488' },
+        { producto: 'Torta piña crema lactea', codigo: '405487' },
+      ],
+      'Unimarc': [
+        { producto: 'Torta crema manjar mini', codigo: '393272' },
+        { producto: 'Torta guinda mini', codigo: '393273' },
+        { producto: 'Torta hoja manjar 15pp', codigo: '392332' },
+        { producto: 'Torta holandesa smu', codigo: '393391' },
+        { producto: 'Torta panqueque naranja', codigo: '393409' },
+        { producto: 'Torta yogurt frutilla', codigo: '393441' },
+        { producto: 'Torta cuatro leches', codigo: '393440' },
+      ],
+    };
+
+    // motivos (puedes externalizar)
+    const motivosDetenciones = [
+      "1-Colacion",
+      "2-Falta insumo (bizcocho, panqueque, discos de hoja, hojarasca, etc.)",
+      "3-Falta de prelistos",
+      "4-Falta de crema, manjar o pastelera",
+      "5-Falla mecanica",
+      "6-Equipos fuera de servicio",
+      "7-Preparacion de insumos",
+      "8-Tortas reparadas",
+      "9-Cambio de formato/producto",
+      "10-Aseo de linea",
+      "11-Mantencion preventiva",
+      "12-Medicion de laboratorio",
+      "13-Capacitación",
+      "14-Falta de personal",
+      "15-Limpieza cabezal",
+      "16-Ajuste de modulo"
+    ];
+
+    const motivosReprocesos = [
+      "1-Defecto visual",
+      "2-Error en etiquetado",
+      "3-Desviación de peso",
+      "4-Contaminación cruzada",
+      "5-Caida al piso",
+      "6-Insumo en mal estado"
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // DETENCIONES
+      function agregarFilaDetencion() {
+        const opciones = motivosDetenciones
+          .map(m => `<option value="${m}">${m}</option>`)
+          .join('');
+
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>
+            <select name="motivo_det[]" required>
+              <option value="">-- Seleccionar --</option>
+              ${opciones}
+            </select>
+          </td>
+          <td><input type="time" name="hora_inicio_det[]" required></td>
+          <td><input type="time" name="hora_fin_det[]" required></td>
+          <td><input type="number" name="duracion_det[]" readonly></td>
+          <td><input type="text" name="comentarios_det[]" maxlength="200" placeholder="Comentarios adicionales"></td>
+          <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove()">Eliminar</button></td>
+        `;
+        document.querySelector("#tabla-detenciones tbody").append(fila);
+
+        const hi = fila.querySelector('input[name="hora_inicio_det[]"]');
+        const hf = fila.querySelector('input[name="hora_fin_det[]"]');
+        const dur = fila.querySelector('input[name="duracion_det[]"]');
+        function recalcular() {
+          if (!hi.value || !hf.value) { dur.value = ''; return; }
+          let [h1,m1] = hi.value.split(':').map(n=>+n);
+          let [h2,m2] = hf.value.split(':').map(n=>+n);
+          let t1 = h1*60 + m1, t2 = h2*60 + m2;
+          if (t2 < t1) t2 += 24*60;
+          dur.value = t2 - t1;
+        }
+        hi.addEventListener('change', recalcular);
+        hf.addEventListener('change', recalcular);
+      }
+
+      // REPROCESOS
+      function agregarFilaReproceso() {
+        let opciones = motivosReprocesos.map(m => `<option value="${m}">${m}</option>`).join('');
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>
+            <select name="motivo_rep[]" required>
+              <option value="">-- Seleccionar --</option>
+              ${opciones}
+            </select>
+          </td>
+          <td><input type="number" name="cantidad_rep[]" min="0" required></td>
+          <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove()">Eliminar</button></td>
+        `;
+        document.querySelector("#tabla-reprocesos tbody").append(fila);
+      }
+
+      // PRODUCTOS
+      const tablaBodyProd = document.querySelector('#tabla-productos tbody');
+      const templateProd = document.getElementById('fila-producto-template').content;
+      const btnAgregarProd = document.getElementById('btn-agregar-producto');
+
+      function llenarSelectCliente(select, seleccionado = '') {
+        select.innerHTML = `<option value="">--Seleccionar cliente--</option>`;
+        Object.keys(catalogo).forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          if (c === seleccionado) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+
+      function llenarSelectProducto(select, cliente, seleccionado = '') {
+        select.innerHTML = `<option value="">--Seleccionar producto--</option>`;
+        const lista = catalogo[cliente] || [];
+        lista.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.producto;
+          opt.textContent = item.producto;
+          if (item.producto === seleccionado) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+
+      function obtenerCodigo(cliente, producto) {
         const lista = catalogo[cliente] || [];
         const encontrado = lista.find(i => i.producto === producto);
         return encontrado ? encontrado.codigo : '';
-    }
+      }
 
-    // Actualiza selects en el formulario principal
-    clienteSelect.addEventListener('change', function() {
-        const cliente = this.value;
-        productoSelect.innerHTML = construirOpcionesProducto(cliente);
-        codigoInput.value = '';
-        // También actualizar filas de productos adicionales
-        actualizarFilasProductoPorCliente(cliente);
-    });
-
-    productoSelect.addEventListener('change', function() {
-        const cliente = clienteSelect.value;
-        codigoInput.value = obtenerCodigo(cliente, this.value);
-    });
-
-    // Múltiples productos
-    function actualizarFilasProductoPorCliente(cliente) {
-        document.querySelectorAll('#tabla-productos tbody tr').forEach(row => {
-        const prodSelect = row.querySelector('.producto-en-turno');
-        const codigoField = row.querySelector('.codigo-en-turno');
-        const previo = prodSelect.value;
-
-        prodSelect.innerHTML = construirOpcionesProducto(cliente, previo);
-        if (previo) {
-            codigoField.value = obtenerCodigo(cliente, previo);
-        } else {
-            codigoField.value = '';
-        }
-        });
-    }
-
-    // Agregar fila nueva
-    window.agregarFilaProducto = function() {
-        const cliente = clienteSelect.value;
-        const tablaBody = document.querySelector('#tabla-productos tbody');
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-        <td>
-            <select name="producto[]" class="producto-en-turno" required>
-            ${construirOpcionesProducto(cliente)}
-            </select>
-        </td>
-        <td>
-            <input type="text" name="codigo[]" readonly class="codigo-en-turno" placeholder="Autocompleta">
-        </td>
-        <td><input type="number" name="produccion_planeada[]" min="0" placeholder="Planeada"></td>
-        <td><input type="number" name="produccion_real[]" min="0" placeholder="Real"></td>
-        <td><input type="text" name="comentarios_producto[]" placeholder="Comentarios"></td>
-        <td><button type="button" class="btn-eliminar">Eliminar</button></td>
-        `;
-        tablaBody.appendChild(fila);
-
+      function agregarFilaProductoInterna() {
+        const clone = document.importNode(templateProd, true);
+        const fila = clone.querySelector('tr');
+        const selectCliente = fila.querySelector('.cliente-en-producto');
         const selectProducto = fila.querySelector('.producto-en-turno');
         const inputCodigo = fila.querySelector('.codigo-en-turno');
+        const btnEliminar = fila.querySelector('.btn-eliminar');
 
-        selectProducto.addEventListener('change', function() {
-        inputCodigo.value = obtenerCodigo(cliente, this.value);
+        llenarSelectCliente(selectCliente);
+
+        selectCliente.addEventListener('change', () => {
+          const cliente = selectCliente.value;
+          llenarSelectProducto(selectProducto, cliente);
+          inputCodigo.value = '';
         });
 
-        fila.querySelector('.btn-eliminar').addEventListener('click', function() {
-        fila.remove();
+        selectProducto.addEventListener('change', () => {
+          const cliente = selectCliente.value;
+          inputCodigo.value = obtenerCodigo(cliente, selectProducto.value);
         });
-    };
 
-    // Si el cliente cambia después y hay filas previas:
-    clienteSelect.addEventListener('change', function() {
-        actualizarFilasProductoPorCliente(this.value);
+        btnEliminar.addEventListener('click', () => {
+          fila.remove();
+        });
+
+        tablaBodyProd.appendChild(fila);
+      }
+
+      // ganchos de botones
+      document.getElementById('btn-agregar-producto').addEventListener('click', agregarFilaProductoInterna);
+      // También dejar disponibles funciones globales si se usan en HTML inline:
+      window.agregarFilaDetencion = agregarFilaDetencion;
+      window.agregarFilaReproceso = agregarFilaReproceso;
+      window.agregarFilaProducto = agregarFilaProductoInterna;
     });
-    });
-    </script>
-</head>
-<body>
-    <div class="login">
-        <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
-        <div class="login_container">
-            <h1 class="title">📋 Crear Turno OEE</h1>
-
-            <form method="post" action="{% url 'crear_turno' %}">
-                {% csrf_token %}
-
-                <!-- 📑 Datos del Turno -->
-                <fieldset>
-                    <legend>📑 Datos del Turno</legend>
-                    <table>
-                        {{ form.as_table }}
-                    </table>
-                </fieldset>
-
-                <!-- 🏭 Productos del Turno -->
-                <fieldset>
-                    <legend>🍰 Productos</legend>
-                    <table id="tabla-productos">
-                        <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Producto</th>
-                            <th>Código</th>
-                            <th>Planeado</th>
-                            <th>Real</th>
-                            <th>Comentarios</th>
-                            <th>Acción</th>
-                        </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                    <button type="button" class="primary-button" onclick="agregarFilaProducto()">➕ Agregar Producto</button>
-                </fieldset>
-
-                <!-- ⛔ Detenciones -->
-                <fieldset>
-                    <legend>⛔ Detenciones</legend>
-                    <table id="tabla-detenciones">
-                        <thead>
-                            <tr>
-                                <th>Motivo</th>
-                                <th>Hora inicio</th>
-                                <th>Hora fin</th>
-                                <th>Duración (min)</th>
-                                <th>Comentarios</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                    <button type="button" onclick="agregarFilaDetencion()" class="primary-button">➕ Agregar Detención</button>
-                </fieldset>
-
-                <!-- ♻️ Reprocesos -->
-                <fieldset>
-                    <legend>♻️ Mermas</legend>
-                    <table id="tabla-reprocesos">
-                        <thead>
-                            <tr>
-                                <th>Motivo</th>
-                                <th>Cantidad</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                    <button type="button" onclick="agregarFilaReproceso()" class="primary-button">➕ Agregar Reproceso</button>
-                </fieldset>
-
-                <!-- ✅ Botones -->
-                <div class="botones" >
-                    <button type="submit" class="primary-button login-button" onclick="return confirm('¿Estás seguro de guardar este turno?')">💾 Guardar Turno</button>
-                    <a href="{% url 'lista_turnos' %}" class="primary-button login-button">🚪 Turnos Registrados</a>
-                    <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
-                </div>
-            </form>
-        </div>
-    </div>
+  </script>
 </body>
 </html>
-
