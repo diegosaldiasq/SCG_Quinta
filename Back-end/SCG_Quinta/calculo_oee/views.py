@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import TurnoOEEForm
-from .models import TurnoOEE, Detencion, Reproceso, ResumenTurnoOee
+from .models import TurnoOEE, Producto, Detencion, Reproceso, ResumenTurnoOee
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .forms import ProduccionRealForm
@@ -29,6 +29,25 @@ def crear_turno(request):
         form = TurnoOEEForm(request.POST)
         if form.is_valid():
             lote = form.save()
+
+            # Guardar productos
+            cliente = lote.POST.get('cliente[]', '')
+            productos = request.POST.getlist('producto[]')
+            codigos = request.POST.getlist('codigo[]')
+            planeadas = request.POST.getlist('produccion_planeada[]')
+            reales = request.POST.getlist('produccion_real[]')  # si ya se ingresan
+            comentarios = request.POST.getlist('comentarios[]')  # <-- nuevo campo
+
+            for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios):
+                Producto.objects.create(
+                    turno=lote,
+                    cliente=cli,
+                    producto=prod,
+                    codigo=cod,
+                    produccion_planeada=int(plan) if plan else None,
+                    produccion_real=int(real) if real else None,
+                    comentarios=com.strip() if com else None  # <-- nuevo campo 
+                )
 
             # Guardar detenciones
             motivos   = request.POST.getlist('motivo_det[]')
@@ -209,12 +228,14 @@ def lista_turnos(request):
 @login_required
 def detalle_turno(request, lote_id):
     lote = get_object_or_404(TurnoOEE, id=lote_id)
+    productos = lote.productos.all()
     detenciones = lote.detenciones.all()
     reprocesos = lote.reprocesos.all()
 
     next_param = request.GET.get('next', '')
     return render(request, 'calculo_oee/detalle_turno.html', {
         'lote': lote,
+        'productos': productos,
         'detenciones': detenciones,
         'reprocesos': reprocesos,
         'next_url': next_param or reverse('lista_turnos'),

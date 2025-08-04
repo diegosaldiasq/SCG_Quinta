@@ -22,6 +22,19 @@ class TurnoOEE(models.Model):
 
     def __str__(self):
         return f"{self.fecha} - {self.linea} - {self.turno}"
+    
+class Producto(models.Model):
+    lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='productos')
+    cliente = models.CharField(max_length=100)
+    producto = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=20, null=True, blank=True)
+    produccion_planeada = models.PositiveIntegerField(help_text="Producción planeada en unidades", null=True, blank=True)
+    produccion_real = models.PositiveIntegerField(null=True, blank=True)
+    # puedes agregar más campos específicos por producto, p.ej. observaciones
+    comentarios = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.turno} - {self.producto}"
 
 class Detencion(models.Model):
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='detenciones')

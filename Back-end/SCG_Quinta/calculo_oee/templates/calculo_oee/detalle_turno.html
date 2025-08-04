@@ -22,6 +22,39 @@
             <h1 class="title">📑 Detalles del Turno</h1>
             <h2>{{ lote.fecha|date:'d-m-Y' }} - {{ lote.lote }} - {{ lote.linea }} - {{ lote.turno }}</h2>
 
+            <!-- 📝 Tabla de Productos -->
+            <h3>📝 Productos</h3>
+            <div class="tabla-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Producto</th>                   
+                            <th>Código</th>
+                            <th>Planeada</th>
+                            <th>Real</th>
+                            <th>Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in productos %}
+                        <tr>
+                            <td>{{ prod.cliente }}</td>
+                            <td>{{ prod.producto }}</td>
+                            <td>{{ prod.codigo }}</td>
+                            <td>{{ prod.produccion_planeada }}</td>
+                            <td>{{ prod.produccion_real }}</td>
+                            <td>{{ prod.comentarios|default_if_none:"" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">⚠️ No hay productos registrados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
             <!-- 🛑 Tabla de Detenciones -->
             <h3>⛔ Detenciones</h3>
             <div class="tabla-container">
