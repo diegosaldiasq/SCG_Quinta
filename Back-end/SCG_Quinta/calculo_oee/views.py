@@ -40,7 +40,7 @@ def crear_turno(request):
 
             for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios):
                 Producto.objects.create(
-                    turno=lote,
+                    lote=lote,
                     cliente=cli,
                     producto=prod,
                     codigo=cod,
