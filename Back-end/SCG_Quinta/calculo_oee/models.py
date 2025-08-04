@@ -52,8 +52,8 @@ class Reproceso(models.Model):
 class ResumenTurnoOee(models.Model):
     fecha = models.DateTimeField(auto_now_add=False)
     cliente = models.CharField(max_length=100)
-    codigo = models.CharField(max_length=20, null=True, blank=True)
-    producto = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=200, null=True, blank=True)
+    producto = models.CharField(max_length=200)
     linea   = models.CharField(max_length=50)
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='resumenes_turno', null=True, blank=True)
     turno = models.CharField(max_length=20)
