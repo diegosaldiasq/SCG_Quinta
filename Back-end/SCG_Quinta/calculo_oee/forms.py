@@ -105,22 +105,22 @@ class TurnoOEEForm(forms.ModelForm):
     #    ('Walmart', 'Walmart'),
     #    ('Unimarc', 'Unimarc'),
     #]
-    cliente = forms.ChoiceField(
-        choices=[('', '--Seleccionar cliente--')] + [(c, c) for c in CATALOGO],
-        widget=forms.Select(attrs={'id': 'id_cliente'}),
-        help_text="Agregar cliente y producto siempre, si es mas de un producto ingresar detalle completo abajo en 🍰 Productos"
-    )
-    producto = forms.ChoiceField(
-        choices=[('', '--Seleccionar cliente primero--')],
-        widget=forms.Select(attrs={'id': 'id_producto'})
-    )
-    codigo = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'readonly': 'readonly', 
-            'id': 'id_codigo',
-            'placeholder': 'Se autocompleta'
-        })
-    )
+    #cliente = forms.ChoiceField(
+    #    choices=[('', '--Seleccionar cliente--')] + [(c, c) for c in CATALOGO],
+    #    widget=forms.Select(attrs={'id': 'id_cliente'}),
+    #    help_text="Agregar cliente y producto siempre, si es mas de un producto ingresar detalle completo abajo en 🍰 Productos"
+    #)
+    #producto = forms.ChoiceField(
+    #    choices=[('', '--Seleccionar cliente primero--')],
+    #    widget=forms.Select(attrs={'id': 'id_producto'})
+    #)
+    #codigo = forms.CharField(
+    #    widget=forms.TextInput(attrs={
+    #        'readonly': 'readonly', 
+    #        'id': 'id_codigo',
+    #        'placeholder': 'Se autocompleta'
+    #    })
+    #)
     lote = forms.CharField(
         required=True,
         help_text="Lote del turno, ej: 123BCA",
@@ -175,8 +175,8 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'id_linea'}))
     class Meta:
         model = TurnoOEE
-        # 'cliente', 'producto', 'codigo', 
-        fields = ['fecha', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado', 'produccion_planeada']
+        # 'cliente', 'producto', 'codigo', 'produccion_planeada'
+        fields = ['fecha', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado']
         widgets = {
             'tiempo_planeado': forms.NumberInput(attrs={
                 # Valor fijo de 480 minutos (8 horas)
