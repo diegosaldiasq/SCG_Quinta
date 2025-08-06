@@ -131,12 +131,19 @@
                             <td>{{ t.produccion_real|default:'-' }}</td>
                             <td>
                                 {% if not t.produccion_real %}
+                                    {# 1. No hay producción real aún #}
                                     <a href="{% url 'cerrar_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
-                                        Cerrar Turno
+                                    Cerrar turno
+                                    </a>
+                                {% elif t.resumenes_turno.count %}
+                                    {# 3. Ya existe resumen para este lote #}
+                                    <a href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
+                                    Ver resumen
                                     </a>
                                 {% else %}
+                                    {# 2. Hay producción real, pero aún no se calculó el resumen #}
                                     <a href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
-                                        Ver Resumen
+                                    Calcular resumen
                                     </a>
                                 {% endif %}
                             </td>
