@@ -194,17 +194,17 @@ class TurnoOEEForm(forms.ModelForm):
             self.fields.pop(f, None)
 
         # 1) Intentamos sacar el cliente de los datos enviados (POST)
-        cliente_sel = self.data.get('cliente')
+        #cliente_sel = self.data.get('cliente')
 
         # 2) Si no viene en data (es un GET o validación falló), probamos en initial o en la instancia
-        if not cliente_sel:
-            cliente_sel = self.initial.get('cliente') \
-                          or getattr(self.instance, 'cliente', None)
+        #if not cliente_sel:
+        #    cliente_sel = self.initial.get('cliente') \
+        #                  or getattr(self.instance, 'cliente', None)
 
         # 3) Si tenemos un cliente válido, reconstruimos las choices de producto
-        if cliente_sel in CATALOGO:
-            opciones = [(p['producto'], p['producto']) for p in CATALOGO[cliente_sel]]
-            self.fields['producto'].choices = [('', '--Seleccionar producto--')] + opciones
+        #if cliente_sel in CATALOGO:
+        #    opciones = [(p['producto'], p['producto']) for p in CATALOGO[cliente_sel]]
+        #    self.fields['producto'].choices = [('', '--Seleccionar producto--')] + opciones
 
 class ProduccionRealForm(forms.ModelForm):
     produccion_real = forms.IntegerField(
