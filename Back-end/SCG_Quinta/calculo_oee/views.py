@@ -49,15 +49,16 @@ def crear_turno(request):
                     comentarios=com.strip() if com else None  # <-- nuevo campo 
                 )
             sum_real = sum(int(r) for r in reales)
-            lote.produccion_real = sum_real # actualizar producción real del lote
+            #lote.produccion_real = sum_real # actualizar producción real del lote
             sum_plan = sum(int(p) for p in planeadas)
-            lote.produccion_planeada = sum_plan # actualizar producción planeada del lote
-
-            lote.cliente = cliente[0] if cliente else None
-            lote.codigo = codigos[0] if codigos else None
-            lote.producto = productos[0] if productos else None
-            lote.save()
-
+            turno_oee = TurnoOEE.objects.get(id=lote.id)
+            turno_oee.produccion_real = sum_real  # actualizar producción real del lote
+            turno_oee.produccion_planeada = sum_plan  # actualizar producción planeada del lote
+            turno_oee.cliente = cliente[0] if cliente else None
+            turno_oee.codigo = codigos[0] if codigos else None
+            turno_oee.producto = productos[0] if productos else None
+            turno_oee.save()  # guardar cambios
+        
             # Guardar detenciones
             motivos   = request.POST.getlist('motivo_det[]')
             inicios   = request.POST.getlist('hora_inicio_det[]')
