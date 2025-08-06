@@ -48,6 +48,11 @@ def crear_turno(request):
                     produccion_real=int(real) if real else None,
                     comentarios=com.strip() if com else None  # <-- nuevo campo 
                 )
+                real_plan = []
+                real_plan.append(real)
+            sum_real = sum(int(r) for r in real_plan if r.isdigit())
+            lote.produccion_real = sum_real # actualizar producción real del lote
+            lote.save() # guardar cambios
 
             # Guardar detenciones
             motivos   = request.POST.getlist('motivo_det[]')
