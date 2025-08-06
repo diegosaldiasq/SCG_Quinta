@@ -167,6 +167,8 @@ class TurnoOEEForm(forms.ModelForm):
         ('Cakematic', 'Cakematic'),
         ('Gorreri pasteleria', 'Gorreri pasteleria'),
         ('Gorreri kuchen', 'Gorreri kuchen'),
+        ('Meson 3', 'Meson 3'),
+        ('Meson 4', 'Meson 4'),
     ]
     linea    = forms.ChoiceField(
         choices= [('', '--Seleccionar linea--')] + LINEA_CHOICES,
