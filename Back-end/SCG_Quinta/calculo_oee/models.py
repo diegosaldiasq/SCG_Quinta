@@ -4,9 +4,9 @@ from django.db import models
 
 class TurnoOEE(models.Model):
     fecha = models.DateTimeField(null=False, blank=False)
-    cliente = models.CharField(max_length=100)
+    cliente = models.CharField(max_length=100, null=True, blank=True)
     codigo = models.CharField(max_length=20, null=True, blank=True) 
-    producto = models.CharField(max_length=100)
+    producto = models.CharField(max_length=100, null=True, blank=True)
     linea = models.CharField(max_length=50)
     turno = models.CharField(max_length=20)
     numero_personas = models.PositiveIntegerField(help_text="Número de personas que trabajan en el turno", null=True, blank=True)
