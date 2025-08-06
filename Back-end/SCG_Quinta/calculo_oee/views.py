@@ -114,7 +114,9 @@ def resumen_turno(request, lote_id):
             codigos_concat = ", ".join(
                 dict.fromkeys(p.codigo for p in productos_qs if p.codigo)
             )
-            cliente = lote.cliente  # asumimos que cliente del turno es válido
+            cliente_concat = ", ".join(
+                dict.fromkeys(p.cliente for p in productos_qs if p.cliente)
+            )
             # Tasa nominal promedio (promedio simple)
             tasas = []
             for p in productos_qs:
@@ -127,7 +129,7 @@ def resumen_turno(request, lote_id):
             produccion_real = lote.produccion_real or 0
             productos_concat = lote.producto
             codigos_concat = lote.codigo or ""
-            cliente = lote.cliente
+            cliente_concat = lote.cliente
             clave = (lote.producto, lote.codigo)
             tasa_nominal = TASA_NOMINAL_POR_PRODUCTO.get(clave, TASA_NOMINAL_DEFECTO)
 
@@ -150,7 +152,7 @@ def resumen_turno(request, lote_id):
             turno=turno,
             supervisor=supervisor,
             lote=lote,
-            cliente=cliente,
+            cliente=cliente_concat,
             codigo=codigos_concat,
             producto=productos_concat,
             linea=lote.linea,
