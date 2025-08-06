@@ -28,7 +28,9 @@ def crear_turno(request):
     if request.method == 'POST':
         form = TurnoOEEForm(request.POST)
         if form.is_valid():
-            lote = form.save()
+            # 1) Guardar el turno sin cliente/producto/código
+            turno_oee = form.save(commit=False)
+            turno_oee.save()
 
             # Guardar productos
             cliente = request.POST.getlist('cliente_producto[]')
@@ -40,7 +42,7 @@ def crear_turno(request):
 
             for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios):
                 Producto.objects.create(
-                    lote=lote,
+                    lote=turno_oee,
                     cliente=cli,
                     producto=prod,
                     codigo=cod,
@@ -48,17 +50,20 @@ def crear_turno(request):
                     produccion_real=int(real) if real else None,
                     comentarios=com.strip() if com else None  # <-- nuevo campo 
                 )
-            sum_real = sum(int(r) for r in reales)
-            #lote.produccion_real = sum_real # actualizar producción real del lote
-            sum_plan = sum(int(p) for p in planeadas)
-            turno_oee = TurnoOEE.objects.get(id=lote.id)
-            turno_oee.produccion_real = sum_real  # actualizar producción real del lote
-            turno_oee.produccion_planeada = sum_plan  # actualizar producción planeada del lote
-            turno_oee.cliente = cliente[0] if cliente else None
-            turno_oee.codigo = codigos[0] if codigos else None
-            turno_oee.producto = productos[0] if productos else None
-            turno_oee.save()  # guardar cambios
-        
+            # 3) Con base en los productos guardados, actualizar el mismo TurnoOEE
+            turno_oee.cliente = cliente[0]
+            turno_oee.producto = productos[0]
+            turno_oee.codigo = codigos[0] or None
+
+            # Sumar producción de todos los productos
+            turno_oee.produccion_planeada = sum(
+                int(p) for p in planeadas if p.isdigit()
+            )
+            turno_oee.produccion_real = sum(
+                int(r) for r in reales if r.isdigit()
+            )
+            turno_oee.save()
+            
             # Guardar detenciones
             motivos   = request.POST.getlist('motivo_det[]')
             inicios   = request.POST.getlist('hora_inicio_det[]')
@@ -76,7 +81,7 @@ def crear_turno(request):
                 dur = int((t2 - t1).total_seconds() // 60)
 
                 Detencion.objects.create(
-                    lote=lote,
+                    lote=turno_oee,
                     motivo=mot,
                     hora_inicio=t1.time(),   # <-- aquí
                     hora_fin=   t2.time(),   # <-- y aquí
@@ -88,7 +93,7 @@ def crear_turno(request):
             motivos_rep = request.POST.getlist('motivo_rep[]')
             cantidades_rep = request.POST.getlist('cantidad_rep[]')
             for motivo, cantidad in zip(motivos_rep, cantidades_rep):
-                Reproceso.objects.create(lote=lote, motivo=motivo, cantidad=int(cantidad))
+                Reproceso.objects.create(lote=turno_oee, motivo=motivo, cantidad=int(cantidad))
 
             return redirect('lista_turnos')  # Redirige al listado
 
