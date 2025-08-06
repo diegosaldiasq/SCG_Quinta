@@ -50,6 +50,8 @@ def crear_turno(request):
                 )
             sum_real = sum(int(r) for r in reales)
             lote.produccion_real = sum_real # actualizar producción real del lote
+            sum_plan = sum(int(p) for p in planeadas)
+            lote.produccion_planeada = sum_plan # actualizar producción planeada del lote
 
             lote.cliente = cliente[0] if cliente else None
             lote.codigo = codigos[0] if codigos else None
