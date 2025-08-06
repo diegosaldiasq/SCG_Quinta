@@ -50,7 +50,11 @@ def crear_turno(request):
                 )
             sum_real = sum(int(r) for r in reales)
             lote.produccion_real = sum_real # actualizar producción real del lote
-            lote.save() # guardar cambios
+
+            lote.cliente = cliente[0] if cliente else None
+            lote.codigo = codigos[0] if codigos else None
+            lote.producto = productos[0] if productos else None
+            lote.save()
 
             # Guardar detenciones
             motivos   = request.POST.getlist('motivo_det[]')

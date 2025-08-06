@@ -175,7 +175,8 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'id_linea'}))
     class Meta:
         model = TurnoOEE
-        fields = ['fecha', 'cliente', 'producto', 'codigo', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado', 'produccion_planeada']
+        # 'cliente', 'producto', 'codigo', 
+        fields = ['fecha', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado', 'produccion_planeada']
         widgets = {
             'tiempo_planeado': forms.NumberInput(attrs={
                 # Valor fijo de 480 minutos (8 horas)
