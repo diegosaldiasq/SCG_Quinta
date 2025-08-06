@@ -176,7 +176,7 @@ class TurnoOEEForm(forms.ModelForm):
     class Meta:
         model = TurnoOEE
         # 'cliente', 'producto', 'codigo', 'produccion_planeada'
-        fields = ['fecha', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado']
+        fields = ['fecha', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado', 'cliente', 'producto', 'codigo', 'produccion_planeada']
         widgets = {
             'tiempo_planeado': forms.NumberInput(attrs={
                 # Valor fijo de 480 minutos (8 horas)
@@ -189,6 +189,9 @@ class TurnoOEEForm(forms.ModelForm):
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        for f in ('cliente', 'producto', 'codigo', 'produccion_planeada'):
+            self.fields.pop(f, None)
 
         # 1) Intentamos sacar el cliente de los datos enviados (POST)
         cliente_sel = self.data.get('cliente')

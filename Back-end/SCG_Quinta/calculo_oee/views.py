@@ -28,9 +28,7 @@ def crear_turno(request):
     if request.method == 'POST':
         form = TurnoOEEForm(request.POST)
         if form.is_valid():
-            # 1) Guardar el turno sin cliente/producto/código
-            turno_oee = form.save(commit=False)
-            turno_oee.save()
+            lote = form.save()
 
             # Guardar productos
             cliente = request.POST.getlist('cliente_producto[]')
@@ -42,7 +40,7 @@ def crear_turno(request):
 
             for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios):
                 Producto.objects.create(
-                    lote=turno_oee,
+                    lote=lote,
                     cliente=cli,
                     producto=prod,
                     codigo=cod,
@@ -51,18 +49,18 @@ def crear_turno(request):
                     comentarios=com.strip() if com else None  # <-- nuevo campo 
                 )
             # 3) Con base en los productos guardados, actualizar el mismo TurnoOEE
-            turno_oee.cliente = cliente[0]
-            turno_oee.producto = productos[0]
-            turno_oee.codigo = codigos[0] or None
+            lote.cliente = cliente[0]
+            lote.producto = productos[0]
+            lote.codigo = codigos[0] or None
 
             # Sumar producción de todos los productos
-            turno_oee.produccion_planeada = sum(
+            lote.produccion_planeada = sum(
                 int(p) for p in planeadas if p.isdigit()
             )
-            turno_oee.produccion_real = sum(
+            lote.produccion_real = sum(
                 int(r) for r in reales if r.isdigit()
             )
-            turno_oee.save()
+            lote.save()
             
             # Guardar detenciones
             motivos   = request.POST.getlist('motivo_det[]')
@@ -81,7 +79,7 @@ def crear_turno(request):
                 dur = int((t2 - t1).total_seconds() // 60)
 
                 Detencion.objects.create(
-                    lote=turno_oee,
+                    lote=lote,
                     motivo=mot,
                     hora_inicio=t1.time(),   # <-- aquí
                     hora_fin=   t2.time(),   # <-- y aquí
@@ -93,7 +91,7 @@ def crear_turno(request):
             motivos_rep = request.POST.getlist('motivo_rep[]')
             cantidades_rep = request.POST.getlist('cantidad_rep[]')
             for motivo, cantidad in zip(motivos_rep, cantidades_rep):
-                Reproceso.objects.create(lote=turno_oee, motivo=motivo, cantidad=int(cantidad))
+                Reproceso.objects.create(lote=lote, motivo=motivo, cantidad=int(cantidad))
 
             return redirect('lista_turnos')  # Redirige al listado
 
