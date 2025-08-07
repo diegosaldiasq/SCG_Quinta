@@ -92,6 +92,11 @@ CATALOGO = {
 
 
 class TurnoOEEForm(forms.ModelForm):
+    cliente = forms.CharField(required=False, widget=HiddenInput)
+    producto = forms.CharField(required=False, widget=HiddenInput)
+    codigo = forms.CharField(required=False, widget=HiddenInput)
+    produccion_planeada = forms.IntegerField(required=False, widget=HiddenInput)
+
     fecha = forms.DateField(
         widget=forms.DateInput(attrs={
             'type': 'date',
