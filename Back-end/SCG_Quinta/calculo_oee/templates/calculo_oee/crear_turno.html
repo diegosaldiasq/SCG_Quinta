@@ -72,16 +72,7 @@
         <fieldset>
           <legend>📑 Datos del Turno</legend>
           <table>
-            {% for field in form.visible_fields %}
-              <tr>
-                <th>{{ field.label_tag }}</th>
-                <td>
-                  {{ field }}
-                  {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-                  {{ field.errors }}
-                </td>
-              </tr>
-            {% endfor %}
+            {{ form.as_table }}
           </table>
           {# — luego, los hidden — #}
           {% for hidden in form.hidden_fields %}
