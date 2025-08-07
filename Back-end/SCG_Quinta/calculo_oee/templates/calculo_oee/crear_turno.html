@@ -72,8 +72,18 @@
         <fieldset>
           <legend>📑 Datos del Turno</legend>
           <table>
-            {{ form.as_table }}
+            {% for field in form.visible_fields %}
+              <tr>
+                <th>{{ field.label_tag }}</th>
+                <td>
+                  {{ field }}
+                  {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                  {{ field.errors }}
+                </td>
+              </tr>
+            {% endfor %}
           </table>
+  {{ form.hidden_fields }}  {# aquí Django añadirá los hidden inputs #}
         </fieldset>
 
         <!-- 🏭 Productos del Turno -->

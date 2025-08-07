@@ -1,5 +1,6 @@
 from django import forms
 from .models import TurnoOEE
+from django.forms.widgets import HiddenInput
 #from .forms import CATALOGO
 
 CATALOGO = {
@@ -186,12 +187,17 @@ class TurnoOEEForm(forms.ModelForm):
                 'readonly': 'readonly'
             }),
             # … otros widgets …
+            # aquí ocultamos los cuatro:
+            'cliente': HiddenInput(),
+            'producto': HiddenInput(),
+            'codigo': HiddenInput(),
+            'produccion_planeada': HiddenInput(),
         }
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    #def __init__(self, *args, **kwargs):
+    #    super().__init__(*args, **kwargs)
 
-        for f in ('cliente', 'producto', 'codigo', 'produccion_planeada'):
-            self.fields.pop(f, None)
+    #    for f in ('cliente', 'producto', 'codigo', 'produccion_planeada'):
+    #        self.fields.pop(f, None)
 
         # 1) Intentamos sacar el cliente de los datos enviados (POST)
         #cliente_sel = self.data.get('cliente')
