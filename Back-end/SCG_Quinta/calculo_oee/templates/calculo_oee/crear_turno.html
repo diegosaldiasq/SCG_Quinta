@@ -83,7 +83,10 @@
               </tr>
             {% endfor %}
           </table>
-          {{ form.hidden_fields }}  {# aquí Django añadirá los hidden inputs #}
+          {# — luego, los hidden — #}
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
         </fieldset>
 
         <!-- 🏭 Productos del Turno -->
