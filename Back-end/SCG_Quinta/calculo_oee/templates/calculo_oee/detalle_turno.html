@@ -94,6 +94,7 @@
                         <tr>
                             <th>Motivo</th>
                             <th>Cantidad</th>
+                            <th>Comentarios</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,6 +102,7 @@
                         <tr>
                             <td>{{ rep.motivo }}</td>
                             <td>{{ rep.cantidad }}</td>
+                            <td>{{ rep.comentarios|default_if_none:"" }}</td>
                         </tr>
                         {% empty %}
                         <tr>

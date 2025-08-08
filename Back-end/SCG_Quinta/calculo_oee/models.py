@@ -48,6 +48,7 @@ class Reproceso(models.Model):
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='reprocesos')
     motivo = models.CharField(max_length=100)
     cantidad = models.PositiveIntegerField()
+    comentarios = models.TextField(null=True, blank=True, max_length=200, help_text="Comentarios adicionales sobre el reproceso")
 
 class ResumenTurnoOee(models.Model):
     fecha = models.DateTimeField(auto_now_add=False)

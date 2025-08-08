@@ -372,6 +372,7 @@
             </select>
           </td>
           <td><input type="number" name="cantidad_rep[]" min="0" required></td>
+          <td><input type="text" name="comentarios_rep[]" maxlength="200" placeholder="Comentarios adicionales"></td>
           <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove()">Eliminar</button></td>
         `;
         document.querySelector("#tabla-reprocesos tbody").append(fila);

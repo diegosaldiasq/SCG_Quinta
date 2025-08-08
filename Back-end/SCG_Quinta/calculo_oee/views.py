@@ -90,8 +90,9 @@ def crear_turno(request):
             # Guardar reprocesos
             motivos_rep = request.POST.getlist('motivo_rep[]')
             cantidades_rep = request.POST.getlist('cantidad_rep[]')
-            for motivo, cantidad in zip(motivos_rep, cantidades_rep):
-                Reproceso.objects.create(lote=lote, motivo=motivo, cantidad=int(cantidad))
+            comentarios_rep = request.POST.getlist('comentarios_rep[]')  # <-- si quieres agregar comentarios a reprocesos
+            for motivo, cantidad, comentario in zip(motivos_rep, cantidades_rep, comentarios_rep):
+                Reproceso.objects.create(lote=lote, motivo=motivo, comentarios=comentario, cantidad=int(cantidad))
 
             return redirect('lista_turnos')  # Redirige al listado
 
