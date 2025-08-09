@@ -36,9 +36,9 @@ def crear_turno(request):
             codigos = request.POST.getlist('codigo[]')
             planeadas = request.POST.getlist('produccion_planeada[]')
             reales = request.POST.getlist('produccion_real[]')  # si ya se ingresan
-            comentarios = request.POST.getlist('comentarios_producto[]')  # <-- nuevo campo
+            comentarios_pro = request.POST.getlist('comentarios_producto[]')  # <-- nuevo campo
 
-            for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios):
+            for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios_pro):
                 Producto.objects.create(
                     lote=lote,
                     cliente=cli,
@@ -66,11 +66,11 @@ def crear_turno(request):
             motivos   = request.POST.getlist('motivo_det[]')
             inicios   = request.POST.getlist('hora_inicio_det[]')
             finales   = request.POST.getlist('hora_fin_det[]')
-            comentarios = request.POST.getlist('comentarios_det[]')  # <-- nuevo campo
+            comentarios_det = request.POST.getlist('comentarios_det[]')  # <-- nuevo campo
 
             from datetime import datetime, timedelta
             fmt = "%H:%M"
-            for mot, hi, hf, com in zip(motivos, inicios, finales, comentarios):
+            for mot, hi, hf, com in zip(motivos, inicios, finales, comentarios_det):
                 # parseamos las horas
                 t1 = datetime.strptime(hi, fmt)
                 t2 = datetime.strptime(hf, fmt)
