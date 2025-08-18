@@ -51,10 +51,12 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Torta cookies & cream','405295'):  200,
     ('Torta caramel macchiato','405294'):  80,
     ('Torta piña colada','405292'):  80,
+    ('Torta panqueque chocolate manjar','405460'):  25,
     ('Tartaleta fruta mixta mediana','393270'):  80,
     ('Pie de limon familiar','393000'):  100,
     ('Pie de limon mediano','405396'):  100,
     ('Pie de maracuya mediano','405397'):  80,
+    ('Pastel de yogurt frutilla','392488'):  80,
     # WALMART
     # UNIMARC
 }
