@@ -31,6 +31,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Media torta San Jorge lucuma','405414'):  50,
     ('Tarta soft familiar','393433'):  80,
     ('Tartaleta fruta mixta familiar','393432'):  80,
+    ('Reparaciones tortas','111111'):  150,  # código ficticio para reparaciones jumbo
     # SISA
     ('Torta amor','393266'):  100,
     ('Torta crema manjar mediana','392518'):  200,
@@ -57,6 +58,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Pie de limon mediano','405396'):  100,
     ('Pie de maracuya mediano','405397'):  80,
     ('Pastel de yogurt frutilla','392488'):  80,
+    ('Reparaciones tortas','222222'):  150,  # código ficticio para reparaciones sisa
     # WALMART
     # UNIMARC
 }
