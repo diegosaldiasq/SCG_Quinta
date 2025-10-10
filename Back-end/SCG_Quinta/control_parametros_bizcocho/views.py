@@ -68,6 +68,7 @@ def vista_control_parametros_bizcocho(request):
             return JsonResponse({'existe': False, 'error': 'Método no permitido.'})     
         
 @login_required
-def redireccionar_selecciones_3(request):
-    return HttpResponseRedirect(reverse('selecciones'))     
+def redireccionar_selecciones_2(request):
+    url_selecciones = reverse('vista_selecciones_2')
+    return HttpResponseRedirect(url_selecciones)   
 
