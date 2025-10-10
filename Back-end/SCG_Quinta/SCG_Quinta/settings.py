@@ -52,7 +52,8 @@ LOCAL_APPS = [
     "control_parametros_gorreri.apps.ControlParametrosGorreriConfig",
     "control_de_pesos_prelistos.apps.ControlDePesosPrelistosConfig",
     "control_de_pesos_insumos_kuchen.apps.ControlDePesosInsumosKuchenConfig",
-    "calculo_oee.apps.CalculoOeeConfig"
+    "calculo_oee.apps.CalculoOeeConfig",
+    "control_parametros_bizcochos.apps.ControlParametrosBizcochosConfig"
 ]
 
 DJANGO_APPS = [

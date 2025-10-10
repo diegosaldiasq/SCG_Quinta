@@ -1,0 +1,107 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'control_parametros_bizcocho/estilos_r_control_parametros_bizcocho.css' %}">
+    <link rel="icon" href="{% static 'control_parametros_bizcocho/images/logoquinta2.png' %}" />
+    <title>Registro control Parametros Gorreri Bizcocho R-POE-Q-04-XX</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'control_parametros_bizcocho/images/logoquinta.png' %}" alt="logo" class="logo">
+        <div class="login-container">
+            <h1 class="title">Registro control Parametos Gorreri Bizcocho R-POE-Q-04-XX</h1>
+        </div>
+        <div class="login-container">
+            <!-- Selección de Cliente -->
+            <label for="proveedor">Proveedor</label>
+            <select id="proveedor" class="input">
+                <option value="">-- Selecciona proveedor --</option>
+                <option value="San Cristobal">San Cristobal</option>
+                <option value="Puratos">Puratos</option>
+                <option value="Bakels">Bakels</option>
+            </select>
+
+            <!-- Selección de Producto -->
+            <label for="producto">Producto</label>
+            <select id="producto" class="input">
+                <option value="">-- Selecciona producto --</option>
+                <option value="Bizcocho Vainilla">Bizcocho Vainilla</option>
+                <option value="Bizcocho Chocolate">Bizcocho Chocolate</option>
+                <option value="Bizcocho Tres Leches">Bizcocho Tres Leches</option>
+            </select>
+            <!-- Campo que mostrará la cantidad de agua -->
+            <label for="cantidad-agua">Cantidad de Agua (L)</label>  
+            <input type="number" id="cantidad-agua" class="input" placeholder="-" required min="0" step="0.1" value="0">
+
+            <!-- Campo que mostrará la cantidad de huevo -->
+            <label for="cantidad-huevo">Cantidad de Huevo (L)</label>
+            <input type="number" id="cantidad-huevo" class="input" placeholder="-" required min="0" step="0.1" value="0">
+
+            <!-- Campo que mostrará la velocidad bomba -->
+            <label for="velocidad-bomba">Velocidad Bomba (RPM)</label>  
+            <input type="text" id="velocidad-bomba" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la velocidad turbo -->
+            <label for="velocidad-turbo">Velocidad Turbo (RPM)</label>  
+            <input type="text" id="velocidad-turbo" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la contrapresion -->
+            <label for="contrapresion">Contrapresion (Bar)</label>  
+            <input type="text" id="contrapresion" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la contrapresion trasera -->
+            <label for="contrapresion-trasera">Contrapresion trasera (Bar)</label>  
+            <input type="text" id="contrapresion-trasera" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la inyeccion de aire -->
+            <label for="inyeccion-de-aire">Inyeccion de aire (mm)</label>  
+            <input type="text" id="inyeccion-de-aire" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrará la desnidad -->
+            <label for="densidad">Densidad (g/ml)</label>
+            <input type="number" id="densidad" class="input" placeholder="-" required min="0" step="0.01" value="0">
+
+            <!-- Campo que mostrará la temperatura -->
+            <label for="t-final">Temperatura (°C)</label>
+            <input type="number" id="t-final" class="input" placeholder="-" required min="-5" max="40" step="0.1" value="0">
+
+            <!-- Campo que mostrará el lote -->
+            <label for"lote">Lote</label>
+            <input type="text" id="lote" class="input" placeholder="-" required>
+
+            <!-- Campo que mostrara el turno A-B-C -->
+            <label for="turno">Turno</label>
+            <select id="turno" class="input">
+                <option value="">-- Selecciona turno --</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+            </select>
+        </div>
+        <div class="botones">
+            <form class="form">
+                {% csrf_token %}
+                <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
+            </form>
+            <form class="form" action="{% url 'redireccionar_selecciones_3' %}">
+                <button class="primary-button login-button">Salir</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // Definir el token CSRF para su uso en las solicitudes AJAX
+        var csrftoken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'control_parametros_bizcocho/scrip_r_control_parametros_bizcocho.js' %}"></script>
+</body>
+</html>

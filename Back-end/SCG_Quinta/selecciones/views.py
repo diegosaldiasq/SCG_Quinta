@@ -125,3 +125,8 @@ def redireccionar_control_de_pesos_insumos_kuchen(request):
 def redireccionar_crear_turno(request):
     url_crear_turno = reverse('crear_turno')
     return HttpResponseRedirect(url_crear_turno)
+
+@login_required
+def redireccionar_control_parametros_bizcocho(request):
+    url_control_parametros_bizcocho = reverse('control_parametros_bizcocho')
+    return HttpResponseRedirect(url_control_parametros_bizcocho)
