@@ -26,13 +26,13 @@ document.addEventListener("DOMContentLoaded", function() {
         try {
             event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
             // obtener valores de los campos
-            var cliente = document.getElementById("cliente").value;
-            var codigoProducto = document.getElementById("codigo-producto").value;
+            var proveedor = document.getElementById("proveedor");
             var producto = document.getElementById("producto").value;
             var velocidadBomba = parseInt(document.getElementById("velocidad-bomba").value);
             var velocidadTurbo = parseInt(document.getElementById("velocidad-turbo").value);
             var contrapresion = parseFloat(document.getElementById("contrapresion").value);
-            var inyeccionAire = parseFloat(document.getElementById("inyeccion-aire").value);
+            var contrapresionTrasera = parseFloat(document.getElementById("contrapresion-trasera").value);
+            var inyeccionAire = parseFloat(document.getElementById("inyeccion-de-aire").value);
             var densidad = parseFloat(document.getElementById("densidad").value);
             var temperaturaFinal = parseFloat(document.getElementById("t-final").value);
             var lote = document.getElementById("lote").value;
@@ -55,17 +55,17 @@ document.addEventListener("DOMContentLoaded", function() {
             // agregar valores a datos
 
             var datos = {
-                cliente: cliente,
-                codigo_producto: codigoProducto,
+                proveedor: proveedor,
                 producto: producto,
                 cantidad_agua: cantidadAgua, // Nuevo campo
                 cantidad_huevo: cantidadHuevo, // Nuevo campo
                 velocidad_bomba: velocidadBomba,
                 velocidad_turbo: velocidadTurbo,
                 contrapresion: contrapresion,
-                inyeccion_aire: inyeccionAire,
+                contrapresion_trasera: contrapresionTrasera,
+                inyeccion_de_aire: inyeccionAire,
                 densidad: densidad,
-                temperatura_final: temperaturaFinal,
+                t_final: temperaturaFinal,
                 lote: lote,
                 turno: turno
             }
