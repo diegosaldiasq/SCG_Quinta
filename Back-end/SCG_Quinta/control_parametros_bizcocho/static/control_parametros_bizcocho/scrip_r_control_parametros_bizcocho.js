@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         try {
             event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
             // obtener valores de los campos
-            var proveedor = document.getElementById("proveedor");
+            var proveedor = document.getElementById("proveedor").value;
             var producto = document.getElementById("producto").value;
             var velocidadBomba = parseInt(document.getElementById("velocidad-bomba").value);
             var velocidadTurbo = parseInt(document.getElementById("velocidad-turbo").value);
