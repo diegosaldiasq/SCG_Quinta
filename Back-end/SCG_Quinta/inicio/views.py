@@ -147,7 +147,8 @@ model_mapping = {
         'control_de_pesos': 'DatosFormularioControlDePesos',
         'control_parametros_gorreri': 'DatosFormularioControlParametrosGorreri',
         'control_de_pesos_prelistos': 'DatosFormularioControlDePesosPrelistos',
-        'control_de_pesos_insumos_kuchen': 'DatosFormularioControlDePesosInsumosKuchen'
+        'control_de_pesos_insumos_kuchen': 'DatosFormularioControlDePesosInsumosKuchen',
+        'control_parametros_bizcocho': 'DatosFormularioControlParametrosBizcocho'
     }
 
 @csrf_exempt
