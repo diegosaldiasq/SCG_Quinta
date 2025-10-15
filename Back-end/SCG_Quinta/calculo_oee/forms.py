@@ -173,6 +173,8 @@ class TurnoOEEForm(forms.ModelForm):
         ('Cakematic', 'Cakematic'),
         ('Gorreri pasteleria', 'Gorreri pasteleria'),
         ('Gorreri kuchen', 'Gorreri kuchen'),
+        ('Mesón 1', 'Mesón 1'),
+        ('Mesón 2', 'Mesón 2'),
         ('Mesón 3', 'Mesón 3'),
         ('Mesón 4', 'Mesón 4'),
     ]
