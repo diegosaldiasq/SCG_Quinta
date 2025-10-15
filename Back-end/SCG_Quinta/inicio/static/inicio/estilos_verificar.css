@@ -770,7 +770,7 @@ body {
     align-items: center;
     background-color: var(--rojo-quinta);
     color: var(--white);
-    font-size: 9px;
+    font-size:12px;
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
@@ -815,7 +815,7 @@ body {
     align-items: center;
     background-color: var(--rojo-quinta);
     color: var(--white);
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
