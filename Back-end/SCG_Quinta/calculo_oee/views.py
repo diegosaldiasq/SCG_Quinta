@@ -19,6 +19,7 @@ from openpyxl import Workbook
 from datetime import datetime
 import pytz
 from urllib.parse import unquote
+from django.db.models import Exists, OuterRef
 
 # Create your views here.
 
@@ -215,6 +216,10 @@ def cerrar_turno(request, lote_id):
 def lista_turnos(request):
     qs = TurnoOEE.objects.all().order_by('-fecha')
 
+    # Anotación: ¿existe resumen para este lote?
+    resumen_subq = ResumenTurnoOee.objects.filter(lote=OuterRef('pk'))
+    qs = qs.annotate(tiene_resumen=Exists(resumen_subq))
+
     # --- 1. Aplicar filtros GET si vienen ---
     fecha    = request.GET.get('fecha', '')
     linea    = request.GET.get('linea', '')
@@ -247,6 +252,18 @@ def lista_turnos(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
+    # --- 4. Filtro por estado (nuevo) ---
+    estado = request.GET.get('estado', '')
+    if estado == 'calcular_oee':
+        # Tiene produccion_real, pero no tiene resumen aún
+        qs = qs.filter(produccion_real__isnull=False, tiene_resumen=False)
+    elif estado == 'cerrar_turno':
+        # Aún no tiene produccion_real
+        qs = qs.filter(produccion_real__isnull=True)
+    elif estado == 'ver_resumen':
+        # Ya existe resumen
+        qs = qs.filter(tiene_resumen=True)
+
     # Construimos un querystring sin el parámetro page:
     query_params = request.GET.copy()
     if 'page' in query_params:
@@ -264,6 +281,7 @@ def lista_turnos(request):
         'filtro_producto': producto,
         'turnos_disponibles': turnos,
         'filtro_produccion_real': produccion_real,
+        'filtro_estado': estado, 
         'querystring': querystring,   # <-- nuevo
     })
     

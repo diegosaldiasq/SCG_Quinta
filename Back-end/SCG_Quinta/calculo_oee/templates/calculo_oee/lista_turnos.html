@@ -92,6 +92,22 @@
                     </select>
                 </div>
 
+                <div class="campo-filtro">
+                    <label>🧮 Estado:</label>
+                    <select name="estado">
+                        <option value="">--Todos--</option>
+                        <option value="calcular_oee" {% if filtro_estado == 'calcular_oee' %}selected{% endif %}>
+                        Calcular OEE
+                        </option>
+                        <option value="cerrar_turno" {% if filtro_estado == 'cerrar_turno' %}selected{% endif %}>
+                        Cerrar turno
+                        </option>
+                        <option value="ver_resumen" {% if filtro_estado == 'ver_resumen' %}selected{% endif %}>
+                        Ver resumen
+                        </option>
+                    </select>
+                </div>
+
                 <div class="botones">
                     <button type="submit" class="primary-button">Filtrar</button>
                     <a href="{% url 'lista_turnos' %}" class="primary-button">Limpiar</a>
@@ -131,19 +147,21 @@
                             <td>{{ t.produccion_real|default:'-' }}</td>
                             <td>
                                 {% if not t.produccion_real %}
-                                    {# 1. No hay producción real aún #}
+                                    {# 1) Aún no hay producción real -> cerrar turno #}
                                     <a href="{% url 'cerrar_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
-                                    Cerrar turno
+                                        Cerrar turno
                                     </a>
-                                {% elif t.resumenes_turno.count %}
-                                    {# 3. Ya existe resumen para este lote #}
+
+                                {% elif t.tiene_resumen %}
+                                    {# 2) Ya existe resumen -> ver resumen #}
                                     <a href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
-                                    Ver resumen
+                                        Ver resumen
                                     </a>
+
                                 {% else %}
-                                    {# 2. Hay producción real, pero aún no se calculó el resumen #}
+                                    {# 3) Hay producción real pero aún no se calcula -> calcular OEE #}
                                     <a href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
-                                    Calcular OEE
+                                        Calcular OEE
                                     </a>
                                 {% endif %}
                             </td>
