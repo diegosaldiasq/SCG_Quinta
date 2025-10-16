@@ -241,18 +241,7 @@ def lista_turnos(request):
     if produccion_real == 'null':
         qs = qs.filter(produccion_real__isnull=True)
 
-    # --- 2. Obtener valores únicos para los desplegables ---
-    lineas    = TurnoOEE.objects.values_list('linea', flat=True).distinct()
-    clientes  = TurnoOEE.objects.values_list('cliente', flat=True).distinct()
-    productos = TurnoOEE.objects.values_list('producto', flat=True).distinct()
-    turnos   = TurnoOEE.objects.values_list('turno', flat=True).distinct()
-
-    # --- 3. Paginación ---
-    paginator = Paginator(qs, 10)
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
-
-    # --- 4. Filtro por estado (nuevo) ---
+     # --- 2. Filtro por estado (nuevo) ---
     estado = request.GET.get('estado', '')
     if estado == 'calcular_oee':
         # Tiene produccion_real, pero no tiene resumen aún
@@ -263,6 +252,17 @@ def lista_turnos(request):
     elif estado == 'ver_resumen':
         # Ya existe resumen
         qs = qs.filter(tiene_resumen=True)
+
+    # --- 3. Obtener valores únicos para los desplegables ---
+    lineas    = TurnoOEE.objects.values_list('linea', flat=True).distinct()
+    clientes  = TurnoOEE.objects.values_list('cliente', flat=True).distinct()
+    productos = TurnoOEE.objects.values_list('producto', flat=True).distinct()
+    turnos   = TurnoOEE.objects.values_list('turno', flat=True).distinct()
+
+    # --- 4. Paginación ---
+    paginator = Paginator(qs, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     # Construimos un querystring sin el parámetro page:
     query_params = request.GET.copy()
