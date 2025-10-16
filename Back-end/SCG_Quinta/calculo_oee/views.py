@@ -305,17 +305,27 @@ def detalle_turno(request, lote_id):
 @login_required
 def marcar_verificado(request, lote_id):
     next_param = request.GET.get('next') or request.POST.get('next', '')
+    next_param = unquote(next_param) if next_param else ''
+
     if request.user.is_staff or request.user.is_superuser:
         if request.method == 'POST':
             resumen = get_object_or_404(ResumenTurnoOee, lote_id=lote_id)
             resumen.verificado = True
-            resumen.verificado_por = request.user.nombre_completo
+            # Evita error si el usuario no tiene 'nombre_completo'
+            resumen.verificado_por = getattr(request.user, 'nombre_completo', request.user.get_username())
             resumen.fecha_de_verificacion = timezone.now()
             resumen.save()
+
+            # ✅ Si hay next, vuelve directo al listado filtrado
+            if next_param:
+                return redirect(next_param)
+
+            # Si no hay next, vuelve al resumen del turno
+            return redirect(reverse('resumen_turno', args=[lote_id]))
+
+    # GET u otro método: vuelve al resumen preservando next si existe
     base = reverse('resumen_turno', args=[lote_id])
-    if next_param:
-        return redirect(f"{base}?next={next_param}")
-    return redirect(base)
+    return redirect(f"{base}?next={next_param}") if next_param else redirect(base)
     
 @login_required
 def redireccionar_intermedio(request):
