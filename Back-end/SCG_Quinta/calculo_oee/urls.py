@@ -14,5 +14,6 @@ urlpatterns = [
     path('detalle_turno/<int:lote_id>/', views.detalle_turno, name='detalle_turno'),
     path('marcar_verificado/<int:lote_id>/', views.marcar_verificado, name='marcar_verificado'),
     path('redireccionar_intermedio/', views.redireccionar_intermedio, name='redireccionar_intermedio'),
-    path('descargar_resumenturnooee/', views.descargar_resumenturnooee, name='descargar_resumenturnooee')
+    path('descargar_resumenturnooee/', views.descargar_resumenturnooee, name='descargar_resumenturnooee'),
+    path('api/resumen_turno_oee/', views.resumen_turno_oee_api, name='resumen_turno_oee_api')
 ]

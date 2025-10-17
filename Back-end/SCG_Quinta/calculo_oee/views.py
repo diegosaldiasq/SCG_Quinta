@@ -20,6 +20,7 @@ from datetime import datetime
 import pytz
 from urllib.parse import unquote
 from django.db.models import Exists, OuterRef
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -382,3 +383,10 @@ def descargar_resumenturnooee(request):
         del request.session['fechainicio']
         del request.session['fechafin']
     return response
+
+def resumen_turno_oee_api(request):
+    datos = ResumenTurnoOee.objects.values(
+        'fecha', 'turno', 'disponibilidad', 'eficiencia', 'oee', 'target'
+    ).order_by('fecha', 'turno')
+
+    return JsonResponse(list(datos), safe=False)

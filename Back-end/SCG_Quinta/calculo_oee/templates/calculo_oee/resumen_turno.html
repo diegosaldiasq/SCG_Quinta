@@ -50,6 +50,46 @@
                     <li><strong>🔥 OEE:</strong> {{ resumen.oee }}%</li>
                 </ul>
 
+                <canvas id="graficoOEE" width="100%" height="40"></canvas>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                fetch("{% url 'resumen_turno_oee_api' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const etiquetas = data.map(d => `${d.fecha} (${d.turno})`);
+                    const disponibilidad = data.map(d => d.disponibilidad);
+                    const eficiencia = data.map(d => d.eficiencia);
+                    const oee = data.map(d => d.oee);
+                    const target = data.map(d => d.target);
+
+                    const ctx = document.getElementById('graficoOEE').getContext('2d');
+                    new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: etiquetas,
+                        datasets: [
+                        { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue', fill: false },
+                        { label: 'Eficiencia', data: eficiencia, borderColor: 'red', fill: false },
+                        { label: 'OEE', data: oee, borderColor: 'green', fill: false },
+                        { label: 'Target', data: target, borderColor: 'purple', borderDash: [5, 5], fill: false },
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: { mode: 'index' },
+                        plugins: {
+                        legend: { position: 'right' },
+                        title: { display: true, text: 'Tendencia OEE - Línea Gorreri Pastelería' }
+                        },
+                        scales: {
+                        y: { beginAtZero: true }
+                        }
+                    }
+                    });
+                });
+                </script>
+
                 {% if resumen.verificado %}
                 <div class="verificado-info">
                     ✅ Turno verificado por <strong>{{ resumen.verificado_por }}</strong>
