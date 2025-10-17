@@ -20,7 +20,10 @@ from datetime import datetime
 import pytz
 from urllib.parse import unquote
 from django.db.models import Exists, OuterRef
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_GET
+from django.db.models import Value, FloatField
+from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
 
@@ -384,9 +387,16 @@ def descargar_resumenturnooee(request):
         del request.session['fechafin']
     return response
 
+@require_GET
 def resumen_turno_oee_api(request):
-    datos = ResumenTurnoOee.objects.values(
-        'fecha', 'turno', 'disponibilidad', 'eficiencia', 'oee', 'target'
-    ).order_by('fecha', 'turno')
+    try:
+        qs = (ResumenTurnoOee.objects
+              .annotate(target=Value(70.0, output_field=FloatField()))  # <- línea punteada del gráfico
+              .values('fecha', 'turno', 'disponibilidad', 'eficiencia', 'oee', 'target')
+              .order_by('fecha', 'turno'))
 
-    return JsonResponse(list(datos), safe=False)
+        datos = list(qs)
+        return JsonResponse(datos, safe=False, json_dumps_params={"cls": DjangoJSONEncoder})
+    except Exception as e:
+        # Si algo falla, no dejes al front “a ciegas”.
+        return HttpResponseBadRequest(f"error_api_resumen: {e}")

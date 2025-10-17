@@ -11,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'calculo_oee/estilos_oee.css' %}">
     <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
+    <style>
+        #graficoOEE { width: 100%; height: 380px; }
+    </style>
     <title>Resumen del Turno</title>
 </head>
 <body>
@@ -50,44 +53,75 @@
                     <li><strong>🔥 OEE:</strong> {{ resumen.oee }}%</li>
                 </ul>
 
-                <canvas id="graficoOEE" width="100%" height="40"></canvas>
-
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                 <script>
-                fetch("{% url 'resumen_turno_oee_api' %}")
-                .then(response => response.json())
-                .then(data => {
-                    const etiquetas = data.map(d => `${d.fecha} (${d.turno})`);
-                    const disponibilidad = data.map(d => d.disponibilidad);
-                    const eficiencia = data.map(d => d.eficiencia);
-                    const oee = data.map(d => d.oee);
-                    const target = data.map(d => d.target);
+                (async function(){
+                const url = "{% url 'resumen_turno_oee_api' %}";
+                let data;
+                try {
+                    const resp = await fetch(url, { credentials: 'same-origin' });
+                    if (!resp.ok) {
+                    const txt = await resp.text();
+                    console.error('API no OK:', resp.status, txt);
+                    alert('No se pudo cargar el gráfico (API). Revisa consola.');
+                    return;
+                    }
+                    data = await resp.json();
+                } catch (err) {
+                    console.error('Error fetch/json:', err);
+                    alert('No se pudo cargar el gráfico (red/JSON). Revisa consola.');
+                    return;
+                }
 
-                    const ctx = document.getElementById('graficoOEE').getContext('2d');
-                    new Chart(ctx, {
+                if (!Array.isArray(data) || data.length === 0) {
+                    console.warn('API sin datos');
+                    return;
+                }
+
+                // Etiquetas: fecha (dd-mm-aaaa) + turno
+                const fmtFecha = s => {
+                    // si viene ISO: "2025-10-01T12:34:56Z" -> dd-mm-aaaa
+                    const d = new Date(s);
+                    if (isNaN(d)) return s; // por si ya viene formateada
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    const mm = String(d.getMonth()+1).padStart(2, '0');
+                    const yyyy = d.getFullYear();
+                    return `${dd}-${mm}-${yyyy}`;
+                };
+
+                const etiquetas = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
+                const disponibilidad = data.map(d => Number(d.disponibilidad ?? 0));
+                const eficiencia     = data.map(d => Number(d.eficiencia ?? 0));
+                const oee            = data.map(d => Number(d.oee ?? 0));
+                const target         = data.map(d => Number(d.target ?? 0));
+
+                const ctx = document.getElementById('graficoOEE').getContext('2d');
+                new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: etiquetas,
-                        datasets: [
-                        { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue', fill: false },
-                        { label: 'Eficiencia', data: eficiencia, borderColor: 'red', fill: false },
-                        { label: 'OEE', data: oee, borderColor: 'green', fill: false },
-                        { label: 'Target', data: target, borderColor: 'purple', borderDash: [5, 5], fill: false },
-                        ]
+                    labels: etiquetas,
+                    datasets: [
+                        { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue',  fill: false, tension: 0.25 },
+                        { label: 'Eficiencia',     data: eficiencia,     borderColor: 'red',   fill: false, tension: 0.25 },
+                        { label: 'OEE',            data: oee,            borderColor: 'green', fill: false, tension: 0.25 },
+                        { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false }
+                    ]
                     },
                     options: {
-                        responsive: true,
-                        interaction: { mode: 'index' },
-                        plugins: {
+                    responsive: true,
+                    maintainAspectRatio: false,               // <-- usa el alto CSS
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
                         legend: { position: 'right' },
-                        title: { display: true, text: 'Tendencia OEE - Línea Gorreri Pastelería' }
-                        },
-                        scales: {
-                        y: { beginAtZero: true }
-                        }
+                        title: { display: true, text: 'Tendencia OEE - Línea Gorreri Pastelería' },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed?.(0) ?? ctx.parsed.y}%` } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } }
                     }
-                    });
+                    }
                 });
+                })();
                 </script>
 
                 {% if resumen.verificado %}
