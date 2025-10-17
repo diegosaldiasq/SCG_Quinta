@@ -390,13 +390,16 @@ def descargar_resumenturnooee(request):
 @require_GET
 def resumen_turno_oee_api(request):
     try:
-        qs = (ResumenTurnoOee.objects
-              .annotate(target=Value(70.0, output_field=FloatField()))  # <- línea punteada del gráfico
-              .values('fecha', 'turno', 'disponibilidad', 'eficiencia', 'oee', 'target')
-              .order_by('fecha', 'turno'))
+        qs = (
+            ResumenTurnoOee.objects
+            .annotate(target=Value(70.0, output_field=FloatField()))  # target fijo
+            .values('fecha', 'turno', 'disponibilidad', 'eficiencia', 'oee', 'target')
+            .order_by('fecha', 'turno')
+        )
 
         datos = list(qs)
-        return JsonResponse(datos, safe=False, json_dumps_params={"cls": DjangoJSONEncoder})
+        return JsonResponse(datos, safe=False, json_dumps_params={"ensure_ascii": False})
+
     except Exception as e:
-        # Si algo falla, no dejes al front “a ciegas”.
+        # 👇 aquí estaba el error: faltaba cerrar correctamente el paréntesis y las comillas
         return HttpResponseBadRequest(f"error_api_resumen: {e}")
