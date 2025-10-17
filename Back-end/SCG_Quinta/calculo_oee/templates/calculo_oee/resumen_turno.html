@@ -11,9 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'calculo_oee/estilos_oee.css' %}">
     <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
-    <style>
-        #graficoOEE { width: 100%; height: 380px; }
-    </style>
     <title>Resumen del Turno</title>
 </head>
 <body>
@@ -53,75 +50,74 @@
                     <li><strong>🔥 OEE:</strong> {{ resumen.oee }}%</li>
                 </ul>
 
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <style>
+                    #graficoOEE { width: 100%; height: 380px; }
+                </style>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
                 <script>
-                (async function(){
-                const url = "{% url 'resumen_turno_oee_api' %}";
-                let data;
+                document.addEventListener('DOMContentLoaded', async () => {
+                const canvas = document.getElementById('graficoOEE');
+                if (!canvas) {
+                    console.warn('No se encontró #graficoOEE en el DOM.');
+                    return;
+                }
+                const ctx = canvas.getContext('2d');
+
                 try {
-                    const resp = await fetch(url, { credentials: 'same-origin' });
+                    const resp = await fetch("{% url 'resumen_turno_oee_api' %}", {credentials:'same-origin'});
                     if (!resp.ok) {
                     const txt = await resp.text();
                     console.error('API no OK:', resp.status, txt);
-                    alert('No se pudo cargar el gráfico (API). Revisa consola.');
                     return;
                     }
-                    data = await resp.json();
-                } catch (err) {
-                    console.error('Error fetch/json:', err);
-                    alert('No se pudo cargar el gráfico (red/JSON). Revisa consola.');
-                    return;
-                }
-
-                if (!Array.isArray(data) || data.length === 0) {
+                    const data = await resp.json();
+                    if (!Array.isArray(data) || data.length === 0) {
                     console.warn('API sin datos');
                     return;
-                }
+                    }
 
-                // Etiquetas: fecha (dd-mm-aaaa) + turno
-                const fmtFecha = s => {
-                    // si viene ISO: "2025-10-01T12:34:56Z" -> dd-mm-aaaa
+                    const fmtFecha = s => {
                     const d = new Date(s);
-                    if (isNaN(d)) return s; // por si ya viene formateada
-                    const dd = String(d.getDate()).padStart(2, '0');
-                    const mm = String(d.getMonth()+1).padStart(2, '0');
-                    const yyyy = d.getFullYear();
-                    return `${dd}-${mm}-${yyyy}`;
-                };
+                    if (isNaN(d)) return s;
+                    const dd = String(d.getDate()).padStart(2,'0');
+                    const mm = String(d.getMonth()+1).padStart(2,'0');
+                    const yy = d.getFullYear();
+                    return `${dd}-${mm}-${yy}`;
+                    };
 
-                const etiquetas = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
-                const disponibilidad = data.map(d => Number(d.disponibilidad ?? 0));
-                const eficiencia     = data.map(d => Number(d.eficiencia ?? 0));
-                const oee            = data.map(d => Number(d.oee ?? 0));
-                const target         = data.map(d => Number(d.target ?? 0));
+                    const labels = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
+                    const disponibilidad = data.map(d => Number(d.disponibilidad ?? 0));
+                    const eficiencia     = data.map(d => Number(d.eficiencia ?? 0));
+                    const oee            = data.map(d => Number(d.oee ?? 0));
+                    const target         = data.map(d => Number(d.target ?? 0));
 
-                const ctx = document.getElementById('graficoOEE').getContext('2d');
-                new Chart(ctx, {
+                    new Chart(ctx, {
                     type: 'line',
                     data: {
-                    labels: etiquetas,
-                    datasets: [
+                        labels,
+                        datasets: [
                         { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue',  fill: false, tension: 0.25 },
                         { label: 'Eficiencia',     data: eficiencia,     borderColor: 'red',   fill: false, tension: 0.25 },
                         { label: 'OEE',            data: oee,            borderColor: 'green', fill: false, tension: 0.25 },
-                        { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false }
-                    ]
+                        { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false },
+                        ]
                     },
                     options: {
-                    responsive: true,
-                    maintainAspectRatio: false,               // <-- usa el alto CSS
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
                         legend: { position: 'right' },
-                        title: { display: true, text: 'Tendencia OEE - Línea Gorreri Pastelería' },
-                        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed?.(0) ?? ctx.parsed.y}%` } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } }
+                        title: { display: true, text: 'Tendencia OEE - Línea Gorreri Pastelería' }
+                        },
+                        scales: { y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } } }
                     }
-                    }
+                    });
+                } catch (err) {
+                    console.error('Error fetch/json:', err);
+                }
                 });
-                })();
                 </script>
 
                 {% if resumen.verificado %}
