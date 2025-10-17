@@ -50,41 +50,31 @@
                     <li><strong>🔥 OEE:</strong> {{ resumen.oee }}%</li>
                 </ul>
 
+                <!-- CONTENEDOR DEL GRÁFICO -->
+                <div style="width:100%; height:380px;">
+                    <canvas id="graficoOEE" style="width:100%; height:100%;"></canvas>
+                </div>
+
                 <style>
-                    #graficoOEE { width: 100%; height: 380px; }
+                    /* o pásalo a tu CSS */
+                    #graficoOEE { width:100%; height:100%; }
                 </style>
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
                 <script>
                 document.addEventListener('DOMContentLoaded', async () => {
                 const canvas = document.getElementById('graficoOEE');
-                if (!canvas) {
-                    console.warn('No se encontró #graficoOEE en el DOM.');
-                    return;
-                }
+                if (!canvas) { console.warn('No se encontró #graficoOEE en el DOM.'); return; }
                 const ctx = canvas.getContext('2d');
 
                 try {
-                    const resp = await fetch("{% url 'resumen_turno_oee_api' %}", {credentials:'same-origin'});
-                    if (!resp.ok) {
-                    const txt = await resp.text();
-                    console.error('API no OK:', resp.status, txt);
-                    return;
-                    }
+                    const resp = await fetch("{% url 'resumen_turno_oee_api' %}", { credentials:'same-origin' });
+                    if (!resp.ok) { console.error('API no OK:', resp.status, await resp.text()); return; }
                     const data = await resp.json();
-                    if (!Array.isArray(data) || data.length === 0) {
-                    console.warn('API sin datos');
-                    return;
-                    }
+                    if (!Array.isArray(data) || data.length === 0) { console.warn('API sin datos'); return; }
 
-                    const fmtFecha = s => {
-                    const d = new Date(s);
-                    if (isNaN(d)) return s;
-                    const dd = String(d.getDate()).padStart(2,'0');
-                    const mm = String(d.getMonth()+1).padStart(2,'0');
-                    const yy = d.getFullYear();
-                    return `${dd}-${mm}-${yy}`;
-                    };
+                    const fmtFecha = s => { const d=new Date(s); if(isNaN(d)) return s;
+                    return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; };
 
                     const labels = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
                     const disponibilidad = data.map(d => Number(d.disponibilidad ?? 0));
