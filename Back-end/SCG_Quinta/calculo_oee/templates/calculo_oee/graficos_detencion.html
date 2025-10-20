@@ -142,7 +142,7 @@
           const barras = [...new Set(
             data.map(d => {
               const f = fmtFecha(d.fecha);
-              return JSON.stringify([f, `Turno ${d.turno}`]);
+              return JSON.stringify([f, `${d.turno}`]);
             })
           )].map(x => JSON.parse(x)); // [[fecha,'Turno X'], ...]
 
