@@ -59,19 +59,104 @@
             <!-- === 4. SCRIPTS DE GRÁFICOS === -->
             <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
             <script>
-            document.addEventListener('DOMContentLoaded', async () => {
-            const canvas = document.getElementById('graficoOEE');
-            if (!canvas) { console.warn('No se encontró #graficoOEE en el DOM.'); return; }
-            const ctx = canvas.getContext('2d');
+            document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('graficoOEE')?.getContext('2d');
+            if (!ctx) return;
 
-            try {
-                const resp = await fetch("{% url 'resumen_turno_oee_api' %}", { credentials:'same-origin' });
-                if (!resp.ok) { console.error('API no OK:', resp.status, await resp.text()); return; }
+            // Controles
+            const $ = s => document.querySelector(s);
+            const sSemanas = $('#f_semanas');
+            const sAnios   = $('#f_anios');
+            const sLineas  = $('#f_lineas');
+            const sTurnos  = $('#f_turnos');
+            const fDesde   = $('#f_desde');
+            const fHasta   = $('#f_hasta');
+
+            const btnAplicar = $('#btn_aplicar');
+            const btnLimpiar = $('#btn_limpiar');
+            const btnSelTodoSem = $('#btn_sel_todo_sem');
+            const btnSelTodoLin = $('#btn_sel_todo_lin');
+            const btnSelTodoTur = $('#btn_sel_todo_tur');
+
+            let chart;
+
+            // Utilidades
+            const fmtFecha = s => {
+                const d = new Date(s);
+                if (isNaN(d)) return s;
+                return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+            };
+
+            function llenarSelect(select, valores, {placeholder=null, orden='asc'} = {}) {
+                select.innerHTML = '';
+                if (placeholder) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = placeholder;
+                select.appendChild(opt);
+                }
+                const arr = [...valores];
+                if (orden === 'asc') arr.sort((a,b) => (''+a).localeCompare((''+b), undefined, {numeric:true}));
+                if (orden === 'desc') arr.sort((a,b) => (''+b).localeCompare((''+a), undefined, {numeric:true}));
+                for (const v of arr) {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.textContent = v;
+                select.appendChild(opt);
+                }
+            }
+
+            function getMultiValues(select) {
+                return Array.from(select.selectedOptions || []).map(o => o.value).filter(Boolean);
+            }
+
+            function buildURL() {
+                const base = "{% url 'resumen_turno_oee_api' %}";
+                const p = new URLSearchParams();
+
+                for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+                const anio = sAnios.value; if (anio) p.append('anio', anio);
+                for (const l of getMultiValues(sLineas)) p.append('linea', l);
+                for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+                if (fDesde.value) p.set('desde', fDesde.value);
+                if (fHasta.value) p.set('hasta', fHasta.value);
+
+                const qs = p.toString();
+                return qs ? `${base}?${qs}` : base;
+            }
+
+            async function cargarOpciones() {
+                const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+                const r = await fetch(urlOpt, {credentials:'same-origin'});
+                if (!r.ok) {
+                console.error('Opciones no OK:', r.status, await r.text());
+                return;
+                }
+                const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+
+                llenarSelect(sSemanas, semanas, {orden:'asc'});
+                llenarSelect(sAnios,   anios,   {orden:'desc'});   // año más reciente arriba
+                llenarSelect(sLineas,  lineas,  {orden:'asc'});
+                llenarSelect(sTurnos,  turnos,  {orden:'asc'});
+
+                // Selecciones “cómodas” por defecto (opcional):
+                // Selecciona el año más reciente
+                if (sAnios.options.length) sAnios.selectedIndex = 0;
+            }
+
+            async function cargarDatosYGraficar() {
+                const url = buildURL();
+                const resp = await fetch(url, {credentials:'same-origin'});
+                if (!resp.ok) {
+                console.error('API no OK:', resp.status, await resp.text());
+                return;
+                }
                 const data = await resp.json();
-                if (!Array.isArray(data) || data.length === 0) { console.warn('API sin datos'); return; }
-
-                const fmtFecha = s => { const d=new Date(s); if(isNaN(d)) return s;
-                return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; };
+                if (!Array.isArray(data) || data.length === 0) {
+                if (chart) { chart.destroy(); chart = null; }
+                console.warn('Sin datos con los filtros actuales');
+                return;
+                }
 
                 const labels = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
                 const disponibilidad = data.map(d => Number(d.disponibilidad ?? 0));
@@ -79,7 +164,8 @@
                 const oee            = data.map(d => Number(d.oee ?? 0));
                 const target         = data.map(d => Number(d.target ?? 0));
 
-                new Chart(ctx, {
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels,
@@ -96,14 +182,32 @@
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                     legend: { position: 'right' },
-                    title: { display: true, text: 'Tendencia OEE - Línea Gorreri Pastelería' }
+                    title: { display: true, text: 'Tendencia OEE - Filtros' }
                     },
                     scales: { y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } } }
                 }
                 });
-            } catch (err) {
-                console.error('Error fetch/json:', err);
             }
+
+            // Botones seleccionar todo en multi-selects
+            btnSelTodoSem.addEventListener('click', () => { Array.from(sSemanas.options).forEach(o => o.selected = true); });
+            btnSelTodoLin.addEventListener('click', () => { Array.from(sLineas.options).forEach(o => o.selected = true); });
+            btnSelTodoTur.addEventListener('click', () => { Array.from(sTurnos.options).forEach(o => o.selected = true); });
+
+            // Aplicar / Limpiar
+            btnAplicar.addEventListener('click', (e) => { e.preventDefault(); cargarDatosYGraficar(); });
+            btnLimpiar.addEventListener('click', () => {
+                [sSemanas, sLineas, sTurnos].forEach(sel => Array.from(sel.options).forEach(o => o.selected = false));
+                sAnios.selectedIndex = -1;
+                fDesde.value = ''; fHasta.value = '';
+                cargarDatosYGraficar();
+            });
+
+            // Inicial
+            (async () => {
+                await cargarOpciones();
+                await cargarDatosYGraficar();
+            })();
             });
             </script>
 
