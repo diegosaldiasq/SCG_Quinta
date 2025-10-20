@@ -466,9 +466,9 @@ def graficos_oee(request):
 @require_GET
 def detenciones_turno_api(request):
     """
-    Devuelve: fecha, turno, linea, motivo, porcentaje (0..100)
-    Calculado como duracion_motivo / tiempo_planeado * 100
-    + un motivo adicional: 'Tiempo Productivo'
+    Devuelve: fecha, turno, linea, motivo, porcentaje (0..100), lote_id
+    % calculado sobre tiempo_planeado del ResumenTurnoOee.
+    Agrega un motivo extra: 'Tiempo Productivo' (resto).
     """
     try:
         semanas = request.GET.getlist('semana')
@@ -478,12 +478,13 @@ def detenciones_turno_api(request):
         desde   = request.GET.get('desde')
         hasta   = request.GET.get('hasta')
 
-        # Base queryset: une Detencion con su ResumenTurnoOee
+        # Detención -> TurnoOEE (lote) -> ResumenTurnoOee
         qs = (Detencion.objects
               .select_related('lote')
               .filter(lote__resumenes_turno__isnull=False)
               .values(
-                  'lote__resumenes_turno__id',
+                  'lote_id',                                  # 👈 NECESARIO
+                  'lote__resumenes_turno__id',                # id del resumen
                   'lote__resumenes_turno__fecha',
                   'lote__resumenes_turno__turno',
                   'lote__resumenes_turno__linea',
@@ -494,12 +495,12 @@ def detenciones_turno_api(request):
                         'lote__resumenes_turno__turno',
                         'motivo'))
 
-        # Aplicar filtros
+        # Filtros
         if semanas:
-            qs = qs.annotate(sem=ExtractWeek('lote__resumenes_turno__fecha'))\
+            qs = qs.annotate(sem=ExtractWeek('lote__resumenes_turno__fecha')) \
                    .filter(sem__in=[int(s) for s in semanas if s.isdigit()])
         if anios:
-            qs = qs.annotate(an=ExtractYear('lote__resumenes_turno__fecha'))\
+            qs = qs.annotate(an=ExtractYear('lote__resumenes_turno__fecha')) \
                    .filter(an__in=[int(a) for a in anios if a.isdigit()])
         if lineas:
             qs = qs.filter(lote__resumenes_turno__linea__in=lineas)
@@ -512,50 +513,51 @@ def detenciones_turno_api(request):
         elif hasta:
             qs = qs.filter(lote__resumenes_turno__fecha__lte=hasta)
 
-        # Agrupar datos
-        salida = []
+        # Resúmenes con tiempo_planeado + lote_id para todos
         resumenes = (ResumenTurnoOee.objects
-                     .values('id', 'fecha', 'turno', 'linea', 'tiempo_planeado'))
-
+                     .values('id', 'fecha', 'turno', 'linea', 'tiempo_planeado', 'lote_id'))
         resumen_map = {r['id']: r for r in resumenes}
 
-        # Totales por turno
-        totales_detenciones = {}
+        # Totales de detenciones por resumen
+        tot_det_por_resumen = {}
         for r in qs:
             rid = r['lote__resumenes_turno__id']
-            totales_detenciones[rid] = totales_detenciones.get(rid, 0) + (r['duracion_total'] or 0)
+            tot_det_por_resumen[rid] = tot_det_por_resumen.get(rid, 0) + (r['duracion_total'] or 0)
 
-        # 1️⃣ Motivos de detención (porcentaje respecto al tiempo_planeado)
+        salida = []
+
+        # Por motivo (duracion_motivo / tiempo_planeado)
         for r in qs:
             rid = r['lote__resumenes_turno__id']
-            resumen = resumen_map.get(rid)
-            if not resumen:
+            res = resumen_map.get(rid)
+            if not res:
                 continue
-            tiempo_planeado = resumen['tiempo_planeado'] or 1
-            porcentaje = round(100 * (r['duracion_total'] or 0) / tiempo_planeado, 2)
+            tp = res['tiempo_planeado'] or 1
+            porcentaje = round(100 * (r['duracion_total'] or 0) / tp, 2)
             salida.append({
-                'fecha': resumen['fecha'],
-                'turno': resumen['turno'],
-                'linea': resumen['linea'],
+                'fecha': res['fecha'],
+                'turno': res['turno'],
+                'linea': res['linea'],
                 'motivo': r['motivo'],
                 'porcentaje': porcentaje,
-                'lote_id': r['lote_id'],
+                'lote_id': r['lote_id'],  # 👈 ahora sí siempre va
             })
 
-        # 2️⃣ Tiempo productivo (resto del turno)
-        for rid, total_det in totales_detenciones.items():
-            resumen = resumen_map.get(rid)
-            if not resumen:
+        # Tiempo Productivo (resto)
+        for rid, det in tot_det_por_resumen.items():
+            res = resumen_map.get(rid)
+            if not res:
                 continue
-            tiempo_planeado = resumen['tiempo_planeado'] or 1
-            restante = max(tiempo_planeado - total_det, 0)
-            porcentaje_restante = round(100 * restante / tiempo_planeado, 2)
+            tp = res['tiempo_planeado'] or 1
+            restante = max(tp - det, 0)
+            porcentaje_restante = round(100 * restante / tp, 2)
             salida.append({
-                'fecha': resumen['fecha'],
-                'turno': resumen['turno'],
-                'linea': resumen['linea'],
+                'fecha': res['fecha'],
+                'turno': res['turno'],
+                'linea': res['linea'],
                 'motivo': 'Tiempo Productivo',
                 'porcentaje': porcentaje_restante,
+                'lote_id': res['lote_id'],  # 👈 también aquí
             })
 
         return JsonResponse(salida, safe=False, json_dumps_params={'ensure_ascii': False})

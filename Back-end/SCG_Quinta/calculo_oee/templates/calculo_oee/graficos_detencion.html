@@ -39,25 +39,25 @@
         <label>Hasta
           <input type="date" id="f_hasta">
         </label>
-      </div>
+        </div>
 
-      <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
-        <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
-        <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
-        <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
-        <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
-        <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
-      </div>
+        <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
+            <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
+            <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
+            <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
+            <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
+            <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
+        </div>
 
-      <!-- GRÁFICO DETENCIONES (con scroll horizontal opcional para muchas barras) -->
-      <div style="width:100%; height:420px; background:#fff; overflow-x:auto;">
-          <canvas id="graficoDetenciones"></canvas>
-      </div>
+        <!-- GRÁFICO DETENCIONES (con scroll horizontal opcional para muchas barras) -->
+        <div style="width:100%; height:420px; background:#fff; overflow-x:auto;">
+            <canvas id="graficoDetenciones"></canvas>
+        </div>
 
-      <!-- SCRIPTS -->
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      <script>
-      document.addEventListener('DOMContentLoaded', async () => {
+        <!-- SCRIPTS -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', async () => {
         const ctx = document.getElementById('graficoDetenciones')?.getContext('2d');
         if (!ctx) return;
 
@@ -79,199 +79,173 @@
         let chart;
 
         const getMultiValues = sel =>
-          Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+            Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
 
         function buildURL() {
-          const base = "{% url 'detenciones_turno_api' %}";
-          const p = new URLSearchParams();
-          for (const s of getMultiValues(sSemanas)) p.append('semana', s);
-          if (sAnios.value) p.append('anio', sAnios.value);
-          for (const l of getMultiValues(sLineas)) p.append('linea', l);
-          for (const t of getMultiValues(sTurnos)) p.append('turno', t);
-          if (fDesde.value) p.set('desde', fDesde.value);
-          if (fHasta.value) p.set('hasta', fHasta.value);
-          const qs = p.toString();
-          return qs ? `${base}?${qs}` : base;
+            const base = "{% url 'detenciones_turno_api' %}";
+            const p = new URLSearchParams();
+            for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+            if (sAnios.value) p.append('anio', sAnios.value);
+            for (const l of getMultiValues(sLineas)) p.append('linea', l);
+            for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+            if (fDesde.value) p.set('desde', fDesde.value);
+            if (fHasta.value) p.set('hasta', fHasta.value);
+            return p.toString() ? `${base}?${p}` : base;
         }
 
         async function cargarOpciones() {
-          const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
-          const r = await fetch(urlOpt, {credentials:'same-origin'});
-          if (!r.ok) return;
-          const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
-
-          const fill = (sel, arr) => {
+            const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+            const r = await fetch(urlOpt, {credentials:'same-origin'});
+            if (!r.ok) return;
+            const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+            const fill = (sel, arr) => {
             sel.innerHTML = '';
             arr.sort((a,b)=>a-b).forEach(v=>{
-              const o=document.createElement('option');
-              o.value=v; o.textContent=v; sel.appendChild(o);
+                const o=document.createElement('option');
+                o.value=v; o.textContent=v; sel.appendChild(o);
             });
-          };
-          fill(sSemanas, semanas);
-          fill(sAnios,   anios);
-          fill(sLineas,  lineas);
-          fill(sTurnos,  turnos);
-          if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
+            };
+            fill(sSemanas,semanas); fill(sAnios,anios); fill(sLineas,lineas); fill(sTurnos,turnos);
+            if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
         }
 
-        function fmtFecha(s) {
-          const d = new Date(s);
-          if (isNaN(d)) return s;
-          const dd = String(d.getDate()).padStart(2,'0');
-          const mm = String(d.getMonth()+1).padStart(2,'0');
-          const yy = d.getFullYear();
-          return `${dd}-${mm}-${yy}`;
-        }
+        const fmtFecha = s => {
+            const d = new Date(s);
+            if (isNaN(d)) return s;
+            return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+        };
 
         async function cargarGrafico() {
-          const url = buildURL();
-          const resp = await fetch(url, {credentials:'same-origin'});
-          if (!resp.ok) {
-            console.error('Error API:', resp.status, await resp.text());
-            return;
-          }
-          const data = await resp.json();
-          if (!Array.isArray(data) || data.length === 0) {
+            const url = buildURL();
+            const resp = await fetch(url, {credentials:'same-origin'});
+            if (!resp.ok) { console.error('API:', resp.status, await resp.text()); return; }
+            const data = await resp.json();
+            if (!Array.isArray(data) || !data.length) {
             if (chart) { chart.destroy(); chart = null; }
-            console.warn('Sin datos');
-            return;
-          }
+            console.warn('Sin datos'); return;
+            }
 
-          // ======= Etiquetas X en 2 líneas (Fecha / Turno) =======
-          // Usamos JSON para deduplicar set de arrays.
-          const barras = [...new Set(
-            data.map(d => JSON.stringify({
-                fecha: fmtFecha(d.fecha),
-                turno: `Turno ${d.turno}`,
-                lote_id: d.lote_id
-            }))
-          )].map(x => JSON.parse(x));
+            // ---- Agrupar por lote_id (clave real) ----
+            // Conservamos orden por fecha/turno (primera ocurrencia)
+            data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || String(a.turno).localeCompare(String(b.turno)));
 
-          const motivos = [...new Set(data.map(d => d.motivo))];
+            const loteInfo = {}; // {lote_id: {label:[fecha,'Turno X']}}
+            const mp = {};       // {lote_id: {motivo: porcentaje}}
+            const motivosSet = new Set();
 
-          // Mapa: barra -> motivo -> porcentaje
-          const M = {};
-          for (const d of data) {
-            const key = JSON.stringify([fmtFecha(d.fecha), `${d.turno}`]);
-            M[key] ??= {};
-            M[key][d.motivo] = d.porcentaje;
-          }
+            for (const d of data) {
+            const lid = d.lote_id;
+            if (!lid) continue;
+            if (!loteInfo[lid]) {
+                loteInfo[lid] = { label: [fmtFecha(d.fecha), `Turno ${d.turno}`] };
+            }
+            (mp[lid] ||= {})[d.motivo] = d.porcentaje;
+            motivosSet.add(d.motivo);
+            }
 
-          // 🎨 Generador automático de colores únicos (HSL → RGB)
-          function generarColor(idx, total) {
-          const hue = (idx * 360 / total) % 360; // distribuye el tono
-          return `hsl(${hue}, 65%, 55%)`; // saturación y luminosidad uniformes
-          }
+            const motivos = Array.from(motivosSet);
+            const loteIds = Object.keys(loteInfo);              // orden ya está por fecha/turno
+            const labels  = loteIds.map(id => loteInfo[id].label);
 
-          // Crea una paleta sin repetir tonos
-          const palette = motivos.map((_, i) => generarColor(i, motivos.length));
+            // 🎨 colores únicos (HSL); “Tiempo Productivo” verde fijo
+            function colorHSL(i, tot){ const h=(i*360/tot)%360; return `hsl(${h},65%,55%)`; }
+            const palette = motivos.map((_, i) => colorHSL(i, motivos.length));
 
-          // Aseguramos que “Tiempo Productivo” sea verde fijo
-          const datasets = motivos.map((m, i) => ({
-          label: m,
-          data: barras.map(b => {
-              const key = JSON.stringify(b);
-              return M[key]?.[m] ?? 0;
-          }),
-          backgroundColor: m === "Tiempo Productivo" ? "#2ca02c" : palette[i],
-          stack: 'x',
-          borderWidth: 1,
-          borderColor: 'rgba(0,0,0,0.1)',
-          }));
+            const datasets = motivos.map((m,i)=>({
+            label: m,
+            data: loteIds.map(id => mp[id]?.[m] ?? 0),
+            backgroundColor: m === 'Tiempo Productivo' ? '#2ca02c' : palette[i],
+            stack: 'x',
+            borderWidth: 1,
+            borderColor: 'rgba(0,0,0,0.1)',
+            }));
 
-          // Línea roja objetivo
-          const hLine = {
+            // Línea roja objetivo al 30%
+            const hLine = {
             id:'hLine',
             afterDraw(chart,args,opts){
-              const {ctx,chartArea:{left,right},scales:{y}}=chart;
-              const yVal=opts.yValue??30;
-              const yPix=y.getPixelForValue(yVal);
-              ctx.save();ctx.beginPath();
-              ctx.moveTo(left,yPix);ctx.lineTo(right,yPix);
-              ctx.lineWidth=2;ctx.strokeStyle='red';
-              ctx.setLineDash([6,4]);ctx.stroke();ctx.restore();
+                const {ctx,chartArea:{left,right},scales:{y}}=chart;
+                const yVal=opts.yValue??30;
+                const yPix=y.getPixelForValue(yVal);
+                ctx.save(); ctx.beginPath(); ctx.moveTo(left,yPix); ctx.lineTo(right,yPix);
+                ctx.lineWidth=2; ctx.strokeStyle='red'; ctx.setLineDash([6,4]); ctx.stroke(); ctx.restore();
             }
-          };
+            };
 
-          // Mostrar ~25 etiquetas máximo (step dinámico)
-          const step = Math.max(1, Math.ceil(barras.length / 25));
+            const step = Math.max(1, Math.ceil(labels.length / 25));
 
-          if (chart) chart.destroy();
-          chart = new Chart(ctx, {
-            type:'bar',
-            data:{labels:barras,datasets},
-            plugins:[hLine],
-            options:{
-              responsive:true,
-              maintainAspectRatio:false,
-              onClick(evt, elements) {  // 👈 aquí
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets },
+            plugins: [hLine],
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                // Clic → detalle_turno/<lote_id>
+                onClick(evt, elements){
                 if (!elements.length) return;
-                const index = elements[0].index;
-                const barra = barras[index];
-                if (barra?.lote_id) {
-                    const url = `{% url 'detalle_turno' 0 %}`.replace('0', barra.lote_id);
-                    window.location.href = `${url}?next=${encodeURIComponent(window.location.pathname)}`;
+                const idx = elements[0].index;
+                const lid = loteIds[idx];
+                if (lid) {
+                    const urlDet = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
+                    window.location.href = `${urlDet}?next=${encodeURIComponent(window.location.pathname)}`;
                 }
-              },
-              plugins:{
-                legend:{position:'right'},
-                title:{display:true,text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
-                tooltip:{
-                  callbacks:{
+                },
+                plugins: {
+                legend: { position: 'right' },
+                title: { display: true, text: '% Distribución del Tiempo de Turno (Detenciones + Productivo)' },
+                tooltip: {
+                    callbacks: {
                     title(items){
-                      const lbl = items[0].label;
-                      return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
+                        const lbl = items[0].label;
+                        return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
                     },
                     label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
-                  }
-                }
-              },
-              scales:{
-                x:{
-                  stacked:true,
-                  ticks:{
-                    autoSkip:false,
-                    maxRotation:60,
-                    minRotation:60,
-                    font:{size:10},
-                    callback(value, index){
-                      // deja visible solo cada "step"
-                      return index % step === 0 ? this.getLabelForValue(value) : '';
                     }
-                  },
-                  grid:{display:false}
-                },
-                y:{
-                  stacked:true, min:0, max:100,
-                  ticks:{ callback:v=>v+'%' }
                 }
-              },
-              hLine:{yValue:30}
+                },
+                scales: {
+                x: {
+                    stacked: true,
+                    ticks: {
+                    autoSkip: false,
+                    minRotation: 60, maxRotation: 60,
+                    font: { size: 10 },
+                    callback(value, index){ return index % step === 0 ? this.getLabelForValue(value) : ''; }
+                    },
+                    grid: { display: false }
+                },
+                y: {
+                    stacked: true, min: 0, max: 100,
+                    ticks: { callback: v => v + '%' }
+                }
+                },
+                hLine: { yValue: 30 }
             }
-          });
+            });
         }
 
-        // Eventos
+        // Eventos UI
         btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
         btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
         btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
 
         btnAplicar.onclick = e => { e.preventDefault(); cargarGrafico(); };
         btnLimpiar.onclick = ()=>{
-          [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
-          sAnios.selectedIndex=-1; fDesde.value=''; fHasta.value='';
-          cargarGrafico();
+            [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
+            sAnios.selectedIndex = -1; fDesde.value = ''; fHasta.value = '';
+            cargarGrafico();
         };
 
-        // Inicial
         await cargarOpciones();
         await cargarGrafico();
-      });
-      </script>
+        });
+        </script>
 
-      <div class="botones">
-        <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
-      </div>
+        <div class="botones">
+            <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+        </div>
     </div>
   </div>
 </body>
