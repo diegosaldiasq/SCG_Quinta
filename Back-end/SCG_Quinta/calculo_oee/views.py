@@ -403,3 +403,7 @@ def resumen_turno_oee_api(request):
     except Exception as e:
         # 👇 aquí estaba el error: faltaba cerrar correctamente el paréntesis y las comillas
         return HttpResponseBadRequest(f"error_api_resumen: {e}")
+    
+@login_required
+def graficos_oee(request):
+    return render(request, 'calculo_oee/graficos_oee.html')
