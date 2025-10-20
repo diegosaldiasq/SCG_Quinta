@@ -159,7 +159,7 @@
             const lid = d.lote_id;
             if (!lid) continue;
             if (!loteInfo[lid]) {
-              loteInfo[lid] = { label: [fmtFecha(d.fecha), `Turno ${d.turno}`] };
+              loteInfo[lid] = { label: [fmtFecha(d.fecha), `${d.turno}`] };
             }
             (mp[lid] ||= {})[d.motivo] = d.porcentaje;
             motivosSet.add(d.motivo);
