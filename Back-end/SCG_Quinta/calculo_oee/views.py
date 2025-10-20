@@ -390,18 +390,42 @@ def descargar_resumenturnooee(request):
 @require_GET
 def resumen_turno_oee_api(request):
     try:
-        qs = (
-            ResumenTurnoOee.objects
-            .annotate(target=Value(70.0, output_field=FloatField()))  # target fijo
-            .values('fecha', 'turno', 'disponibilidad', 'eficiencia', 'oee', 'target')
-            .order_by('fecha', 'turno')
-        )
+        semana = request.GET.get('semana')     # ej: "41"
+        anio   = request.GET.get('anio')       # ej: "2025"
+        linea  = request.GET.get('linea')      # ej: "Gorreri pastelería"
+        turno  = request.GET.get('turno')      # ej: "B"
+        desde  = request.GET.get('desde')      # ej: "2025-10-01"
+        hasta  = request.GET.get('hasta')      # ej: "2025-10-31"
 
-        datos = list(qs)
-        return JsonResponse(datos, safe=False, json_dumps_params={"ensure_ascii": False})
+        qs = ResumenTurnoOee.objects.all()
 
+        # Filtro por semana y año (recomendado usar año para no mezclar semanas de distintos años)
+        if semana:
+            qs = qs.filter(fecha__week=int(semana))
+        if anio:
+            qs = qs.filter(fecha__year=int(anio))
+
+        # Filtros libres
+        if linea:
+            qs = qs.filter(linea__icontains=linea.strip())
+        if turno:
+            qs = qs.filter(turno__iexact=turno.strip())
+
+        # Rango de fechas opcional (YYYY-MM-DD)
+        if desde and hasta:
+            qs = qs.filter(fecha__date__range=[desde, hasta])
+        elif desde:
+            qs = qs.filter(fecha__date__gte=desde)
+        elif hasta:
+            qs = qs.filter(fecha__date__lte=hasta)
+
+        qs = (qs
+              .annotate(target=Value(70.0, output_field=FloatField()))  # ajusta tu target
+              .values('fecha','turno','linea','disponibilidad','eficiencia','oee','target')
+              .order_by('fecha','turno'))
+
+        return JsonResponse(list(qs), safe=False, json_dumps_params={'ensure_ascii': False})
     except Exception as e:
-        # 👇 aquí estaba el error: faltaba cerrar correctamente el paréntesis y las comillas
         return HttpResponseBadRequest(f"error_api_resumen: {e}")
     
 @login_required

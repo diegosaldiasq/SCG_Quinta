@@ -19,8 +19,39 @@
     <div class="login">
         <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
         <div class="login_container">
-            <h1 class="title">🔒 Cerrar Turno - Producción Real</h1>
-            <h2>{{ lote.lote }} - {{ lote.fecha|date:'d-m-Y' }} - {{ lote.linea }} - {{ lote.turno }} - {{ lote.supervisor }}</h2>
+            <h1 class="title">Grafico OEE</h1>
+
+            <!-- FILTROS -->
+            <div class="filtros" style="display:grid; gap:.5rem; grid-template-columns: repeat(6, minmax(120px,1fr)); align-items:end; margin:12px 0;">
+            <label>Semana
+                <input type="number" id="f_semana" min="1" max="53" placeholder="1-53">
+            </label>
+            <label>Año
+                <input type="number" id="f_anio" value="{{ lote.fecha|date:'Y' }}">
+            </label>
+            <label>Línea
+                <input type="text" id="f_linea" placeholder="Gorreri pastelería">
+            </label>
+            <label>Turno
+                <select id="f_turno">
+                <option value="">Todos</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                </select>
+            </label>
+            <label>Desde
+                <input type="date" id="f_desde">
+            </label>
+            <label>Hasta
+                <input type="date" id="f_hasta">
+            </label>
+            </div>
+
+            <div style="display:flex; gap:.5rem; margin-bottom:12px;">
+            <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
+            <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
+            </div>
 
             <!-- CONTENEDOR DEL GRÁFICO -->
             <div style="width:100%; height:380px;">
@@ -34,19 +65,61 @@
 
             <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
             <script>
-            document.addEventListener('DOMContentLoaded', async () => {
+            document.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('graficoOEE');
-            if (!canvas) { console.warn('No se encontró #graficoOEE en el DOM.'); return; }
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
 
-            try {
-                const resp = await fetch("{% url 'resumen_turno_oee_api' %}", { credentials:'same-origin' });
-                if (!resp.ok) { console.error('API no OK:', resp.status, await resp.text()); return; }
-                const data = await resp.json();
-                if (!Array.isArray(data) || data.length === 0) { console.warn('API sin datos'); return; }
+            // Controles
+            const $ = sel => document.querySelector(sel);
+            const fSemana = $('#f_semana');
+            const fAnio   = $('#f_anio');
+            const fLinea  = $('#f_linea');
+            const fTurno  = $('#f_turno');
+            const fDesde  = $('#f_desde');
+            const fHasta  = $('#f_hasta');
+            const btnAplicar = $('#btn_aplicar');
+            const btnLimpiar = $('#btn_limpiar');
 
-                const fmtFecha = s => { const d=new Date(s); if(isNaN(d)) return s;
-                return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; };
+            let chart; // para destruir y recrear
+
+            function buildURL() {
+                const params = new URLSearchParams();
+                if (fSemana.value) params.set('semana', fSemana.value);
+                if (fAnio.value)   params.set('anio',   fAnio.value);
+                if (fLinea.value)  params.set('linea',  fLinea.value);
+                if (fTurno.value)  params.set('turno',  fTurno.value);
+                if (fDesde.value)  params.set('desde',  fDesde.value);
+                if (fHasta.value)  params.set('hasta',  fHasta.value);
+                const base = "{% url 'resumen_turno_oee_api' %}";
+                const qs   = params.toString();
+                return qs ? `${base}?${qs}` : base;
+            }
+
+            function fmtFecha(s) {
+                const d = new Date(s);
+                if (isNaN(d)) return s;
+                const dd = String(d.getDate()).padStart(2,'0');
+                const mm = String(d.getMonth()+1).padStart(2,'0');
+                const yy = d.getFullYear();
+                return `${dd}-${mm}-${yy}`;
+            }
+
+            async function cargar() {
+                const url = buildURL();
+                try {
+                const resp = await fetch(url, { credentials:'same-origin' });
+                if (!resp.ok) {
+                    console.error('API no OK:', resp.status, await resp.text());
+                    return;
+                }
+                const data = await resp.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    // Limpia gráfico si no hay datos
+                    if (chart) { chart.destroy(); chart = null; }
+                    console.warn('Sin datos para los filtros.');
+                    return;
+                }
 
                 const labels = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
                 const disponibilidad = data.map(d => Number(d.disponibilidad ?? 0));
@@ -54,31 +127,44 @@
                 const oee            = data.map(d => Number(d.oee ?? 0));
                 const target         = data.map(d => Number(d.target ?? 0));
 
-                new Chart(ctx, {
-                type: 'line',
-                data: {
+                // Re-render
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
                     labels,
                     datasets: [
-                    { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue',  fill: false, tension: 0.25 },
-                    { label: 'Eficiencia',     data: eficiencia,     borderColor: 'red',   fill: false, tension: 0.25 },
-                    { label: 'OEE',            data: oee,            borderColor: 'green', fill: false, tension: 0.25 },
-                    { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false },
+                        { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue',  fill: false, tension: 0.25 },
+                        { label: 'Eficiencia',     data: eficiencia,     borderColor: 'red',   fill: false, tension: 0.25 },
+                        { label: 'OEE',            data: oee,            borderColor: 'green', fill: false, tension: 0.25 },
+                        { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false },
                     ]
-                },
-                options: {
+                    },
+                    options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
-                    legend: { position: 'right' },
-                    title: { display: true, text: 'Tendencia OEE - Línea Gorreri Pastelería' }
+                        legend: { position: 'right' },
+                        title: { display: true, text: 'Tendencia OEE - Filtros aplicados' }
                     },
                     scales: { y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } } }
-                }
+                    }
                 });
-            } catch (err) {
+                } catch (err) {
                 console.error('Error fetch/json:', err);
+                }
             }
+
+            // Eventos
+            btnAplicar.addEventListener('click', (e) => { e.preventDefault(); cargar(); });
+            btnLimpiar.addEventListener('click', () => {
+                [fSemana, fAnio, fLinea, fTurno, fDesde, fHasta].forEach(i => i.value = '');
+                cargar();
+            });
+
+            // Carga inicial
+            cargar();
             });
             </script>
         </div>
