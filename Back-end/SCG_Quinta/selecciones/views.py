@@ -135,3 +135,8 @@ def redireccionar_control_parametros_bizcocho(request):
 def redireccionar_graficos_oee(request):
     url_graficos_oee = reverse('graficos_oee')
     return HttpResponseRedirect(url_graficos_oee)
+
+@login_required
+def redireccionar_graficos_detencion(request):
+    url_graficos_detencion = reverse('graficos_detencion')
+    return HttpResponseRedirect(url_graficos_detencion)

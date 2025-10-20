@@ -534,3 +534,7 @@ def detenciones_turno_api(request):
 
     except Exception as e:
         return HttpResponseBadRequest(f"error_api_detenciones: {e}")
+    
+@login_required
+def graficos_detencion(request):
+    return render(request, 'calculo_oee/graficos_detencion.html')

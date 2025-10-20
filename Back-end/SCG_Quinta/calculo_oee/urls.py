@@ -18,5 +18,6 @@ urlpatterns = [
     path('api/resumen_turno_oee/opciones/', views.resumen_turno_oee_opciones, name='resumen_turno_oee_opciones'),
     path('api/resumen_turno_oee/', views.resumen_turno_oee_api, name='resumen_turno_oee_api'),
     path('graficos_oee/', views.graficos_oee, name='graficos_oee'),
-    path('api/detenciones/', views.detenciones_turno_api, name='detenciones_turno_api')
+    path('api/detenciones/', views.detenciones_turno_api, name='detenciones_turno_api'),
+    path('graficos_detencion/', views.graficos_detencion, name='graficos_detencion')
 ]

@@ -1,0 +1,172 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Estilos corporativos -->
+    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}">
+    <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
+    <title>Grafico OEE - Dinámico</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+        <div class="login_container">
+            <h1 class="title">Grafico OEE</h1>
+
+            <!-- === 1. FILTROS (los mismos de antes) === -->
+            <div class="filtros" style="display:grid; gap:.5rem; grid-template-columns: repeat(6, minmax(140px,1fr)); align-items:end; margin:12px 0;">
+            <label>Semanas (multi)
+                <select id="f_semanas" multiple size="4"></select>
+            </label>
+            <label>Año
+                <select id="f_anios"></select>
+            </label>
+            <label>Líneas (multi)
+                <select id="f_lineas" multiple size="4"></select>
+            </label>
+            <label>Turnos (multi)
+                <select id="f_turnos" multiple size="3"></select>
+            </label>
+            <label>Desde
+                <input type="date" id="f_desde">
+            </label>
+            <label>Hasta
+                <input type="date" id="f_hasta">
+            </label>
+            </div>
+
+            <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
+            <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
+            <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
+            <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
+            <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
+            <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
+            </div>
+
+            <!-- === 3. GRÁFICO DETENCIONES === -->
+            <div style="width:100%; height:420px; background:#fff;">
+                <canvas id="graficoDetenciones"></canvas>
+            </div>
+
+            <!-- === 4. SCRIPTS DE GRÁFICOS === -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+            document.addEventListener('DOMContentLoaded', async () => {
+            const cv = document.getElementById('graficoDetenciones');
+            if (!cv) return;
+            const ctx = cv.getContext('2d');
+
+            // Si quieres pasar filtros actuales, arma la URL como hicimos en el otro gráfico:
+            const url = "{% url 'detenciones_turno_api' %}"; // p.ej: + "?semana=41&semana=42&turno=B"
+
+            // Colores (ajústalos a tu leyenda)
+            const palette = [
+                '#1f77b4','#ff7f0e','#2ca02c','#9467bd','#8c564b',
+                '#e377c2','#7f7f7f','#bcbd22','#17becf','#d62728',
+                '#aec7e8','#ffbb78','#98df8a','#c5b0d5','#c49c94',
+            ];
+
+            // Plugin: línea horizontal roja en % objetivo (p.ej. 30%)
+            const hLine = {
+                id: 'hLine',
+                afterDraw(chart, args, opts) {
+                const {ctx, chartArea: {top, left, right}, scales: {y}} = chart;
+                const yVal = opts?.yValue ?? 30;
+                const yPix = y.getPixelForValue(yVal);
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(left, yPix);
+                ctx.lineTo(right, yPix);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'red';
+                ctx.setLineDash([8, 4]);
+                ctx.stroke();
+                ctx.restore();
+                }
+            };
+
+            try {
+                const resp = await fetch(url, {credentials:'same-origin'});
+                if (!resp.ok) { console.error('API no OK:', resp.status, await resp.text()); return; }
+                const data = await resp.json();
+                if (!Array.isArray(data) || data.length === 0) { console.warn('Sin datos de detenciones'); return; }
+
+                // Etiqueta por barra: Turno + fecha (formateada)
+                const fmtFecha = s => {
+                const d = new Date(s);
+                if (isNaN(d)) return s;
+                return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+                };
+
+                // Construye clave por barra (fecha, turno). Si quieres incluir "Línea", agrega `(${d.linea})`
+                const barras = [...new Set(data.map(d => `${d.turno}  ${fmtFecha(d.fecha)}`))];
+
+                // Motivos únicos
+                const motivos = [...new Set(data.map(d => d.motivo))];
+
+                // Mapa rápido (barra -> motivo -> porcentaje)
+                const M = {};
+                for (const d of data) {
+                const k = `${d.turno}  ${fmtFecha(d.fecha)}`;
+                M[k] ||= {};
+                M[k][d.motivo] = d.porcentaje;
+                }
+
+                // Datasets por motivo, alineados con "barras"
+                const datasets = motivos.map((m, i) => ({
+                label: m,
+                data: barras.map(b => M[b]?.[m] ?? 0),
+                backgroundColor: palette[i % palette.length],
+                stack: 'x',
+                borderWidth: 1,
+                borderColor: 'rgba(0,0,0,0.1)',
+                }));
+
+                new Chart(ctx, {
+                type: 'bar',
+                data: { labels: barras, datasets },
+                plugins: [hLine],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                    legend: { position: 'right' },
+                    title: { display: true, text: '% Detenciones por motivo (apilado 100%)' },
+                    tooltip: {
+                        callbacks: {
+                        label: (item) => `${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
+                        }
+                    }
+                    },
+                    scales: {
+                    x: { stacked: true, ticks: { autoSkip: false, maxRotation: 0 } },
+                    y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + '%' } }
+                    },
+                    // Línea roja de referencia (30%)
+                    hLine: { yValue: 30 }
+                }
+                });
+
+            } catch (err) {
+                console.error('Error fetch/json:', err);
+            }
+            });
+            </script>
+
+            <!-- ✅ Botones -->
+            <div class="botones">
+                <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
