@@ -61,7 +61,7 @@
         const ctx = document.getElementById('graficoDetenciones')?.getContext('2d');
         if (!ctx) return;
 
-        // Filtros
+        // ====== Filtros ======
         const $ = s => document.querySelector(s);
         const sSemanas = $('#f_semanas');
         const sAnios   = $('#f_anios');
@@ -105,7 +105,10 @@
                 o.value=v; o.textContent=v; sel.appendChild(o);
             });
             };
-            fill(sSemanas,semanas); fill(sAnios,anios); fill(sLineas,lineas); fill(sTurnos,turnos);
+            fill(sSemanas,semanas);
+            fill(sAnios,anios);
+            fill(sLineas,lineas);
+            fill(sTurnos,turnos);
             if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
         }
 
@@ -125,10 +128,10 @@
             console.warn('Sin datos'); return;
             }
 
-            // ---- Agrupar por lote_id (clave real) ----
-            // Conservamos orden por fecha/turno (primera ocurrencia)
+            // ---- Ordenamos por fecha y turno para un eje X estable ----
             data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || String(a.turno).localeCompare(String(b.turno)));
 
+            // ---- Agrupar por lote_id (clave real del turno) ----
             const loteInfo = {}; // {lote_id: {label:[fecha,'Turno X']}}
             const mp = {};       // {lote_id: {motivo: porcentaje}}
             const motivosSet = new Set();
@@ -143,14 +146,33 @@
             motivosSet.add(d.motivo);
             }
 
-            const motivos = Array.from(motivosSet);
-            const loteIds = Object.keys(loteInfo);              // orden ya está por fecha/turno
-            const labels  = loteIds.map(id => loteInfo[id].label);
+            // ---- Motivos: todas las detenciones primero y "Tiempo Productivo" al final ----
+            const motivos = Array.from(motivosSet)
+            .sort((a, b) => (a === 'Tiempo Productivo') - (b === 'Tiempo Productivo'));
 
-            // 🎨 colores únicos (HSL); “Tiempo Productivo” verde fijo
+            // Si quieres además ordenar las detenciones por magnitud media, descomenta:
+            // const promedio = m => {
+            //   let sum = 0, n = 0;
+            //   for (const id of Object.keys(loteInfo)) {
+            //     if (mp[id] && typeof mp[id][m] === 'number') { sum += mp[id][m]; n++; }
+            //   }
+            //   return n ? (sum/n) : 0;
+            // };
+            // motivos.sort((a,b)=>{
+            //   if (a === 'Tiempo Productivo') return 1;
+            //   if (b === 'Tiempo Productivo') return -1;
+            //   return promedio(b) - promedio(a); // detenciones de mayor a menor
+            // });
+
+            // ---- Eje X y vector de ids para el click ----
+            const loteIds = Object.keys(loteInfo);
+            const labels  = loteIds.map(id => loteInfo[id].label); // [ [fecha,'Turno X'], ... ]
+
+            // ---- Paleta de colores (HSL), "Tiempo Productivo" verde fijo ----
             function colorHSL(i, tot){ const h=(i*360/tot)%360; return `hsl(${h},65%,55%)`; }
             const palette = motivos.map((_, i) => colorHSL(i, motivos.length));
 
+            // ---- Datasets en el orden deseado (define el apilado) ----
             const datasets = motivos.map((m,i)=>({
             label: m,
             data: loteIds.map(id => mp[id]?.[m] ?? 0),
@@ -160,7 +182,7 @@
             borderColor: 'rgba(0,0,0,0.1)',
             }));
 
-            // Línea roja objetivo al 30%
+            // ---- Línea roja de referencia (30%) ----
             const hLine = {
             id:'hLine',
             afterDraw(chart,args,opts){
@@ -226,7 +248,7 @@
             });
         }
 
-        // Eventos UI
+        // ====== Eventos UI ======
         btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
         btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
         btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
