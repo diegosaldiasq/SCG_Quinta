@@ -3,231 +3,263 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <!-- Estilos corporativos -->
-    <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}">
-    <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
-    <title>Grafico OEE - Dinámico</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com"> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}">
+  <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
+  <title>Gráfico Detenciones - Dinámico</title>
 </head>
 <body>
-    <div class="login">
-        <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
-        <div class="login_container">
-            <h1 class="title">Grafico OEE</h1>
+  <div class="login">
+    <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+    <div class="login_container">
+      <h1 class="title">Gráfico Detenciones</h1>
 
-            <!-- === 1. FILTROS (los mismos de antes) === -->
-            <div class="filtros" style="display:grid; gap:.5rem; grid-template-columns: repeat(6, minmax(140px,1fr)); align-items:end; margin:12px 0;">
-            <label>Semanas (multi)
-                <select id="f_semanas" multiple size="4"></select>
-            </label>
-            <label>Año
-                <select id="f_anios"></select>
-            </label>
-            <label>Líneas (multi)
-                <select id="f_lineas" multiple size="4"></select>
-            </label>
-            <label>Turnos (multi)
-                <select id="f_turnos" multiple size="3"></select>
-            </label>
-            <label>Desde
-                <input type="date" id="f_desde">
-            </label>
-            <label>Hasta
-                <input type="date" id="f_hasta">
-            </label>
-            </div>
+      <!-- FILTROS -->
+      <div class="filtros" style="display:grid; gap:.5rem; grid-template-columns: repeat(6, minmax(140px,1fr)); align-items:end; margin:12px 0;">
+        <label>Semanas (multi)
+          <select id="f_semanas" multiple size="4"></select>
+        </label>
+        <label>Año
+          <select id="f_anios"></select>
+        </label>
+        <label>Líneas (multi)
+          <select id="f_lineas" multiple size="4"></select>
+        </label>
+        <label>Turnos (multi)
+          <select id="f_turnos" multiple size="3"></select>
+        </label>
+        <label>Desde
+          <input type="date" id="f_desde">
+        </label>
+        <label>Hasta
+          <input type="date" id="f_hasta">
+        </label>
+      </div>
 
-            <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
-            <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
-            <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
-            <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
-            <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
-            <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
-            </div>
+      <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
+        <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
+        <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
+        <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
+        <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
+        <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
+      </div>
 
-            <!-- === 3. GRÁFICO DETENCIONES === -->
-            <div style="width:100%; height:420px; background:#fff;">
-                <canvas id="graficoDetenciones"></canvas>
-            </div>
-
-            <!-- === 4. SCRIPTS DE GRÁFICOS === -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-            document.addEventListener('DOMContentLoaded', async () => {
-            const ctx = document.getElementById('graficoDetenciones')?.getContext('2d');
-            if (!ctx) return;
-
-            // Referencias a los filtros
-            const $ = s => document.querySelector(s);
-            const sSemanas = $('#f_semanas');
-            const sAnios   = $('#f_anios');
-            const sLineas  = $('#f_lineas');
-            const sTurnos  = $('#f_turnos');
-            const fDesde   = $('#f_desde');
-            const fHasta   = $('#f_hasta');
-
-            const btnAplicar = $('#btn_aplicar');
-            const btnLimpiar = $('#btn_limpiar');
-            const btnSelTodoSem = $('#btn_sel_todo_sem');
-            const btnSelTodoLin = $('#btn_sel_todo_lin');
-            const btnSelTodoTur = $('#btn_sel_todo_tur');
-
-            let chart; // gráfico activo
-
-            // Función utilitaria para obtener valores seleccionados de un <select multiple>
-            const getMultiValues = sel =>
-                Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
-
-            // Construye la URL con parámetros GET según filtros
-            function buildURL() {
-                const base = "{% url 'detenciones_turno_api' %}";
-                const p = new URLSearchParams();
-
-                for (const s of getMultiValues(sSemanas)) p.append('semana', s);
-                if (sAnios.value) p.append('anio', sAnios.value);
-                for (const l of getMultiValues(sLineas)) p.append('linea', l);
-                for (const t of getMultiValues(sTurnos)) p.append('turno', t);
-                if (fDesde.value) p.set('desde', fDesde.value);
-                if (fHasta.value) p.set('hasta', fHasta.value);
-
-                const qs = p.toString();
-                return qs ? `${base}?${qs}` : base;
-            }
-
-            // Cargar opciones únicas desde API de opciones
-            async function cargarOpciones() {
-                const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
-                const r = await fetch(urlOpt, {credentials:'same-origin'});
-                if (!r.ok) return;
-                const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
-
-                const llenarSelect = (sel, arr) => {
-                sel.innerHTML = '';
-                arr.sort((a,b)=>a-b).forEach(v=>{
-                    const o=document.createElement('option');
-                    o.value=v; o.textContent=v; sel.appendChild(o);
-                });
-                };
-                llenarSelect(sSemanas,semanas);
-                llenarSelect(sAnios,anios);
-                llenarSelect(sLineas,lineas);
-                llenarSelect(sTurnos,turnos);
-                if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
-            }
-
-            // Función principal para cargar datos y graficar
-            async function cargarGrafico() {
-                const url = buildURL();
-                const resp = await fetch(url, {credentials:'same-origin'});
-                if (!resp.ok) {
-                console.error('Error API:', resp.status, await resp.text());
-                return;
-                }
-                const data = await resp.json();
-                if (!Array.isArray(data) || data.length === 0) {
-                if (chart) { chart.destroy(); chart = null; }
-                console.warn('Sin datos');
-                return;
-                }
-
-                // ==== Preparación de datos ====
-                const fmtFecha = s => {
-                const d = new Date(s);
-                if (isNaN(d)) return s;
-                return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
-                };
-                const barras = [...new Set(data.map(d => `${d.turno} ${fmtFecha(d.fecha)}`))];
-                const motivos = [...new Set(data.map(d => d.motivo))];
-
-                // Mapa: barra → motivo → porcentaje
-                const M = {};
-                for (const d of data) {
-                const k = `${d.turno} ${fmtFecha(d.fecha)}`;
-                M[k] ||= {};
-                M[k][d.motivo] = d.porcentaje;
-                }
-
-                // Paleta de colores
-                const palette = [
-                '#1f77b4','#ff7f0e','#2ca02c','#9467bd','#8c564b',
-                '#e377c2','#7f7f7f','#bcbd22','#17becf','#d62728',
-                '#aec7e8','#ffbb78','#98df8a','#c5b0d5','#c49c94'
-                ];
-
-                // Motivo especial “Tiempo Productivo” debe ser verde
-                const datasets = motivos.map((m,i)=>({
-                label:m,
-                data:barras.map(b=>M[b]?.[m]??0),
-                backgroundColor: m==="Tiempo Productivo" ? "#2ca02c" : palette[i % palette.length],
-                stack:'x',
-                borderWidth:1,
-                borderColor:'rgba(0,0,0,0.1)',
-                }));
-
-                // Plugin línea roja objetivo (30%)
-                const hLine = {
-                id:'hLine',
-                afterDraw(chart,args,opts){
-                    const {ctx,chartArea:{left,right},scales:{y}}=chart;
-                    const yVal=opts.yValue??30;
-                    const yPix=y.getPixelForValue(yVal);
-                    ctx.save();ctx.beginPath();
-                    ctx.moveTo(left,yPix);ctx.lineTo(right,yPix);
-                    ctx.lineWidth=2;ctx.strokeStyle='red';
-                    ctx.setLineDash([6,4]);ctx.stroke();ctx.restore();
-                }
-                };
-
-                if (chart) chart.destroy();
-                chart = new Chart(ctx, {
-                type:'bar',
-                data:{labels:barras,datasets},
-                plugins:[hLine],
-                options:{
-                    responsive:true,
-                    maintainAspectRatio:false,
-                    plugins:{
-                    legend:{position:'right'},
-                    title:{display:true,text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'}
-                    },
-                    scales:{
-                    x:{stacked:true,ticks:{autoSkip:false,maxRotation:0}},
-                    y:{stacked:true,min:0,max:100,ticks:{callback:v=>v+'%'}}
-                    },
-                    hLine:{yValue:30}
-                }
-                });
-            }
-
-            // ==== Eventos ====
-            btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
-            btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
-            btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
-
-            btnAplicar.onclick = e => { e.preventDefault(); cargarGrafico(); };
-            btnLimpiar.onclick = ()=>{
-                [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
-                sAnios.selectedIndex=-1; fDesde.value=''; fHasta.value='';
-                cargarGrafico();
-            };
-
-            // ==== Inicial ====
-            await cargarOpciones();
-            await cargarGrafico();
-            });
-            </script>
-
-            <!-- ✅ Botones -->
-            <div class="botones">
-                <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
-            </div>
+      <!-- GRÁFICO DETENCIONES (con scroll horizontal opcional para muchas barras) -->
+      <div style="width:100%; height:420px; background:#fff; border-radius:8px; padding:8px; overflow-x:auto;">
+        <div style="min-width:1200px;">
+          <canvas id="graficoDetenciones"></canvas>
         </div>
+      </div>
+
+      <!-- SCRIPTS -->
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const ctx = document.getElementById('graficoDetenciones')?.getContext('2d');
+        if (!ctx) return;
+
+        // Filtros
+        const $ = s => document.querySelector(s);
+        const sSemanas = $('#f_semanas');
+        const sAnios   = $('#f_anios');
+        const sLineas  = $('#f_lineas');
+        const sTurnos  = $('#f_turnos');
+        const fDesde   = $('#f_desde');
+        const fHasta   = $('#f_hasta');
+
+        const btnAplicar = $('#btn_aplicar');
+        const btnLimpiar = $('#btn_limpiar');
+        const btnSelTodoSem = $('#btn_sel_todo_sem');
+        const btnSelTodoLin = $('#btn_sel_todo_lin');
+        const btnSelTodoTur = $('#btn_sel_todo_tur');
+
+        let chart;
+
+        const getMultiValues = sel =>
+          Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+
+        function buildURL() {
+          const base = "{% url 'detenciones_turno_api' %}";
+          const p = new URLSearchParams();
+          for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+          if (sAnios.value) p.append('anio', sAnios.value);
+          for (const l of getMultiValues(sLineas)) p.append('linea', l);
+          for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+          if (fDesde.value) p.set('desde', fDesde.value);
+          if (fHasta.value) p.set('hasta', fHasta.value);
+          const qs = p.toString();
+          return qs ? `${base}?${qs}` : base;
+        }
+
+        async function cargarOpciones() {
+          const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+          const r = await fetch(urlOpt, {credentials:'same-origin'});
+          if (!r.ok) return;
+          const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+
+          const fill = (sel, arr) => {
+            sel.innerHTML = '';
+            arr.sort((a,b)=>a-b).forEach(v=>{
+              const o=document.createElement('option');
+              o.value=v; o.textContent=v; sel.appendChild(o);
+            });
+          };
+          fill(sSemanas, semanas);
+          fill(sAnios,   anios);
+          fill(sLineas,  lineas);
+          fill(sTurnos,  turnos);
+          if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
+        }
+
+        function fmtFecha(s) {
+          const d = new Date(s);
+          if (isNaN(d)) return s;
+          const dd = String(d.getDate()).padStart(2,'0');
+          const mm = String(d.getMonth()+1).padStart(2,'0');
+          const yy = d.getFullYear();
+          return `${dd}-${mm}-${yy}`;
+        }
+
+        async function cargarGrafico() {
+          const url = buildURL();
+          const resp = await fetch(url, {credentials:'same-origin'});
+          if (!resp.ok) {
+            console.error('Error API:', resp.status, await resp.text());
+            return;
+          }
+          const data = await resp.json();
+          if (!Array.isArray(data) || data.length === 0) {
+            if (chart) { chart.destroy(); chart = null; }
+            console.warn('Sin datos');
+            return;
+          }
+
+          // ======= Etiquetas X en 2 líneas (Fecha / Turno) =======
+          // Usamos JSON para deduplicar set de arrays.
+          const barras = [...new Set(
+            data.map(d => {
+              const f = fmtFecha(d.fecha);
+              return JSON.stringify([f, `Turno ${d.turno}`]);
+            })
+          )].map(x => JSON.parse(x)); // [[fecha,'Turno X'], ...]
+
+          const motivos = [...new Set(data.map(d => d.motivo))];
+
+          // Mapa: barra -> motivo -> porcentaje
+          const M = {};
+          for (const d of data) {
+            const key = JSON.stringify([fmtFecha(d.fecha), `Turno ${d.turno}`]);
+            M[key] ??= {};
+            M[key][d.motivo] = d.porcentaje;
+          }
+
+          const palette = [
+            '#1f77b4','#ff7f0e','#2ca02c','#9467bd','#8c564b',
+            '#e377c2','#7f7f7f','#bcbd22','#17becf','#d62728',
+            '#aec7e8','#ffbb78','#98df8a','#c5b0d5','#c49c94'
+          ];
+
+          const datasets = motivos.map((m,i)=>({
+            label:m,
+            data:barras.map(b=>{
+              const key = JSON.stringify(b);
+              return M[key]?.[m] ?? 0;
+            }),
+            backgroundColor: m==="Tiempo Productivo" ? "#2ca02c" : palette[i % palette.length],
+            stack:'x',
+            borderWidth:1,
+            borderColor:'rgba(0,0,0,0.1)',
+          }));
+
+          // Línea roja objetivo
+          const hLine = {
+            id:'hLine',
+            afterDraw(chart,args,opts){
+              const {ctx,chartArea:{left,right},scales:{y}}=chart;
+              const yVal=opts.yValue??30;
+              const yPix=y.getPixelForValue(yVal);
+              ctx.save();ctx.beginPath();
+              ctx.moveTo(left,yPix);ctx.lineTo(right,yPix);
+              ctx.lineWidth=2;ctx.strokeStyle='red';
+              ctx.setLineDash([6,4]);ctx.stroke();ctx.restore();
+            }
+          };
+
+          // Mostrar ~25 etiquetas máximo (step dinámico)
+          const step = Math.max(1, Math.ceil(barras.length / 25));
+
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type:'bar',
+            data:{labels:barras,datasets},
+            plugins:[hLine],
+            options:{
+              responsive:true,
+              maintainAspectRatio:false,
+              plugins:{
+                legend:{position:'right'},
+                title:{display:true,text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
+                tooltip:{
+                  callbacks:{
+                    title(items){
+                      const lbl = items[0].label;
+                      return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
+                    },
+                    label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
+                  }
+                }
+              },
+              scales:{
+                x:{
+                  stacked:true,
+                  ticks:{
+                    autoSkip:false,
+                    maxRotation:0,
+                    font:{size:10},
+                    callback(value, index){
+                      // deja visible solo cada "step"
+                      return index % step === 0 ? this.getLabelForValue(value) : '';
+                    }
+                  },
+                  grid:{display:false}
+                },
+                y:{
+                  stacked:true, min:0, max:100,
+                  ticks:{ callback:v=>v+'%' }
+                }
+              },
+              hLine:{yValue:30}
+            }
+          });
+        }
+
+        // Eventos
+        btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
+        btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
+        btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
+
+        btnAplicar.onclick = e => { e.preventDefault(); cargarGrafico(); };
+        btnLimpiar.onclick = ()=>{
+          [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
+          sAnios.selectedIndex=-1; fDesde.value=''; fHasta.value='';
+          cargarGrafico();
+        };
+
+        // Inicial
+        await cargarOpciones();
+        await cargarGrafico();
+      });
+      </script>
+
+      <div class="botones">
+        <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+      </div>
     </div>
+  </div>
 </body>
 </html>
