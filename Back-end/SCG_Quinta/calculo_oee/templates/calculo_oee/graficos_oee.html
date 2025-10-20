@@ -215,13 +215,12 @@
             })();
             });
             </script>
+            <!-- ✅ Botones -->
+            <div class="botones">
+                <button type="submit" class="primary-button login-button" onclick="return confirm('¿Estás seguro de guardar este turno?')">💾 Guardar Turno</button>
+                <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+            </div>
         </div>
     </div>
-
-    <script>
-        function confirmarEnvio() {
-            return confirm("✅ ¿Estás seguro de guardar la producción real y cerrar el turno?");
-        }
-    </script>
 </body>
 </html>
