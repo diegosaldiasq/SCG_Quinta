@@ -39,25 +39,25 @@
         <label>Hasta
           <input type="date" id="f_hasta">
         </label>
-        </div>
+      </div>
 
-        <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
-            <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
-            <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
-            <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
-            <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
-            <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
-        </div>
+      <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
+        <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
+        <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
+        <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
+        <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
+        <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
+      </div>
 
-        <!-- GRÁFICO DETENCIONES (con scroll horizontal opcional para muchas barras) -->
-        <div style="width:100%; height:420px; background:#fff; overflow-x:auto;">
-            <canvas id="graficoDetenciones"></canvas>
-        </div>
+      <!-- GRÁFICO -->
+      <div style="width:100%; height:420px; background:#fff; border-radius:8px; padding:8px; overflow-x:auto;">
+        <canvas id="graficoDetenciones"></canvas>
+      </div>
 
-        <!-- SCRIPTS -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+      <!-- SCRIPTS -->
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script>
+      document.addEventListener('DOMContentLoaded', async () => {
         const ctx = document.getElementById('graficoDetenciones')?.getContext('2d');
         if (!ctx) return;
 
@@ -70,204 +70,216 @@
         const fDesde   = $('#f_desde');
         const fHasta   = $('#f_hasta');
 
-        const btnAplicar = $('#btn_aplicar');
-        const btnLimpiar = $('#btn_limpiar');
-        const btnSelTodoSem = $('#btn_sel_todo_sem');
-        const btnSelTodoLin = $('#btn_sel_todo_lin');
-        const btnSelTodoTur = $('#btn_sel_todo_tur');
+        const btnAplicar   = $('#btn_aplicar');
+        const btnLimpiar   = $('#btn_limpiar');
+        const btnSelTodoSem= $('#btn_sel_todo_sem');
+        const btnSelTodoLin= $('#btn_sel_todo_lin');
+        const btnSelTodoTur= $('#btn_sel_todo_tur');
 
         let chart;
 
-        const getMultiValues = sel =>
-            Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+        // Helpers filtros
+        const getMultiValues = sel => Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+
+        function buildParams() {
+          const p = new URLSearchParams();
+          for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+          if (sAnios.value) p.append('anio', sAnios.value);
+          for (const l of getMultiValues(sLineas)) p.append('linea', l);
+          for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+          if (fDesde.value) p.set('desde', fDesde.value);
+          if (fHasta.value) p.set('hasta', fHasta.value);
+          return p;
+        }
 
         function buildURL() {
-            const base = "{% url 'detenciones_turno_api' %}";
-            const p = new URLSearchParams();
-            for (const s of getMultiValues(sSemanas)) p.append('semana', s);
-            if (sAnios.value) p.append('anio', sAnios.value);
-            for (const l of getMultiValues(sLineas)) p.append('linea', l);
-            for (const t of getMultiValues(sTurnos)) p.append('turno', t);
-            if (fDesde.value) p.set('desde', fDesde.value);
-            if (fHasta.value) p.set('hasta', fHasta.value);
-            return p.toString() ? `${base}?${p}` : base;
+          const base = "{% url 'detenciones_turno_api' %}";
+          const p = buildParams();
+          return p.toString() ? `${base}?${p}` : base;
         }
 
         async function cargarOpciones() {
-            const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
-            const r = await fetch(urlOpt, {credentials:'same-origin'});
-            if (!r.ok) return;
-            const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
-            const fill = (sel, arr) => {
+          const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+          const r = await fetch(urlOpt, {credentials:'same-origin'});
+          if (!r.ok) return;
+          const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+          const fill = (sel, arr) => {
             sel.innerHTML = '';
             arr.sort((a,b)=>a-b).forEach(v=>{
-                const o=document.createElement('option');
-                o.value=v; o.textContent=v; sel.appendChild(o);
+              const o=document.createElement('option');
+              o.value=v; o.textContent=v; sel.appendChild(o);
             });
-            };
-            fill(sSemanas,semanas);
-            fill(sAnios,anios);
-            fill(sLineas,lineas);
-            fill(sTurnos,turnos);
-            if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
+          };
+          fill(sSemanas,semanas);
+          fill(sAnios,anios);
+          fill(sLineas,lineas);
+          fill(sTurnos,turnos);
+          if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
+        }
+
+        function aplicarFiltrosDesdeURL() {
+          const params = new URLSearchParams(window.location.search);
+          const marcarMulti = (sel, valores) => {
+            const set = new Set(valores);
+            Array.from(sel.options).forEach(opt => { opt.selected = set.has(opt.value); });
+          };
+          const semanas = params.getAll('semana'); if (semanas.length) marcarMulti(sSemanas, semanas);
+          const anio = params.get('anio'); if (anio) sAnios.value = anio;
+          const lineas = params.getAll('linea'); if (lineas.length) marcarMulti(sLineas, lineas);
+          const turnos = params.getAll('turno'); if (turnos.length) marcarMulti(sTurnos, turnos);
+          const desde = params.get('desde'); if (desde) fDesde.value = desde;
+          const hasta = params.get('hasta'); if (hasta) fHasta.value = hasta;
         }
 
         const fmtFecha = s => {
-            const d = new Date(s);
-            if (isNaN(d)) return s;
-            return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+          const d = new Date(s);
+          if (isNaN(d)) return s;
+          return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
         };
 
         async function cargarGrafico() {
-            const url = buildURL();
-            const resp = await fetch(url, {credentials:'same-origin'});
-            if (!resp.ok) { console.error('API:', resp.status, await resp.text()); return; }
-            const data = await resp.json();
-            if (!Array.isArray(data) || !data.length) {
+          const url = buildURL();
+          const resp = await fetch(url, {credentials:'same-origin'});
+          if (!resp.ok) { console.error('API:', resp.status, await resp.text()); return; }
+          const data = await resp.json();
+          if (!Array.isArray(data) || !data.length) {
             if (chart) { chart.destroy(); chart = null; }
             console.warn('Sin datos'); return;
-            }
+          }
 
-            // ---- Ordenamos por fecha y turno para un eje X estable ----
-            data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || String(a.turno).localeCompare(String(b.turno)));
+          // Orden por fecha y turno para eje X estable
+          data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || String(a.turno).localeCompare(String(b.turno)));
 
-            // ---- Agrupar por lote_id (clave real del turno) ----
-            const loteInfo = {}; // {lote_id: {label:[fecha,'Turno X']}}
-            const mp = {};       // {lote_id: {motivo: porcentaje}}
-            const motivosSet = new Set();
+          // Agrupar por lote_id
+          const loteInfo = {}; // {lote_id: {label:[fecha,'Turno X']}}
+          const mp = {};       // {lote_id: {motivo: porcentaje}}
+          const motivosSet = new Set();
 
-            for (const d of data) {
+          for (const d of data) {
             const lid = d.lote_id;
             if (!lid) continue;
             if (!loteInfo[lid]) {
-                loteInfo[lid] = { label: [fmtFecha(d.fecha), `Turno ${d.turno}`] };
+              loteInfo[lid] = { label: [fmtFecha(d.fecha), `Turno ${d.turno}`] };
             }
             (mp[lid] ||= {})[d.motivo] = d.porcentaje;
             motivosSet.add(d.motivo);
-            }
+          }
 
-            // ---- Motivos: todas las detenciones primero y "Tiempo Productivo" al final ----
-            const motivos = Array.from(motivosSet)
+          // Motivos: detenciones primero, "Tiempo Productivo" al final (arriba en el stack)
+          const motivos = Array.from(motivosSet)
             .sort((a, b) => (a === 'Tiempo Productivo') - (b === 'Tiempo Productivo'));
 
-            // Si quieres además ordenar las detenciones por magnitud media, descomenta:
-            // const promedio = m => {
-            //   let sum = 0, n = 0;
-            //   for (const id of Object.keys(loteInfo)) {
-            //     if (mp[id] && typeof mp[id][m] === 'number') { sum += mp[id][m]; n++; }
-            //   }
-            //   return n ? (sum/n) : 0;
-            // };
-            // motivos.sort((a,b)=>{
-            //   if (a === 'Tiempo Productivo') return 1;
-            //   if (b === 'Tiempo Productivo') return -1;
-            //   return promedio(b) - promedio(a); // detenciones de mayor a menor
-            // });
+          // Eje X y vector de ids para click
+          const loteIds = Object.keys(loteInfo);
+          const labels  = loteIds.map(id => loteInfo[id].label);
 
-            // ---- Eje X y vector de ids para el click ----
-            const loteIds = Object.keys(loteInfo);
-            const labels  = loteIds.map(id => loteInfo[id].label); // [ [fecha,'Turno X'], ... ]
+          // Colores únicos HSL; “Tiempo Productivo” verde
+          function colorHSL(i, tot){ const h=(i*360/tot)%360; return `hsl(${h},65%,55%)`; }
+          const palette = motivos.map((_, i) => colorHSL(i, motivos.length));
 
-            // ---- Paleta de colores (HSL), "Tiempo Productivo" verde fijo ----
-            function colorHSL(i, tot){ const h=(i*360/tot)%360; return `hsl(${h},65%,55%)`; }
-            const palette = motivos.map((_, i) => colorHSL(i, motivos.length));
-
-            // ---- Datasets en el orden deseado (define el apilado) ----
-            const datasets = motivos.map((m,i)=>({
+          const datasets = motivos.map((m,i)=>({
             label: m,
             data: loteIds.map(id => mp[id]?.[m] ?? 0),
             backgroundColor: m === 'Tiempo Productivo' ? '#2ca02c' : palette[i],
             stack: 'x',
             borderWidth: 1,
             borderColor: 'rgba(0,0,0,0.1)',
-            }));
+          }));
 
-            // ---- Línea roja de referencia (30%) ----
-            const hLine = {
+          // Línea roja 30%
+          const hLine = {
             id:'hLine',
             afterDraw(chart,args,opts){
-                const {ctx,chartArea:{left,right},scales:{y}}=chart;
-                const yVal=opts.yValue??30;
-                const yPix=y.getPixelForValue(yVal);
-                ctx.save(); ctx.beginPath(); ctx.moveTo(left,yPix); ctx.lineTo(right,yPix);
-                ctx.lineWidth=2; ctx.strokeStyle='red'; ctx.setLineDash([6,4]); ctx.stroke(); ctx.restore();
+              const {ctx,chartArea:{left,right},scales:{y}}=chart;
+              const yVal=opts.yValue??30;
+              const yPix=y.getPixelForValue(yVal);
+              ctx.save(); ctx.beginPath(); ctx.moveTo(left,yPix); ctx.lineTo(right,yPix);
+              ctx.lineWidth=2; ctx.strokeStyle='red'; ctx.setLineDash([6,4]); ctx.stroke(); ctx.restore();
             }
-            };
+          };
 
-            const step = Math.max(1, Math.ceil(labels.length / 25));
+          const step = Math.max(1, Math.ceil(labels.length / 25));
 
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
             type: 'bar',
             data: { labels, datasets },
             plugins: [hLine],
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                // Clic → detalle_turno/<lote_id>
-                onClick(evt, elements){
+              responsive: true,
+              maintainAspectRatio: false,
+              // Click → detalle_turno/<lote_id>?next=<ruta+query actual>
+              onClick(evt, elements){
                 if (!elements.length) return;
                 const idx = elements[0].index;
                 const lid = loteIds[idx];
                 if (lid) {
-                    const urlDet = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
-                    window.location.href = `${urlDet}?next=${encodeURIComponent(window.location.pathname)}`;
+                  const urlDet = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
+                  const returnTo = window.location.pathname + window.location.search; // conserva filtros
+                  window.location.href = `${urlDet}?next=${encodeURIComponent(returnTo)}`;
                 }
-                },
-                plugins: {
+              },
+              plugins: {
                 legend: { position: 'right' },
                 title: { display: true, text: '% Distribución del Tiempo de Turno (Detenciones + Productivo)' },
                 tooltip: {
-                    callbacks: {
+                  callbacks: {
                     title(items){
-                        const lbl = items[0].label;
-                        return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
+                      const lbl = items[0].label;
+                      return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
                     },
                     label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
-                    }
+                  }
                 }
-                },
-                scales: {
+              },
+              layout: { padding: { bottom: 20 } },
+              scales: {
                 x: {
-                    stacked: true,
-                    ticks: {
+                  stacked: true,
+                  ticks: {
                     autoSkip: false,
                     minRotation: 60, maxRotation: 60,
                     font: { size: 10 },
                     callback(value, index){ return index % step === 0 ? this.getLabelForValue(value) : ''; }
-                    },
-                    grid: { display: false }
+                  },
+                  grid: { display: false }
                 },
-                y: {
-                    stacked: true, min: 0, max: 100,
-                    ticks: { callback: v => v + '%' }
-                }
-                },
-                hLine: { yValue: 30 }
+                y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + '%' } }
+              },
+              hLine: { yValue: 30 }
             }
-            });
+          });
         }
 
-        // ====== Eventos UI ======
+        // ==== Eventos UI ====
         btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
         btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
         btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
 
-        btnAplicar.onclick = e => { e.preventDefault(); cargarGrafico(); };
-        btnLimpiar.onclick = ()=>{
-            [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
-            sAnios.selectedIndex = -1; fDesde.value = ''; fHasta.value = '';
-            cargarGrafico();
+        btnAplicar.onclick = e => {
+          e.preventDefault();
+          const p = buildParams();
+          history.replaceState(null, '', p.toString() ? `?${p}` : window.location.pathname); // persiste filtros en URL
+          cargarGrafico();
         };
 
-        await cargarOpciones();
-        await cargarGrafico();
-        });
-        </script>
+        btnLimpiar.onclick = ()=>{
+          [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
+          sAnios.selectedIndex = -1; fDesde.value = ''; fHasta.value = '';
+          history.replaceState(null, '', window.location.pathname); // limpia query
+          cargarGrafico();
+        };
 
-        <div class="botones">
-            <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
-        </div>
+        // Inicial
+        await cargarOpciones();
+        aplicarFiltrosDesdeURL();   // marca selects con lo que venga en la URL
+        await cargarGrafico();
+      });
+      </script>
+
+      <div class="botones">
+        <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+      </div>
     </div>
   </div>
 </body>
