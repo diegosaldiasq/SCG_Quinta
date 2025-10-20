@@ -22,23 +22,19 @@
             <h1 class="title">Grafico OEE</h1>
 
             <!-- FILTROS -->
-            <div class="filtros" style="display:grid; gap:.5rem; grid-template-columns: repeat(6, minmax(120px,1fr)); align-items:end; margin:12px 0;">
-            <label>Semana
-                <input type="number" id="f_semana" min="1" max="53" placeholder="1-53">
+            <!-- FILTROS MULTI -->
+            <div class="filtros" style="display:grid; gap:.5rem; grid-template-columns: repeat(6, minmax(140px,1fr)); align-items:end; margin:12px 0;">
+            <label>Semanas (multi)
+                <select id="f_semanas" multiple size="4"></select>
             </label>
             <label>Año
-                <input type="number" id="f_anio" value="{{ lote.fecha|date:'Y' }}">
+                <select id="f_anios"></select>
             </label>
-            <label>Línea
-                <input type="text" id="f_linea" placeholder="Gorreri pastelería">
+            <label>Líneas (multi)
+                <select id="f_lineas" multiple size="4"></select>
             </label>
-            <label>Turno
-                <select id="f_turno">
-                <option value="">Todos</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                </select>
+            <label>Turnos (multi)
+                <select id="f_turnos" multiple size="3"></select>
             </label>
             <label>Desde
                 <input type="date" id="f_desde">
@@ -48,9 +44,12 @@
             </label>
             </div>
 
-            <div style="display:flex; gap:.5rem; margin-bottom:12px;">
+            <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
             <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
             <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
+            <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
+            <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
+            <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
             </div>
 
             <!-- CONTENEDOR DEL GRÁFICO -->
@@ -66,59 +65,102 @@
             <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
             <script>
             document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('graficoOEE');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
+            const ctx = document.getElementById('graficoOEE')?.getContext('2d');
+            if (!ctx) return;
 
             // Controles
-            const $ = sel => document.querySelector(sel);
-            const fSemana = $('#f_semana');
-            const fAnio   = $('#f_anio');
-            const fLinea  = $('#f_linea');
-            const fTurno  = $('#f_turno');
-            const fDesde  = $('#f_desde');
-            const fHasta  = $('#f_hasta');
+            const $ = s => document.querySelector(s);
+            const sSemanas = $('#f_semanas');
+            const sAnios   = $('#f_anios');
+            const sLineas  = $('#f_lineas');
+            const sTurnos  = $('#f_turnos');
+            const fDesde   = $('#f_desde');
+            const fHasta   = $('#f_hasta');
+
             const btnAplicar = $('#btn_aplicar');
             const btnLimpiar = $('#btn_limpiar');
+            const btnSelTodoSem = $('#btn_sel_todo_sem');
+            const btnSelTodoLin = $('#btn_sel_todo_lin');
+            const btnSelTodoTur = $('#btn_sel_todo_tur');
 
-            let chart; // para destruir y recrear
+            let chart;
+
+            // Utilidades
+            const fmtFecha = s => {
+                const d = new Date(s);
+                if (isNaN(d)) return s;
+                return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+            };
+
+            function llenarSelect(select, valores, {placeholder=null, orden='asc'} = {}) {
+                select.innerHTML = '';
+                if (placeholder) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = placeholder;
+                select.appendChild(opt);
+                }
+                const arr = [...valores];
+                if (orden === 'asc') arr.sort((a,b) => (''+a).localeCompare((''+b), undefined, {numeric:true}));
+                if (orden === 'desc') arr.sort((a,b) => (''+b).localeCompare((''+a), undefined, {numeric:true}));
+                for (const v of arr) {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.textContent = v;
+                select.appendChild(opt);
+                }
+            }
+
+            function getMultiValues(select) {
+                return Array.from(select.selectedOptions || []).map(o => o.value).filter(Boolean);
+            }
 
             function buildURL() {
-                const params = new URLSearchParams();
-                if (fSemana.value) params.set('semana', fSemana.value);
-                if (fAnio.value)   params.set('anio',   fAnio.value);
-                if (fLinea.value)  params.set('linea',  fLinea.value);
-                if (fTurno.value)  params.set('turno',  fTurno.value);
-                if (fDesde.value)  params.set('desde',  fDesde.value);
-                if (fHasta.value)  params.set('hasta',  fHasta.value);
                 const base = "{% url 'resumen_turno_oee_api' %}";
-                const qs   = params.toString();
+                const p = new URLSearchParams();
+
+                for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+                const anio = sAnios.value; if (anio) p.append('anio', anio);
+                for (const l of getMultiValues(sLineas)) p.append('linea', l);
+                for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+                if (fDesde.value) p.set('desde', fDesde.value);
+                if (fHasta.value) p.set('hasta', fHasta.value);
+
+                const qs = p.toString();
                 return qs ? `${base}?${qs}` : base;
             }
 
-            function fmtFecha(s) {
-                const d = new Date(s);
-                if (isNaN(d)) return s;
-                const dd = String(d.getDate()).padStart(2,'0');
-                const mm = String(d.getMonth()+1).padStart(2,'0');
-                const yy = d.getFullYear();
-                return `${dd}-${mm}-${yy}`;
+            async function cargarOpciones() {
+                const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+                const r = await fetch(urlOpt, {credentials:'same-origin'});
+                if (!r.ok) {
+                console.error('Opciones no OK:', r.status, await r.text());
+                return;
+                }
+                const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+
+                llenarSelect(sSemanas, semanas, {orden:'asc'});
+                llenarSelect(sAnios,   anios,   {orden:'desc'});   // año más reciente arriba
+                llenarSelect(sLineas,  lineas,  {orden:'asc'});
+                llenarSelect(sTurnos,  turnos,  {orden:'asc'});
+
+                // Selecciones “cómodas” por defecto (opcional):
+                // Selecciona el año más reciente
+                if (sAnios.options.length) sAnios.selectedIndex = 0;
             }
 
-            async function cargar() {
+            async function cargarDatosYGraficar() {
                 const url = buildURL();
-                try {
-                const resp = await fetch(url, { credentials:'same-origin' });
+                const resp = await fetch(url, {credentials:'same-origin'});
                 if (!resp.ok) {
-                    console.error('API no OK:', resp.status, await resp.text());
-                    return;
+                console.error('API no OK:', resp.status, await resp.text());
+                return;
                 }
                 const data = await resp.json();
                 if (!Array.isArray(data) || data.length === 0) {
-                    // Limpia gráfico si no hay datos
-                    if (chart) { chart.destroy(); chart = null; }
-                    console.warn('Sin datos para los filtros.');
-                    return;
+                if (chart) { chart.destroy(); chart = null; }
+                console.warn('Sin datos con los filtros actuales');
+                return;
                 }
 
                 const labels = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
@@ -127,44 +169,50 @@
                 const oee            = data.map(d => Number(d.oee ?? 0));
                 const target         = data.map(d => Number(d.target ?? 0));
 
-                // Re-render
                 if (chart) chart.destroy();
                 chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
+                type: 'line',
+                data: {
                     labels,
                     datasets: [
-                        { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue',  fill: false, tension: 0.25 },
-                        { label: 'Eficiencia',     data: eficiencia,     borderColor: 'red',   fill: false, tension: 0.25 },
-                        { label: 'OEE',            data: oee,            borderColor: 'green', fill: false, tension: 0.25 },
-                        { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false },
+                    { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue',  fill: false, tension: 0.25 },
+                    { label: 'Eficiencia',     data: eficiencia,     borderColor: 'red',   fill: false, tension: 0.25 },
+                    { label: 'OEE',            data: oee,            borderColor: 'green', fill: false, tension: 0.25 },
+                    { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false },
                     ]
-                    },
-                    options: {
+                },
+                options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: { position: 'right' },
-                        title: { display: true, text: 'Tendencia OEE - Filtros aplicados' }
+                    legend: { position: 'right' },
+                    title: { display: true, text: 'Tendencia OEE - Filtros' }
                     },
                     scales: { y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } } }
-                    }
-                });
-                } catch (err) {
-                console.error('Error fetch/json:', err);
                 }
+                });
             }
 
-            // Eventos
-            btnAplicar.addEventListener('click', (e) => { e.preventDefault(); cargar(); });
+            // Botones seleccionar todo en multi-selects
+            btnSelTodoSem.addEventListener('click', () => { Array.from(sSemanas.options).forEach(o => o.selected = true); });
+            btnSelTodoLin.addEventListener('click', () => { Array.from(sLineas.options).forEach(o => o.selected = true); });
+            btnSelTodoTur.addEventListener('click', () => { Array.from(sTurnos.options).forEach(o => o.selected = true); });
+
+            // Aplicar / Limpiar
+            btnAplicar.addEventListener('click', (e) => { e.preventDefault(); cargarDatosYGraficar(); });
             btnLimpiar.addEventListener('click', () => {
-                [fSemana, fAnio, fLinea, fTurno, fDesde, fHasta].forEach(i => i.value = '');
-                cargar();
+                [sSemanas, sLineas, sTurnos].forEach(sel => Array.from(sel.options).forEach(o => o.selected = false));
+                sAnios.selectedIndex = -1;
+                fDesde.value = ''; fHasta.value = '';
+                cargarDatosYGraficar();
             });
 
-            // Carga inicial
-            cargar();
+            // Inicial
+            (async () => {
+                await cargarOpciones();
+                await cargarDatosYGraficar();
+            })();
             });
             </script>
         </div>

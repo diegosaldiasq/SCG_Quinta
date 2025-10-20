@@ -24,6 +24,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_GET
 from django.db.models import Value, FloatField
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.functions import ExtractWeek, ExtractYear
 
 # Create your views here.
 
@@ -388,28 +389,56 @@ def descargar_resumenturnooee(request):
     return response
 
 @require_GET
+def resumen_turno_oee_opciones(request):
+    try:
+        qs = ResumenTurnoOee.objects.all()
+        semanas = (qs.annotate(sem=ExtractWeek('fecha'))
+                     .values_list('sem', flat=True)
+                     .distinct())
+        anios = (qs.annotate(y=ExtractYear('fecha'))
+                   .values_list('y', flat=True)
+                   .distinct())
+        lineas = (qs.values_list('linea', flat=True)
+                    .distinct()
+                    .order_by('linea'))
+        turnos = (qs.values_list('turno', flat=True)
+                    .distinct()
+                    .order_by('turno'))
+
+        # Ordena semanas y años
+        semanas = sorted([s for s in semanas if s is not None])
+        anios = sorted([a for a in anios if a is not None])
+
+        return JsonResponse({
+            "semanas": semanas,   # [1..53]
+            "anios": anios,       # [2024, 2025, ...]
+            "lineas": list(lineas),
+            "turnos": list(turnos)
+        }, safe=False, json_dumps_params={'ensure_ascii': False})
+    except Exception as e:
+        return HttpResponseBadRequest(f"error_opciones: {e}")
+
+@require_GET
 def resumen_turno_oee_api(request):
     try:
-        semana = request.GET.get('semana')     # ej: "41"
-        anio   = request.GET.get('anio')       # ej: "2025"
-        linea  = request.GET.get('linea')      # ej: "Gorreri pastelería"
-        turno  = request.GET.get('turno')      # ej: "B"
-        desde  = request.GET.get('desde')      # ej: "2025-10-01"
-        hasta  = request.GET.get('hasta')      # ej: "2025-10-31"
+        semanas = request.GET.getlist('semana')  # ej: ?semana=41&semana=42
+        anios   = request.GET.getlist('anio')
+        lineas  = request.GET.getlist('linea')
+        turnos  = request.GET.getlist('turno')
+        desde   = request.GET.get('desde')
+        hasta   = request.GET.get('hasta')
 
         qs = ResumenTurnoOee.objects.all()
 
-        # Filtro por semana y año (recomendado usar año para no mezclar semanas de distintos años)
-        if semana:
-            qs = qs.filter(fecha__week=int(semana))
-        if anio:
-            qs = qs.filter(fecha__year=int(anio))
-
-        # Filtros libres
-        if linea:
-            qs = qs.filter(linea__icontains=linea.strip())
-        if turno:
-            qs = qs.filter(turno__iexact=turno.strip())
+        # Filtros múltiples
+        if semanas:
+            qs = qs.annotate(sem=ExtractWeek('fecha')).filter(sem__in=[int(s) for s in semanas if s.isdigit()])
+        if anios:
+            qs = qs.annotate(y=ExtractYear('fecha')).filter(y__in=[int(a) for a in anios if a.isdigit()])
+        if lineas:
+            qs = qs.filter(linea__in=lineas)
+        if turnos:
+            qs = qs.filter(turno__in=turnos)
 
         # Rango de fechas opcional (YYYY-MM-DD)
         if desde and hasta:
@@ -420,7 +449,7 @@ def resumen_turno_oee_api(request):
             qs = qs.filter(fecha__date__lte=hasta)
 
         qs = (qs
-              .annotate(target=Value(70.0, output_field=FloatField()))  # ajusta tu target
+              .annotate(target=Value(70.0, output_field=FloatField()))
               .values('fecha','turno','linea','disponibilidad','eficiencia','oee','target')
               .order_by('fecha','turno'))
 
