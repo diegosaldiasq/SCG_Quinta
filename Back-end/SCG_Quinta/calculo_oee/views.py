@@ -539,6 +539,7 @@ def detenciones_turno_api(request):
                 'linea': resumen['linea'],
                 'motivo': r['motivo'],
                 'porcentaje': porcentaje,
+                'lote_id': r['lote_id'],
             })
 
         # 2️⃣ Tiempo productivo (resto del turno)
