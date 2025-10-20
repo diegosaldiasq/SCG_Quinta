@@ -156,25 +156,26 @@
             M[key][d.motivo] = d.porcentaje;
           }
 
-          const palette = [
-            '#1f77b4','#ff7f0e','#2ca02c','#9467bd','#8c564b',
-            '#e377c2','#7f7f7f','#bcbd22','#17becf','#d62728',
-            '#aec7e8','#ffbb78','#98df8a','#c5b0d5','#c49c94',
-            '#f7b6d2','#c7c7c7','#dbdb8d','#9edae5', '#393b79',
-            '#5254a3', '#6b6ecf', '#9c9ede', '#637939', '#8ca252',
-            '#b5cf6b', '#cedb9c', '#8c6d31', '#bd9e39', '#e7ba52'
-          ];
+          // 🎨 Generador automático de colores únicos (HSL → RGB)
+          function generarColor(idx, total) {
+          const hue = (idx * 360 / total) % 360; // distribuye el tono
+          return `hsl(${hue}, 65%, 55%)`; // saturación y luminosidad uniformes
+          }
 
-          const datasets = motivos.map((m,i)=>({
-            label:m,
-            data:barras.map(b=>{
+          // Crea una paleta sin repetir tonos
+          const palette = motivos.map((_, i) => generarColor(i, motivos.length));
+
+          // Aseguramos que “Tiempo Productivo” sea verde fijo
+          const datasets = motivos.map((m, i) => ({
+          label: m,
+          data: barras.map(b => {
               const key = JSON.stringify(b);
               return M[key]?.[m] ?? 0;
-            }),
-            backgroundColor: m==="Tiempo Productivo" ? "#2ca02c" : palette[i % palette.length],
-            stack:'x',
-            borderWidth:1,
-            borderColor:'rgba(0,0,0,0.1)',
+          }),
+          backgroundColor: m === "Tiempo Productivo" ? "#2ca02c" : palette[i],
+          stack: 'x',
+          borderWidth: 1,
+          borderColor: 'rgba(0,0,0,0.1)',
           }));
 
           // Línea roja objetivo
