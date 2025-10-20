@@ -151,7 +151,7 @@
           // Mapa: barra -> motivo -> porcentaje
           const M = {};
           for (const d of data) {
-            const key = JSON.stringify([fmtFecha(d.fecha), `Turno ${d.turno}`]);
+            const key = JSON.stringify([fmtFecha(d.fecha), `${d.turno}`]);
             M[key] ??= {};
             M[key][d.motivo] = d.porcentaje;
           }
