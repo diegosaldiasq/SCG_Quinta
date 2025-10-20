@@ -466,12 +466,11 @@ def graficos_oee(request):
 @require_GET
 def detenciones_turno_api(request):
     """
-    Devuelve registros planos: fecha, turno, linea, motivo, porcentaje (0..100)
-    Calculado como minutos_motivo / minutos_totales_del_turno * 100
-    Filtros múltiples: semana, anio, linea, turno, desde, hasta.
+    Devuelve: fecha, turno, linea, motivo, porcentaje (0..100)
+    Calculado como duracion_motivo / tiempo_planeado * 100
+    + un motivo adicional: 'Tiempo Productivo'
     """
     try:
-        # Parámetros múltiples (?semana=41&semana=42&turno=B…)
         semanas = request.GET.getlist('semana')
         anios   = request.GET.getlist('anio')
         lineas  = request.GET.getlist('linea')
@@ -479,55 +478,83 @@ def detenciones_turno_api(request):
         desde   = request.GET.get('desde')
         hasta   = request.GET.get('hasta')
 
-        # Ajusta el modelo y los campos a tu proyecto:
-        # Ejemplo:
-        # class Detencion(models.Model):
-        #     fecha = models.DateField()
-        #     turno = models.CharField(max_length=5)
-        #     linea = models.CharField(max_length=50)
-        #     motivo = models.CharField(max_length=100)
-        #     minutos = models.PositiveIntegerField()
-        qs = Detencion.objects.all()
+        # Base queryset: une Detencion con su ResumenTurnoOee
+        qs = (Detencion.objects
+              .select_related('lote')
+              .filter(lote__resumenes_turno__isnull=False)
+              .values(
+                  'lote__resumenes_turno__id',
+                  'lote__resumenes_turno__fecha',
+                  'lote__resumenes_turno__turno',
+                  'lote__resumenes_turno__linea',
+                  'motivo'
+              )
+              .annotate(duracion_total=Sum('duracion'))
+              .order_by('lote__resumenes_turno__fecha',
+                        'lote__resumenes_turno__turno',
+                        'motivo'))
 
-        # Filtros
+        # Aplicar filtros
         if semanas:
-            qs = qs.annotate(sem=ExtractWeek('fecha')).filter(sem__in=[int(s) for s in semanas if s.isdigit()])
+            qs = qs.annotate(sem=ExtractWeek('lote__resumenes_turno__fecha'))\
+                   .filter(sem__in=[int(s) for s in semanas if s.isdigit()])
         if anios:
-            qs = qs.annotate(yy=ExtractYear('fecha')).filter(yy__in=[int(a) for a in anios if a.isdigit()])
+            qs = qs.annotate(an=ExtractYear('lote__resumenes_turno__fecha'))\
+                   .filter(an__in=[int(a) for a in anios if a.isdigit()])
         if lineas:
-            qs = qs.filter(linea__in=lineas)
+            qs = qs.filter(lote__resumenes_turno__linea__in=lineas)
         if turnos:
-            qs = qs.filter(turno__in=turnos)
+            qs = qs.filter(lote__resumenes_turno__turno__in=turnos)
         if desde and hasta:
-            qs = qs.filter(fecha__range=[desde, hasta])
+            qs = qs.filter(lote__resumenes_turno__fecha__range=[desde, hasta])
         elif desde:
-            qs = qs.filter(fecha__gte=desde)
+            qs = qs.filter(lote__resumenes_turno__fecha__gte=desde)
         elif hasta:
-            qs = qs.filter(fecha__lte=hasta)
+            qs = qs.filter(lote__resumenes_turno__fecha__lte=hasta)
 
-        # Agregar (fecha, turno, linea, motivo) => minutos_motivo
-        rows = (qs.values('fecha', 'turno', 'linea', 'motivo')
-                  .annotate(minutos=Sum('minutos'))
-                  .order_by('fecha', 'turno', 'motivo'))
-
-        # Totales por (fecha, turno, linea) para calcular %
-        totales = {}
-        for r in rows:
-            k = (r['fecha'], r['turno'], r['linea'])
-            totales[k] = totales.get(k, 0) + (r['minutos'] or 0)
-
-        # Salida plana: un registro por motivo con porcentaje
+        # Agrupar datos
         salida = []
-        for r in rows:
-            k = (r['fecha'], r['turno'], r['linea'])
-            total = totales.get(k, 0) or 1  # evita división por cero
-            porcentaje = round(100.0 * (r['minutos'] or 0) / total, 2)
+        resumenes = (ResumenTurnoOee.objects
+                     .values('id', 'fecha', 'turno', 'linea', 'tiempo_planeado'))
+
+        resumen_map = {r['id']: r for r in resumenes}
+
+        # Totales por turno
+        totales_detenciones = {}
+        for r in qs:
+            rid = r['lote__resumenes_turno__id']
+            totales_detenciones[rid] = totales_detenciones.get(rid, 0) + (r['duracion_total'] or 0)
+
+        # 1️⃣ Motivos de detención (porcentaje respecto al tiempo_planeado)
+        for r in qs:
+            rid = r['lote__resumenes_turno__id']
+            resumen = resumen_map.get(rid)
+            if not resumen:
+                continue
+            tiempo_planeado = resumen['tiempo_planeado'] or 1
+            porcentaje = round(100 * (r['duracion_total'] or 0) / tiempo_planeado, 2)
             salida.append({
-                'fecha': r['fecha'],
-                'turno': r['turno'],
-                'linea': r['linea'],
+                'fecha': resumen['fecha'],
+                'turno': resumen['turno'],
+                'linea': resumen['linea'],
                 'motivo': r['motivo'],
                 'porcentaje': porcentaje,
+            })
+
+        # 2️⃣ Tiempo productivo (resto del turno)
+        for rid, total_det in totales_detenciones.items():
+            resumen = resumen_map.get(rid)
+            if not resumen:
+                continue
+            tiempo_planeado = resumen['tiempo_planeado'] or 1
+            restante = max(tiempo_planeado - total_det, 0)
+            porcentaje_restante = round(100 * restante / tiempo_planeado, 2)
+            salida.append({
+                'fecha': resumen['fecha'],
+                'turno': resumen['turno'],
+                'linea': resumen['linea'],
+                'motivo': 'Tiempo Productivo',
+                'porcentaje': porcentaje_restante,
             })
 
         return JsonResponse(salida, safe=False, json_dumps_params={'ensure_ascii': False})
