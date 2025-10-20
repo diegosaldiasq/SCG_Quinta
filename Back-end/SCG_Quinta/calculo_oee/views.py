@@ -25,6 +25,8 @@ from django.views.decorators.http import require_GET
 from django.db.models import Value, FloatField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.functions import ExtractWeek, ExtractYear
+from django.db.models import Sum
+
 
 # Create your views here.
 
@@ -460,3 +462,75 @@ def resumen_turno_oee_api(request):
 @login_required
 def graficos_oee(request):
     return render(request, 'calculo_oee/graficos_oee.html')
+
+@require_GET
+def detenciones_turno_api(request):
+    """
+    Devuelve registros planos: fecha, turno, linea, motivo, porcentaje (0..100)
+    Calculado como minutos_motivo / minutos_totales_del_turno * 100
+    Filtros múltiples: semana, anio, linea, turno, desde, hasta.
+    """
+    try:
+        # Parámetros múltiples (?semana=41&semana=42&turno=B…)
+        semanas = request.GET.getlist('semana')
+        anios   = request.GET.getlist('anio')
+        lineas  = request.GET.getlist('linea')
+        turnos  = request.GET.getlist('turno')
+        desde   = request.GET.get('desde')
+        hasta   = request.GET.get('hasta')
+
+        # Ajusta el modelo y los campos a tu proyecto:
+        # Ejemplo:
+        # class Detencion(models.Model):
+        #     fecha = models.DateField()
+        #     turno = models.CharField(max_length=5)
+        #     linea = models.CharField(max_length=50)
+        #     motivo = models.CharField(max_length=100)
+        #     minutos = models.PositiveIntegerField()
+        qs = Detencion.objects.all()
+
+        # Filtros
+        if semanas:
+            qs = qs.annotate(sem=ExtractWeek('fecha')).filter(sem__in=[int(s) for s in semanas if s.isdigit()])
+        if anios:
+            qs = qs.annotate(yy=ExtractYear('fecha')).filter(yy__in=[int(a) for a in anios if a.isdigit()])
+        if lineas:
+            qs = qs.filter(linea__in=lineas)
+        if turnos:
+            qs = qs.filter(turno__in=turnos)
+        if desde and hasta:
+            qs = qs.filter(fecha__range=[desde, hasta])
+        elif desde:
+            qs = qs.filter(fecha__gte=desde)
+        elif hasta:
+            qs = qs.filter(fecha__lte=hasta)
+
+        # Agregar (fecha, turno, linea, motivo) => minutos_motivo
+        rows = (qs.values('fecha', 'turno', 'linea', 'motivo')
+                  .annotate(minutos=Sum('minutos'))
+                  .order_by('fecha', 'turno', 'motivo'))
+
+        # Totales por (fecha, turno, linea) para calcular %
+        totales = {}
+        for r in rows:
+            k = (r['fecha'], r['turno'], r['linea'])
+            totales[k] = totales.get(k, 0) + (r['minutos'] or 0)
+
+        # Salida plana: un registro por motivo con porcentaje
+        salida = []
+        for r in rows:
+            k = (r['fecha'], r['turno'], r['linea'])
+            total = totales.get(k, 0) or 1  # evita división por cero
+            porcentaje = round(100.0 * (r['minutos'] or 0) / total, 2)
+            salida.append({
+                'fecha': r['fecha'],
+                'turno': r['turno'],
+                'linea': r['linea'],
+                'motivo': r['motivo'],
+                'porcentaje': porcentaje,
+            })
+
+        return JsonResponse(salida, safe=False, json_dumps_params={'ensure_ascii': False})
+
+    except Exception as e:
+        return HttpResponseBadRequest(f"error_api_detenciones: {e}")
