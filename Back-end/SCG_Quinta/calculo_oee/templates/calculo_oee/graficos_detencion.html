@@ -60,105 +60,166 @@
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
             document.addEventListener('DOMContentLoaded', async () => {
-            const cv = document.getElementById('graficoDetenciones');
-            if (!cv) return;
-            const ctx = cv.getContext('2d');
+            const ctx = document.getElementById('graficoDetenciones')?.getContext('2d');
+            if (!ctx) return;
 
-            // Si quieres pasar filtros actuales, arma la URL como hicimos en el otro gráfico:
-            const url = "{% url 'detenciones_turno_api' %}"; // p.ej: + "?semana=41&semana=42&turno=B"
+            // Referencias a los filtros
+            const $ = s => document.querySelector(s);
+            const sSemanas = $('#f_semanas');
+            const sAnios   = $('#f_anios');
+            const sLineas  = $('#f_lineas');
+            const sTurnos  = $('#f_turnos');
+            const fDesde   = $('#f_desde');
+            const fHasta   = $('#f_hasta');
 
-            // Colores (ajústalos a tu leyenda)
-            const palette = [
-                '#1f77b4','#ff7f0e','#2ca02c','#9467bd','#8c564b',
-                '#e377c2','#7f7f7f','#bcbd22','#17becf','#d62728',
-                '#aec7e8','#ffbb78','#98df8a','#c5b0d5','#c49c94',
-            ];
+            const btnAplicar = $('#btn_aplicar');
+            const btnLimpiar = $('#btn_limpiar');
+            const btnSelTodoSem = $('#btn_sel_todo_sem');
+            const btnSelTodoLin = $('#btn_sel_todo_lin');
+            const btnSelTodoTur = $('#btn_sel_todo_tur');
 
-            // Plugin: línea horizontal roja en % objetivo (p.ej. 30%)
-            const hLine = {
-                id: 'hLine',
-                afterDraw(chart, args, opts) {
-                const {ctx, chartArea: {top, left, right}, scales: {y}} = chart;
-                const yVal = opts?.yValue ?? 30;
-                const yPix = y.getPixelForValue(yVal);
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(left, yPix);
-                ctx.lineTo(right, yPix);
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'red';
-                ctx.setLineDash([8, 4]);
-                ctx.stroke();
-                ctx.restore();
-                }
-            };
+            let chart; // gráfico activo
 
-            try {
+            // Función utilitaria para obtener valores seleccionados de un <select multiple>
+            const getMultiValues = sel =>
+                Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+
+            // Construye la URL con parámetros GET según filtros
+            function buildURL() {
+                const base = "{% url 'detenciones_turno_api' %}";
+                const p = new URLSearchParams();
+
+                for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+                if (sAnios.value) p.append('anio', sAnios.value);
+                for (const l of getMultiValues(sLineas)) p.append('linea', l);
+                for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+                if (fDesde.value) p.set('desde', fDesde.value);
+                if (fHasta.value) p.set('hasta', fHasta.value);
+
+                const qs = p.toString();
+                return qs ? `${base}?${qs}` : base;
+            }
+
+            // Cargar opciones únicas desde API de opciones
+            async function cargarOpciones() {
+                const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+                const r = await fetch(urlOpt, {credentials:'same-origin'});
+                if (!r.ok) return;
+                const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+
+                const llenarSelect = (sel, arr) => {
+                sel.innerHTML = '';
+                arr.sort((a,b)=>a-b).forEach(v=>{
+                    const o=document.createElement('option');
+                    o.value=v; o.textContent=v; sel.appendChild(o);
+                });
+                };
+                llenarSelect(sSemanas,semanas);
+                llenarSelect(sAnios,anios);
+                llenarSelect(sLineas,lineas);
+                llenarSelect(sTurnos,turnos);
+                if (sAnios.options.length) sAnios.selectedIndex = sAnios.options.length - 1;
+            }
+
+            // Función principal para cargar datos y graficar
+            async function cargarGrafico() {
+                const url = buildURL();
                 const resp = await fetch(url, {credentials:'same-origin'});
-                if (!resp.ok) { console.error('API no OK:', resp.status, await resp.text()); return; }
+                if (!resp.ok) {
+                console.error('Error API:', resp.status, await resp.text());
+                return;
+                }
                 const data = await resp.json();
-                if (!Array.isArray(data) || data.length === 0) { console.warn('Sin datos de detenciones'); return; }
+                if (!Array.isArray(data) || data.length === 0) {
+                if (chart) { chart.destroy(); chart = null; }
+                console.warn('Sin datos');
+                return;
+                }
 
-                // Etiqueta por barra: Turno + fecha (formateada)
+                // ==== Preparación de datos ====
                 const fmtFecha = s => {
                 const d = new Date(s);
                 if (isNaN(d)) return s;
                 return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
                 };
-
-                // Construye clave por barra (fecha, turno). Si quieres incluir "Línea", agrega `(${d.linea})`
-                const barras = [...new Set(data.map(d => `${d.turno}  ${fmtFecha(d.fecha)}`))];
-
-                // Motivos únicos
+                const barras = [...new Set(data.map(d => `${d.turno} ${fmtFecha(d.fecha)}`))];
                 const motivos = [...new Set(data.map(d => d.motivo))];
 
-                // Mapa rápido (barra -> motivo -> porcentaje)
+                // Mapa: barra → motivo → porcentaje
                 const M = {};
                 for (const d of data) {
-                const k = `${d.turno}  ${fmtFecha(d.fecha)}`;
+                const k = `${d.turno} ${fmtFecha(d.fecha)}`;
                 M[k] ||= {};
                 M[k][d.motivo] = d.porcentaje;
                 }
 
-                // Datasets por motivo, alineados con "barras"
-                const datasets = motivos.map((m, i) => ({
-                label: m,
-                data: barras.map(b => M[b]?.[m] ?? 0),
-                backgroundColor: palette[i % palette.length],
-                stack: 'x',
-                borderWidth: 1,
-                borderColor: 'rgba(0,0,0,0.1)',
+                // Paleta de colores
+                const palette = [
+                '#1f77b4','#ff7f0e','#2ca02c','#9467bd','#8c564b',
+                '#e377c2','#7f7f7f','#bcbd22','#17becf','#d62728',
+                '#aec7e8','#ffbb78','#98df8a','#c5b0d5','#c49c94'
+                ];
+
+                // Motivo especial “Tiempo Productivo” debe ser verde
+                const datasets = motivos.map((m,i)=>({
+                label:m,
+                data:barras.map(b=>M[b]?.[m]??0),
+                backgroundColor: m==="Tiempo Productivo" ? "#2ca02c" : palette[i % palette.length],
+                stack:'x',
+                borderWidth:1,
+                borderColor:'rgba(0,0,0,0.1)',
                 }));
 
-                new Chart(ctx, {
-                type: 'bar',
-                data: { labels: barras, datasets },
-                plugins: [hLine],
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                    legend: { position: 'right' },
-                    title: { display: true, text: '% Detenciones por motivo (apilado 100%)' },
-                    tooltip: {
-                        callbacks: {
-                        label: (item) => `${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
-                        }
-                    }
+                // Plugin línea roja objetivo (30%)
+                const hLine = {
+                id:'hLine',
+                afterDraw(chart,args,opts){
+                    const {ctx,chartArea:{left,right},scales:{y}}=chart;
+                    const yVal=opts.yValue??30;
+                    const yPix=y.getPixelForValue(yVal);
+                    ctx.save();ctx.beginPath();
+                    ctx.moveTo(left,yPix);ctx.lineTo(right,yPix);
+                    ctx.lineWidth=2;ctx.strokeStyle='red';
+                    ctx.setLineDash([6,4]);ctx.stroke();ctx.restore();
+                }
+                };
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                type:'bar',
+                data:{labels:barras,datasets},
+                plugins:[hLine],
+                options:{
+                    responsive:true,
+                    maintainAspectRatio:false,
+                    plugins:{
+                    legend:{position:'right'},
+                    title:{display:true,text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'}
                     },
-                    scales: {
-                    x: { stacked: true, ticks: { autoSkip: false, maxRotation: 0 } },
-                    y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + '%' } }
+                    scales:{
+                    x:{stacked:true,ticks:{autoSkip:false,maxRotation:0}},
+                    y:{stacked:true,min:0,max:100,ticks:{callback:v=>v+'%'}}
                     },
-                    // Línea roja de referencia (30%)
-                    hLine: { yValue: 30 }
+                    hLine:{yValue:30}
                 }
                 });
-
-            } catch (err) {
-                console.error('Error fetch/json:', err);
             }
+
+            // ==== Eventos ====
+            btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
+            btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
+            btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
+
+            btnAplicar.onclick = e => { e.preventDefault(); cargarGrafico(); };
+            btnLimpiar.onclick = ()=>{
+                [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
+                sAnios.selectedIndex=-1; fDesde.value=''; fHasta.value='';
+                cargarGrafico();
+            };
+
+            // ==== Inicial ====
+            await cargarOpciones();
+            await cargarGrafico();
             });
             </script>
 
