@@ -57,13 +57,13 @@
             </div>
 
             <!-- === 4. SCRIPTS DE GRÁFICOS === -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
             document.addEventListener('DOMContentLoaded', () => {
             const ctx = document.getElementById('graficoOEE')?.getContext('2d');
             if (!ctx) return;
 
-            // Controles
+            // ====== Filtros (mismos IDs que ya usas) ======
             const $ = s => document.querySelector(s);
             const sSemanas = $('#f_semanas');
             const sAnios   = $('#f_anios');
@@ -72,97 +72,95 @@
             const fDesde   = $('#f_desde');
             const fHasta   = $('#f_hasta');
 
-            const btnAplicar = $('#btn_aplicar');
-            const btnLimpiar = $('#btn_limpiar');
-            const btnSelTodoSem = $('#btn_sel_todo_sem');
-            const btnSelTodoLin = $('#btn_sel_todo_lin');
-            const btnSelTodoTur = $('#btn_sel_todo_tur');
+            const btnAplicar   = $('#btn_aplicar');
+            const btnLimpiar   = $('#btn_limpiar');
+            const btnSelTodoSem= $('#btn_sel_todo_sem');
+            const btnSelTodoLin= $('#btn_sel_todo_lin');
+            const btnSelTodoTur= $('#btn_sel_todo_tur');
 
             let chart;
 
-            // Utilidades
+            // ========= Utilidades de filtros (igual que en detenciones) =========
+            const getMultiValues = sel => Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+
+            function buildParams() {
+                const p = new URLSearchParams();
+                for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+                if (sAnios.value) p.append('anio', sAnios.value);
+                for (const l of getMultiValues(sLineas)) p.append('linea', l);
+                for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+                if (fDesde.value) p.set('desde', fDesde.value);
+                if (fHasta.value) p.set('hasta', fHasta.value);
+                return p;
+            }
+
+            function buildURL() {
+                const base = "{% url 'resumen_turno_oee_api' %}";
+                const p = buildParams();
+                return p.toString() ? `${base}?${p}` : base;
+            }
+
+            async function cargarOpciones() {
+                const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+                const r = await fetch(urlOpt, {credentials:'same-origin'});
+                if (!r.ok) return;
+                const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+                const fill = (sel, arr, desc=false) => {
+                sel.innerHTML = '';
+                const lista = [...arr].sort((a,b)=> (''+(desc?b:a)).localeCompare(''+(desc?a:b), undefined, {numeric:true}));
+                for (const v of lista) {
+                    const o = document.createElement('option');
+                    o.value = v; o.textContent = v; sel.appendChild(o);
+                }
+                };
+                fill(sSemanas, semanas);
+                fill(sAnios,   anios, true);   // años descendente
+                fill(sLineas,  lineas);
+                fill(sTurnos,  turnos);
+                if (sAnios.options.length && !new URLSearchParams(location.search).has('anio')) {
+                sAnios.selectedIndex = 0; // año más reciente por defecto si no viene en URL
+                }
+            }
+
+            function aplicarFiltrosDesdeURL() {
+                const params = new URLSearchParams(location.search);
+                const markMulti = (sel, arr) => {
+                const S = new Set(arr);
+                Array.from(sel.options).forEach(o => o.selected = S.has(o.value));
+                };
+                const semanas = params.getAll('semana'); if (semanas.length) markMulti(sSemanas, semanas);
+                const anio = params.get('anio'); if (anio) sAnios.value = anio;
+                const lineas = params.getAll('linea'); if (lineas.length) markMulti(sLineas, lineas);
+                const turnos = params.getAll('turno'); if (turnos.length) markMulti(sTurnos, turnos);
+                const desde = params.get('desde'); if (desde) fDesde.value = desde;
+                const hasta = params.get('hasta'); if (hasta) fHasta.value = hasta;
+            }
+
             const fmtFecha = s => {
                 const d = new Date(s);
                 if (isNaN(d)) return s;
                 return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
             };
 
-            function llenarSelect(select, valores, {placeholder=null, orden='asc'} = {}) {
-                select.innerHTML = '';
-                if (placeholder) {
-                const opt = document.createElement('option');
-                opt.value = '';
-                opt.textContent = placeholder;
-                select.appendChild(opt);
-                }
-                const arr = [...valores];
-                if (orden === 'asc') arr.sort((a,b) => (''+a).localeCompare((''+b), undefined, {numeric:true}));
-                if (orden === 'desc') arr.sort((a,b) => (''+b).localeCompare((''+a), undefined, {numeric:true}));
-                for (const v of arr) {
-                const opt = document.createElement('option');
-                opt.value = v;
-                opt.textContent = v;
-                select.appendChild(opt);
-                }
-            }
-
-            function getMultiValues(select) {
-                return Array.from(select.selectedOptions || []).map(o => o.value).filter(Boolean);
-            }
-
-            function buildURL() {
-                const base = "{% url 'resumen_turno_oee_api' %}";
-                const p = new URLSearchParams();
-
-                for (const s of getMultiValues(sSemanas)) p.append('semana', s);
-                const anio = sAnios.value; if (anio) p.append('anio', anio);
-                for (const l of getMultiValues(sLineas)) p.append('linea', l);
-                for (const t of getMultiValues(sTurnos)) p.append('turno', t);
-                if (fDesde.value) p.set('desde', fDesde.value);
-                if (fHasta.value) p.set('hasta', fHasta.value);
-
-                const qs = p.toString();
-                return qs ? `${base}?${qs}` : base;
-            }
-
-            async function cargarOpciones() {
-                const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
-                const r = await fetch(urlOpt, {credentials:'same-origin'});
-                if (!r.ok) {
-                console.error('Opciones no OK:', r.status, await r.text());
-                return;
-                }
-                const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
-
-                llenarSelect(sSemanas, semanas, {orden:'asc'});
-                llenarSelect(sAnios,   anios,   {orden:'desc'});   // año más reciente arriba
-                llenarSelect(sLineas,  lineas,  {orden:'asc'});
-                llenarSelect(sTurnos,  turnos,  {orden:'asc'});
-
-                // Selecciones “cómodas” por defecto (opcional):
-                // Selecciona el año más reciente
-                if (sAnios.options.length) sAnios.selectedIndex = 0;
-            }
-
             async function cargarDatosYGraficar() {
                 const url = buildURL();
                 const resp = await fetch(url, {credentials:'same-origin'});
-                if (!resp.ok) {
-                console.error('API no OK:', resp.status, await resp.text());
-                return;
-                }
+                if (!resp.ok) { console.error('API OEE:', resp.status, await resp.text()); return; }
                 const data = await resp.json();
-                if (!Array.isArray(data) || data.length === 0) {
+                if (!Array.isArray(data) || !data.length) {
                 if (chart) { chart.destroy(); chart = null; }
-                console.warn('Sin datos con los filtros actuales');
-                return;
+                console.warn('Sin datos OEE'); return;
                 }
 
-                const labels = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
-                const disponibilidad = data.map(d => Number(d.disponibilidad ?? 0));
-                const eficiencia     = data.map(d => Number(d.eficiencia ?? 0));
-                const oee            = data.map(d => Number(d.oee ?? 0));
-                const target         = data.map(d => Number(d.target ?? 0));
+                // Orden estable por fecha, turno
+                data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || String(a.turno).localeCompare(String(b.turno)));
+
+                const labels  = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
+                const disp    = data.map(d => Number(d.disponibilidad ?? 0));
+                const efic    = data.map(d => Number(d.eficiencia ?? 0));
+                const oee     = data.map(d => Number(d.oee ?? 0));
+                const target  = data.map(d => Number(d.target ?? 0));
+                const loteIds = data.map(d => d.lote_id); // 👈 para navegar al resumen
 
                 if (chart) chart.destroy();
                 chart = new Chart(ctx, {
@@ -170,42 +168,64 @@
                 data: {
                     labels,
                     datasets: [
-                    { label: 'Disponibilidad', data: disponibilidad, borderColor: 'blue',  fill: false, tension: 0.25 },
-                    { label: 'Eficiencia',     data: eficiencia,     borderColor: 'red',   fill: false, tension: 0.25 },
-                    { label: 'OEE',            data: oee,            borderColor: 'green', fill: false, tension: 0.25 },
-                    { label: 'Target',         data: target,         borderColor: 'purple', borderDash: [6,6], fill: false },
+                    { label: 'Disponibilidad', data: disp,   borderColor: 'blue',  fill: false, tension: 0.25 },
+                    { label: 'Eficiencia',     data: efic,   borderColor: 'red',   fill: false, tension: 0.25 },
+                    { label: 'OEE',            data: oee,    borderColor: 'green', fill: false, tension: 0.25 },
+                    { label: 'Target',         data: target, borderColor: 'purple', borderDash: [6,6], fill: false },
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
+                    interaction: { mode: 'nearest', intersect: true },
+                    // 👇 Click en un punto → resumen_turno/<lote_id>?next=<ruta+query actual>
+                    onClick(evt, elements) {
+                    if (!elements.length) return;
+                    const el = elements[0]; // {datasetIndex, index}
+                    const idx = el.index;
+                    const lid = loteIds[idx];
+                    if (lid) {
+                        const urlRes = `{% url 'resumen_turno' 0 %}`.replace('0', lid);
+                        const returnTo = window.location.pathname + window.location.search;
+                        window.location.href = `${urlRes}?next=${encodeURIComponent(returnTo)}`;
+                    }
+                    },
                     plugins: {
                     legend: { position: 'right' },
-                    title: { display: true, text: 'Tendencia OEE - Filtros' }
+                    title:  { display: true, text: 'Tendencia OEE - Filtros' },
+                    tooltip:{ mode:'index', intersect:false }
                     },
-                    scales: { y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } } }
+                    scales: {
+                    x: { ticks: { autoSkip: true, maxRotation: 60, minRotation: 60 } },
+                    y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: v => v + '%' } }
+                    }
                 }
                 });
             }
 
-            // Botones seleccionar todo en multi-selects
-            btnSelTodoSem.addEventListener('click', () => { Array.from(sSemanas.options).forEach(o => o.selected = true); });
-            btnSelTodoLin.addEventListener('click', () => { Array.from(sLineas.options).forEach(o => o.selected = true); });
-            btnSelTodoTur.addEventListener('click', () => { Array.from(sTurnos.options).forEach(o => o.selected = true); });
+            // ====== Botones y persistencia en URL ======
+            btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
+            btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
+            btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
 
-            // Aplicar / Limpiar
-            btnAplicar.addEventListener('click', (e) => { e.preventDefault(); cargarDatosYGraficar(); });
-            btnLimpiar.addEventListener('click', () => {
-                [sSemanas, sLineas, sTurnos].forEach(sel => Array.from(sel.options).forEach(o => o.selected = false));
-                sAnios.selectedIndex = -1;
-                fDesde.value = ''; fHasta.value = '';
+            btnAplicar.onclick = e => {
+                e.preventDefault();
+                const p = buildParams();
+                history.replaceState(null, '', p.toString() ? `?${p}` : window.location.pathname); // persiste filtros
                 cargarDatosYGraficar();
-            });
+            };
 
-            // Inicial
+            btnLimpiar.onclick = () => {
+                [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
+                sAnios.selectedIndex = -1; fDesde.value=''; fHasta.value='';
+                history.replaceState(null, '', window.location.pathname); // limpia query
+                cargarDatosYGraficar();
+            };
+
+            // ====== Inicial ======
             (async () => {
                 await cargarOpciones();
+                aplicarFiltrosDesdeURL();  // restaura desde la URL si volviste de resumen
                 await cargarDatosYGraficar();
             })();
             });

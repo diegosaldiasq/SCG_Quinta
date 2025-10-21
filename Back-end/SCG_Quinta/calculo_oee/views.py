@@ -422,40 +422,44 @@ def resumen_turno_oee_opciones(request):
 
 @require_GET
 def resumen_turno_oee_api(request):
+    """
+    Devuelve puntos OEE con: fecha, turno, linea, disponibilidad, eficiencia, oee, target, lote_id
+    Soporta filtros múltiples: semana, anio, linea, turno, desde, hasta
+    """
     try:
-        semanas = request.GET.getlist('semana')  # ej: ?semana=41&semana=42
+        semanas = request.GET.getlist('semana')
         anios   = request.GET.getlist('anio')
         lineas  = request.GET.getlist('linea')
         turnos  = request.GET.getlist('turno')
         desde   = request.GET.get('desde')
         hasta   = request.GET.get('hasta')
 
-        qs = ResumenTurnoOee.objects.all()
+        qs = (ResumenTurnoOee.objects
+              .annotate(target=Value(70.0, output_field=FloatField()))  # ajusta tu target si es otro
+              .values('id', 'fecha', 'turno', 'linea',
+                      'disponibilidad', 'eficiencia', 'oee',
+                      'target', 'lote_id'))
 
-        # Filtros múltiples
         if semanas:
-            qs = qs.annotate(sem=ExtractWeek('fecha')).filter(sem__in=[int(s) for s in semanas if s.isdigit()])
+            qs = qs.annotate(sem=ExtractWeek('fecha')) \
+                   .filter(sem__in=[int(s) for s in semanas if s.isdigit()])
         if anios:
-            qs = qs.annotate(y=ExtractYear('fecha')).filter(y__in=[int(a) for a in anios if a.isdigit()])
+            qs = qs.annotate(an=ExtractYear('fecha')) \
+                   .filter(an__in=[int(a) for a in anios if a.isdigit()])
         if lineas:
             qs = qs.filter(linea__in=lineas)
         if turnos:
             qs = qs.filter(turno__in=turnos)
-
-        # Rango de fechas opcional (YYYY-MM-DD)
         if desde and hasta:
-            qs = qs.filter(fecha__date__range=[desde, hasta])
+            qs = qs.filter(fecha__range=[desde, hasta])
         elif desde:
-            qs = qs.filter(fecha__date__gte=desde)
+            qs = qs.filter(fecha__gte=desde)
         elif hasta:
-            qs = qs.filter(fecha__date__lte=hasta)
+            qs = qs.filter(fecha__lte=hasta)
 
-        qs = (qs
-              .annotate(target=Value(70.0, output_field=FloatField()))
-              .values('fecha','turno','linea','disponibilidad','eficiencia','oee','target')
-              .order_by('fecha','turno'))
+        datos = sorted(qs, key=lambda d: (d['fecha'], str(d['turno'])))
+        return JsonResponse(list(datos), safe=False, json_dumps_params={'ensure_ascii': False})
 
-        return JsonResponse(list(qs), safe=False, json_dumps_params={'ensure_ascii': False})
     except Exception as e:
         return HttpResponseBadRequest(f"error_api_resumen: {e}")
     
