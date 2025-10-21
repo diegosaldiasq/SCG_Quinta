@@ -115,7 +115,10 @@
 
             <!-- 🔙 Botón volver -->
             <div class="botones">
-                <a href="{{ next_url }}" class="primary-button">⬅️ Volver al Resumen</a>
+                <a href="{{ next_url }}" class="primary-button">⬅️ Volver al atrás</a>
+                <a href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
+                    📊 Ver Resumen del Turno        
+                </a>
             </div>
         </div>
     </div>
