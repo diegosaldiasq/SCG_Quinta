@@ -31,7 +31,7 @@
     @media (min-width:1100px){ .grid{ grid-template-columns:1fr 1fr; } }
     .badge { font-size:.8rem; padding:4px 8px; border-radius:999px; background:#f2f2f2; display:inline-block; }
 
-    /* Altura definida para los canvas + ratio libre (complementa maintainAspectRatio:false) */
+    /* Altura definida para los canvas + ratio libre */
     .grid .card canvas { height: 320px !important; }
     canvas { min-height: 260px; }
   </style>
@@ -236,7 +236,7 @@
           const y = Number(d.peso_real);
           if (!Number.isFinite(y)) continue;
           if (isNaN(t.getTime())) continue;
-          pts.push({ t, y, peso_receta: Number(d.peso_receta) });
+          pts.push({ t, y, receta: Number(d.peso_receta) });
         }
         return pts;
       }
@@ -255,13 +255,13 @@
         return 'month';
       }
 
+      // === SERIE TEMPORAL (usa datos {x, y}) ===
       function construirSerieTemporal(data){
         const ctx = document.getElementById('chartLinea').getContext('2d');
 
-        // Sanitizar datos
-        const pts = sanitizarSerie(data);
+        const ptsRaw = sanitizarSerie(data);
 
-        if (!pts.length){
+        if (!ptsRaw.length){
           chartLinea = new Chart(ctx, {
             type: 'line',
             data: { labels: [], datasets: [{ label: 'Sin datos', data: [] }] },
@@ -272,60 +272,46 @@
           return;
         }
 
-        const labels = pts.map(p => p.t);
-        const yReal  = pts.map(p => p.y);
+        // Datos como {x: fecha, y: valor}
+        const dataRealXY = ptsRaw.map(p => ({ x: p.t, y: p.y }));
 
-        const pesoRecetaVal = pts.find(p => Number.isFinite(p.peso_receta))?.peso_receta;
+        const pesoRecetaVal = ptsRaw.find(p => Number.isFinite(p.receta))?.receta;
         const pesoReceta = Number.isFinite(pesoRecetaVal) ? pesoRecetaVal : null;
         const banda = calcularBandaTolerancia(pesoReceta);
 
         F.pesoRef.textContent = 'Peso receta: ' + (pesoReceta ?? '–');
         F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
 
-        const datasets = [
-          { label: 'Peso real (gr)', data: yReal, borderWidth: 2, pointRadius: 2 }
-        ];
-        if (pesoReceta || pesoReceta === 0){
-          datasets.push({ label: 'Peso receta (gr)', data: pts.map(_ => pesoReceta), borderWidth: 1, pointRadius: 0 });
-        }
-        if (banda.min != null && banda.max != null){
-          datasets.push({ label: 'Límite inferior', data: pts.map(_ => banda.min), borderWidth: 1, pointRadius: 0 });
-          datasets.push({ label: 'Límite superior', data: pts.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
-        }
+        const dataRecetaXY = (pesoReceta || pesoReceta === 0)
+          ? ptsRaw.map(p => ({ x: p.t, y: pesoReceta }))
+          : [];
 
-        // ¿hay adapter de tiempo?
-        let useTime = true;
-        try { if (!Chart._adapters || !Chart._adapters._date) useTime = false; } catch (e) { useTime = false; }
+        const dataMinXY = (banda.min != null)
+          ? ptsRaw.map(p => ({ x: p.t, y: banda.min }))
+          : [];
 
-        if (!useTime){
-          console.warn('Adapter de tiempo no disponible. Usando escala category.');
-          const labelsCat = labels.map(d => d.toLocaleString());
-          chartLinea = new Chart(ctx, {
-            type: 'line',
-            data: { labels: labelsCat, datasets },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              parsing: false,
-              spanGaps: true,
-              scales: {
-                x: { type: 'category', ticks: { maxTicksLimit: 12 } },
-                y: { title: { display: true, text: 'gr' }, beginAtZero: false }
-              },
-              plugins: { tooltip: { mode: 'index', intersect: false } }
-            }
-          });
-          return;
-        }
+        const dataMaxXY = (banda.max != null)
+          ? ptsRaw.map(p => ({ x: p.t, y: banda.max }))
+          : [];
 
+        const labels = ptsRaw.map(p => p.t);
         const unit = unidadTiempo(labels);
+
         chartLinea = new Chart(ctx, {
           type: 'line',
-          data: { labels, datasets },
+          data: {
+            // Sin labels: datasets con pares {x,y}
+            datasets: [
+              { label: 'Peso real (gr)', data: dataRealXY, borderWidth: 2, pointRadius: 2 },
+              ...(dataRecetaXY.length ? [{ label: 'Peso receta (gr)', data: dataRecetaXY, borderWidth: 1, pointRadius: 0 }] : []),
+              ...(dataMinXY.length ? [{ label: 'Límite inferior', data: dataMinXY, borderWidth: 1, pointRadius: 0 }] : []),
+              ...(dataMaxXY.length ? [{ label: 'Límite superior', data: dataMaxXY, borderWidth: 1, pointRadius: 0 }] : []),
+            ]
+          },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            parsing: false,
+            parsing: true,        // Chart parsea {x,y}
             spanGaps: true,
             scales: {
               x: { type: 'time', time: { unit }, ticks: { maxTicksLimit: 12 } },

@@ -170,4 +170,3 @@ def api_graficos_control_pesos(request):
         })
 
     return JsonResponse({'ok': True, 'registros': registros})
-
