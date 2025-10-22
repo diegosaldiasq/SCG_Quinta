@@ -104,8 +104,21 @@
   /* === FONDO BLANCO EN LOS GRÁFICOS === */
   .grid .card canvas {
     background: #fff !important; /* fuerza fondo blanco */
-    width:100%; 
-    height:100%;
+  }
+  /* Contenedor que fija el alto real del gráfico */
+  .chart-wrap {
+    position: relative;
+    height: 340px;      /* <- ajusta a gusto (320–380 va bien) */
+    width: 100%;
+  }
+
+  /* Fuerza fondo blanco y que el canvas NO cambie su tamaño visual */
+  .chart-wrap > canvas {
+    background: #fff !important;     /* fondo blanco */
+    width: 100% !important;          /* ocupa el ancho del wrap */
+    height: 100% !important;         /* ocupa el alto del wrap */
+    display: block;
+    box-sizing: border-box;
   }
 </style>
 </head>
@@ -170,12 +183,17 @@
     <div class="grid">
       <div class="card">
         <h3 class="title">Serie temporal (Peso Real vs Receta)</h3>
-        <canvas id="chartLinea"></canvas>
+        <div class="chart-wrap">
+          <canvas id="chartLinea"></canvas>
+        </div>
         <small id="nota-tolerancia" class="badge">Tolerancia ±3%</small>
       </div>
+
       <div class="card">
         <h3 class="title">Histograma de desviación (gr)</h3>
-        <canvas id="chartHist"></canvas>
+        <div class="chart-wrap">
+          <canvas id="chartHist"></canvas>
+        </div>
       </div>
     </div>
 
