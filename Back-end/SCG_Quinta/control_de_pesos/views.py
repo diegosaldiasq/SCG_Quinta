@@ -8,6 +8,7 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 
 # Create your views here.
 
@@ -54,4 +55,94 @@ def redireccionar_selecciones_2(request):
     url_selecciones = reverse('vista_selecciones_2')
     return HttpResponseRedirect(url_selecciones)
 
+@login_required
+def graficos_control_pesos(request):
+    """
+    Render del template de gráficos de control de pesos.
+    """
+    # Opcional: valores únicos para filtros rápidos (cliente, turno, etc.)
+    clientes = DatosFormularioControlDePesos.objects.order_by().values_list('cliente', flat=True).distinct()
+    turnos = DatosFormularioControlDePesos.objects.order_by().values_list('turno', flat=True).distinct()
+
+    ctx = {
+        'clientes': [c for c in clientes if c],
+        'turnos': [t for t in turnos if t],
+    }
+    return render(request, 'control_de_pesos/graficos_control_pesos.html', ctx)
+
+
+@login_required
+@require_GET
+def api_productos_por_cliente(request):
+    """
+    Devuelve lista de productos y códigos disponibles para un cliente (para poblar el combo Producto).
+    GET ?cliente=Jumbo
+    """
+    cliente = request.GET.get('cliente', '')
+    qs = DatosFormularioControlDePesos.objects.filter(cliente=cliente).order_by().values('producto', 'codigo_producto').distinct()
+    data = [{'producto': r['producto'], 'codigo': r['codigo_producto']} for r in qs if r['producto']]
+    return JsonResponse({'ok': True, 'productos': data})
+
+
+@login_required
+@require_GET
+def api_graficos_control_pesos(request):
+    """
+    Endpoint de datos para las gráficas.
+    Filtros por ?cliente=&producto=&turno=&lote=&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
+    """
+    qs = DatosFormularioControlDePesos.objects.all()
+
+    cliente = request.GET.get('cliente', '').strip()
+    producto = request.GET.get('producto', '').strip()
+    turno = request.GET.get('turno', '').strip()
+    lote = request.GET.get('lote', '').strip()
+    desde = request.GET.get('desde', '').strip()
+    hasta = request.GET.get('hasta', '').strip()
+
+    if cliente:
+        qs = qs.filter(cliente=cliente)
+    if producto:
+        qs = qs.filter(producto=producto)
+    if turno:
+        qs = qs.filter(turno=turno)
+    if lote:
+        qs = qs.filter(lote=lote)
+    if desde:
+        # Interpretar como fecha local a medianoche
+        try:
+            dt_desde = datetime.fromisoformat(desde)
+            qs = qs.filter(fecha_registro__date__gte=dt_desde.date())
+        except Exception:
+            pass
+    if hasta:
+        try:
+            dt_hasta = datetime.fromisoformat(hasta)
+            qs = qs.filter(fecha_registro__date__lte=dt_hasta.date())
+        except Exception:
+            pass
+
+    # Orden por tiempo
+    qs = qs.order_by('fecha_registro').values(
+        'id', 'fecha_registro', 'cliente', 'producto', 'codigo_producto',
+        'peso_receta', 'peso_real', 'lote', 'turno'
+    )
+
+    # Empaquetar para frontend
+    registros = []
+    for r in qs:
+        registros.append({
+            'id': r['id'],
+            'ts': r['fecha_registro'].isoformat(),
+            'cliente': r['cliente'],
+            'producto': r['producto'],
+            'codigo_producto': r['codigo_producto'],
+            'peso_receta': r['peso_receta'],
+            'peso_real': r['peso_real'],
+            'desviacion': (r['peso_real'] or 0) - (r['peso_receta'] or 0),
+            'lote': r['lote'],
+            'turno': r['turno'],
+        })
+
+    return JsonResponse({'ok': True, 'registros': registros})
 

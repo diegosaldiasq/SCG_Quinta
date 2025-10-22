@@ -368,3 +368,8 @@ def redireccionar_graficos_oee(request):
 def redireccionar_graficos_detencion(request):
     url_graficos_detencion = reverse('graficos_detencion')
     return HttpResponseRedirect(url_graficos_detencion)
+
+@login_required
+def redireccionar_graficos_control_pesos(request):
+    url_graficos_control_pesos = reverse('graficos_control_pesos')
+    return HttpResponseRedirect(url_graficos_control_pesos)
