@@ -339,6 +339,11 @@ def redireccionar_intermedio(request):
     url_inicio = reverse('intermedio')
     return HttpResponseRedirect(url_inicio)
 
+@login_required
+def redireccionar_intermedio_4(request):
+    url_inicio = reverse('intermedio_4')
+    return HttpResponseRedirect(url_inicio)
+
 # Descargar registros de ResumenTurnoOee
 @csrf_exempt
 @login_required
