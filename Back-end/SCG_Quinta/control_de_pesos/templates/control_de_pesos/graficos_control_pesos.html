@@ -18,15 +18,21 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 
   <style>
+    body { overflow-x: hidden; }
+    .login { max-width: 1200px; margin: 0 auto; }
+
     .filtros { display:grid; gap:12px; grid-template-columns: repeat(6, minmax(140px, 1fr)); align-items:end; }
     .acciones { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;}
-    .card { background:#fff; border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.08); margin-top:18px;}
+    .card { background:#fff; border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.08); margin-top:18px; overflow: hidden; }
     .title { font-family:Quicksand, system-ui; margin: 0 0 10px; }
     label { font-size:.9rem; font-weight:600 }
     input, select { width:100%; padding:8px 10px; border-radius:10px; border:1px solid #ddd; }
     .grid { display:grid; gap:18px; grid-template-columns:1fr; }
     @media (min-width:1100px){ .grid{ grid-template-columns:1fr 1fr; } }
     .badge { font-size:.8rem; padding:4px 8px; border-radius:999px; background:#f2f2f2; display:inline-block; }
+
+    /* Altura definida para los canvas + ratio libre (complementa maintainAspectRatio:false) */
+    .grid .card canvas { height: 320px !important; }
     canvas { min-height: 260px; }
   </style>
 </head>
@@ -111,11 +117,10 @@
   <script type="module">
     if (window.__CP_INIT__) {
       console.warn('Control de Pesos: script ya inicializado, salto duplicado.');
-      // no hacer nada si ya está inicializado
     } else {
       window.__CP_INIT__ = true;
 
-      // === Persistencia filtros (localStorage + querystring) ===
+      // === Helpers de DOM / Filtros persistentes ===
       const qs = new URLSearchParams(location.search);
       const $c = id => document.getElementById(id);
 
@@ -223,6 +228,19 @@
         return {min: pesoReceta - delta, max: pesoReceta + delta};
       }
 
+      // Sanitiza puntos (fecha válida + número válido)
+      function sanitizarSerie(data){
+        const pts = [];
+        for (const d of data){
+          const t = new Date(d.ts);
+          const y = Number(d.peso_real);
+          if (!Number.isFinite(y)) continue;
+          if (isNaN(t.getTime())) continue;
+          pts.push({ t, y, peso_receta: Number(d.peso_receta) });
+        }
+        return pts;
+      }
+
       // Unidad de tiempo dinámica según rango
       function unidadTiempo(labels){
         if (!labels.length) return 'day';
@@ -231,7 +249,7 @@
         const span = max - min;
         const H = 60 * 60 * 1000;
         const D = 24 * H;
-        if (span <= 2 * H)   return 'minute'; // hasta 2h
+        if (span <= 2 * H)   return 'minute'; // hasta 2 horas
         if (span <= 2 * D)   return 'hour';   // hasta 2 días
         if (span <= 90 * D)  return 'day';    // hasta 3 meses
         return 'month';
@@ -240,34 +258,39 @@
       function construirSerieTemporal(data){
         const ctx = document.getElementById('chartLinea').getContext('2d');
 
-        if (!data.length){
+        // Sanitizar datos
+        const pts = sanitizarSerie(data);
+
+        if (!pts.length){
           chartLinea = new Chart(ctx, {
             type: 'line',
             data: { labels: [], datasets: [{ label: 'Sin datos', data: [] }] },
-            options: { responsive: true }
+            options: { responsive: true, maintainAspectRatio: false }
           });
           F.pesoRef.textContent = 'Peso receta: –';
           F.notaTol.textContent = 'Sin datos';
           return;
         }
 
-        const labels = data.map(d => new Date(d.ts));
-        const yReal  = data.map(d => d.peso_real);
-        const pesoReceta = data[0].peso_receta ?? null;
+        const labels = pts.map(p => p.t);
+        const yReal  = pts.map(p => p.y);
+
+        const pesoRecetaVal = pts.find(p => Number.isFinite(p.peso_receta))?.peso_receta;
+        const pesoReceta = Number.isFinite(pesoRecetaVal) ? pesoRecetaVal : null;
         const banda = calcularBandaTolerancia(pesoReceta);
 
         F.pesoRef.textContent = 'Peso receta: ' + (pesoReceta ?? '–');
         F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
 
         const datasets = [
-          { label: 'Peso real (gr)', data: yReal, borderWidth: 2, pointRadius: 2 },
+          { label: 'Peso real (gr)', data: yReal, borderWidth: 2, pointRadius: 2 }
         ];
         if (pesoReceta || pesoReceta === 0){
-          datasets.push({ label: 'Peso receta (gr)', data: data.map(_ => pesoReceta), borderWidth: 1, pointRadius: 0 });
+          datasets.push({ label: 'Peso receta (gr)', data: pts.map(_ => pesoReceta), borderWidth: 1, pointRadius: 0 });
         }
         if (banda.min != null && banda.max != null){
-          datasets.push({ label: 'Límite inferior', data: data.map(_ => banda.min), borderWidth: 1, pointRadius: 0 });
-          datasets.push({ label: 'Límite superior', data: data.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
+          datasets.push({ label: 'Límite inferior', data: pts.map(_ => banda.min), borderWidth: 1, pointRadius: 0 });
+          datasets.push({ label: 'Límite superior', data: pts.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
         }
 
         // ¿hay adapter de tiempo?
@@ -276,14 +299,15 @@
 
         if (!useTime){
           console.warn('Adapter de tiempo no disponible. Usando escala category.');
-          const labelsCat = data.map(d => new Date(d.ts).toLocaleString());
+          const labelsCat = labels.map(d => d.toLocaleString());
           chartLinea = new Chart(ctx, {
             type: 'line',
             data: { labels: labelsCat, datasets },
             options: {
               responsive: true,
+              maintainAspectRatio: false,
               parsing: false,
-              spansGaps: true,
+              spanGaps: true,
               scales: {
                 x: { type: 'category', ticks: { maxTicksLimit: 12 } },
                 y: { title: { display: true, text: 'gr' }, beginAtZero: false }
@@ -300,6 +324,7 @@
           data: { labels, datasets },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             parsing: false,
             spanGaps: true,
             scales: {
@@ -316,7 +341,7 @@
         const ctx = document.getElementById('chartHist').getContext('2d');
 
         if (!desv.length){
-          chartHist = new Chart(ctx, { type: 'bar', data: {labels:[], datasets:[{label:'Sin datos', data:[]}]} });
+          chartHist = new Chart(ctx, { type: 'bar', data: {labels:[], datasets:[{label:'Sin datos', data:[]}]} , options:{ maintainAspectRatio:false, responsive:true }});
           return;
         }
 
@@ -342,6 +367,7 @@
           data: { labels, datasets: [{ label: 'Frecuencia', data: counts }] },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: { x: { title:{display:true,text:'Desviación (gr)'} }, y:{ beginAtZero:true } }
           }
         });
@@ -404,7 +430,7 @@
 
       // Anti-concurrencia + destroy seguro
       async function aplicar(){
-        if (rendering) return;  // evita doble ejecución
+        if (rendering) return;
         rendering = true;
 
         saveFilters();
@@ -418,9 +444,9 @@
 
         if (!data.length){
           const ctx1 = document.getElementById('chartLinea').getContext('2d');
-          chartLinea = new Chart(ctx1, { type:'line', data:{labels:[], datasets:[{label:'Sin datos', data:[]}] } });
+          chartLinea = new Chart(ctx1, { type:'line', data:{labels:[], datasets:[{label:'Sin datos', data:[]}] }, options:{ maintainAspectRatio:false } });
           const ctx2 = document.getElementById('chartHist').getContext('2d');
-          chartHist  = new Chart(ctx2,  { type:'bar',  data:{labels:[], datasets:[{label:'Sin datos', data:[]}] } });
+          chartHist  = new Chart(ctx2,  { type:'bar',  data:{labels:[], datasets:[{label:'Sin datos', data:[]}] }, options:{ maintainAspectRatio:false } });
           rendering = false;
           return;
         }

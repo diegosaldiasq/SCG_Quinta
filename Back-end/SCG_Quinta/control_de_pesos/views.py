@@ -76,9 +76,7 @@ def graficos_control_pesos(request):
 @require_GET
 def api_productos_por_cliente(request):
     """
-    Retorna productos por cliente.
-    - Tolerante a mayúsculas/minúsculas y espacios.
-    - Usa contains sobre el campo normalizado para soportar variantes como 'WALMART - LIDER'.
+    Retorna productos por cliente (tolerante a mayúsculas/espacios y variantes).
     GET ?cliente=Walmart
     """
     cliente = (request.GET.get('cliente') or '').strip()
@@ -88,7 +86,7 @@ def api_productos_por_cliente(request):
     qs = (
         DatosFormularioControlDePesos.objects
         .annotate(cliente_norm=Upper(Trim('cliente')))
-        .filter(cliente_norm__contains=cliente.upper())  # <- filtro laxo
+        .filter(cliente_norm__contains=cliente.upper())  # laxo: soporta 'WALMART - LIDER'
         .order_by()
         .values('producto', 'codigo_producto')
         .distinct()
@@ -107,12 +105,8 @@ def api_graficos_control_pesos(request):
     """
     Datos para las gráficas.
     Filtros: ?cliente=&producto=&turno=&lote=&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
-    - Cliente/Producto: filtros laxos (contains sobre normalizados).
-    - Turno: exacto (A/B/C).
-    - Lote: exacto.
-    - Fechas: sobre fecha_registro__date.
+    Cliente/Producto: contains (normalizados); Turno/Lote: exacto; Fechas por date.
     """
-    # Anotaciones para normalizar y poder filtrar de forma robusta
     qs = (
         DatosFormularioControlDePesos.objects
         .annotate(
@@ -131,13 +125,13 @@ def api_graficos_control_pesos(request):
     hasta    = (request.GET.get('hasta') or '').strip()
 
     if cliente:
-        qs = qs.filter(cliente_norm__contains=cliente.upper())   # laxo
+        qs = qs.filter(cliente_norm__contains=cliente.upper())
     if producto:
-        qs = qs.filter(producto_norm__contains=producto.upper()) # laxo
+        qs = qs.filter(producto_norm__contains=producto.upper())
     if turno:
-        qs = qs.filter(turno_norm=turno.upper())                 # exacto
+        qs = qs.filter(turno_norm=turno.upper())
     if lote:
-        qs = qs.filter(lote_norm=lote)                           # exacto
+        qs = qs.filter(lote_norm=lote)
 
     if desde:
         try:
@@ -152,7 +146,6 @@ def api_graficos_control_pesos(request):
         except Exception:
             pass
 
-    # Orden cronológico y proyección
     qs = qs.order_by('fecha_registro').values(
         'id', 'fecha_registro', 'cliente', 'producto', 'codigo_producto',
         'peso_receta', 'peso_real', 'lote', 'turno'
@@ -160,8 +153,9 @@ def api_graficos_control_pesos(request):
 
     registros = []
     for r in qs:
-        peso_receta = r['peso_receta']
-        peso_real   = r['peso_real']
+        # coerción defensiva (por si en BD hay nulls)
+        peso_receta = int(r['peso_receta']) if r['peso_receta'] is not None else None
+        peso_real   = int(r['peso_real'])   if r['peso_real']   is not None else None
         registros.append({
             'id': r['id'],
             'ts': r['fecha_registro'].isoformat(),
