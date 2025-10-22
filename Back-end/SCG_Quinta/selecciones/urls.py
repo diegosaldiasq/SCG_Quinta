@@ -27,8 +27,6 @@ urlpatterns = [
     path("control_de_pesos_prelistos/", views.redireccionar_control_de_pesos_prelistos, name="redireccionar_control_de_pesos_prelistos"),
     path("control_de_pesos_insumos_kuchen/", views.redireccionar_control_de_pesos_insumos_kuchen, name="redireccionar_control_de_pesos_insumos_kuchen"),
     path("crear_turno/", views.redireccionar_crear_turno, name="redireccionar_crear_turno"),
-    path("control_parametros_bizcocho/", views.redireccionar_control_parametros_bizcocho, name="redireccionar_control_parametros_bizcocho"),
-    path("graficos_oee/", views.redireccionar_graficos_oee, name="redireccionar_graficos_oee"),
-    path("graficos_detencion/", views.redireccionar_graficos_detencion, name="redireccionar_graficos_detencion")
+    path("control_parametros_bizcocho/", views.redireccionar_control_parametros_bizcocho, name="redireccionar_control_parametros_bizcocho")
 ]
 
