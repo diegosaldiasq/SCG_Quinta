@@ -59,52 +59,60 @@ def redireccionar_selecciones_2(request):
 
 @login_required
 def graficos_control_pesos(request):
-    """
-    Render del template de gráficos de control de pesos.
-    """
-    # Opcional: valores únicos para filtros rápidos (cliente, turno, etc.)
     clientes = DatosFormularioControlDePesos.objects.order_by().values_list('cliente', flat=True).distinct()
     turnos = DatosFormularioControlDePesos.objects.order_by().values_list('turno', flat=True).distinct()
-
     ctx = {
         'clientes': [c for c in clientes if c],
         'turnos': [t for t in turnos if t],
     }
     return render(request, 'control_de_pesos/graficos_control_pesos.html', ctx)
 
+
+@login_required
 @require_GET
 def api_productos_por_cliente(request):
     """
-    Devuelve lista de productos por cliente (tolerante a mayúsculas y espacios).
-    GET ?cliente=Jumbo
+    Lista productos por cliente (robusto a mayúsculas/espacios y variantes tipo 'Walmart - Lider').
+    GET ?cliente=Walmart
     """
     cliente = (request.GET.get('cliente') or '').strip()
     if not cliente:
         return JsonResponse({'ok': True, 'productos': []})
 
-    # Normalizamos ambas partes a UPPER(TRIM(...)) para comparar sin errores de espacios/caso
     qs = (
         DatosFormularioControlDePesos.objects
         .annotate(cliente_norm=Upper(Trim('cliente')))
-        .filter(cliente_norm=cliente.upper())
+        # en vez de igualdad exacta, usamos contains en el campo normalizado
+        .filter(cliente_norm__contains=cliente.upper())
         .order_by()
         .values('producto', 'codigo_producto')
         .distinct()
     )
 
     data = [
-        {'producto': r['producto'], 'codigo': r['codigo_producto']}
+        {'producto': (r['producto'] or '').strip(), 'codigo': r['codigo_producto']}
         for r in qs if (r['producto'] or '').strip()
     ]
     return JsonResponse({'ok': True, 'productos': data})
 
+
+@login_required
 @require_GET
 def api_graficos_control_pesos(request):
     """
-    Endpoint de datos para las gráficas.
+    Datos para las gráficas.
     Filtros por ?cliente=&producto=&turno=&lote=&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
     """
-    qs = DatosFormularioControlDePesos.objects.all()
+    # Normalizamos para filtrar de forma laxa
+    qs = (
+        DatosFormularioControlDePesos.objects
+        .annotate(
+            cliente_norm=Upper(Trim('cliente')),
+            producto_norm=Upper(Trim('producto')),
+            turno_norm=Upper(Trim('turno')),
+            lote_norm=Trim('lote'),
+        )
+    )
 
     cliente = (request.GET.get('cliente') or '').strip()
     producto = (request.GET.get('producto') or '').strip()
@@ -114,13 +122,14 @@ def api_graficos_control_pesos(request):
     hasta    = (request.GET.get('hasta') or '').strip()
 
     if cliente:
-        qs = qs.filter(cliente=cliente)
+        qs = qs.filter(cliente_norm__contains=cliente.upper())
     if producto:
-        qs = qs.filter(producto=producto)
+        qs = qs.filter(producto_norm__contains=producto.upper())
     if turno:
-        qs = qs.filter(turno=turno)
+        qs = qs.filter(turno_norm=turno.upper())  # aquí sí exacto (A/B/C)
     if lote:
-        qs = qs.filter(lote=lote)
+        qs = qs.filter(lote_norm=lote)
+
     if desde:
         try:
             dt_desde = datetime.fromisoformat(desde)
