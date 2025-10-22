@@ -18,23 +18,90 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 
   <style>
-    body { overflow-x: hidden; }
-    .login { max-width: 1200px; margin: 0 auto; }
+  /* ====== FIX BOTONES (override) ====== */
+  .primary-button.login-button,
+  .botones .primary-button,
+  .acciones .primary-button {
+    /* Reseteos para Safari/Firefox */
+    -webkit-appearance: none;
+    appearance: none;
+    border: 0;
 
-    .filtros { display:grid; gap:12px; grid-template-columns: repeat(6, minmax(140px, 1fr)); align-items:end; }
-    .acciones { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;}
-    .card { background:#fff; border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.08); margin-top:18px; overflow: hidden; }
-    .title { font-family:Quicksand, system-ui; margin: 0 0 10px; }
-    label { font-size:.9rem; font-weight:600 }
-    input, select { width:100%; padding:8px 10px; border-radius:10px; border:1px solid #ddd; }
-    .grid { display:grid; gap:18px; grid-template-columns:1fr; }
-    @media (min-width:1100px){ .grid{ grid-template-columns:1fr 1fr; } }
-    .badge { font-size:.8rem; padding:4px 8px; border-radius:999px; background:#f2f2f2; display:inline-block; }
+    /* Tacto y legibilidad */
+    background: #c94a3a;          /* color corporativo/bien contrastado */
+    color: #fff !important;       /* asegura contraste */
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1;
+    padding: 12px 18px;
+    border-radius: 12px;
+    cursor: pointer;
 
-    /* Altura definida para los canvas + ratio libre */
-    .grid .card canvas { height: 320px !important; }
-    canvas { min-height: 260px; }
-  </style>
+    /* Presencia */
+    box-shadow: 0 6px 14px rgba(201,74,58,.25);
+    transform: translateZ(0);     /* evita blur en Safari */
+    transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+  }
+
+  .primary-button.login-button:hover,
+  .botones .primary-button:hover,
+  .acciones .primary-button:hover {
+    background: #b84335;
+    box-shadow: 0 8px 18px rgba(201,74,58,.35);
+  }
+
+  .primary-button.login-button:active,
+  .botones .primary-button:active,
+  .acciones .primary-button:active {
+    transform: translateY(1px);
+  }
+
+  .primary-button.login-button:focus-visible,
+  .botones .primary-button:focus-visible,
+  .acciones .primary-button:focus-visible {
+    outline: 3px solid #ffd8d3;   /* anillo de enfoque accesible */
+    outline-offset: 2px;
+  }
+
+  /* Tamaño coherente en la barra de acciones */
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+    z-index: 2;                   /* por si un canvas/card la sobrepasa */
+  }
+
+  .acciones .primary-button {
+    min-width: 160px;             /* mejor click target */
+  }
+
+  /* Chips de resumen/peso para que no “empujen” botones */
+  .acciones .badge {
+    background: #f5f5f5;
+    color: #444;
+    border: 1px solid #eee;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+    border-radius: 999px;
+  }
+
+  /* Botón “Salir” grande y centrado */
+  .botones .primary-button {
+    display: inline-block;
+    min-width: 180px;
+    background: #b84335;
+    margin: 12px auto 0;
+  }
+
+  @media (max-width: 720px){
+    .acciones .primary-button { flex: 1 1 100%; }
+    .acciones .badge { width: 100%; justify-content: center; }
+  }
+</style>
 </head>
 <body>
   <div class="login">
@@ -107,7 +174,7 @@
     </div>
 
     <div class="botones" style="margin-top:16px;">
-      <form class="form" action="{% url 'redireccionar_selecciones_2' %}">
+      <form class="form" action="{% url 'redireccionar_intermedio_4' %}">
         <button class="primary-button login-button">Salir</button>
       </form>
     </div>
