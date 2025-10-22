@@ -162,17 +162,14 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'id_supervisor'})
     )
     LINEA_CHOICES = [
-        ('Línea 1', 'Línea 1'),
         ('Línea 1A', 'Línea 1A'),
         ('Línea 1B', 'Línea 1B'),
         ('Línea 2', 'Línea 2'),
-        ('Línea 3', 'Línea 3'),
         ('Línea 3A', 'Línea 3A'),
         ('Línea 3B', 'Línea 3B'),
         ('Isla', 'Isla'),
         ('Cakematic', 'Cakematic'),
         ('Gorreri pasteleria', 'Gorreri pasteleria'),
-        ('Gorreri kuchen', 'Gorreri kuchen'),
         ('Mesón 1', 'Mesón 1'),
         ('Mesón 2', 'Mesón 2'),
         ('Mesón 3', 'Mesón 3'),
