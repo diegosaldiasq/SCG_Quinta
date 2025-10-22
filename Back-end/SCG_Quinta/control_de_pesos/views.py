@@ -72,8 +72,6 @@ def graficos_control_pesos(request):
     }
     return render(request, 'control_de_pesos/graficos_control_pesos.html', ctx)
 
-
-@login_required
 @require_GET
 def api_productos_por_cliente(request):
     """
@@ -100,8 +98,6 @@ def api_productos_por_cliente(request):
     ]
     return JsonResponse({'ok': True, 'productos': data})
 
-
-@login_required
 @require_GET
 def api_graficos_control_pesos(request):
     """
