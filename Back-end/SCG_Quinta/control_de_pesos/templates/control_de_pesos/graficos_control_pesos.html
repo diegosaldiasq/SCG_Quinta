@@ -11,8 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'control_de_pesos/estilos_r_control_de_pesos.css' %}">
   <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
+  <!-- Chart.js + adapter de tiempo (orden IMPORTANTE) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+
   <style>
     .filtros { display:grid; gap:12px; grid-template-columns: repeat(6, minmax(140px, 1fr)); align-items:end; }
     .acciones { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;}
@@ -23,6 +26,8 @@
     .grid { display:grid; gap:18px; grid-template-columns:1fr; }
     @media (min-width:1100px){ .grid{ grid-template-columns:1fr 1fr; } }
     .badge { font-size:.8rem; padding:4px 8px; border-radius:999px; background:#f2f2f2; display:inline-block; }
+    /* Evita canvas "invisibles" si el contenedor no tiene alto calculado */
+    canvas { min-height: 260px; }
   </style>
 </head>
 <body>
@@ -136,7 +141,6 @@
       F.lote.value = f.lote || '';
       F.desde.value = f.desde || '';
       F.hasta.value = f.hasta || '';
-      // Producto se carga asincrónico según cliente
       if (f.cliente) { cargarProductos(f.cliente, f.producto); }
     }
     function saveFilters(){
@@ -154,7 +158,10 @@
       F.producto.innerHTML = '<option value="">Todos</option>';
       F.producto.disabled = true;
       if (!cliente) return;
-      const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`);
+      const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`, { credentials: 'same-origin' });
+      // Si por algún motivo devolviera HTML (no debería), no rompe:
+      const ct = r.headers.get('content-type') || '';
+      if (!ct.includes('application/json')) { console.error('productos_por_cliente devolvió contenido no JSON'); return; }
       const j = await r.json();
       if (j.ok){
         j.productos.forEach(p => {
@@ -183,69 +190,95 @@
     }
 
     function calcularBandaTolerancia(pesoReceta){
-      if (!pesoReceta) return {min:null, max:null};
+      if (!pesoReceta && pesoReceta !== 0) return {min:null, max:null};
       const delta = pesoReceta * (TOLERANCIA_PCT/100);
       return {min: pesoReceta - delta, max: pesoReceta + delta};
     }
 
     function construirSerieTemporal(data){
-        const ctx = document.getElementById('chartLinea').getContext('2d');
+      const ctx = document.getElementById('chartLinea').getContext('2d');
 
-        if (!data.length){
-            // Dibuja un placeholder en vez de quedar en blanco
-            chartLinea = new Chart(ctx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Sin datos', data: [] }] },
-            options: { responsive: true }
-            });
-            F.pesoRef.textContent = 'Peso receta: –';
-            F.notaTol.textContent = 'Sin datos';
-            return;
-        }
-
-        const labels = data.map(d => new Date(d.ts));  // <- requiere el adapter
-        const yReal  = data.map(d => d.peso_real);
-        const pesoReceta = data[0].peso_receta ?? null; // asumiendo receta constante
-        const banda = calcularBandaTolerancia(pesoReceta);
-
-        F.pesoRef.textContent = 'Peso receta: ' + (pesoReceta ?? '–');
-        F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
-
-        const datasets = [
-            { label: 'Peso real (gr)', data: yReal, borderWidth: 2, pointRadius: 2 },
-        ];
-        if (pesoReceta){
-            datasets.push({ label: 'Peso receta (gr)', data: data.map(_ => pesoReceta), borderWidth: 1, pointRadius: 0 });
-        }
-        if (banda.min != null && banda.max != null){
-            datasets.push({ label: 'Límite inferior', data: data.map(_ => banda.min), borderWidth: 1, pointRadius: 0 });
-            datasets.push({ label: 'Límite superior', data: data.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
-        }
-
+      if (!data.length){
+        // Placeholder para no quedar en blanco
         chartLinea = new Chart(ctx, {
-            type: 'line',
-            data: { labels, datasets },
-            options: {
+          type: 'line',
+          data: { labels: [], datasets: [{ label: 'Sin datos', data: [] }] },
+          options: { responsive: true }
+        });
+        F.pesoRef.textContent = 'Peso receta: –';
+        F.notaTol.textContent = 'Sin datos';
+        return;
+      }
+
+      const labels = data.map(d => new Date(d.ts));  // requiere adapter de tiempo
+      const yReal  = data.map(d => d.peso_real);
+      const pesoReceta = data[0].peso_receta ?? null; // asumimos receta constante por producto
+      const banda = calcularBandaTolerancia(pesoReceta);
+
+      F.pesoRef.textContent = 'Peso receta: ' + (pesoReceta ?? '–');
+      F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
+
+      const datasets = [
+        { label: 'Peso real (gr)', data: yReal, borderWidth: 2, pointRadius: 2 },
+      ];
+      if (pesoReceta || pesoReceta === 0){
+        datasets.push({ label: 'Peso receta (gr)', data: data.map(_ => pesoReceta), borderWidth: 1, pointRadius: 0 });
+      }
+      if (banda.min != null && banda.max != null){
+        datasets.push({ label: 'Límite inferior', data: data.map(_ => banda.min), borderWidth: 1, pointRadius: 0 });
+        datasets.push({ label: 'Límite superior', data: data.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
+      }
+
+      // Fallback automático si no hay adapter de tiempo:
+      let useTime = true;
+      try {
+        if (!Chart._adapters || !Chart._adapters._date) useTime = false;
+      } catch (e) { useTime = false; }
+
+      if (!useTime){
+        console.warn('Adapter de tiempo no disponible. Usando escala category.');
+        const labelsCat = data.map(d => new Date(d.ts).toLocaleString());
+        chartLinea = new Chart(ctx, {
+          type: 'line',
+          data: { labels: labelsCat, datasets },
+          options: {
             responsive: true,
             parsing: false,
             scales: {
-                x: { type: 'time', time: { unit: 'minute' } },
-                y: { title: { display: true, text: 'gr' }, beginAtZero: false }
+              x: { type: 'category' },
+              y: { title: { display: true, text: 'gr' }, beginAtZero: false }
             },
             plugins: { tooltip: { mode: 'index', intersect: false } }
-            }
+          }
         });
+        return;
+      }
+
+      chartLinea = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          parsing: false,
+          scales: {
+            x: { type: 'time', time: { unit: 'minute' } },
+            y: { title: { display: true, text: 'gr' }, beginAtZero: false }
+          },
+          plugins: { tooltip: { mode: 'index', intersect: false } }
+        }
+      });
     }
 
     function construirHistograma(data){
       // Desviaciones en gramos
       const desv = data.map(d => d.desviacion);
+      const ctx = document.getElementById('chartHist').getContext('2d');
+
       if (!desv.length){
-        const ctx = document.getElementById('chartHist').getContext('2d');
         chartHist = new Chart(ctx, { type: 'bar', data: {labels:[], datasets:[{label:'Sin datos', data:[]}]} });
         return;
       }
-      // bins automáticos simples
+
       const min = Math.min(...desv), max = Math.max(...desv);
       const bins = 12;
       const step = Math.max(1, Math.ceil((max-min)/bins));
@@ -263,7 +296,6 @@
         counts[idx]++;
       });
 
-      const ctx = document.getElementById('chartHist').getContext('2d');
       chartHist = new Chart(ctx, {
         type: 'bar',
         data: { labels, datasets: [{ label: 'Frecuencia', data: counts }] },
@@ -274,37 +306,44 @@
       });
     }
 
-    // === Fetch datos ===
+    // === Fetch datos (robusto ante redirecciones al login) ===
     async function cargarDatos(){
-        const p = new URLSearchParams({
-            cliente: F.cliente.value || '',
-            producto: F.producto.value || '',
-            turno: F.turno.value || '',
-            lote: F.lote.value || '',
-            desde: F.desde.value || '',
-            hasta: F.hasta.value || ''
-        });
-        const url = `{% url 'api_graficos_control_pesos' %}?` + p.toString();
-        try {
-            const r = await fetch(url, { credentials: 'same-origin' });
-            if (!r.ok){
-            console.error('Error HTTP', r.status, url);
-            return [];
-            }
-            const j = await r.json();
-            if (!j.ok){
-            console.error('API respondió ok=false', j);
-            return [];
-            }
-            // Debug rápido en consola
-            if (j.registros && j.registros.length){
-            console.debug('Primeros registros', j.registros.slice(0,3));
-            }
-            return j.registros || [];
-        } catch (err){
-            console.error('Fallo fetch', err);
-            return [];
+      const p = new URLSearchParams({
+        cliente: F.cliente.value || '',
+        producto: F.producto.value || '',
+        turno: F.turno.value || '',
+        lote: F.lote.value || '',
+        desde: F.desde.value || '',
+        hasta: F.hasta.value || ''
+      });
+      const url = `{% url 'api_graficos_control_pesos' %}?` + p.toString();
+      try {
+        const r = await fetch(url, { credentials: 'same-origin' });
+
+        const ctype = r.headers.get('content-type') || '';
+        if (!ctype.includes('application/json')) {
+          console.error('La respuesta no es JSON (¿redirigido al login?)', r.status, url);
+          alert('No pude leer datos (posible sesión expirada). Refresca la página e inicia sesión.');
+          return [];
         }
+
+        if (!r.ok){
+          console.error('Error HTTP', r.status, url);
+          return [];
+        }
+        const j = await r.json();
+        if (!j.ok){
+          console.error('API ok=false', j);
+          return [];
+        }
+        if (j.registros && j.registros.length){
+          console.debug('Primeros registros', j.registros.slice(0,3));
+        }
+        return j.registros || [];
+      } catch (err){
+        console.error('Fallo fetch', err);
+        return [];
+      }
     }
 
     function descargarCSV(rows){
@@ -327,6 +366,15 @@
       const data = await cargarDatos();
       F.resumen.textContent = `${data.length} registros`;
       destruirCharts();
+
+      if (!data.length){
+        const ctx1 = document.getElementById('chartLinea').getContext('2d');
+        chartLinea = new Chart(ctx1, { type:'line', data:{labels:[], datasets:[{label:'Sin datos', data:[]}] } });
+        const ctx2 = document.getElementById('chartHist').getContext('2d');
+        chartHist  = new Chart(ctx2,  { type:'bar',  data:{labels:[], datasets:[{label:'Sin datos', data:[]}] } });
+        return;
+      }
+
       construirSerieTemporal(data);
       construirHistograma(data);
       window.__datosActuales = data; // para CSV
