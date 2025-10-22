@@ -1,0 +1,36 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'inicio/estilos_selec_verif.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}" />
+    <title>Seleccion de verificaciones de Procesos</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
+        <h1 class="title">Seleccionar registro a verificar</h1>
+        <div class="login-container">
+            <p class="subtitle">POE</p>
+            <p class="registro">
+                <span>1.- Grafico OEE</span>
+                <a href="{% url 'redireccionar_graficos_oee' %}">Gráficos OEE</a>
+            </p>
+            <p class="registro">
+                <span>1.- Grafico Detenciones</span>
+                <a href="{% url 'redireccionar_graficos_detencion' %}">Graficos Detenciones</a>
+            </p>
+        </div>
+        <form class="form" action="{% url 'redireccionar_inicio' %}">
+            <button class="primary-button login-button">Volver inicio</button>
+        </form>
+    </div>
+</body>
+</html>

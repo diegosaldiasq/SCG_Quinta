@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'inicio/estilos_intermedio.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}" />
+    <title>Seleccion area</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
+        <h1 class="title">Seleccionar Área</h1>
+        <div class="login-container">
+            <p class="subtitle">Áreas</p>
+            <p class="registro">
+                <a href="{% url 'en_desarrollo' %}?config=intermedio_4">CALIDAD</a>
+            </p>
+            <p class="registro">
+                <a href="{% url 'graficos_2' %}">PROCESOS</a>
+            </p>
+            <p class="registro">
+                <a href="{% url 'graficos_3' %}">PRODUCCION</a>
+            </p>
+        </div>
+        <form class="form" action="{% url 'index' %}">
+            <button class="primary-button login-button">Volver inicio</button>
+        </form>
+    </div>
+</body>
+</html>

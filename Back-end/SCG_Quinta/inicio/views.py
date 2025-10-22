@@ -122,6 +122,18 @@ def intermedio_3(request):
     return render(request, 'inicio/intermedio_3.html')
 
 @login_required
+def intermedio_4(request):  
+    return render(request, 'inicio/intermedio_4.html')
+
+@login_required
+def graficos_2(request):  
+    return render(request, 'inicio/graficos_2.html')
+
+@login_required
+def graficos_3(request):    
+    return render(request, 'inicio/graficos_3.html')
+
+@login_required
 def seleccion_verifica(request):
     return render(request, 'inicio/seleccion_verifica.html')
 
@@ -346,3 +358,13 @@ def descargar_resumenturnooee(request):
 
     wb.save(response)
     return response
+
+@login_required
+def redireccionar_graficos_oee(request):
+    url_graficos_oee = reverse('graficos_oee')
+    return HttpResponseRedirect(url_graficos_oee)
+
+@login_required
+def redireccionar_graficos_detencion(request):
+    url_graficos_detencion = reverse('graficos_detencion')
+    return HttpResponseRedirect(url_graficos_detencion)
