@@ -31,7 +31,7 @@ body {
 }
 .card {
     width: 500px;
-    height: 620px;
+    height: 650px;
     background: var(--amarillo-quinta);
     border-radius: 20px;
     overflow: hidden;
