@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
+from django.db.models.functions import Trim, Upper
+from django.db.models import Value
 
 # Create your views here.
 
@@ -75,12 +77,27 @@ def graficos_control_pesos(request):
 @require_GET
 def api_productos_por_cliente(request):
     """
-    Devuelve lista de productos y códigos disponibles para un cliente (para poblar el combo Producto).
+    Devuelve lista de productos por cliente (tolerante a mayúsculas y espacios).
     GET ?cliente=Jumbo
     """
-    cliente = request.GET.get('cliente', '')
-    qs = DatosFormularioControlDePesos.objects.filter(cliente=cliente).order_by().values('producto', 'codigo_producto').distinct()
-    data = [{'producto': r['producto'], 'codigo': r['codigo_producto']} for r in qs if r['producto']]
+    cliente = (request.GET.get('cliente') or '').strip()
+    if not cliente:
+        return JsonResponse({'ok': True, 'productos': []})
+
+    # Normalizamos ambas partes a UPPER(TRIM(...)) para comparar sin errores de espacios/caso
+    qs = (
+        DatosFormularioControlDePesos.objects
+        .annotate(cliente_norm=Upper(Trim('cliente')))
+        .filter(cliente_norm=cliente.upper())
+        .order_by()
+        .values('producto', 'codigo_producto')
+        .distinct()
+    )
+
+    data = [
+        {'producto': r['producto'], 'codigo': r['codigo_producto']}
+        for r in qs if (r['producto'] or '').strip()
+    ]
     return JsonResponse({'ok': True, 'productos': data})
 
 

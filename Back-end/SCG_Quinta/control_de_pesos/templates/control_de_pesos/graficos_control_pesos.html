@@ -155,25 +155,39 @@
 
     // === Poblar productos por cliente desde backend ===
     async function cargarProductos(cliente, preselect=''){
-      F.producto.innerHTML = '<option value="">Todos</option>';
-      F.producto.disabled = true;
-      if (!cliente) return;
-      const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`, { credentials: 'same-origin' });
-      // Si por algún motivo devolviera HTML (no debería), no rompe:
-      const ct = r.headers.get('content-type') || '';
-      if (!ct.includes('application/json')) { console.error('productos_por_cliente devolvió contenido no JSON'); return; }
-      const j = await r.json();
-      if (j.ok){
-        j.productos.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.producto;
-          opt.textContent = p.producto;
-          opt.setAttribute('data-codigo', p.codigo || '');
-          F.producto.appendChild(opt);
-        });
-        F.producto.disabled = false;
-        if (preselect){ F.producto.value = preselect; }
-      }
+        F.producto.innerHTML = '<option value="">Todos</option>';
+        F.producto.disabled = true;
+        if (!cliente) return;
+
+        const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`, { credentials: 'same-origin' });
+        const ct = r.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+            console.error('productos_por_cliente devolvió contenido no JSON');
+            return;
+        }
+
+        const j = await r.json();
+        if (j.ok){
+            if (!j.productos.length){
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '— Sin productos para este cliente —';
+            F.producto.appendChild(opt);
+            // lo dejamos habilitado para que el usuario vea el mensaje
+            F.producto.disabled = false;
+            return;
+            }
+
+            j.productos.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.producto;
+            opt.textContent = p.producto;
+            opt.setAttribute('data-codigo', p.codigo || '');
+            F.producto.appendChild(opt);
+            });
+            F.producto.disabled = false;
+            if (preselect){ F.producto.value = preselect; }
+        }
     }
 
     F.cliente.addEventListener('change', () => {
