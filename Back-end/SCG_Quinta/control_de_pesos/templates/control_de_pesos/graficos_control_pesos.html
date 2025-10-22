@@ -101,6 +101,11 @@
     .acciones .primary-button { flex: 1 1 100%; }
     .acciones .badge { width: 100%; justify-content: center; }
   }
+  /* === FONDO BLANCO EN LOS GRÁFICOS === */
+  .grid .card canvas {
+    background: #fff !important; /* fuerza fondo blanco */
+    border-radius: 12px;
+  }
 </style>
 </head>
 <body>
@@ -381,8 +386,18 @@
             parsing: true,        // Chart parsea {x,y}
             spanGaps: true,
             scales: {
-              x: { type: 'time', time: { unit }, ticks: { maxTicksLimit: 12 } },
-              y: { title: { display: true, text: 'gr' }, beginAtZero: false }
+              x: { 
+                type: 'time', 
+                time: { unit }, 
+                ticks: { maxTicksLimit: 12 } 
+              },
+              y: { 
+                title: { display: true, text: 'gr' },
+                beginAtZero: false,
+                grace: '5%',                // margen superior/inferior
+                min: pesoReceta ? pesoReceta * 0.9 : undefined,  // 10% debajo
+                max: pesoReceta ? pesoReceta * 1.1 : undefined,  // 10% arriba
+              }
             },
             plugins: { tooltip: { mode: 'index', intersect: false } }
           }
