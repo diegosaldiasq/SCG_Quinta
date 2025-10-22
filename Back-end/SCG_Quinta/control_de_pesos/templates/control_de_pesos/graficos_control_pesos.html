@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="{% static 'control_de_pesos/estilos_r_control_de_pesos.css' %}">
   <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
   <style>
     .filtros { display:grid; gap:12px; grid-template-columns: repeat(6, minmax(140px, 1fr)); align-items:end; }
     .acciones { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;}
@@ -188,41 +189,52 @@
     }
 
     function construirSerieTemporal(data){
-      const labels = data.map(d => new Date(d.ts));
-      const yReal  = data.map(d => d.peso_real);
-      const pesoReceta = data.length ? data[0].peso_receta : null; // asumimos receta constante por producto
-      const banda = calcularBandaTolerancia(pesoReceta);
+        const ctx = document.getElementById('chartLinea').getContext('2d');
 
-      F.pesoRef.textContent = 'Peso receta: ' + (pesoReceta ?? '–');
-      F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
-
-      const datasets = [
-        { label: 'Peso real (gr)', data: yReal, borderWidth: 2, pointRadius: 2 },
-      ];
-      if (pesoReceta){
-        datasets.push({ label: 'Peso receta (gr)', data: data.map(_ => pesoReceta), borderWidth: 1, pointRadius: 0 });
-      }
-      if (banda.min && banda.max){
-        datasets.push({ label: 'Límite inferior', data: data.map(_ => banda.min), borderWidth: 1, pointRadius: 0 });
-        datasets.push({ label: 'Límite superior', data: data.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
-      }
-
-      const ctx = document.getElementById('chartLinea').getContext('2d');
-      chartLinea = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets },
-        options: {
-          responsive: true,
-          parsing: false,
-          scales: {
-            x: { type: 'time', time: { unit: 'minute' } },
-            y: { title: { display: true, text: 'gr' }, beginAtZero: false }
-          },
-          plugins: {
-            tooltip: { mode: 'index', intersect: false }
-          }
+        if (!data.length){
+            // Dibuja un placeholder en vez de quedar en blanco
+            chartLinea = new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Sin datos', data: [] }] },
+            options: { responsive: true }
+            });
+            F.pesoRef.textContent = 'Peso receta: –';
+            F.notaTol.textContent = 'Sin datos';
+            return;
         }
-      });
+
+        const labels = data.map(d => new Date(d.ts));  // <- requiere el adapter
+        const yReal  = data.map(d => d.peso_real);
+        const pesoReceta = data[0].peso_receta ?? null; // asumiendo receta constante
+        const banda = calcularBandaTolerancia(pesoReceta);
+
+        F.pesoRef.textContent = 'Peso receta: ' + (pesoReceta ?? '–');
+        F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
+
+        const datasets = [
+            { label: 'Peso real (gr)', data: yReal, borderWidth: 2, pointRadius: 2 },
+        ];
+        if (pesoReceta){
+            datasets.push({ label: 'Peso receta (gr)', data: data.map(_ => pesoReceta), borderWidth: 1, pointRadius: 0 });
+        }
+        if (banda.min != null && banda.max != null){
+            datasets.push({ label: 'Límite inferior', data: data.map(_ => banda.min), borderWidth: 1, pointRadius: 0 });
+            datasets.push({ label: 'Límite superior', data: data.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
+        }
+
+        chartLinea = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+            responsive: true,
+            parsing: false,
+            scales: {
+                x: { type: 'time', time: { unit: 'minute' } },
+                y: { title: { display: true, text: 'gr' }, beginAtZero: false }
+            },
+            plugins: { tooltip: { mode: 'index', intersect: false } }
+            }
+        });
     }
 
     function construirHistograma(data){
@@ -264,18 +276,35 @@
 
     // === Fetch datos ===
     async function cargarDatos(){
-      const p = new URLSearchParams({
-        cliente: F.cliente.value || '',
-        producto: F.producto.value || '',
-        turno: F.turno.value || '',
-        lote: F.lote.value || '',
-        desde: F.desde.value || '',
-        hasta: F.hasta.value || ''
-      });
-      const url = `{% url 'api_graficos_control_pesos' %}?` + p.toString();
-      const r = await fetch(url);
-      const j = await r.json();
-      return j.ok ? j.registros : [];
+        const p = new URLSearchParams({
+            cliente: F.cliente.value || '',
+            producto: F.producto.value || '',
+            turno: F.turno.value || '',
+            lote: F.lote.value || '',
+            desde: F.desde.value || '',
+            hasta: F.hasta.value || ''
+        });
+        const url = `{% url 'api_graficos_control_pesos' %}?` + p.toString();
+        try {
+            const r = await fetch(url, { credentials: 'same-origin' });
+            if (!r.ok){
+            console.error('Error HTTP', r.status, url);
+            return [];
+            }
+            const j = await r.json();
+            if (!j.ok){
+            console.error('API respondió ok=false', j);
+            return [];
+            }
+            // Debug rápido en consola
+            if (j.registros && j.registros.length){
+            console.debug('Primeros registros', j.registros.slice(0,3));
+            }
+            return j.registros || [];
+        } catch (err){
+            console.error('Fallo fetch', err);
+            return [];
+        }
     }
 
     function descargarCSV(rows){
