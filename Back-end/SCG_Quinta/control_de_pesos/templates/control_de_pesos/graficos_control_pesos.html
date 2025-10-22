@@ -155,7 +155,13 @@
 
     // === Poblar productos por cliente desde backend ===
     async function cargarProductos(cliente, preselect=''){
-        F.producto.innerHTML = '<option value="">Todos</option>';
+        // reset duro para evitar residuos
+        F.producto.innerHTML = '';
+        const optTodos = document.createElement('option');
+        optTodos.value = '';
+        optTodos.textContent = 'Todos';
+        F.producto.appendChild(optTodos);
+
         F.producto.disabled = true;
         if (!cliente) return;
 
@@ -168,12 +174,12 @@
 
         const j = await r.json();
         if (j.ok){
+            console.debug('Productos recibidos:', j.productos?.length || 0);
             if (!j.productos.length){
             const opt = document.createElement('option');
             opt.value = '';
             opt.textContent = '— Sin productos para este cliente —';
             F.producto.appendChild(opt);
-            // lo dejamos habilitado para que el usuario vea el mensaje
             F.producto.disabled = false;
             return;
             }
