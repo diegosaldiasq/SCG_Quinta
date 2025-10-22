@@ -107,10 +107,11 @@
     </div>
   </div>
 
-  <!-- IMPORTANTE: módulo con guardia para evitar doble inicialización -->
+  <!-- Script como módulo + guardia contra doble inicialización -->
   <script type="module">
     if (window.__CP_INIT__) {
       console.warn('Control de Pesos: script ya inicializado, salto duplicado.');
+      // no hacer nada si ya está inicializado
     } else {
       window.__CP_INIT__ = true;
 
@@ -159,7 +160,6 @@
 
       // === Poblar productos por cliente desde backend ===
       async function cargarProductos(cliente, preselect=''){
-        // reset
         F.producto.innerHTML = '';
         const optTodos = document.createElement('option');
         optTodos.value = '';
@@ -206,17 +206,35 @@
 
       // === Charts ===
       let chartLinea, chartHist;
-      const TOLERANCIA_PCT = 3; // ±3% editable
+      let rendering = false; // evita renders simultáneos
 
+      function safeDestroy(chart){
+        try { if (chart && !chart._destroyed) chart.destroy(); } catch (_) {}
+      }
       function destruirCharts(){
-        if (chartLinea) { chartLinea.destroy(); chartLinea = null; }
-        if (chartHist)  { chartHist.destroy();  chartHist  = null; }
+        safeDestroy(chartLinea); chartLinea = undefined;
+        safeDestroy(chartHist);  chartHist  = undefined;
       }
 
+      const TOLERANCIA_PCT = 3; // ±3% editable
       function calcularBandaTolerancia(pesoReceta){
         if (!pesoReceta && pesoReceta !== 0) return {min:null, max:null};
         const delta = pesoReceta * (TOLERANCIA_PCT/100);
         return {min: pesoReceta - delta, max: pesoReceta + delta};
+      }
+
+      // Unidad de tiempo dinámica según rango
+      function unidadTiempo(labels){
+        if (!labels.length) return 'day';
+        const min = labels[0].getTime();
+        const max = labels[labels.length - 1].getTime();
+        const span = max - min;
+        const H = 60 * 60 * 1000;
+        const D = 24 * H;
+        if (span <= 2 * H)   return 'minute'; // hasta 2h
+        if (span <= 2 * D)   return 'hour';   // hasta 2 días
+        if (span <= 90 * D)  return 'day';    // hasta 3 meses
+        return 'month';
       }
 
       function construirSerieTemporal(data){
@@ -252,6 +270,7 @@
           datasets.push({ label: 'Límite superior', data: data.map(_ => banda.max), borderWidth: 1, pointRadius: 0 });
         }
 
+        // ¿hay adapter de tiempo?
         let useTime = true;
         try { if (!Chart._adapters || !Chart._adapters._date) useTime = false; } catch (e) { useTime = false; }
 
@@ -264,8 +283,9 @@
             options: {
               responsive: true,
               parsing: false,
+              spansGaps: true,
               scales: {
-                x: { type: 'category' },
+                x: { type: 'category', ticks: { maxTicksLimit: 12 } },
                 y: { title: { display: true, text: 'gr' }, beginAtZero: false }
               },
               plugins: { tooltip: { mode: 'index', intersect: false } }
@@ -274,14 +294,16 @@
           return;
         }
 
+        const unit = unidadTiempo(labels);
         chartLinea = new Chart(ctx, {
           type: 'line',
           data: { labels, datasets },
           options: {
             responsive: true,
             parsing: false,
+            spanGaps: true,
             scales: {
-              x: { type: 'time', time: { unit: 'minute' } },
+              x: { type: 'time', time: { unit }, ticks: { maxTicksLimit: 12 } },
               y: { title: { display: true, text: 'gr' }, beginAtZero: false }
             },
             plugins: { tooltip: { mode: 'index', intersect: false } }
@@ -380,29 +402,43 @@
         URL.revokeObjectURL(a.href);
       }
 
+      // Anti-concurrencia + destroy seguro
       async function aplicar(){
+        if (rendering) return;  // evita doble ejecución
+        rendering = true;
+
         saveFilters();
         const data = await cargarDatos();
+
         F.resumen.textContent = `${data.length} registros`;
         destruirCharts();
+
+        // cede 1 frame para liberar canvas antes de crear el siguiente chart
+        await new Promise(requestAnimationFrame);
 
         if (!data.length){
           const ctx1 = document.getElementById('chartLinea').getContext('2d');
           chartLinea = new Chart(ctx1, { type:'line', data:{labels:[], datasets:[{label:'Sin datos', data:[]}] } });
           const ctx2 = document.getElementById('chartHist').getContext('2d');
           chartHist  = new Chart(ctx2,  { type:'bar',  data:{labels:[], datasets:[{label:'Sin datos', data:[]}] } });
+          rendering = false;
           return;
         }
 
         construirSerieTemporal(data);
         construirHistograma(data);
         window.__datosActuales = data;
+        rendering = false;
       }
 
       // Botones
-      document.getElementById('btn-aplicar').addEventListener('click', (e)=>{ e.preventDefault(); aplicar(); });
+      document.getElementById('btn-aplicar').addEventListener('click', (e)=>{
+        e.preventDefault();
+        if (!rendering) aplicar();
+      });
       document.getElementById('btn-limpiar').addEventListener('click', (e)=>{
         e.preventDefault();
+        if (rendering) return;
         ['f-cliente','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id=>{
           const el = $c(id);
           if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = '';
