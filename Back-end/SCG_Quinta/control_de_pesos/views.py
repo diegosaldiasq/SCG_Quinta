@@ -110,12 +110,12 @@ def api_graficos_control_pesos(request):
     """
     qs = DatosFormularioControlDePesos.objects.all()
 
-    cliente = request.GET.get('cliente', '').strip()
-    producto = request.GET.get('producto', '').strip()
-    turno = request.GET.get('turno', '').strip()
-    lote = request.GET.get('lote', '').strip()
-    desde = request.GET.get('desde', '').strip()
-    hasta = request.GET.get('hasta', '').strip()
+    cliente = (request.GET.get('cliente') or '').strip()
+    producto = (request.GET.get('producto') or '').strip()
+    turno    = (request.GET.get('turno') or '').strip()
+    lote     = (request.GET.get('lote') or '').strip()
+    desde    = (request.GET.get('desde') or '').strip()
+    hasta    = (request.GET.get('hasta') or '').strip()
 
     if cliente:
         qs = qs.filter(cliente=cliente)
@@ -126,7 +126,6 @@ def api_graficos_control_pesos(request):
     if lote:
         qs = qs.filter(lote=lote)
     if desde:
-        # Interpretar como fecha local a medianoche
         try:
             dt_desde = datetime.fromisoformat(desde)
             qs = qs.filter(fecha_registro__date__gte=dt_desde.date())
@@ -139,24 +138,24 @@ def api_graficos_control_pesos(request):
         except Exception:
             pass
 
-    # Orden por tiempo
     qs = qs.order_by('fecha_registro').values(
         'id', 'fecha_registro', 'cliente', 'producto', 'codigo_producto',
         'peso_receta', 'peso_real', 'lote', 'turno'
     )
 
-    # Empaquetar para frontend
     registros = []
     for r in qs:
+        peso_receta = r['peso_receta']
+        peso_real   = r['peso_real']
         registros.append({
             'id': r['id'],
             'ts': r['fecha_registro'].isoformat(),
             'cliente': r['cliente'],
             'producto': r['producto'],
             'codigo_producto': r['codigo_producto'],
-            'peso_receta': r['peso_receta'],
-            'peso_real': r['peso_real'],
-            'desviacion': (r['peso_real'] or 0) - (r['peso_receta'] or 0),
+            'peso_receta': peso_receta,
+            'peso_real':   peso_real,
+            'desviacion': (peso_real or 0) - (peso_receta or 0),
             'lote': r['lote'],
             'turno': r['turno'],
         })
