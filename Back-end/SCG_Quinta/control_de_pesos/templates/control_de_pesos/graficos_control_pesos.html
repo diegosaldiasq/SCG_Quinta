@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"> 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'control_de_pesos/estilos_r_control_de_pesos.css' %}">
   <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
 
   <!-- Chart.js + adapter de tiempo (orden IMPORTANTE) -->
@@ -18,109 +17,163 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 
   <style>
-  /* ====== FIX BOTONES (override) ====== */
-  .primary-button.login-button,
-  .botones .primary-button,
-  .acciones .primary-button {
-    /* Reseteos para Safari/Firefox */
-    -webkit-appearance: none;
-    appearance: none;
-    border: 0;
+  /* ===============================
+   DASHBOARD GRÁFICOS - QUINTA
+   =============================== */
 
-    /* Tacto y legibilidad */
-    background: #c94a3a;          /* color corporativo/bien contrastado */
-    color: #fff !important;       /* asegura contraste */
+  /* ----- Variables corporativas ----- */
+  :root {
+    --rojo-quinta: #B43C2C;
+    --naranjo-quinta: #d07020;
+    --naranjo-claro-quinta: #d4841c;
+    --amarillo-quinta: #f3ba14;
+    --gris-claro: #f5f5f5;
+    --white: #ffffff;
+    --black: #000000;
+    --sm: 14px;
+    --md: 16px;
+    --lg: 18px;
+  }
+
+  /* ----- Fondo general ----- */
+  body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    background-image: url("{% static 'control_de_pesos/images/Fondo.png' %}");
+    background-size: cover;
+    background-attachment: fixed;
+  }
+
+  /* ----- Contenedor principal ----- */
+  .login {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px 40px;
+    box-sizing: border-box;
+  }
+
+  /* ----- Header ----- */
+  .logo {
+    width: 200px;
+    margin: 0 auto 10px;
+    display: block;
+  }
+  .login-container {
+    text-align: center;
+    background: var(--naranjo-claro-quinta);
+    border-radius: 32px;
+    padding: 8px 24px;
+    width: min(800px, 95%);
+    margin-bottom: 20px;
+  }
+  .title {
+    font-size: var(--lg);
+    margin: 0;
+    color: var(--white);
     font-weight: 700;
-    font-size: 0.95rem;
-    line-height: 1;
+  }
+
+  /* ----- Filtros ----- */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+  .filtros {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    align-items: end;
+  }
+  label {
+    font-size: .9rem;
+    font-weight: 600;
+    color: #333;
+  }
+  input, select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: var(--white);
+  }
+
+  /* ----- Botones ----- */
+  .primary-button {
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-weight: bold;
+    font-size: .95rem;
     padding: 12px 18px;
-    border-radius: 12px;
+    border-radius: 10px;
+    border: none;
     cursor: pointer;
-
-    /* Presencia */
-    box-shadow: 0 6px 14px rgba(201,74,58,.25);
-    transform: translateZ(0);     /* evita blur en Safari */
-    transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+    transition: background .2s ease;
   }
-
-  .primary-button.login-button:hover,
-  .botones .primary-button:hover,
-  .acciones .primary-button:hover {
-    background: #b84335;
-    box-shadow: 0 8px 18px rgba(201,74,58,.35);
+  .primary-button:hover {
+    background-color: #a83628;
   }
-
-  .primary-button.login-button:active,
-  .botones .primary-button:active,
-  .acciones .primary-button:active {
-    transform: translateY(1px);
-  }
-
-  .primary-button.login-button:focus-visible,
-  .botones .primary-button:focus-visible,
-  .acciones .primary-button:focus-visible {
-    outline: 3px solid #ffd8d3;   /* anillo de enfoque accesible */
-    outline-offset: 2px;
-  }
-
-  /* Tamaño coherente en la barra de acciones */
   .acciones {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
-    position: relative;
-    z-index: 2;                   /* por si un canvas/card la sobrepasa */
+    margin-top: 10px;
   }
-
-  .acciones .primary-button {
-    min-width: 160px;             /* mejor click target */
-  }
-
-  /* Chips de resumen/peso para que no “empujen” botones */
-  .acciones .badge {
-    background: #f5f5f5;
-    color: #444;
-    border: 1px solid #eee;
-    height: 38px;
-    display: inline-flex;
-    align-items: center;
-    padding: 0 10px;
+  .badge {
+    font-size: .8rem;
+    padding: 4px 8px;
     border-radius: 999px;
-  }
-
-  /* Botón “Salir” grande y centrado */
-  .botones .primary-button {
+    background: var(--gris-claro);
     display: inline-block;
-    min-width: 180px;
-    background: #b84335;
-    margin: 12px auto 0;
   }
 
-  @media (max-width: 720px){
-    .acciones .primary-button { flex: 1 1 100%; }
-    .acciones .badge { width: 100%; justify-content: center; }
+  /* ----- Gráficos ----- */
+  .grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
   }
-  /* === FONDO BLANCO EN LOS GRÁFICOS === */
-  .grid .card canvas {
-    background: #fff !important; /* fuerza fondo blanco */
+  @media (min-width: 1000px) {
+    .grid { grid-template-columns: 1fr 1fr; }
   }
-  /* Contenedor que fija el alto real del gráfico */
   .chart-wrap {
     position: relative;
-    height: 340px;      /* <- ajusta a gusto (320–380 va bien) */
+    height: 360px;
     width: 100%;
   }
-
-  /* Fuerza fondo blanco y que el canvas NO cambie su tamaño visual */
   .chart-wrap > canvas {
-    background: #fff !important;     /* fondo blanco */
-    width: 100% !important;          /* ocupa el ancho del wrap */
-    height: 100% !important;         /* ocupa el alto del wrap */
+    background: #fff !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px;
     display: block;
     box-sizing: border-box;
   }
-</style>
+
+  /* ----- Botón salir ----- */
+  .botones {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .botones .primary-button {
+    min-width: 200px;
+    font-size: 1rem;
+  }
+
+  /* ----- Responsive menor a 720px ----- */
+  @media (max-width: 720px) {
+    .acciones { flex-direction: column; align-items: stretch; }
+    .acciones .primary-button { width: 100%; }
+    .acciones .badge { width: 100%; text-align: center; }
+  }
+  </style>
 </head>
 <body>
   <div class="login">
