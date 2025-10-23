@@ -21,7 +21,7 @@ body {
 margin: 0;
 font-family: 'Quicksand', sans-serif;
 background-image: url(./images/Fondo.png);
-background-size: cover;
+/*background-size: cover;*/
 background-attachment: fixed;
 }
 
