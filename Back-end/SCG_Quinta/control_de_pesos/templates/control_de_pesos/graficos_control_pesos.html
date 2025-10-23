@@ -12,11 +12,15 @@
   <link rel="stylesheet" type="text/css" href="{% static 'control_de_pesos/estilos_graficos_control_pesos.css' %}">
   <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
 
-  <!-- Chart.js + adapter de tiempo (orden IMPORTANTE) -->
+  <!-- Chart.js + adapter de tiempo -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+
+  <!-- SheetJS para exportar a Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
+
 <body>
   <div class="login">
     <img src="{% static 'control_de_pesos/images/logoquinta.png' %}" alt="logo" class="logo">
@@ -68,7 +72,7 @@
       <div class="acciones">
         <button class="primary-button login-button" id="btn-aplicar">Aplicar filtros</button>
         <button class="primary-button login-button" id="btn-limpiar" type="button">Limpiar</button>
-        <button class="primary-button login-button" id="btn-descargar" type="button">Descargar CSV</button>
+        <button class="primary-button login-button" id="btn-descargar" type="button">Descargar Excel</button>
         <span id="resumen" class="badge">0 registros</span>
         <span id="peso-ref" class="badge">Peso receta: –</span>
       </div>
@@ -99,362 +103,202 @@
     </div>
   </div>
 
-  <!-- Script como módulo + guardia contra doble inicialización -->
+  <!-- Script principal -->
   <script type="module">
-    if (window.__CP_INIT__) {
-      console.warn('Control de Pesos: script ya inicializado, salto duplicado.');
-    } else {
-      window.__CP_INIT__ = true;
+    if (window.__CP_INIT__) return;
+    window.__CP_INIT__ = true;
 
-      // === Helpers de DOM / Filtros persistentes ===
-      const qs = new URLSearchParams(location.search);
-      const $c = id => document.getElementById(id);
+    const qs = new URLSearchParams(location.search);
+    const $ = id => document.getElementById(id);
 
-      const F = {
-        cliente: $c('f-cliente'),
-        producto: $c('f-producto'),
-        turno: $c('f-turno'),
-        lote: $c('f-lote'),
-        desde: $c('f-desde'),
-        hasta: $c('f-hasta'),
-        resumen: $c('resumen'),
-        pesoRef: $c('peso-ref'),
-        notaTol: $c('nota-tolerancia'),
-      };
+    const F = {
+      cliente: $('f-cliente'),
+      producto: $('f-producto'),
+      turno: $('f-turno'),
+      lote: $('f-lote'),
+      desde: $('f-desde'),
+      hasta: $('f-hasta'),
+      resumen: $('resumen'),
+      pesoRef: $('peso-ref'),
+      notaTol: $('nota-tolerancia')
+    };
 
-      const STORAGE_KEY = 'filtros_graficos_control_pesos_v1';
-      function loadFilters(){
-        const f = Object.fromEntries(['cliente','producto','turno','lote','desde','hasta']
-          .map(k => [k, qs.get(k) || '']));
-        if (!qs.toString()){
-          try {
-            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            Object.assign(f, saved);
-          } catch(e){}
-        }
-        F.cliente.value = f.cliente || '';
-        F.turno.value = f.turno || '';
-        F.lote.value = f.lote || '';
-        F.desde.value = f.desde || '';
-        F.hasta.value = f.hasta || '';
-        if (f.cliente) { cargarProductos(f.cliente, f.producto); }
-      }
-      function saveFilters(){
-        const f = {
-          cliente: F.cliente.value, producto: F.producto.value, turno: F.turno.value,
-          lote: F.lote.value, desde: F.desde.value, hasta: F.hasta.value
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
-        const qsNew = new URLSearchParams(f);
-        history.replaceState(null, '', '?' + qsNew.toString());
-      }
+    const STORAGE_KEY = 'filtros_graficos_control_pesos_v1';
 
-      // === Poblar productos por cliente desde backend ===
-      async function cargarProductos(cliente, preselect=''){
-        F.producto.innerHTML = '';
-        const optTodos = document.createElement('option');
-        optTodos.value = '';
-        optTodos.textContent = 'Todos';
-        F.producto.appendChild(optTodos);
-
-        F.producto.disabled = true;
-        if (!cliente) return;
-
-        const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`, { credentials: 'same-origin' });
-        const ct = r.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) {
-          console.error('productos_por_cliente devolvió contenido no JSON');
-          return;
-        }
-
-        const j = await r.json();
-        if (j.ok){
-          console.debug('Productos recibidos:', j.productos?.length || 0);
-          if (!j.productos.length){
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = '— Sin productos para este cliente —';
-            F.producto.appendChild(opt);
-            F.producto.disabled = false;
-            return;
-          }
-
-          j.productos.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.producto;
-            opt.textContent = p.producto;
-            opt.setAttribute('data-codigo', p.codigo || '');
-            F.producto.appendChild(opt);
-          });
-          F.producto.disabled = false;
-          if (preselect){ F.producto.value = preselect; }
-        }
-      }
-
-      F.cliente.addEventListener('change', () => {
-        cargarProductos(F.cliente.value, '');
-      });
-
-      // === Charts ===
-      let chartLinea, chartHist;
-      let rendering = false; // evita renders simultáneos
-
-      function safeDestroy(chart){
-        try { if (chart && !chart._destroyed) chart.destroy(); } catch (_) {}
-      }
-      function destruirCharts(){
-        safeDestroy(chartLinea); chartLinea = undefined;
-        safeDestroy(chartHist);  chartHist  = undefined;
-      }
-
-      const TOLERANCIA_PCT = 3; // ±3% editable
-      function calcularBandaTolerancia(pesoReceta){
-        if (!pesoReceta && pesoReceta !== 0) return {min:null, max:null};
-        const delta = pesoReceta * (TOLERANCIA_PCT/100);
-        return {min: pesoReceta - delta, max: pesoReceta + delta};
-      }
-
-      // Sanitiza puntos (fecha válida + número válido)
-      function sanitizarSerie(data){
-        const pts = [];
-        for (const d of data){
-          const t = new Date(d.ts);
-          const y = Number(d.peso_real);
-          if (!Number.isFinite(y)) continue;
-          if (isNaN(t.getTime())) continue;
-          pts.push({ t, y, receta: Number(d.peso_receta) });
-        }
-        return pts;
-      }
-
-      // Unidad de tiempo dinámica según rango
-      function unidadTiempo(labels){
-        if (!labels.length) return 'day';
-        const min = labels[0].getTime();
-        const max = labels[labels.length - 1].getTime();
-        const span = max - min;
-        const H = 60 * 60 * 1000;
-        const D = 24 * H;
-        if (span <= 2 * H)   return 'minute'; // hasta 2 horas
-        if (span <= 2 * D)   return 'hour';   // hasta 2 días
-        if (span <= 90 * D)  return 'day';    // hasta 3 meses
-        return 'month';
-      }
-
-      // === SERIE TEMPORAL (usa datos {x, y}) ===
-      function construirSerieTemporal(data){
-        const ctx = document.getElementById('chartLinea').getContext('2d');
-
-        const ptsRaw = sanitizarSerie(data);
-
-        if (!ptsRaw.length){
-          chartLinea = new Chart(ctx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Sin datos', data: [] }] },
-            options: { responsive: true, maintainAspectRatio: false }
-          });
-          F.pesoRef.textContent = 'Peso receta: –';
-          F.notaTol.textContent = 'Sin datos';
-          return;
-        }
-
-        // Datos como {x: fecha, y: valor}
-        const dataRealXY = ptsRaw.map(p => ({ x: p.t, y: p.y }));
-
-        const pesoRecetaVal = ptsRaw.find(p => Number.isFinite(p.receta))?.receta;
-        const pesoReceta = Number.isFinite(pesoRecetaVal) ? pesoRecetaVal : null;
-        const banda = calcularBandaTolerancia(pesoReceta);
-
-        F.pesoRef.textContent = 'Peso receta: ' + (pesoReceta ?? '–');
-        F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
-
-        const dataRecetaXY = (pesoReceta || pesoReceta === 0)
-          ? ptsRaw.map(p => ({ x: p.t, y: pesoReceta }))
-          : [];
-
-        const dataMinXY = (banda.min != null)
-          ? ptsRaw.map(p => ({ x: p.t, y: banda.min }))
-          : [];
-
-        const dataMaxXY = (banda.max != null)
-          ? ptsRaw.map(p => ({ x: p.t, y: banda.max }))
-          : [];
-
-        const labels = ptsRaw.map(p => p.t);
-        const unit = unidadTiempo(labels);
-
-        chartLinea = new Chart(ctx, {
-          type: 'line',
-          data: {
-            // Sin labels: datasets con pares {x,y}
-            datasets: [
-              { label: 'Peso real (gr)', data: dataRealXY, borderWidth: 2, pointRadius: 2 },
-              ...(dataRecetaXY.length ? [{ label: 'Peso receta (gr)', data: dataRecetaXY, borderWidth: 1, pointRadius: 0 }] : []),
-              ...(dataMinXY.length ? [{ label: 'Límite inferior', data: dataMinXY, borderWidth: 1, pointRadius: 0 }] : []),
-              ...(dataMaxXY.length ? [{ label: 'Límite superior', data: dataMaxXY, borderWidth: 1, pointRadius: 0 }] : []),
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            parsing: true,        // Chart parsea {x,y}
-            spanGaps: true,
-            scales: {
-              x: { type: 'time', time: { unit }, ticks: { maxTicksLimit: 12 } },
-              y: { title: { display: true, text: 'gr' }, beginAtZero: false }
-            },
-            plugins: { tooltip: { mode: 'index', intersect: false } }
-          }
-        });
-      }
-
-      function construirHistograma(data){
-        const desv = data.map(d => d.desviacion);
-        const ctx = document.getElementById('chartHist').getContext('2d');
-
-        if (!desv.length){
-          chartHist = new Chart(ctx, { type: 'bar', data: {labels:[], datasets:[{label:'Sin datos', data:[]}]} , options:{ maintainAspectRatio:false, responsive:true }});
-          return;
-        }
-
-        const min = Math.min(...desv), max = Math.max(...desv);
-        const bins = 12;
-        const step = Math.max(1, Math.ceil((max-min)/bins));
-        const labels = [];
-        const counts = new Array(bins).fill(0);
-        for (let i=0;i<bins;i++){
-          const a = min + i*step;
-          const b = a + step;
-          labels.push(`${a} a ${b}`);
-        }
-        desv.forEach(v => {
-          let idx = Math.floor((v - min)/step);
-          if (idx >= bins) idx = bins-1;
-          if (idx < 0) idx = 0;
-          counts[idx]++;
-        });
-
-        chartHist = new Chart(ctx, {
-          type: 'bar',
-          data: { labels, datasets: [{ label: 'Frecuencia', data: counts }] },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { x: { title:{display:true,text:'Desviación (gr)'} }, y:{ beginAtZero:true } }
-          }
-        });
-      }
-
-      // === Fetch datos (robusto ante redirecciones al login) ===
-      async function cargarDatos(){
-        const p = new URLSearchParams({
-          cliente: F.cliente.value || '',
-          producto: F.producto.value || '',
-          turno: F.turno.value || '',
-          lote: F.lote.value || '',
-          desde: F.desde.value || '',
-          hasta: F.hasta.value || ''
-        });
-        const url = `{% url 'api_graficos_control_pesos' %}?` + p.toString();
+    function loadFilters(){
+      const f = Object.fromEntries(['cliente','producto','turno','lote','desde','hasta']
+        .map(k => [k, qs.get(k) || '']));
+      if (!qs.toString()){
         try {
-          const r = await fetch(url, { credentials: 'same-origin' });
-
-          const ctype = r.headers.get('content-type') || '';
-          if (!ctype.includes('application/json')) {
-            console.error('La respuesta no es JSON (¿redirigido al login?)', r.status, url);
-            alert('No pude leer datos (posible sesión expirada). Refresca la página e inicia sesión.');
-            return [];
-          }
-
-          if (!r.ok){
-            console.error('Error HTTP', r.status, url);
-            return [];
-          }
-          const j = await r.json();
-          if (!j.ok){
-            console.error('API ok=false', j);
-            return [];
-          }
-          if (j.registros && j.registros.length){
-            console.debug('Primeros registros', j.registros.slice(0,3));
-          }
-          return j.registros || [];
-        } catch (err){
-          console.error('Fallo fetch', err);
-          return [];
-        }
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+          Object.assign(f, saved);
+        } catch(e){}
       }
-
-      function descargarCSV(rows){
-        if (!rows.length){ alert('No hay datos para descargar.'); return; }
-        const headers = Object.keys(rows[0]);
-        const csv = [
-          headers.join(','),
-          ...rows.map(o => headers.map(h => JSON.stringify(o[h] ?? '')).join(','))
-        ].join('\n');
-        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'control_pesos_filtrado.csv';
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
-
-      // Anti-concurrencia + destroy seguro
-      async function aplicar(){
-        if (rendering) return;
-        rendering = true;
-
-        saveFilters();
-        const data = await cargarDatos();
-
-        F.resumen.textContent = `${data.length} registros`;
-        destruirCharts();
-
-        // cede 1 frame para liberar canvas antes de crear el siguiente chart
-        await new Promise(requestAnimationFrame);
-
-        if (!data.length){
-          const ctx1 = document.getElementById('chartLinea').getContext('2d');
-          chartLinea = new Chart(ctx1, { type:'line', data:{labels:[], datasets:[{label:'Sin datos', data:[]}] }, options:{ maintainAspectRatio:false } });
-          const ctx2 = document.getElementById('chartHist').getContext('2d');
-          chartHist  = new Chart(ctx2,  { type:'bar',  data:{labels:[], datasets:[{label:'Sin datos', data:[]}] }, options:{ maintainAspectRatio:false } });
-          rendering = false;
-          return;
-        }
-
-        construirSerieTemporal(data);
-        construirHistograma(data);
-        window.__datosActuales = data;
-        rendering = false;
-      }
-
-      // Botones
-      document.getElementById('btn-aplicar').addEventListener('click', (e)=>{
-        e.preventDefault();
-        if (!rendering) aplicar();
-      });
-      document.getElementById('btn-limpiar').addEventListener('click', (e)=>{
-        e.preventDefault();
-        if (rendering) return;
-        ['f-cliente','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id=>{
-          const el = $c(id);
-          if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = '';
-        });
-        F.producto.disabled = true;
-        history.replaceState(null,'',location.pathname);
-        localStorage.removeItem(STORAGE_KEY);
-        aplicar();
-      });
-      document.getElementById('btn-descargar').addEventListener('click', (e)=>{
-        e.preventDefault();
-        descargarCSV(window.__datosActuales || []);
-      });
-
-      // Init
-      loadFilters();
-      aplicar();
+      F.cliente.value = f.cliente || '';
+      F.turno.value = f.turno || '';
+      F.lote.value = f.lote || '';
+      F.desde.value = f.desde || '';
+      F.hasta.value = f.hasta || '';
+      if (f.cliente) cargarProductos(f.cliente, f.producto);
     }
+
+    function saveFilters(){
+      const f = {
+        cliente: F.cliente.value, producto: F.producto.value, turno: F.turno.value,
+        lote: F.lote.value, desde: F.desde.value, hasta: F.hasta.value
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
+      const qsNew = new URLSearchParams(f);
+      history.replaceState(null, '', '?' + qsNew.toString());
+    }
+
+    async function cargarProductos(cliente, preselect=''){
+      F.producto.innerHTML = '<option value="">Todos</option>';
+      F.producto.disabled = true;
+      if (!cliente) return;
+
+      const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`);
+      const j = await r.json();
+      if (j.ok){
+        j.productos.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.producto;
+          opt.textContent = p.producto;
+          F.producto.appendChild(opt);
+        });
+        F.producto.disabled = false;
+        if (preselect) F.producto.value = preselect;
+      }
+    }
+    F.cliente.addEventListener('change', ()=> cargarProductos(F.cliente.value));
+
+    // === GRÁFICOS ===
+    let chartLinea, chartHist;
+    const TOLERANCIA_PCT = 3;
+
+    function destruirCharts(){
+      if (chartLinea) chartLinea.destroy();
+      if (chartHist) chartHist.destroy();
+    }
+
+    function calcularBandaTolerancia(pesoReceta){
+      const delta = pesoReceta * (TOLERANCIA_PCT/100);
+      return {min: pesoReceta - delta, max: pesoReceta + delta};
+    }
+
+    function sanitizarSerie(data){
+      return data
+        .map(d => ({t: new Date(d.ts), y:+d.peso_real, receta:+d.peso_receta}))
+        .filter(p => !isNaN(p.t) && Number.isFinite(p.y));
+    }
+
+    function construirSerieTemporal(data){
+      const ctx = document.getElementById('chartLinea').getContext('2d');
+      const pts = sanitizarSerie(data);
+      if (!pts.length){
+        chartLinea = new Chart(ctx,{type:'line',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]}});return;
+      }
+
+      const pesoReceta = pts.find(p => Number.isFinite(p.receta))?.receta ?? 0;
+      const banda = calcularBandaTolerancia(pesoReceta);
+      F.pesoRef.textContent = `Peso receta: ${pesoReceta}`;
+      F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
+
+      chartLinea = new Chart(ctx,{
+        type:'line',
+        data:{
+          datasets:[
+            {label:'Peso real (gr)', data:pts.map(p=>({x:p.t,y:p.y})), borderWidth:2, pointRadius:2},
+            {label:'Peso receta (gr)', data:pts.map(p=>({x:p.t,y:pesoReceta})), borderWidth:1, pointRadius:0},
+            {label:'Límite inf', data:pts.map(p=>({x:p.t,y:banda.min})), borderWidth:1, pointRadius:0},
+            {label:'Límite sup', data:pts.map(p=>({x:p.t,y:banda.max})), borderWidth:1, pointRadius:0}
+          ]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{x:{type:'time',time:{unit:'day'}},y:{title:{display:true,text:'gr'}}}
+        }
+      });
+    }
+
+    function construirHistograma(data){
+      const desv = data.map(d=>d.desviacion);
+      const ctx = document.getElementById('chartHist').getContext('2d');
+      if (!desv.length){
+        chartHist = new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]}});return;
+      }
+      const min=Math.min(...desv), max=Math.max(...desv);
+      const bins=12, step=(max-min)/bins;
+      const labels=[], counts=Array(bins).fill(0);
+      for(let i=0;i<bins;i++){labels.push(`${(min+i*step).toFixed(0)} a ${(min+(i+1)*step).toFixed(0)}`);}
+      desv.forEach(v=>{
+        let idx=Math.floor((v-min)/step);
+        if(idx>=bins)idx=bins-1;
+        counts[idx]++;});
+      chartHist=new Chart(ctx,{
+        type:'bar',
+        data:{labels,datasets:[{label:'Frecuencia',data:counts}]},
+        options:{responsive:true,maintainAspectRatio:false}});
+    }
+
+    async function cargarDatos(){
+      const params = new URLSearchParams({
+        cliente:F.cliente.value,producto:F.producto.value,turno:F.turno.value,
+        lote:F.lote.value,desde:F.desde.value,hasta:F.hasta.value});
+      const url=`{% url 'api_graficos_control_pesos' %}?${params}`;
+      const r=await fetch(url); const j=await r.json();
+      return j.ok? j.registros || [] : [];
+    }
+
+    // === DESCARGAR EXCEL ===
+    function autoWidthFromRows(rows){
+      const headers = Object.keys(rows[0] || {});
+      return headers.map(h=>{
+        let max=h.length;
+        rows.forEach(r=>{const len=String(r[h]??'').length;if(len>max)max=len;});
+        return {wch:Math.min(Math.max(10,max+2),40)};
+      });
+    }
+
+    function descargarExcel(rows){
+      if(!rows.length){alert('No hay datos para descargar.');return;}
+
+      const wb=XLSX.utils.book_new();
+      const headers=[
+        ['ID','Fecha registro','Cliente','Producto','Código','Peso receta (gr)','Peso real (gr)','Desviación (gr)','Lote','Turno']
+      ];
+      const body=rows.map(r=>[
+        r.id, r.ts?new Date(r.ts):'', r.cliente, r.producto, r.codigo_producto,
+        r.peso_receta, r.peso_real, r.desviacion, r.lote, r.turno
+      ]);
+      const ws=XLSX.utils.aoa_to_sheet([...headers,...body]);
+      ws['!cols']=autoWidthFromRows(rows);
+      XLSX.utils.book_append_sheet(wb,ws,'Control de Pesos');
+      XLSX.writeFile(wb,'control_pesos_filtrado.xlsx');
+    }
+
+    // === Eventos ===
+    document.getElementById('btn-aplicar').addEventListener('click',async e=>{
+      e.preventDefault();saveFilters();
+      const data=await cargarDatos();
+      F.resumen.textContent=`${data.length} registros`;
+      destruirCharts();construirSerieTemporal(data);construirHistograma(data);
+      window.__datosActuales=data;
+    });
+
+    document.getElementById('btn-limpiar').addEventListener('click',e=>{
+      e.preventDefault();
+      ['f-cliente','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id=>$(id).value='');
+      F.producto.disabled=true;localStorage.removeItem(STORAGE_KEY);location.search='';
+    });
+
+    document.getElementById('btn-descargar').addEventListener('click',e=>{
+      e.preventDefault();
+      descargarExcel(window.__datosActuales||[]);
+    });
+
+    loadFilters();
   </script>
 </body>
 </html>
