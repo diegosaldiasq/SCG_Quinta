@@ -105,8 +105,11 @@
 
   <!-- Script principal -->
   <script type="module">
-    if (window.__CP_INIT__) return;
-    window.__CP_INIT__ = true;
+    if (window.__CP_INIT__) { /* evita doble init */ } else { window.__CP_INIT__ = true; }
+
+    // Asegura acceso a SheetJS en contexto módulo
+    const XLSX = window.XLSX;
+    if (!XLSX) console.error('SheetJS no cargó. Revisa la red o la política CSP.');
 
     const qs = new URLSearchParams(location.search);
     const $ = id => document.getElementById(id);
@@ -135,10 +138,10 @@
         } catch(e){}
       }
       F.cliente.value = f.cliente || '';
-      F.turno.value = f.turno || '';
-      F.lote.value = f.lote || '';
-      F.desde.value = f.desde || '';
-      F.hasta.value = f.hasta || '';
+      F.turno.value   = f.turno   || '';
+      F.lote.value    = f.lote    || '';
+      F.desde.value   = f.desde   || '';
+      F.hasta.value   = f.hasta   || '';
       if (f.cliente) cargarProductos(f.cliente, f.producto);
     }
 
@@ -154,151 +157,267 @@
 
     async function cargarProductos(cliente, preselect=''){
       F.producto.innerHTML = '<option value="">Todos</option>';
-      F.producto.disabled = true;
+      F.producto.disabled  = true;
       if (!cliente) return;
 
-      const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`);
-      const j = await r.json();
-      if (j.ok){
-        j.productos.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.producto;
-          opt.textContent = p.producto;
-          F.producto.appendChild(opt);
+      try {
+        const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`, {
+          credentials: 'same-origin'
         });
-        F.producto.disabled = false;
-        if (preselect) F.producto.value = preselect;
+        const ctype = r.headers.get('content-type') || '';
+        if (!ctype.includes('application/json')) {
+          console.error('productos_por_cliente devolvió no-JSON (¿sesión expirada?)');
+          return;
+        }
+        const j = await r.json();
+        if (j.ok){
+          (j.productos || []).forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.producto;
+            opt.textContent = p.producto;
+            F.producto.appendChild(opt);
+          });
+          F.producto.disabled = false;
+          if (preselect) F.producto.value = preselect;
+        }
+      } catch (e) {
+        console.error('Fallo cargarProductos', e);
       }
     }
-    F.cliente.addEventListener('change', ()=> cargarProductos(F.cliente.value));
+    F.cliente.addEventListener('change', ()=> cargarProductos(F.cliente.value, ''));
 
     // === GRÁFICOS ===
     let chartLinea, chartHist;
-    const TOLERANCIA_PCT = 3;
-
     function destruirCharts(){
-      if (chartLinea) chartLinea.destroy();
-      if (chartHist) chartHist.destroy();
+      try { chartLinea && chartLinea.destroy(); } catch(e){}
+      try { chartHist && chartHist.destroy(); } catch(e){}
     }
 
+    const TOLERANCIA_PCT = 3;
     function calcularBandaTolerancia(pesoReceta){
-      const delta = pesoReceta * (TOLERANCIA_PCT/100);
-      return {min: pesoReceta - delta, max: pesoReceta + delta};
+      if (!Number.isFinite(pesoReceta)) return {min:null,max:null};
+      const d = pesoReceta * (TOLERANCIA_PCT/100);
+      return {min: pesoReceta - d, max: pesoReceta + d};
     }
-
     function sanitizarSerie(data){
       return data
-        .map(d => ({t: new Date(d.ts), y:+d.peso_real, receta:+d.peso_receta}))
+        .map(d => ({t: new Date(d.ts), y: Number(d.peso_real), receta: Number(d.peso_receta)}))
         .filter(p => !isNaN(p.t) && Number.isFinite(p.y));
     }
 
     function construirSerieTemporal(data){
       const ctx = document.getElementById('chartLinea').getContext('2d');
       const pts = sanitizarSerie(data);
+
       if (!pts.length){
-        chartLinea = new Chart(ctx,{type:'line',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]}});return;
+        chartLinea = new Chart(ctx,{type:'line',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
+          options:{responsive:true,maintainAspectRatio:false}});
+        F.pesoRef.textContent = 'Peso receta: –';
+        F.notaTol.textContent = 'Sin datos';
+        return;
       }
 
-      const pesoReceta = pts.find(p => Number.isFinite(p.receta))?.receta ?? 0;
-      const banda = calcularBandaTolerancia(pesoReceta);
-      F.pesoRef.textContent = `Peso receta: ${pesoReceta}`;
+      const pesoReceta = pts.find(p => Number.isFinite(p.receta))?.receta ?? null;
+      const banda      = calcularBandaTolerancia(pesoReceta);
+      F.pesoRef.textContent = `Peso receta: ${pesoReceta ?? '–'}`;
       F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
+
+      const dataReal = pts.map(p => ({x:p.t,y:p.y}));
+      const dataRec  = pesoReceta!=null ? pts.map(p => ({x:p.t,y:pesoReceta})) : [];
+      const dataMin  = banda.min!=null  ? pts.map(p => ({x:p.t,y:banda.min}))  : [];
+      const dataMax  = banda.max!=null  ? pts.map(p => ({x:p.t,y:banda.max}))  : [];
+
+      // Rango estable basado en datos (o receta ±10%)
+      const ys = dataReal.map(p=>p.y);
+      const yMin = Math.min(...ys), yMax = Math.max(...ys);
+      const pad  = (yMax - yMin) * 0.05 || 5;
+      const yMinFinal = pesoReceta!=null ? Math.min(yMin, pesoReceta*0.9) : Math.floor(yMin - pad);
+      const yMaxFinal = pesoReceta!=null ? Math.max(yMax, pesoReceta*1.1) : Math.ceil (yMax + pad);
 
       chartLinea = new Chart(ctx,{
         type:'line',
-        data:{
-          datasets:[
-            {label:'Peso real (gr)', data:pts.map(p=>({x:p.t,y:p.y})), borderWidth:2, pointRadius:2},
-            {label:'Peso receta (gr)', data:pts.map(p=>({x:p.t,y:pesoReceta})), borderWidth:1, pointRadius:0},
-            {label:'Límite inf', data:pts.map(p=>({x:p.t,y:banda.min})), borderWidth:1, pointRadius:0},
-            {label:'Límite sup', data:pts.map(p=>({x:p.t,y:banda.max})), borderWidth:1, pointRadius:0}
-          ]
-        },
+        data:{ datasets:[
+          {label:'Peso real (gr)', data:dataReal, borderWidth:2, pointRadius:2, tension:.25},
+          ...(dataRec.length ? [{label:'Peso receta (gr)', data:dataRec, borderWidth:1, pointRadius:0}] : []),
+          ...(dataMin.length ? [{label:'Límite inf', data:dataMin, borderWidth:1, pointRadius:0}] : []),
+          ...(dataMax.length ? [{label:'Límite sup', data:dataMax, borderWidth:1, pointRadius:0}] : []),
+        ]},
         options:{
           responsive:true,
           maintainAspectRatio:false,
-          scales:{x:{type:'time',time:{unit:'day'}},y:{title:{display:true,text:'gr'}}}
+          devicePixelRatio:1,
+          animation:false,
+          resizeDelay:150,
+          interaction:{mode:'nearest', intersect:false, axis:'x'},
+          hover:{mode:'nearest', intersect:false},
+          scales:{
+            x:{type:'time', time:{unit:'day'}, ticks:{maxTicksLimit:12}},
+            y:{title:{display:true,text:'gr'}, beginAtZero:false, min:yMinFinal, max:yMaxFinal, grace:0}
+          }
         }
       });
     }
 
     function construirHistograma(data){
-      const desv = data.map(d=>d.desviacion);
+      const desv = data.map(d=>Number(d.desviacion)).filter(Number.isFinite);
       const ctx = document.getElementById('chartHist').getContext('2d');
+
       if (!desv.length){
-        chartHist = new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]}});return;
+        chartHist = new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
+          options:{responsive:true,maintainAspectRatio:false}});
+        return;
       }
-      const min=Math.min(...desv), max=Math.max(...desv);
-      const bins=12, step=(max-min)/bins;
-      const labels=[], counts=Array(bins).fill(0);
-      for(let i=0;i<bins;i++){labels.push(`${(min+i*step).toFixed(0)} a ${(min+(i+1)*step).toFixed(0)}`);}
-      desv.forEach(v=>{
-        let idx=Math.floor((v-min)/step);
-        if(idx>=bins)idx=bins-1;
-        counts[idx]++;});
-      chartHist=new Chart(ctx,{
+
+      const min = Math.min(...desv), max = Math.max(...desv);
+      const bins = 12;
+      const step = Math.max(1, Math.ceil((max-min)/bins));
+      const labels = [];
+      const counts = new Array(bins).fill(0);
+      for (let i=0;i<bins;i++){
+        const a = min + i*step, b = a + step;
+        labels.push(`${a} a ${b}`);
+      }
+      desv.forEach(v => {
+        let idx = Math.floor((v - min)/step);
+        if (idx >= bins) idx = bins-1;
+        if (idx < 0) idx = 0;
+        counts[idx]++;
+      });
+
+      chartHist = new Chart(ctx,{
         type:'bar',
-        data:{labels,datasets:[{label:'Frecuencia',data:counts}]},
-        options:{responsive:true,maintainAspectRatio:false}});
+        data:{ labels, datasets:[{label:'Frecuencia', data:counts}] },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          devicePixelRatio:1, animation:false, resizeDelay:150,
+          interaction:{mode:'index', intersect:false},
+          scales:{ x:{ title:{display:true,text:'Desviación (gr)'} }, y:{ beginAtZero:true, grace:'8%' } }
+        }
+      });
     }
 
     async function cargarDatos(){
       const params = new URLSearchParams({
-        cliente:F.cliente.value,producto:F.producto.value,turno:F.turno.value,
-        lote:F.lote.value,desde:F.desde.value,hasta:F.hasta.value});
-      const url=`{% url 'api_graficos_control_pesos' %}?${params}`;
-      const r=await fetch(url); const j=await r.json();
-      return j.ok? j.registros || [] : [];
+        cliente:F.cliente.value||'', producto:F.producto.value||'', turno:F.turno.value||'',
+        lote:F.lote.value||'', desde:F.desde.value||'', hasta:F.hasta.value||''
+      });
+      const url = `{% url 'api_graficos_control_pesos' %}?${params.toString()}`;
+
+      try {
+        const r = await fetch(url, { credentials:'same-origin' });
+        const ct = r.headers.get('content-type') || '';
+        if (!ct.includes('application/json')){
+          console.error('Respuesta no JSON (¿sesión expirada?)', r.status);
+          alert('Sesión expirada. Actualiza la página e inicia sesión.');
+          return [];
+        }
+        if (!r.ok) return [];
+        const j = await r.json();
+        return j.ok ? (j.registros || []) : [];
+      } catch (e) {
+        console.error('Fallo cargarDatos', e);
+        return [];
+      }
     }
 
     // === DESCARGAR EXCEL ===
     function autoWidthFromRows(rows){
-      const headers = Object.keys(rows[0] || {});
+      const headers = [
+        'ID','Fecha registro','Cliente','Producto','Código',
+        'Peso receta (gr)','Peso real (gr)','Desviación (gr)','Lote','Turno'
+      ];
       return headers.map(h=>{
-        let max=h.length;
-        rows.forEach(r=>{const len=String(r[h]??'').length;if(len>max)max=len;});
-        return {wch:Math.min(Math.max(10,max+2),40)};
+        let max = h.length;
+        rows.forEach(r=>{
+          const v = r[h] ?? '';
+          const len = String(v).length;
+          if (len > max) max = len;
+        });
+        return { wch: Math.min(Math.max(12, max + 2), 40) };
       });
     }
 
     function descargarExcel(rows){
-      if(!rows.length){alert('No hay datos para descargar.');return;}
+      if (!rows.length){ alert('No hay datos para descargar.'); return; }
+      if (!XLSX){ alert('Librería Excel no disponible. Revisa conexión.'); return; }
 
-      const wb=XLSX.utils.book_new();
-      const headers=[
+      // Estructura en el orden deseado
+      const headers = [
         ['ID','Fecha registro','Cliente','Producto','Código','Peso receta (gr)','Peso real (gr)','Desviación (gr)','Lote','Turno']
       ];
-      const body=rows.map(r=>[
-        r.id, r.ts?new Date(r.ts):'', r.cliente, r.producto, r.codigo_producto,
-        r.peso_receta, r.peso_real, r.desviacion, r.lote, r.turno
+      const body = rows.map(r => [
+        r.id,
+        r.ts ? new Date(r.ts) : '',
+        r.cliente ?? '',
+        r.producto ?? '',
+        r.codigo_producto ?? '',
+        Number.isFinite(+r.peso_receta) ? +r.peso_receta : '',
+        Number.isFinite(+r.peso_real)   ? +r.peso_real   : '',
+        Number.isFinite(+r.desviacion)  ? +r.desviacion  : '',
+        r.lote ?? '',
+        r.turno ?? ''
       ]);
-      const ws=XLSX.utils.aoa_to_sheet([...headers,...body]);
-      ws['!cols']=autoWidthFromRows(rows);
-      XLSX.utils.book_append_sheet(wb,ws,'Control de Pesos');
-      XLSX.writeFile(wb,'control_pesos_filtrado.xlsx');
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([...headers, ...body]);
+
+      // Formato de fecha en columna B (index columna 1)
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      for (let r = 1; r <= range.e.r; r++) {
+        const cell = XLSX.utils.encode_cell({ r, c: 1 });
+        if (ws[cell] && ws[cell].v) {
+          ws[cell].t = 'd';
+          ws[cell].z = 'yyyy-mm-dd hh:mm';
+        }
+      }
+
+      // Auto-ancho aproximado
+      ws['!cols'] = [
+        {wch:10},{wch:20},{wch:18},{wch:26},{wch:12},
+        {wch:18},{wch:18},{wch:16},{wch:14},{wch:10}
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Control de Pesos');
+      XLSX.writeFile(wb, 'control_pesos_filtrado.xlsx');
     }
 
     // === Eventos ===
-    document.getElementById('btn-aplicar').addEventListener('click',async e=>{
-      e.preventDefault();saveFilters();
-      const data=await cargarDatos();
-      F.resumen.textContent=`${data.length} registros`;
-      destruirCharts();construirSerieTemporal(data);construirHistograma(data);
-      window.__datosActuales=data;
-    });
+    async function aplicar(){
+      saveFilters();
+      const data = await cargarDatos();
+      F.resumen.textContent = `${data.length} registros`;
+      destruirCharts();
+      if (data.length){
+        construirSerieTemporal(data);
+        construirHistograma(data);
+      } else {
+        // placehold
+        const c1 = document.getElementById('chartLinea').getContext('2d');
+        chartLinea = new Chart(c1,{type:'line',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},options:{maintainAspectRatio:false}});
+        const c2 = document.getElementById('chartHist').getContext('2d');
+        chartHist  = new Chart(c2,{type:'bar', data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},options:{maintainAspectRatio:false}});
+      }
+      window.__datosActuales = data;
+    }
 
-    document.getElementById('btn-limpiar').addEventListener('click',e=>{
+    document.getElementById('btn-aplicar').addEventListener('click', e=>{
+      e.preventDefault(); aplicar();
+    });
+    document.getElementById('btn-limpiar').addEventListener('click', e=>{
       e.preventDefault();
-      ['f-cliente','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id=>$(id).value='');
-      F.producto.disabled=true;localStorage.removeItem(STORAGE_KEY);location.search='';
+      ['f-cliente','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id=>{ const el=$(id); el.value=''; });
+      F.producto.disabled = true;
+      localStorage.removeItem(STORAGE_KEY);
+      history.replaceState(null,'', location.pathname);
+      aplicar();
+    });
+    document.getElementById('btn-descargar').addEventListener('click', e=>{
+      e.preventDefault(); descargarExcel(window.__datosActuales || []);
     });
 
-    document.getElementById('btn-descargar').addEventListener('click',e=>{
-      e.preventDefault();
-      descargarExcel(window.__datosActuales||[]);
-    });
-
+    // Init
     loadFilters();
+    aplicar();
   </script>
 </body>
 </html>
