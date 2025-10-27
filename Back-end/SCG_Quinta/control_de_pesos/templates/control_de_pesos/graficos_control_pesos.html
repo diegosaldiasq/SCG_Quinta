@@ -186,7 +186,7 @@
       if (span <= 2*H)   return 'minute';       // hasta 2 horas → minutos
       if (span <= 2*D)   return 'hour';         // hasta 2 días  → horas
       if (span <= 90*D)  return 'day';          // hasta ~3 meses → días
-      return 'month';
+      //return 'month';
     }
     let chartLinea, chartHist;
     function destruirCharts(){ try{chartLinea?.destroy()}catch{} try{chartHist?.destroy()}catch{} }
@@ -253,7 +253,7 @@
                   minute:'HH:mm',
                   hour:'HH:mm',
                   day:'MMM d',
-                  month:'MMM yyyy',
+                  //month:'MMM yyyy',
                 }
               },
               ticks:{ autoSkip:true, maxTicksLimit: 10 }
