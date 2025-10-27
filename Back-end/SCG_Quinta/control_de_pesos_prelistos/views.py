@@ -161,3 +161,8 @@ def api_graficos_control_pesos_prelistos(request):
         })
 
     return JsonResponse({'ok': True, 'registros': registros})
+
+@login_required
+def redireccionar_intermedio_4(request):
+    url_intermedio = reverse('intermedio_4')
+    return HttpResponseRedirect(url_intermedio)
