@@ -120,6 +120,7 @@ display: grid;
 gap: 18px;
 grid-template-columns: 1fr;
 width: 800px;
+background-color: var(--white);
 }
 .chart-wrap {
 position: relative;
