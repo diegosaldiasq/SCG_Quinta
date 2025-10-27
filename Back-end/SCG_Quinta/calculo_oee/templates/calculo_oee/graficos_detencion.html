@@ -137,6 +137,12 @@
           return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
         };
 
+        // Ranking de turno: A=0, B=1, C=2 (robusto ante "Turno A", "a", etc.)
+        const turnoRank = t => {
+          const x = String(t).toUpperCase().replace(/^TURNO\s*/,'').trim();
+          return ({A:0, B:1, C:2})[x] ?? 999;
+        };
+
         async function cargarGrafico() {
           const url = buildURL();
           const resp = await fetch(url, {credentials:'same-origin'});
@@ -147,39 +153,45 @@
             console.warn('Sin datos'); return;
           }
 
-          // Orden por fecha y turno para eje X estable
-          data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || String(a.turno).localeCompare(String(b.turno)));
+          // Orden: fecha asc → turno A,B,C → lote_id
+          data.sort((a,b)=>
+            new Date(a.fecha) - new Date(b.fecha) ||
+            turnoRank(a.turno) - turnoRank(b.turno) ||
+            (Number(a.lote_id)||0) - (Number(b.lote_id)||0)
+          );
 
-          // Agrupar por lote_id
-          const loteInfo = {}; // {lote_id: {label:[fecha,'Turno X']}}
-          const mp = {};       // {lote_id: {motivo: porcentaje}}
+          // Agrupar por lote conservando ORDEN con Map
+          const loteOrder = [];                // orden correcto de aparición
+          const byLote = new Map();            // Map<lote_id, { label:[fecha, turno], motivos: {motivo: %} }>
           const motivosSet = new Set();
 
           for (const d of data) {
             const lid = d.lote_id;
             if (!lid) continue;
-            if (!loteInfo[lid]) {
-              loteInfo[lid] = { label: [fmtFecha(d.fecha), `${d.turno}`] };
+
+            if (!byLote.has(lid)) {
+              byLote.set(lid, { label: [fmtFecha(d.fecha), String(d.turno)], motivos: {} });
+              loteOrder.push(lid); // conserva el orden (fecha + turno A→B→C)
             }
-            (mp[lid] ||= {})[d.motivo] = d.porcentaje;
+            const entry = byLote.get(lid);
+            entry.motivos[d.motivo] = d.porcentaje;
             motivosSet.add(d.motivo);
           }
 
-          // Motivos: detenciones primero, "Tiempo Productivo" al final (arriba en el stack)
+          // Motivos: "Tiempo Productivo" al final (queda arriba en el stack)
           const motivos = Array.from(motivosSet)
             .sort((a, b) => (a === 'Tiempo Productivo') - (b === 'Tiempo Productivo'));
 
-          // Eje X y vector de ids para click
-          const loteIds = Object.keys(loteInfo);
-          const labels  = loteIds.map(id => loteInfo[id].label);
+          // Labels y datasets siguiendo loteOrder
+          const labels = loteOrder.map(id => byLote.get(id).label);
 
-          // Colores únicos HSL; “Tiempo Productivo” verde
+          // Paleta (verde fijo para Tiempo Productivo)
           function colorHSL(i, tot){ const h=(i*360/tot)%360; return `hsl(${h},65%,55%)`; }
           const palette = motivos.map((_, i) => colorHSL(i, motivos.length));
 
           const datasets = motivos.map((m,i)=>({
             label: m,
-            data: loteIds.map(id => mp[id]?.[m] ?? 0),
+            data: loteOrder.map(id => byLote.get(id).motivos[m] ?? 0),
             backgroundColor: m === 'Tiempo Productivo' ? '#2ca02c' : palette[i],
             stack: 'x',
             borderWidth: 1,
@@ -212,7 +224,7 @@
               onClick(evt, elements){
                 if (!elements.length) return;
                 const idx = elements[0].index;
-                const lid = loteIds[idx];
+                const lid = loteOrder[idx]; // usa el ORDEN correcto
                 if (lid) {
                   const urlDet = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
                   const returnTo = window.location.pathname + window.location.search; // conserva filtros
