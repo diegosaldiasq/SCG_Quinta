@@ -33,5 +33,6 @@ urlpatterns = [
     path("en_desarrollo/", views.en_desarrollo, name="en_desarrollo"),
     path("ver_foto/", views.ver_foto, name="ver_foto"),
     path("descargar_resumenturnooee/", views.descargar_resumenturnooee, name="descargar_resumenturnooee"),
-    path("graficos_control_pesos/", views.redireccionar_graficos_control_pesos, name="redireccionar_graficos_control_pesos")
+    path("graficos_control_pesos/", views.redireccionar_graficos_control_pesos, name="redireccionar_graficos_control_pesos"),
+    path("graficos_control_pesos_prelistos/", views.redidireccionar_graficos_control_pesos_prelistos, name="redidireccionar_graficos_control_pesos_prelistos"),
 ]
