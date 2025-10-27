@@ -244,7 +244,7 @@
         return;
       }
       const min = Math.min(...desv), max = Math.max(...desv);
-      const bins = 12, step = Math.max(1, Math.ceil((max-min)/bins));
+      const bins = 20, step = Math.max(1, Math.ceil((max-min)/bins));
       const labels = [], counts = new Array(bins).fill(0);
       for (let i=0;i<bins;i++){ const a=min+i*step, b=a+step; labels.push(`${a} a ${b}`); }
       desv.forEach(v => { let idx = Math.floor((v-min)/step); if (idx>=bins) idx=bins-1; if (idx<0) idx=0; counts[idx]++; });
