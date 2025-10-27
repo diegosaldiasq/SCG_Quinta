@@ -1,3 +1,7 @@
+export function inicializarGraficosControlPesos() {
+  const { apiProductos, apiDatos } = window.CP_CFG || {};
+  if (!apiProductos || !apiDatos) { console.error('Faltan endpoints'); return; }
+
 if (window.__CP_INIT__) { /* evita doble init */ } else { window.__CP_INIT__ = true; }
 
 const XLSX = window.XLSX; // acceso en contexto módulo
@@ -287,3 +291,4 @@ document.getElementById('btn-descargar').addEventListener('click', e => {
 // Init
 loadFilters();
 aplicar();
+}
