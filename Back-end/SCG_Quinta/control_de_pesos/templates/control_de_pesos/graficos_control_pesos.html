@@ -24,8 +24,6 @@
 
   <!-- SheetJS: Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- ====== JS principal ====== -->
-  <script type="module" src="{% static 'control_de_pesos/scrip_graficos_control_de_pesos.js' %}"></script>
 </head>
 
 <body>
@@ -91,5 +89,10 @@
       </form>
     </div>
   </div>
+  <!-- ====== JS principal ====== -->
+  <script type="module">
+    import { inicializarGraficosControlPesos } from "{% static 'control_de_pesos/scrip_graficos_control_pesos.js' %}";
+    inicializarGraficosControlPesos();
+  </script>
 </body>
 </html>
