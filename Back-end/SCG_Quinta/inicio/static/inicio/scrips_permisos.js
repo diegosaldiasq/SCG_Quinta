@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 return true;
             } else {
                 alert("No se pudo actualizar los permisos.");
-                return false;
+                //return false;
             }
         } catch (error) {
             console.error("Hubo un error:", error);
