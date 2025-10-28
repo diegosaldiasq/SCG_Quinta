@@ -17,6 +17,9 @@ from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 from calculo_oee.models import ResumenTurnoOee
 from django.forms.models import model_to_dict
+from django.views.decorators.http import require_POST
+from django.db import transaction
+import json, unicodedata
 
 
 # Create your views here.
@@ -88,26 +91,45 @@ def permisos(request):
 
 @csrf_exempt
 @login_required
+@require_POST
 def vista_permisos(request):
     try:
-        # ... (tu código existente)
-        if request.method == 'POST':
-            body_unicode = request.body.decode('utf-8')
-            body_data = json.loads(body_unicode)
-            datos = body_data.get('userData')
+        body_unicode = request.body.decode('utf-8') or '{}'
+        body_data = json.loads(body_unicode)
+        datos = body_data.get('userData', [])
 
+        no_encontrados = []
+        actualizados = 0
+
+        with transaction.atomic():
             for dato in datos:
-                nombre = dato['name']
-                es_activo = dato['isActive']
-                es_jefatura = dato['isStaff']
+                # Normaliza y limpia el nombre que viene del front
+                nombre = unicodedata.normalize('NFKC', str(dato.get('name', ''))).strip()
+                es_activo = bool(dato.get('isActive'))
+                es_jefatura = bool(dato.get('isStaff'))
 
-                usuario = DatosFormularioCrearCuenta.objects.get(nombre_completo=nombre)
+                if not nombre:
+                    continue
+
+                # Busca de forma tolerante (sin mayúsculas/minúsculas, tolera espacios)
+                q = DatosFormularioCrearCuenta.objects
+                usuario = (
+                    q.filter(nombre_completo__iexact=nombre).first()
+                    or q.filter(nombre_completo__icontains=nombre).first()
+                )
+
+                if not usuario:
+                    no_encontrados.append(nombre)
+                    continue
+
                 usuario.is_active = es_activo
                 usuario.is_staff = es_jefatura
-                usuario.save()
-            return JsonResponse({'existe': True})
+                usuario.save(update_fields=['is_active', 'is_staff'])
+                actualizados += 1
+
+        return JsonResponse({'ok': True, 'actualizados': actualizados, 'no_encontrados': no_encontrados})
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 
 @login_required    
 def intermedio(request):
