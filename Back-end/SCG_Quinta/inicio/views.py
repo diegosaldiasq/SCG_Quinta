@@ -400,3 +400,8 @@ def redireccionar_graficos_control_pesos(request):
 def redireccionar_graficos_control_pesos_prelistos(request):
     url_graficos_control_pesos_prelistos = reverse('graficos_control_pesos_prelistos')
     return HttpResponseRedirect(url_graficos_control_pesos_prelistos)
+
+@login_required
+def redireccionar_graficos_control_pesos_insumos_kuchen(request):
+    url_graficos_control_pesos_insumos_kuchen = reverse('graficos_control_pesos_insumos_kuchen')
+    return HttpResponseRedirect(url_graficos_control_pesos_insumos_kuchen)

@@ -35,4 +35,5 @@ urlpatterns = [
     path("descargar_resumenturnooee/", views.descargar_resumenturnooee, name="descargar_resumenturnooee"),
     path("graficos_control_pesos/", views.redireccionar_graficos_control_pesos, name="redireccionar_graficos_control_pesos"),
     path("graficos_control_pesos_prelistos/", views.redireccionar_graficos_control_pesos_prelistos, name="redireccionar_graficos_control_pesos_prelistos"),
+    path("graficos_control_pesos_insumos_kuchen/", views.redireccionar_graficos_control_pesos_insumos_kuchen, name="redireccionar_graficos_control_pesos_insumos_kuchen"),
 ]
