@@ -127,9 +127,9 @@ def vista_permisos(request):
                 usuario.save(update_fields=['is_active', 'is_staff'])
                 actualizados += 1
 
-        return JsonResponse({'ok': True, 'actualizados': actualizados, 'no_encontrados': no_encontrados})
+        return JsonResponse({'existe': True, 'actualizados': actualizados, 'no_encontrados': no_encontrados})
     except Exception as e:
-        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+        return JsonResponse({'existe': False, 'error': str(e)}, status=500)
 
 @login_required    
 def intermedio(request):
