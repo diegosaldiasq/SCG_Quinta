@@ -581,3 +581,8 @@ def graficos_detencion(request):
 @login_required
 def panel_oee_y_detenciones(request):
     return render(request, "calculo_oee/graficos_oee_detencion.html")
+
+@login_required
+def redireccionar_intermedio_2(request):
+    url_inicio = reverse('intermedio_2')
+    return HttpResponseRedirect(url_inicio)

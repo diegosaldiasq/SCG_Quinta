@@ -21,5 +21,6 @@ urlpatterns = [
     path('api/detenciones/', views.detenciones_turno_api, name='detenciones_turno_api'),
     path('graficos_detencion/', views.graficos_detencion, name='graficos_detencion'),
     path("graficos/panel-oee-detenciones/", views.panel_oee_y_detenciones, name="panel_oee_y_detenciones"),
-    path('redireccionar_intermedio_4/', views.redireccionar_intermedio_4, name='redireccionar_intermedio_4')
+    path('redireccionar_intermedio_4/', views.redireccionar_intermedio_4, name='redireccionar_intermedio_4'),
+    path('redireccionar_intermedio_2/', views.redireccionar_intermedio_2, name='redireccionar_intermedio_2'),
 ]
