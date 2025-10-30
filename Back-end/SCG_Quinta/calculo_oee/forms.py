@@ -26,7 +26,7 @@ CATALOGO = {
     { 'producto': 'Torta caluga frambuesa',           'codigo': '393414' },
     { 'producto': 'Torta caluga nuez',                'codigo': '405548' },
     { 'producto': 'Torta selva negra vegana',         'codigo': '405258' },
-    { 'producto': 'Torta piña vegana',                'codigo': '405260' },
+    #{ 'producto': 'Torta piña vegana',                'codigo': '405260' }, Descontinuado 30-10-25
     { 'producto': 'Torta panqueque guinda chocolate', 'codigo': '402261' },
     { 'producto': 'Pie de frambuesa familiar',        'codigo': '393429' },
     { 'producto': 'Pie de maracuya familiar',         'codigo': '393430' },
@@ -37,7 +37,7 @@ CATALOGO = {
   ],
   'SISA': [
     { 'producto': 'Torta amor',                       'codigo': '393266' },
-    { 'producto': 'Torta crema manjar mediana',       'codigo': '392518' },
+    #{ 'producto': 'Torta crema manjar mediana',       'codigo': '392518' }, Descontinuado 30-10-25
     { 'producto': 'Torta crema piña',                 'codigo': '393011' },
     { 'producto': 'Torta crema selva negra',          'codigo': '393013' },
     { 'producto': 'Torta chocolate mediana',          'codigo': '405523' },
@@ -48,17 +48,18 @@ CATALOGO = {
     { 'producto': 'Torta tres leches',                'codigo': '393015' },
     { 'producto': 'Torta yogurt',                     'codigo': '393017' },
     { 'producto': 'Torta viena',                      'codigo': '393019' },
-    { 'producto': 'Torta guinda chocolate',           'codigo': '393362' },
+    #{ 'producto': 'Torta guinda chocolate',           'codigo': '393362' }, Descontinuado 30-10-25
     { 'producto': 'Torta sabor lucuma',               'codigo': '393356' },
     { 'producto': 'Torta sacher',                     'codigo': '393354' },
     { 'producto': 'Torta doña isabel',                'codigo': '405256' },
     { 'producto': 'Torta cookies & cream',            'codigo': '405295' },
-    { 'producto': 'Torta caramel macchiato',          'codigo': '405294' },
-    { 'producto': 'Torta piña colada',                'codigo': '405292' },
+    #{ 'producto': 'Torta caramel macchiato',          'codigo': '405294' }, Descontinuado 30-10-25
+    #{ 'producto': 'Torta piña colada',                'codigo': '405292' }, Descontinuado 30-10-25
+    { 'producto': 'Torta panqueque chocolate manjar', 'codigo': '405460' },
     { 'producto': 'Tartaleta fruta mixta mediana',    'codigo': '393270' },
     { 'producto': 'Pie de limon familiar',            'codigo': '393000' },
-    { 'producto': 'Pie de limon mediano',             'codigo': '405396' },
-    { 'producto': 'Pie de maracuya mediano',          'codigo': '405397' },
+    #{ 'producto': 'Pie de limon mediano',             'codigo': '405396' }, Descontinuado 30-10-25
+    #{ 'producto': 'Pie de maracuya mediano',          'codigo': '405397' }, Descontinuado 30-10-25
   ],
   'Walmart': [
     { 'producto': 'Torta chocoguinda',                'codigo': '393058' },
@@ -162,8 +163,7 @@ class TurnoOEEForm(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'id_supervisor'})
     )
     LINEA_CHOICES = [
-        ('Línea 1A', 'Línea 1A'),
-        ('Línea 1B', 'Línea 1B'),
+        ('Línea 1', 'Línea 1'),
         ('Línea 2', 'Línea 2'),
         ('Línea 3A', 'Línea 3A'),
         ('Línea 3B', 'Línea 3B'),
@@ -174,6 +174,7 @@ class TurnoOEEForm(forms.ModelForm):
         ('Mesón 2', 'Mesón 2'),
         ('Mesón 3', 'Mesón 3'),
         ('Mesón 4', 'Mesón 4'),
+        ('Mesón 5', 'Mesón 5'),
     ]
     linea    = forms.ChoiceField(
         choices= [('', '--Seleccionar linea--')] + LINEA_CHOICES,
