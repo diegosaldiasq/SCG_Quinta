@@ -150,77 +150,132 @@
 
     // ====== GRAFICO OEE ======
     async function cargarOEE(){
-      const url = `{% url 'resumen_turno_oee_api' %}?${buildParams().toString()}`;
-      const r=await fetch(url,{credentials:'same-origin'});
-      if(!r.ok)return;
-      const data=await r.json();
-      if(!Array.isArray(data)||!data.length){ if(chartOEE){chartOEE.destroy();chartOEE=null;}return; }
+        const url = `{% url 'resumen_turno_oee_api' %}?${buildParams().toString()}`;
+        const r = await fetch(url, {credentials:'same-origin'});
+        if (!r.ok) return;
+        const data = await r.json();
+        if (!Array.isArray(data) || !data.length) { if (chartOEE) { chartOEE.destroy(); chartOEE = null; } return; }
 
-      data.sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)||turnoRank(a.turno)-turnoRank(b.turno));
-      const labels=data.map(d=>`${fmtFecha(d.fecha)} (${d.turno})`);
-      const disp=data.map(d=>+d.disponibilidad||0);
-      const efic=data.map(d=>+d.eficiencia||0);
-      const oee =data.map(d=>+d.oee||0);
-      const target=data.map(d=>+d.target||0);
+        // Orden por fecha y turno A→B→C
+        data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
 
-      if(chartOEE)chartOEE.destroy();
-      chartOEE=new Chart(ctxOEE,{
-        type:'line',
-        data:{
-          labels,
-          datasets:[
-            {label:'Disponibilidad',data:disp,borderColor:'blue',fill:false,tension:.25},
-            {label:'Eficiencia',data:efic,borderColor:'red',fill:false,tension:.25},
-            {label:'OEE',data:oee,borderColor:'green',fill:false,tension:.25},
-            {label:'Target',data:target,borderColor:'purple',borderDash:[6,6],fill:false},
-          ]
-        },
-        options:{
-          responsive:true,maintainAspectRatio:false,
-          plugins:{
-            legend:{position:'right'},
-            title:{display:true,text:'Tendencia OEE'},
-            tooltip:{mode:'index',intersect:false}
-          },
-          scales:{y:{beginAtZero:true,suggestedMax:100,ticks:{callback:v=>v+'%'}}}
-        }
-      });
+        const labels  = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
+        const disp    = data.map(d => +d.disponibilidad || 0);
+        const efic    = data.map(d => +d.eficiencia || 0);
+        const oee     = data.map(d => +d.oee || 0);
+        const target  = data.map(d => +d.target || 0);
+        const loteIds = data.map(d => d.lote_id); // 👈 necesario para click
+
+        if (chartOEE) chartOEE.destroy();
+        chartOEE = new Chart(ctxOEE, {
+            type:'line',
+            data:{
+            labels,
+            datasets:[
+                {label:'Disponibilidad', data:disp,   borderColor:'blue',  fill:false, tension:.25},
+                {label:'Eficiencia',     data:efic,   borderColor:'red',   fill:false, tension:.25},
+                {label:'OEE',            data:oee,    borderColor:'green', fill:false, tension:.25},
+                {label:'Target',         data:target, borderColor:'purple', borderDash:[6,6], fill:false},
+            ]
+            },
+            options:{
+            responsive:true, maintainAspectRatio:false,
+            interaction:{ mode:'nearest', intersect:true },
+            // 👇 Click en punto → resumen_turno/<lote_id>?next=<ruta+query>
+            onClick(evt, elements){
+                if (!elements.length) return;
+                const idx = elements[0].index;
+                const lid = loteIds[idx];
+                if (lid) {
+                const urlRes   = `{% url 'resumen_turno' 0 %}`.replace('0', lid);
+                const returnTo = window.location.pathname + window.location.search;
+                window.location.href = `${urlRes}?next=${encodeURIComponent(returnTo)}`;
+                }
+            },
+            plugins:{
+                legend:{position:'right'},
+                title:{display:true, text:'Tendencia OEE'},
+                tooltip:{mode:'index', intersect:false},
+            },
+            scales:{ y:{ beginAtZero:true, suggestedMax:100, ticks:{ callback:v=>v+'%' } } }
+            }
+        });
     }
 
     // ====== GRAFICO DETENCIONES ======
     async function cargarDetenciones(){
-      const url=`{% url 'detenciones_turno_api' %}?${buildParams().toString()}`;
-      const r=await fetch(url,{credentials:'same-origin'});
-      if(!r.ok)return;
-      const data=await r.json();
-      if(!Array.isArray(data)||!data.length){ if(chartDet){chartDet.destroy();chartDet=null;}return; }
+        const url = `{% url 'detenciones_turno_api' %}?${buildParams().toString()}`;
+        const r = await fetch(url, {credentials:'same-origin'});
+        if (!r.ok) return;
+        const data = await r.json();
+        if (!Array.isArray(data) || !data.length) { if (chartDet) { chartDet.destroy(); chartDet = null; } return; }
 
-      data.sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)||turnoRank(a.turno)-turnoRank(b.turno));
-      const byLote=new Map(),motivosSet=new Set(),loteOrder=[];
-      for(const d of data){
-        const lid=d.lote_id;if(!lid)continue;
-        if(!byLote.has(lid)){byLote.set(lid,{label:[fmtFecha(d.fecha),String(d.turno)],motivos:{}});loteOrder.push(lid);}
-        const e=byLote.get(lid);e.motivos[d.motivo]=d.porcentaje;motivosSet.add(d.motivo);
-      }
-      const motivos=Array.from(motivosSet).sort((a,b)=>(a==='Tiempo Productivo')-(b==='Tiempo Productivo'));
-      const labels=loteOrder.map(id=>byLote.get(id).label);
-      const colorHSL=(i,tot)=>`hsl(${i*360/tot},65%,55%)`;
-      const palette=motivos.map((_,i)=>colorHSL(i,motivos.length));
-      const datasets=motivos.map((m,i)=>({
-        label:m,
-        data:loteOrder.map(id=>byLote.get(id).motivos[m]??0),
-        backgroundColor:m==='Tiempo Productivo'?'#2ca02c':palette[i],
-        stack:'x',borderWidth:1,borderColor:'rgba(0,0,0,0.1)'
-      }));
-      const hLine={id:'hLine',afterDraw(chart,args,opts){const{ctx,chartArea:{left,right},scales:{y}}=chart;const yPix=y.getPixelForValue(30);ctx.save();ctx.beginPath();ctx.moveTo(left,yPix);ctx.lineTo(right,yPix);ctx.lineWidth=2;ctx.strokeStyle='red';ctx.setLineDash([6,4]);ctx.stroke();ctx.restore();}};
-      if(chartDet)chartDet.destroy();
-      chartDet=new Chart(ctxDet,{type:'bar',data:{labels,datasets},plugins:[hLine],options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{position:'right'},title:{display:true,text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'}},
-        scales:{x:{stacked:true},y:{stacked:true,min:0,max:100,ticks:{callback:v=>v+'%'}}},
-        hLine:{yValue:30}
-      }});
+        data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
+
+        const byLote = new Map(), motivosSet = new Set(), loteOrder = [];
+        for (const d of data) {
+            const lid = d.lote_id; if (!lid) continue;
+            if (!byLote.has(lid)) {
+            byLote.set(lid, { label:[fmtFecha(d.fecha), String(d.turno)], motivos:{} });
+            loteOrder.push(lid); // 👈 orden correcto
+            }
+            byLote.get(lid).motivos[d.motivo] = d.porcentaje;
+            motivosSet.add(d.motivo);
+        }
+
+        const motivos = Array.from(motivosSet).sort((a,b)=>(a==='Tiempo Productivo')-(b==='Tiempo Productivo'));
+        const labels  = loteOrder.map(id => byLote.get(id).label);
+
+        const colorHSL=(i,tot)=>`hsl(${i*360/tot},65%,55%)`;
+        const palette = motivos.map((_,i)=>colorHSL(i, motivos.length));
+        const datasets = motivos.map((m,i)=>({
+            label:m,
+            data:loteOrder.map(id => byLote.get(id).motivos[m] ?? 0),
+            backgroundColor: m==='Tiempo Productivo' ? '#2ca02c' : palette[i],
+            stack:'x',
+            borderWidth:1,
+            borderColor:'rgba(0,0,0,0.1)',
+        }));
+
+        const hLine = { id:'hLine', afterDraw(chart,args,opts){
+            const {ctx, chartArea:{left,right}, scales:{y}} = chart;
+            const yPix = y.getPixelForValue(30);
+            ctx.save(); ctx.beginPath(); ctx.moveTo(left,yPix); ctx.lineTo(right,yPix);
+            ctx.lineWidth=2; ctx.strokeStyle='red'; ctx.setLineDash([6,4]); ctx.stroke(); ctx.restore();
+        }};
+
+        if (chartDet) chartDet.destroy();
+        chartDet = new Chart(ctxDet, {
+            type:'bar',
+            data:{ labels, datasets },
+            plugins:[hLine],
+            options:{
+            responsive:true, maintainAspectRatio:false,
+            // 👇 Click en barra → detalle_turno/<lote_id>?next=<ruta+query>
+            onClick(evt, elements){
+                if (!elements.length) return;
+                const idx = elements[0].index;
+                const lid = loteOrder[idx];
+                if (lid) {
+                const urlDet   = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
+                const returnTo = window.location.pathname + window.location.search;
+                window.location.href = `${urlDet}?next=${encodeURIComponent(returnTo)}`;
+                }
+            },
+            plugins:{
+                legend:{position:'right'},
+                title:{display:true, text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
+                tooltip:{ callbacks:{
+                title(items){ const lbl = items[0].label; return Array.isArray(lbl) ? lbl.join(' · ') : lbl; },
+                label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
+                }}
+            },
+            scales:{ x:{ stacked:true }, y:{ stacked:true, min:0, max:100, ticks:{ callback:v=>v+'%' } } },
+            hLine:{ yValue:30 }
+            }
+        });
     }
+
 
     // === Botones ===
     btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
