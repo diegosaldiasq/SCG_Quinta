@@ -24,8 +24,12 @@
                 <a href="{% url 'redireccionar_graficos_oee' %}">Gráficos OEE</a>
             </p>
             <p class="registro">
-                <span>1.- Grafico Detenciones</span>
+                <span>2.- Grafico Detenciones</span>
                 <a href="{% url 'redireccionar_graficos_detencion' %}">Graficos Detenciones</a>
+            </p>
+            <p class="registro">
+                <span>3.- Grafico OEE y Detenciones</span>
+                <a href="{% url 'redireccionar_panel_oee_y_detenciones' %}">Graficos OEE y Detenciones</a>
             </p>
         </div>
         <form class="form" action="{% url 'redireccionar_inicio' %}">

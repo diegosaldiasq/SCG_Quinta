@@ -36,4 +36,5 @@ urlpatterns = [
     path("graficos_control_pesos/", views.redireccionar_graficos_control_pesos, name="redireccionar_graficos_control_pesos"),
     path("graficos_control_pesos_prelistos/", views.redireccionar_graficos_control_pesos_prelistos, name="redireccionar_graficos_control_pesos_prelistos"),
     path("graficos_control_pesos_insumos_kuchen/", views.redireccionar_graficos_control_pesos_insumos_kuchen, name="redireccionar_graficos_control_pesos_insumos_kuchen"),
+    path("panel_oee_y_detenciones/", views.redireccionar_panel_oee_y_detenciones, name="redireccionar_panel_oee_y_detenciones"),
 ]

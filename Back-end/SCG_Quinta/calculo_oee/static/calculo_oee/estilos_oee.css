@@ -225,3 +225,29 @@ a.primary-button:hover {
         gap: 8px;
     }
 }
+
+.panel-graficos {
+  display: grid;
+  grid-template-columns: 1fr;   /* 1 columna: vertical */
+  gap: 16px;
+}
+
+/* Opcional: si algún día quieres 2 columnas en escritorio, descomenta:
+@media (min-width: 1200px) {
+  .panel-graficos {
+    grid-template-columns: 1fr 1fr;  // 2 columnas
+  }
+}
+*/
+
+/* Asegurar alto consistente de los contenedores */
+.panel-grafico {
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px 8px 16px 8px;
+}
+.panel-grafico canvas {
+  width: 100% !important;
+  height: 380px !important;   /* O 420px para detenciones */
+}

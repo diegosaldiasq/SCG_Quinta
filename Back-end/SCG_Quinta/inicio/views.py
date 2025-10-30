@@ -405,3 +405,8 @@ def redireccionar_graficos_control_pesos_prelistos(request):
 def redireccionar_graficos_control_pesos_insumos_kuchen(request):
     url_graficos_control_pesos_insumos_kuchen = reverse('graficos_control_pesos_insumos_kuchen')
     return HttpResponseRedirect(url_graficos_control_pesos_insumos_kuchen)
+
+@login_required
+def redireccionar_panel_oee_y_detenciones(request):
+    url_panel_oee_y_detenciones = reverse('panel_oee_y_detenciones')
+    return HttpResponseRedirect(url_panel_oee_y_detenciones)

@@ -577,3 +577,7 @@ def detenciones_turno_api(request):
 @login_required
 def graficos_detencion(request):
     return render(request, 'calculo_oee/graficos_detencion.html')
+
+@login_required
+def panel_oee_y_detenciones(request):
+    return render(request, "calculo_oee/graficos_oee_detenciones.html")

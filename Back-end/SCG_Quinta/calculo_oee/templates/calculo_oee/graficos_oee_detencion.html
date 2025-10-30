@@ -1,0 +1,251 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com"> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}">
+  <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}">
+  <title>Panel de Gráficos · OEE & Detenciones</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div class="login">
+    <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+    <div class="login_container">
+      <h1 class="title">Panel Gráfico · OEE y Detenciones</h1>
+
+      <!-- === FILTROS === -->
+      <div class="filtros" style="display:grid; gap:.5rem; grid-template-columns: repeat(6, minmax(140px,1fr)); align-items:end; margin:12px 0;">
+        <label>Semanas (multi)
+          <select id="f_semanas" multiple size="4"></select>
+        </label>
+        <label>Año
+          <select id="f_anios"></select>
+        </label>
+        <label>Líneas (multi)
+          <select id="f_lineas" multiple size="4"></select>
+        </label>
+        <label>Turnos (multi)
+          <select id="f_turnos" multiple size="3"></select>
+        </label>
+        <label>Desde
+          <input type="date" id="f_desde">
+        </label>
+        <label>Hasta
+          <input type="date" id="f_hasta">
+        </label>
+      </div>
+
+      <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
+        <button id="btn_aplicar" class="primary-button">Aplicar filtros</button>
+        <button id="btn_limpiar" class="primary-button" type="button">Limpiar</button>
+        <button id="btn_sel_todo_sem" class="primary-button" type="button">Semanas: seleccionar todo</button>
+        <button id="btn_sel_todo_lin" class="primary-button" type="button">Líneas: seleccionar todo</button>
+        <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
+      </div>
+
+      <!-- === GRÁFICO 1: OEE === -->
+      <div class="panel-graficos">
+        <h2 style="text-align:center; margin-top:8px;">Gráfico OEE</h2>
+        <div style="width:100%; height:380px; background:#fff;">
+            <canvas id="graficoOEE"></canvas>
+        </div>
+
+        <!-- === GRÁFICO 2: DETENCIONES === -->
+        <h2 style="text-align:center; margin-top:24px;">Gráfico Detenciones</h2>
+        <div style="width:100%; height:420px; background:#fff; overflow-x:auto;">
+            <canvas id="graficoDetenciones"></canvas>
+        </div>
+
+        <div class="botones" style="margin-top:16px;">
+            <a href="{% url 'redireccionar_intermedio_4' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+        </div>
+      </div> 
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const $ = s => document.querySelector(s);
+    const sSemanas = $('#f_semanas');
+    const sAnios   = $('#f_anios');
+    const sLineas  = $('#f_lineas');
+    const sTurnos  = $('#f_turnos');
+    const fDesde   = $('#f_desde');
+    const fHasta   = $('#f_hasta');
+
+    const btnAplicar   = $('#btn_aplicar');
+    const btnLimpiar   = $('#btn_limpiar');
+    const btnSelTodoSem= $('#btn_sel_todo_sem');
+    const btnSelTodoLin= $('#btn_sel_todo_lin');
+    const btnSelTodoTur= $('#btn_sel_todo_tur');
+
+    const ctxOEE = $('#graficoOEE').getContext('2d');
+    const ctxDet = $('#graficoDetenciones').getContext('2d');
+    let chartOEE, chartDet;
+
+    // ====== FUNCIONES BASE ======
+    const getMultiValues = sel => Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+
+    function buildParams() {
+      const p = new URLSearchParams();
+      for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+      if (sAnios.value) p.append('anio', sAnios.value);
+      for (const l of getMultiValues(sLineas)) p.append('linea', l);
+      for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+      if (fDesde.value) p.set('desde', fDesde.value);
+      if (fHasta.value) p.set('hasta', fHasta.value);
+      return p;
+    }
+
+    async function cargarOpciones() {
+      const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
+      const r = await fetch(urlOpt, {credentials:'same-origin'});
+      if (!r.ok) return;
+      const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+      const fill = (sel, arr, desc=false)=>{
+        sel.innerHTML='';
+        const lista=[...arr].sort((a,b)=>(desc?b:a)-(desc?a:b));
+        lista.forEach(v=>{
+          const o=document.createElement('option');
+          o.value=v; o.textContent=v; sel.appendChild(o);
+        });
+      };
+      fill(sSemanas,semanas);
+      fill(sAnios,anios,true);
+      fill(sLineas,lineas);
+      fill(sTurnos,turnos);
+      if(sAnios.options.length) sAnios.selectedIndex=0;
+    }
+
+    function aplicarFiltrosDesdeURL(){
+      const params=new URLSearchParams(location.search);
+      const markMulti=(sel,arr)=>{
+        const S=new Set(arr);
+        Array.from(sel.options).forEach(o=>o.selected=S.has(o.value));
+      };
+      const semanas=params.getAll('semana');if(semanas.length)markMulti(sSemanas,semanas);
+      const anio=params.get('anio');if(anio)sAnios.value=anio;
+      const lineas=params.getAll('linea');if(lineas.length)markMulti(sLineas,lineas);
+      const turnos=params.getAll('turno');if(turnos.length)markMulti(sTurnos,turnos);
+      const desde=params.get('desde');if(desde)fDesde.value=desde;
+      const hasta=params.get('hasta');if(hasta)fHasta.value=hasta;
+    }
+
+    const fmtFecha=s=>{
+      const d=new Date(s); if(isNaN(d))return s;
+      return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+    };
+    const turnoRank=t=>{
+      const x=String(t).toUpperCase().replace(/^TURNO\s*/,'').trim();
+      return ({A:0,B:1,C:2})[x]??999;
+    };
+
+    // ====== GRAFICO OEE ======
+    async function cargarOEE(){
+      const url = `{% url 'resumen_turno_oee_api' %}?${buildParams().toString()}`;
+      const r=await fetch(url,{credentials:'same-origin'});
+      if(!r.ok)return;
+      const data=await r.json();
+      if(!Array.isArray(data)||!data.length){ if(chartOEE){chartOEE.destroy();chartOEE=null;}return; }
+
+      data.sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)||turnoRank(a.turno)-turnoRank(b.turno));
+      const labels=data.map(d=>`${fmtFecha(d.fecha)} (${d.turno})`);
+      const disp=data.map(d=>+d.disponibilidad||0);
+      const efic=data.map(d=>+d.eficiencia||0);
+      const oee =data.map(d=>+d.oee||0);
+      const target=data.map(d=>+d.target||0);
+
+      if(chartOEE)chartOEE.destroy();
+      chartOEE=new Chart(ctxOEE,{
+        type:'line',
+        data:{
+          labels,
+          datasets:[
+            {label:'Disponibilidad',data:disp,borderColor:'blue',fill:false,tension:.25},
+            {label:'Eficiencia',data:efic,borderColor:'red',fill:false,tension:.25},
+            {label:'OEE',data:oee,borderColor:'green',fill:false,tension:.25},
+            {label:'Target',data:target,borderColor:'purple',borderDash:[6,6],fill:false},
+          ]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{
+            legend:{position:'right'},
+            title:{display:true,text:'Tendencia OEE'},
+            tooltip:{mode:'index',intersect:false}
+          },
+          scales:{y:{beginAtZero:true,suggestedMax:100,ticks:{callback:v=>v+'%'}}}
+        }
+      });
+    }
+
+    // ====== GRAFICO DETENCIONES ======
+    async function cargarDetenciones(){
+      const url=`{% url 'detenciones_turno_api' %}?${buildParams().toString()}`;
+      const r=await fetch(url,{credentials:'same-origin'});
+      if(!r.ok)return;
+      const data=await r.json();
+      if(!Array.isArray(data)||!data.length){ if(chartDet){chartDet.destroy();chartDet=null;}return; }
+
+      data.sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)||turnoRank(a.turno)-turnoRank(b.turno));
+      const byLote=new Map(),motivosSet=new Set(),loteOrder=[];
+      for(const d of data){
+        const lid=d.lote_id;if(!lid)continue;
+        if(!byLote.has(lid)){byLote.set(lid,{label:[fmtFecha(d.fecha),String(d.turno)],motivos:{}});loteOrder.push(lid);}
+        const e=byLote.get(lid);e.motivos[d.motivo]=d.porcentaje;motivosSet.add(d.motivo);
+      }
+      const motivos=Array.from(motivosSet).sort((a,b)=>(a==='Tiempo Productivo')-(b==='Tiempo Productivo'));
+      const labels=loteOrder.map(id=>byLote.get(id).label);
+      const colorHSL=(i,tot)=>`hsl(${i*360/tot},65%,55%)`;
+      const palette=motivos.map((_,i)=>colorHSL(i,motivos.length));
+      const datasets=motivos.map((m,i)=>({
+        label:m,
+        data:loteOrder.map(id=>byLote.get(id).motivos[m]??0),
+        backgroundColor:m==='Tiempo Productivo'?'#2ca02c':palette[i],
+        stack:'x',borderWidth:1,borderColor:'rgba(0,0,0,0.1)'
+      }));
+      const hLine={id:'hLine',afterDraw(chart,args,opts){const{ctx,chartArea:{left,right},scales:{y}}=chart;const yPix=y.getPixelForValue(30);ctx.save();ctx.beginPath();ctx.moveTo(left,yPix);ctx.lineTo(right,yPix);ctx.lineWidth=2;ctx.strokeStyle='red';ctx.setLineDash([6,4]);ctx.stroke();ctx.restore();}};
+      if(chartDet)chartDet.destroy();
+      chartDet=new Chart(ctxDet,{type:'bar',data:{labels,datasets},plugins:[hLine],options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'right'},title:{display:true,text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'}},
+        scales:{x:{stacked:true},y:{stacked:true,min:0,max:100,ticks:{callback:v=>v+'%'}}},
+        hLine:{yValue:30}
+      }});
+    }
+
+    // === Botones ===
+    btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
+    btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
+    btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
+
+    btnAplicar.onclick=e=>{
+      e.preventDefault();
+      const p=buildParams();
+      history.replaceState(null,'',p.toString()?`?${p}`:location.pathname);
+      cargarOEE(); cargarDetenciones();
+    };
+    btnLimpiar.onclick=()=>{
+      [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
+      sAnios.selectedIndex=-1;fDesde.value='';fHasta.value='';
+      history.replaceState(null,'',location.pathname);
+      cargarOEE(); cargarDetenciones();
+    };
+
+    // Inicial
+    await cargarOpciones();
+    aplicarFiltrosDesdeURL();
+    await cargarOEE();
+    await cargarDetenciones();
+  });
+  </script>
+</body>
+</html>
