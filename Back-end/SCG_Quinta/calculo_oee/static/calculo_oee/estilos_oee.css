@@ -241,13 +241,13 @@ a.primary-button:hover {
 */
 
 /* Asegurar alto consistente de los contenedores */
-.panel-grafico {
+.panel-graficos {
   width: 100%;
   background: #fff;
   border-radius: 12px;
   padding: 8px 8px 16px 8px;
 }
-.panel-grafico canvas {
+.panel-graficos canvas {
   width: 100% !important;
   height: 380px !important;   /* O 420px para detenciones */
 }
