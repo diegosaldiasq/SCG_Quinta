@@ -60,7 +60,9 @@
 
             <!-- Botones bajo el resumen -->
             <div class="botones-resumen">
-                <a href="{{ next_url }}" class="primary-button">⬅️ Volver</a>
+                {% if resumen.verificado %}
+                    <a href="{{ next_url }}" class="primary-button">⬅️ Volver</a>
+                {% endif %}
                 <a href="{% url 'detalle_turno' resumen.lote.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
                     📊 Ver Productos, Detenciones y Mermas
                 </a>
@@ -69,7 +71,7 @@
                     <form method="post" action="{% url 'marcar_verificado' resumen.lote.id %}?next={{ next_url|urlencode }}">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next_url }}">
-                        <button type="submit" class="primary-button">Marcar verificado</button>
+                        <button type="submit" class="primary-button">Marcar verificado y volver</button>
                     </form>
                 {% endif %}
             </div>
