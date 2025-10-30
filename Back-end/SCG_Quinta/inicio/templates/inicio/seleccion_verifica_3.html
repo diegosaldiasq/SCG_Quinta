@@ -9,27 +9,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'inicio/estilos_intermedio.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'inicio/estilos_selec_verif.css' %}">
     <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}" />
-    <title>Seleccion area</title>
+    <title>Seleccion de verificaciones de Procesos</title>
 </head>
 <body>
     <div class="login">
         <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
-        <h1 class="title">Seleccionar Área</h1>
+        <h1 class="title">Seleccionar registro a verificar</h1>
         <div class="login-container">
-            <p class="subtitle">Áreas</p>
+            <p class="subtitle">POE</p>
             <p class="registro">
-                <a href="{% url 'seleccion_verifica' %}">CALIDAD</a>
-            </p>
-            <p class="registro">
-                <a href="{% url 'seleccion_verifica_2' %}">PROCESOS</a>
-            </p>
-            <p class="registro">
-                <a href="{% url 'seleccion_verifica_3' %}">PRODUCCION</a>
+                <span>1.- Registros Cálculo OEE - ENEA</span>
+                <a href="{% url 'redireccionar_lista_turnos' %}">R-POE-E-04-XX</a>
             </p>
         </div>
-        <form class="form" action="{% url 'index' %}">
+        <form class="form" action="{% url 'redireccionar_inicio' %}">
             <button class="primary-button login-button">Volver inicio</button>
         </form>
     </div>

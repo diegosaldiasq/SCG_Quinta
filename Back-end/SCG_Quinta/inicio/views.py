@@ -163,6 +163,10 @@ def seleccion_verifica(request):
 def seleccion_verifica_2(request):
     return render(request, 'inicio/seleccion_verifica_2.html')
 
+@login_required
+def seleccion_verifica_3(request):
+    return render(request, 'inicio/seleccion_verifica_3.html')
+
 # Diccionario para mapear el nombre de la configuración con el nombre del modelo
 model_mapping = {
         'monitoreo_del_agua': 'DatosFormularioMonitoreoDelAgua',
@@ -410,3 +414,8 @@ def redireccionar_graficos_control_pesos_insumos_kuchen(request):
 def redireccionar_panel_oee_y_detenciones(request):
     url_panel_oee_y_detenciones = reverse('panel_oee_y_detenciones')
     return HttpResponseRedirect(url_panel_oee_y_detenciones)
+
+@login_required
+def redireccionar_lista_turnos(request):
+    url_lista_turnos = reverse('lista_turnos')
+    return HttpResponseRedirect(url_lista_turnos)

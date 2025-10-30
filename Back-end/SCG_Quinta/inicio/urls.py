@@ -26,6 +26,7 @@ urlpatterns = [
     path("no_hay_datos/", views.no_hay_datos, name="no_hay_datos"),
     path("seleccion_verifica/", views.seleccion_verifica, name="seleccion_verifica"),
     path("seleccion_verifica_2/", views.seleccion_verifica_2, name="seleccion_verifica_2"),
+    path("seleccion_verifica_3/", views.seleccion_verifica_3, name="seleccion_verifica_3"),
     path("verificar/", views.verificar, name="verificar"),
     path("verificar_2/", views.verificar_2, name="verificar_2"),
     path("verificar_registros/", views.verificar_registros, name="verificar_registros"),
@@ -37,4 +38,5 @@ urlpatterns = [
     path("graficos_control_pesos_prelistos/", views.redireccionar_graficos_control_pesos_prelistos, name="redireccionar_graficos_control_pesos_prelistos"),
     path("graficos_control_pesos_insumos_kuchen/", views.redireccionar_graficos_control_pesos_insumos_kuchen, name="redireccionar_graficos_control_pesos_insumos_kuchen"),
     path("panel_oee_y_detenciones/", views.redireccionar_panel_oee_y_detenciones, name="redireccionar_panel_oee_y_detenciones"),
+    path("lista_turnos/", views.redireccionar_lista_turnos, name="redireccionar_lista_turnos"),
 ]
