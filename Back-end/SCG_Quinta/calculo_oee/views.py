@@ -580,4 +580,4 @@ def graficos_detencion(request):
 
 @login_required
 def panel_oee_y_detenciones(request):
-    return render(request, "calculo_oee/graficos_oee_detenciones.html")
+    return render(request, "calculo_oee/graficos_oee_detencion.html")
