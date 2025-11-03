@@ -21,6 +21,8 @@
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3/locale/es/index.min.js" defer></script>
+  <!-- SheetJS: Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 </head>
 
 <body>
@@ -77,6 +79,7 @@
       <div class="acciones">
         <button class="primary-button" id="btn-aplicar" type="button">Aplicar filtros</button>
         <button class="primary-button" id="btn-limpiar" type="button">Limpiar</button>
+        <button class="primary-button" id="btn-descargar" type="button">Descargar Excel</button>
         <span id="resumen" class="badge">0 registros</span>
       </div>
     </div>
@@ -115,9 +118,8 @@
       </form>
     </div>
   </div>
-
   <script>
-  window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', () => {
     const $ = id => document.getElementById(id);
     const F = {
         cliente: $('f-cliente'),
@@ -160,7 +162,7 @@
         chartBomba = chartTurbo = chartContra = chartAire = chartDensidad = chartTemp = null;
     }
 
-    // ========= 2. cargar productos según cliente (nuevo) =========
+    // ========= 2. cargar productos según cliente =========
     async function cargarProductosPorCliente(cliente, preselect = '') {
         F.producto.innerHTML = '<option value="">Todos</option>';
         if (!cliente) return;
@@ -293,15 +295,82 @@
         });
     }
 
-    // ========= 6. función principal =========
+    // ========= 6. descargar Excel =========
+    function descargarExcel(rows){
+        if (!rows || !rows.length){
+        alert('No hay datos para descargar.');
+        return;
+        }
+
+        const headers = [[
+        'ID',
+        'Fecha registro',
+        'Cliente',
+        'Producto',
+        'Código producto',
+        'TM',
+        'Velocidad bomba (RPM)',
+        'Velocidad turbo (RPM)',
+        'Contrapresión (bar)',
+        'Inyección de aire (mm)',
+        'Densidad (g/ml)',
+        'Temperatura (°C)',
+        'Lote',
+        'Turno'
+        ]];
+
+        const body = rows.map(r => [
+        r.id ?? '',
+        r.ts ?? '',
+        r.cliente ?? '',
+        r.producto ?? '',
+        r.codigo_producto ?? '',
+        r.numero_tm ?? '',
+        r.velocidad_bomba ?? '',
+        r.velocidad_turbo ?? '',
+        r.contrapresion ?? '',
+        r.inyeccion_de_aire ?? '',
+        r.densidad ?? '',
+        r.t_final ?? '',
+        r.lote ?? '',
+        r.turno ?? '',
+        ]);
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([...headers, ...body]);
+
+        ws['!cols'] = [
+        {wch:6},  // id
+        {wch:20}, // fecha
+        {wch:16}, // cliente
+        {wch:28}, // producto
+        {wch:14}, // código
+        {wch:6},  // tm
+        {wch:20}, // bomba
+        {wch:20}, // turbo
+        {wch:18}, // contra
+        {wch:20}, // aire
+        {wch:14}, // densidad
+        {wch:14}, // temp
+        {wch:14}, // lote
+        {wch:8},  // turno
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Parámetros Gorreri');
+        XLSX.writeFile(wb, 'parametros_gorreri.xlsx');
+    }
+
+    // ========= 7. función principal =========
     async function aplicar(){
         saveFilters();
         const data = await cargarDatos();
         F.resumen.textContent = `${data.length} registros`;
         destroyCharts();
 
+        // guardamos para el Excel
+        window.__datosGorreri = Array.isArray(data) ? data : [];
+
         if (!data.length){
-        // si no hay datos, al menos deja un chart vacío en el primero
         const c1 = document.getElementById('chartBomba').getContext('2d');
         chartBomba = new Chart(c1, {
             type:'line',
@@ -313,7 +382,6 @@
 
         // ordenar por fecha
         data.sort((a,b)=> new Date(a.ts) - new Date(b.ts));
-
         const serie = data.map(d => ({ ts: parseFechaLocal(d.ts), row: d })).filter(d=>d.ts);
 
         const ptsBomba    = serie.map(s => ({x:s.ts, y: Number(s.row.velocidad_bomba)})).filter(p=>Number.isFinite(p.y));
@@ -331,7 +399,7 @@
         chartTemp     = buildLineChart(document.getElementById('chartTemp').getContext('2d'),     ptsTemp,     'Temperatura',     '°C');
     }
 
-    // ========= 7. eventos de botones =========
+    // ========= 8. eventos de botones =========
     $('btn-aplicar').addEventListener('click', e => {
         e.preventDefault();
         aplicar();
@@ -348,10 +416,18 @@
         aplicar();
     });
 
-    // ========= 8. init =========
+    const btnDescargar = document.getElementById('btn-descargar');
+    if (btnDescargar) {
+        btnDescargar.addEventListener('click', e => {
+        e.preventDefault();
+        descargarExcel(window.__datosGorreri || []);
+        });
+    }
+
+    // ========= 9. init =========
     loadFilters();
     aplicar();
     });
-  </script>
+  </script>  
 </body>
 </html>
