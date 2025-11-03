@@ -32,6 +32,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Media torta San Jorge lucuma','405414'):  50,
     ('Tarta soft familiar','393433'):  80,
     ('Tartaleta fruta mixta familiar','393432'):  80,
+    ('Chocotorta','405606'):  25,
     ('Reparaciones tortas','111111'):  150,  # código ficticio para reparaciones jumbo
     # SISA
     ('Torta amor','393266'):  100,
