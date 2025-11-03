@@ -10,5 +10,5 @@ urlpatterns = [
     path('parametros/gorreri/graficos/', views.graficos_parametros_gorreri, name='graficos_parametros_gorreri'),
     path('parametros/gorreri/api/', views.api_graficos_parametros_gorreri, name='api_graficos_parametros_gorreri'),
     path("parametros/gorreri/api_productos/", views.api_productos_por_cliente_parametros_gorreri, name="api_productos_por_cliente_parametros_gorreri"),
-    path("redireccionar_selecciones_4/", views.redireccionar_selecciones_4, name="redireccionar_selecciones_4"),
+    path("redireccionar_intermedio_4/", views.redireccionar_intermedio_4, name="redireccionar_intermedio_4"),
 ]

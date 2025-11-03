@@ -71,8 +71,8 @@ def redireccionar_selecciones_2(request):
     return HttpResponseRedirect(url_selecciones)
 
 @login_required
-def redireccionar_selecciones_4(request):
-    url_selecciones = reverse('selecciones_4')
+def redireccionar_intermedio_4(request):
+    url_selecciones = reverse('intermedio_4')
     return HttpResponseRedirect(url_selecciones)
 
 @login_required
