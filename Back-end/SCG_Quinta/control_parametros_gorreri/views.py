@@ -71,6 +71,11 @@ def redireccionar_selecciones_2(request):
     return HttpResponseRedirect(url_selecciones)
 
 @login_required
+def redireccionar_selecciones_4(request):
+    url_selecciones = reverse('selecciones_4')
+    return HttpResponseRedirect(url_selecciones)
+
+@login_required
 def graficos_parametros_gorreri(request):
     """
     Renderiza el template con los gráficos.
