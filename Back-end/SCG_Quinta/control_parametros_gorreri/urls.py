@@ -9,4 +9,5 @@ urlpatterns = [
     path('parametros/gorreri/', views.control_parametros_gorreri, name='control_parametros_gorreri'),
     path('parametros/gorreri/graficos/', views.graficos_parametros_gorreri, name='graficos_parametros_gorreri'),
     path('parametros/gorreri/api/', views.api_graficos_parametros_gorreri, name='api_graficos_parametros_gorreri'),
+    path("parametros/gorreri/api_productos/", views.api_productos_por_cliente_parametros_gorreri, name="api_productos_por_cliente_parametros_gorreri"),
 ]

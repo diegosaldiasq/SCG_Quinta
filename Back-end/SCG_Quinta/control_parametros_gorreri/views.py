@@ -148,3 +148,15 @@ def api_graficos_parametros_gorreri(request):
         })
 
     return JsonResponse({'ok': True, 'registros': registros})
+
+@login_required
+def api_productos_por_cliente_parametros_gorreri(request):
+    cliente = request.GET.get('cliente', '')
+    qs = DatosFormularioControlParametrosGorreri.objects.all()
+    if cliente:
+        qs = qs.filter(cliente=cliente)
+    productos = qs.values_list('producto', flat=True).distinct().order_by('producto')
+    return JsonResponse({
+        'ok': True,
+        'productos': [{'producto': p} for p in productos]
+    })
