@@ -8,6 +8,8 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+from django.utils.dateparse import parse_date
 
 # Create your views here.
 
@@ -67,3 +69,82 @@ def vista_control_parametros_gorreri(request):
 def redireccionar_selecciones_2(request):
     url_selecciones = reverse('vista_selecciones_2')
     return HttpResponseRedirect(url_selecciones)
+
+@login_required
+def graficos_parametros_gorreri(request):
+    """
+    Renderiza el template con los gráficos.
+    Aquí solo mandamos las listas de clientes, productos y turnos distintos
+    para poblar los <select>.
+    """
+    # sacamos valores distintos de la tabla
+    clientes = DatosFormularioControlParametrosGorreri.objects.values_list('cliente', flat=True).distinct().order_by('cliente')
+    productos = DatosFormularioControlParametrosGorreri.objects.values_list('producto', flat=True).distinct().order_by('producto')
+    turnos = DatosFormularioControlParametrosGorreri.objects.values_list('turno', flat=True).distinct().order_by('turno')
+    tms = DatosFormularioControlParametrosGorreri.objects.values_list('numero_tm', flat=True).distinct().order_by('numero_tm')
+
+    ctx = {
+        'clientes': clientes,
+        'productos': productos,
+        'turnos': turnos,
+        'tms': tms,
+    }
+    return render(request, 'control_parametros_gorreri/graficos_parametros_gorreri.html', ctx)
+
+
+@login_required
+def api_graficos_parametros_gorreri(request):
+    """
+    Devuelve los registros filtrados en JSON para que el front dibuje los gráficos.
+    """
+    qs = DatosFormularioControlParametrosGorreri.objects.all().order_by('fecha_registro')
+
+    cliente = request.GET.get('cliente') or ''
+    producto = request.GET.get('producto') or ''
+    turno = request.GET.get('turno') or ''
+    lote = request.GET.get('lote') or ''
+    tm = request.GET.get('tm') or ''
+    desde = request.GET.get('desde') or ''
+    hasta = request.GET.get('hasta') or ''
+
+    if cliente:
+        qs = qs.filter(cliente=cliente)
+    if producto:
+        qs = qs.filter(producto=producto)
+    if turno:
+        qs = qs.filter(turno=turno)
+    if lote:
+        qs = qs.filter(lote__icontains=lote)
+    if tm:
+        qs = qs.filter(numero_tm=tm)
+
+    # fechas
+    if desde:
+        d = parse_date(desde)
+        if d:
+            qs = qs.filter(fecha_registro__date__gte=d)
+    if hasta:
+        h = parse_date(hasta)
+        if h:
+            qs = qs.filter(fecha_registro__date__lte=h)
+
+    registros = []
+    for r in qs:
+        registros.append({
+            'id': r.id,
+            'ts': r.fecha_registro.isoformat(),
+            'cliente': r.cliente,
+            'producto': r.producto,
+            'codigo_producto': r.codigo_producto,
+            'numero_tm': r.numero_tm,
+            'velocidad_bomba': r.velocidad_bomba,
+            'velocidad_turbo': r.velocidad_turbo,
+            'contrapresion': r.contrapresion,
+            'inyeccion_de_aire': r.inyeccion_de_aire,
+            'densidad': r.densidad,
+            't_final': r.t_final,
+            'lote': r.lote,
+            'turno': r.turno,
+        })
+
+    return JsonResponse({'ok': True, 'registros': registros})

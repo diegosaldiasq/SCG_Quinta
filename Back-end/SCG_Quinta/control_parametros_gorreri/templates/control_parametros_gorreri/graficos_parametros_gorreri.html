@@ -1,0 +1,297 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gráficos · Parámetros Gorreri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos (reutilizamos los del módulo) -->
+  <link rel="stylesheet" href="{% static 'control_de_pesos/estilos_graficos_control_pesos.css' %}">
+  <link rel="icon" href="{% static 'control_parametros_gorreri/images/logoquinta2.png' %}" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@3" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@3/locale/es/index.min.js" defer></script>
+</head>
+
+<body>
+  <div class="login">
+    <img src="{% static 'control_parametros_gorreri/images/logoquinta.png' %}" alt="logo" class="logo">
+    <div class="login-container">
+      <h1 class="title">Gráficos · Control Parámetros Gorreri</h1>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="card">
+      <div class="filtros" id="filtros">
+        <div>
+          <label for="f-cliente">Cliente</label>
+          <select id="f-cliente">
+            <option value="">Todos</option>
+            {% for c in clientes %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-producto">Producto</label>
+          <select id="f-producto">
+            <option value="">Todos</option>
+            {% for p in productos %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-tm">Turbomixer</label>
+          <select id="f-tm">
+            <option value="">Todos</option>
+            {% for t in tms %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-turno">Turno</label>
+          <select id="f-turno">
+            <option value="">Todos</option>
+            {% for t in turnos %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-lote">Lote</label>
+          <input id="f-lote" type="text" placeholder="Ej: 241101-01" />
+        </div>
+        <div>
+          <label for="f-desde">Desde</label>
+          <input id="f-desde" type="date" />
+        </div>
+        <div>
+          <label for="f-hasta">Hasta</label>
+          <input id="f-hasta" type="date" />
+        </div>
+      </div>
+      <div class="acciones">
+        <button class="primary-button" id="btn-aplicar" type="button">Aplicar filtros</button>
+        <button class="primary-button" id="btn-limpiar" type="button">Limpiar</button>
+        <span id="resumen" class="badge">0 registros</span>
+      </div>
+    </div>
+
+    <!-- GRILLA DE GRÁFICOS -->
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+      <div class="card">
+        <h3 class="title">Velocidad Bomba (RPM)</h3>
+        <div class="chart-wrap"><canvas id="chartBomba"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Velocidad Turbo (RPM)</h3>
+        <div class="chart-wrap"><canvas id="chartTurbo"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Contrapresión (bar)</h3>
+        <div class="chart-wrap"><canvas id="chartContra"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Inyección de aire (mm)</h3>
+        <div class="chart-wrap"><canvas id="chartAire"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Densidad (g/ml)</h3>
+        <div class="chart-wrap"><canvas id="chartDensidad"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Temperatura (°C)</h3>
+        <div class="chart-wrap"><canvas id="chartTemp"></canvas></div>
+      </div>
+    </div>
+
+    <div class="botones" style="margin-top:16px;">
+      <form class="form" action="{% url 'redireccionar_selecciones_2' %}">
+        <button class="primary-button">Salir</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const $ = id => document.getElementById(id);
+    const F = {
+      cliente: $('f-cliente'),
+      producto: $('f-producto'),
+      tm: $('f-tm'),
+      turno: $('f-turno'),
+      lote: $('f-lote'),
+      desde: $('f-desde'),
+      hasta: $('f-hasta'),
+      resumen: $('resumen'),
+    };
+
+    const STORAGE_KEY = 'filtros_graficos_parametros_gorreri_v1';
+
+    let chartBomba, chartTurbo, chartContra, chartAire, chartDensidad, chartTemp;
+
+    function parseFechaLocal(ts) {
+      if (!ts) return null;
+      let s = String(ts).trim();
+      s = s.replace(/\.(\d{3})\d+(Z|[+\-]\d{2}:\d{2})?$/, '.$1$2');
+      const d = new Date(s);
+      if (!isNaN(d)) return d;
+      return null;
+    }
+
+    function unidadTiempo(minDate, maxDate){
+      const span = maxDate - minDate;
+      const H = 60*60*1000, D = 24*H;
+      if (span <= 2*H) return 'minute';
+      if (span <= 2*D) return 'hour';
+      if (span <= 90*D) return 'day';
+    }
+
+    function loadFilters(){
+      const qs = new URLSearchParams(location.search);
+      const f = Object.fromEntries(['cliente','producto','tm','turno','lote','desde','hasta'].map(k => [k, qs.get(k) || '']));
+      if (!qs.toString()) {
+        try { Object.assign(f, JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')); } catch(e){}
+      }
+      F.cliente.value = f.cliente || '';
+      F.producto.value = f.producto || '';
+      F.tm.value = f.tm || '';
+      F.turno.value = f.turno || '';
+      F.lote.value = f.lote || '';
+      F.desde.value = f.desde || '';
+      F.hasta.value = f.hasta || '';
+    }
+
+    function saveFilters(){
+      const f = {
+        cliente: F.cliente.value,
+        producto: F.producto.value,
+        tm: F.tm.value,
+        turno: F.turno.value,
+        lote: F.lote.value,
+        desde: F.desde.value,
+        hasta: F.hasta.value,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
+      history.replaceState(null, '', '?' + new URLSearchParams(f).toString());
+    }
+
+    function destroyCharts(){
+      [chartBomba, chartTurbo, chartContra, chartAire, chartDensidad, chartTemp].forEach(ch => { try { ch && ch.destroy(); } catch(e){} });
+      chartBomba = chartTurbo = chartContra = chartAire = chartDensidad = chartTemp = null;
+    }
+
+    async function cargarDatos(){
+      const p = new URLSearchParams({
+        cliente: F.cliente.value || '',
+        producto: F.producto.value || '',
+        tm: F.tm.value || '',
+        turno: F.turno.value || '',
+        lote: F.lote.value || '',
+        desde: F.desde.value || '',
+        hasta: F.hasta.value || '',
+      });
+      const url = `{% url 'api_graficos_parametros_gorreri' %}?${p.toString()}`;
+      try{
+        const r = await fetch(url, {credentials:'same-origin'});
+        const ct = r.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) return [];
+        const j = await r.json();
+        return j.ok ? (j.registros || []) : [];
+      }catch(e){
+        console.error(e);
+        return [];
+      }
+    }
+
+    function buildLineChart(ctx, pts, label, yLabel){
+      if (!pts.length){
+        return new Chart(ctx, {
+          type:'line',
+          data:{labels:[], datasets:[{label:'Sin datos', data:[]}]},
+          options:{responsive:true,maintainAspectRatio:false}
+        });
+      }
+      const minDate = pts[0].x, maxDate = pts[pts.length-1].x;
+      const unit = unidadTiempo(minDate, maxDate);
+      const ys = pts.map(p=>p.y);
+      const yMin = Math.min(...ys), yMax = Math.max(...ys);
+      const pad = (yMax - yMin) * 0.05 || 1;
+
+      return new Chart(ctx, {
+        type:'line',
+        data:{ datasets:[{ label, data:pts, borderWidth:2, pointRadius:2, tension:.25 }] },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          interaction:{mode:'nearest',intersect:false,axis:'x'},
+          scales:{
+            x:{
+              type:'time',
+              time:{
+                unit,
+                displayFormats:{ minute:'HH:mm', hour:'HH:mm', day:'MMM d' }
+              },
+              ticks:{ autoSkip:true, maxTicksLimit:10 }
+            },
+            y:{
+              title:{display:true,text:yLabel},
+              min: yMin - pad,
+              max: yMax + pad
+            }
+          }
+        }
+      });
+    }
+
+    async function aplicar(){
+      saveFilters();
+      const data = await cargarDatos();
+      F.resumen.textContent = `${data.length} registros`;
+      destroyCharts();
+
+      if (!data.length){
+        const c1 = document.getElementById('chartBomba').getContext('2d');
+        chartBomba = new Chart(c1,{type:'line',data:{labels:[],datasets:[{label:'Sin datos',data:[]}]}})
+        return;
+      }
+
+      // ordenar por fecha
+      data.sort((a,b)=> new Date(a.ts) - new Date(b.ts));
+
+      const serie = data.map(d => ({ ts: parseFechaLocal(d.ts), row: d })).filter(d=>d.ts);
+
+      const ptsBomba    = serie.map(s => ({x:s.ts, y: Number(s.row.velocidad_bomba)})).filter(p=>Number.isFinite(p.y));
+      const ptsTurbo    = serie.map(s => ({x:s.ts, y: Number(s.row.velocidad_turbo)})).filter(p=>Number.isFinite(p.y));
+      const ptsContra   = serie.map(s => ({x:s.ts, y: Number(s.row.contrapresion)})).filter(p=>Number.isFinite(p.y));
+      const ptsAire     = serie.map(s => ({x:s.ts, y: Number(s.row.inyeccion_de_aire)})).filter(p=>Number.isFinite(p.y));
+      const ptsDensidad = serie.map(s => ({x:s.ts, y: Number(s.row.densidad)})).filter(p=>Number.isFinite(p.y));
+      const ptsTemp     = serie.map(s => ({x:s.ts, y: Number(s.row.t_final)})).filter(p=>Number.isFinite(p.y));
+
+      chartBomba    = buildLineChart(document.getElementById('chartBomba').getContext('2d'), ptsBomba, 'Velocidad bomba', 'RPM');
+      chartTurbo    = buildLineChart(document.getElementById('chartTurbo').getContext('2d'), ptsTurbo, 'Velocidad turbo', 'RPM');
+      chartContra   = buildLineChart(document.getElementById('chartContra').getContext('2d'), ptsContra, 'Contrapresión', 'bar');
+      chartAire     = buildLineChart(document.getElementById('chartAire').getContext('2d'), ptsAire, 'Inyección de aire', 'mm');
+      chartDensidad = buildLineChart(document.getElementById('chartDensidad').getContext('2d'), ptsDensidad, 'Densidad', 'g/ml');
+      chartTemp     = buildLineChart(document.getElementById('chartTemp').getContext('2d'), ptsTemp, 'Temperatura', '°C');
+    }
+
+    // eventos
+    $('btn-aplicar').addEventListener('click', e => { e.preventDefault(); aplicar(); });
+    $('btn-limpiar').addEventListener('click', e => {
+      e.preventDefault();
+      ['f-cliente','f-producto','f-tm','f-turno','f-lote','f-desde','f-hasta'].forEach(id => { const el = $(id); el.value = ''; });
+      localStorage.removeItem(STORAGE_KEY);
+      history.replaceState(null, '', location.pathname);
+      aplicar();
+    });
+
+    loadFilters();
+    aplicar();
+  });
+  </script>
+</body>
+</html>

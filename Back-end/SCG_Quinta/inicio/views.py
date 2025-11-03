@@ -419,3 +419,8 @@ def redireccionar_panel_oee_y_detenciones(request):
 def redireccionar_lista_turnos(request):
     url_lista_turnos = reverse('lista_turnos')
     return HttpResponseRedirect(url_lista_turnos)
+
+@login_required
+def redireccionar_graficos_parametros_gorreri(request):
+    url_graficos_parametros_gorreri = reverse('graficos_parametros_gorreri')
+    return HttpResponseRedirect(url_graficos_parametros_gorreri)
