@@ -133,17 +133,42 @@
 
     let chartBomba, chartTurbo, chartContra, chartAire, chartDensidad, chartTemp;
 
-    // 🔹 NUEVO: cargar productos según cliente
-    async function cargarProductosPorCliente(cliente, preselect = '') {
-        // deja siempre la opción "Todos"
-        F.producto.innerHTML = '<option value="">Todos</option>';
-        if (!cliente) {
-        return;
-        }
-        try {
-        const r = await fetch(`{% url 'api_productos_por_cliente_parametros_gorreri' %}?cliente=${encodeURIComponent(cliente)}`, {
-            credentials: 'same-origin'
+    // ========= 1. utilidades base =========
+    function parseFechaLocal(ts) {
+        if (!ts) return null;
+        let s = String(ts).trim();
+        // normaliza microsegundos largos
+        s = s.replace(/\.(\d{3})\d+(Z|[+\-]\d{2}:\d{2})?$/, '.$1$2');
+        const d = new Date(s);
+        if (!isNaN(d)) return d;
+        return null;
+    }
+
+    function unidadTiempo(minDate, maxDate) {
+        const span = maxDate - minDate;
+        const H = 60*60*1000, D = 24*H;
+        if (span <= 2*H) return 'minute';
+        if (span <= 2*D) return 'hour';
+        if (span <= 90*D) return 'day';
+        return 'month';
+    }
+
+    function destroyCharts(){
+        [chartBomba, chartTurbo, chartContra, chartAire, chartDensidad, chartTemp].forEach(ch => {
+        try { ch && ch.destroy(); } catch(e){}
         });
+        chartBomba = chartTurbo = chartContra = chartAire = chartDensidad = chartTemp = null;
+    }
+
+    // ========= 2. cargar productos según cliente (nuevo) =========
+    async function cargarProductosPorCliente(cliente, preselect = '') {
+        F.producto.innerHTML = '<option value="">Todos</option>';
+        if (!cliente) return;
+        try {
+        const r = await fetch(
+            `{% url 'api_productos_por_cliente_parametros_gorreri' %}?cliente=${encodeURIComponent(cliente)}`,
+            { credentials: 'same-origin' }
+        );
         const ct = r.headers.get('content-type') || '';
         if (!ct.includes('application/json')) return;
         const j = await r.json();
@@ -154,19 +179,19 @@
             opt.textContent = p.producto;
             F.producto.appendChild(opt);
             });
-            if (preselect) {
-            F.producto.value = preselect;
-            }
+            if (preselect) F.producto.value = preselect;
         }
         } catch (err) {
         console.error('Error cargando productos por cliente:', err);
         }
     }
 
+    // ========= 3. persistencia de filtros =========
     function loadFilters(){
         const qs = new URLSearchParams(location.search);
-        const f = Object.fromEntries(['cliente','producto','tm','turno','lote','desde','hasta']
-        .map(k => [k, qs.get(k) || '']));
+        const f = Object.fromEntries(
+        ['cliente','producto','tm','turno','lote','desde','hasta'].map(k => [k, qs.get(k) || ''])
+        );
         if (!qs.toString()) {
         try { Object.assign(f, JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')); } catch(e){}
         }
@@ -178,11 +203,10 @@
         F.desde.value   = f.desde || '';
         F.hasta.value   = f.hasta || '';
 
-        // 👇 si había cliente guardado, cargamos sus productos y preseleccionamos
+        // si había cliente guardado, vuelve a cargar productos para ese cliente
         if (f.cliente) {
         cargarProductosPorCliente(f.cliente, f.producto);
         } else {
-        // si no hay cliente, dejamos el producto como "Todos"
         F.producto.value = '';
         }
     }
@@ -201,15 +225,130 @@
         history.replaceState(null, '', '?' + new URLSearchParams(f).toString());
     }
 
-    // 👇 cuando el usuario cambia cliente desde la UI
+    // cuando cambia el cliente desde la UI
     F.cliente.addEventListener('change', () => {
         const cli = F.cliente.value;
         cargarProductosPorCliente(cli, '');
     });
 
-    // ... 👇 aquí dejas el resto de tu código tal cual:
-    // parseFechaLocal, unidadTiempo, destroyCharts, cargarDatos, buildLineChart, aplicar, etc.
-    // solo acuérdate de llamar:
+    // ========= 4. fetch de datos para graficar =========
+    async function cargarDatos(){
+        const p = new URLSearchParams({
+        cliente: F.cliente.value || '',
+        producto: F.producto.value || '',
+        tm: F.tm.value || '',
+        turno: F.turno.value || '',
+        lote: F.lote.value || '',
+        desde: F.desde.value || '',
+        hasta: F.hasta.value || '',
+        });
+        const url = `{% url 'api_graficos_parametros_gorreri' %}?${p.toString()}`;
+        try {
+        const r = await fetch(url, { credentials:'same-origin' });
+        const ct = r.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) return [];
+        const j = await r.json();
+        return j.ok ? (j.registros || []) : [];
+        } catch (e) {
+        console.error(e);
+        return [];
+        }
+    }
+
+    // ========= 5. helper para crear un chart lineal =========
+    function buildLineChart(ctx, pts, label, yLabel){
+        if (!pts.length){
+        return new Chart(ctx, {
+            type:'line',
+            data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
+            options:{responsive:true,maintainAspectRatio:false}
+        });
+        }
+        const minDate = pts[0].x, maxDate = pts[pts.length-1].x;
+        const unit = unidadTiempo(minDate, maxDate);
+        const ys = pts.map(p=>p.y);
+        const yMin = Math.min(...ys), yMax = Math.max(...ys);
+        const pad = (yMax - yMin) * 0.05 || 1;
+
+        return new Chart(ctx, {
+        type:'line',
+        data:{ datasets:[{ label, data:pts, borderWidth:2, pointRadius:2, tension:.25 }] },
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            interaction:{mode:'nearest',intersect:false,axis:'x'},
+            scales:{
+            x:{
+                type:'time',
+                time:{ unit, displayFormats:{minute:'HH:mm', hour:'HH:mm', day:'MMM d'} },
+                ticks:{ autoSkip:true, maxTicksLimit:10 }
+            },
+            y:{
+                title:{display:true,text:yLabel},
+                min: yMin - pad,
+                max: yMax + pad
+            }
+            }
+        }
+        });
+    }
+
+    // ========= 6. función principal =========
+    async function aplicar(){
+        saveFilters();
+        const data = await cargarDatos();
+        F.resumen.textContent = `${data.length} registros`;
+        destroyCharts();
+
+        if (!data.length){
+        // si no hay datos, al menos deja un chart vacío en el primero
+        const c1 = document.getElementById('chartBomba').getContext('2d');
+        chartBomba = new Chart(c1, {
+            type:'line',
+            data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
+            options:{maintainAspectRatio:false}
+        });
+        return;
+        }
+
+        // ordenar por fecha
+        data.sort((a,b)=> new Date(a.ts) - new Date(b.ts));
+
+        const serie = data.map(d => ({ ts: parseFechaLocal(d.ts), row: d })).filter(d=>d.ts);
+
+        const ptsBomba    = serie.map(s => ({x:s.ts, y: Number(s.row.velocidad_bomba)})).filter(p=>Number.isFinite(p.y));
+        const ptsTurbo    = serie.map(s => ({x:s.ts, y: Number(s.row.velocidad_turbo)})).filter(p=>Number.isFinite(p.y));
+        const ptsContra   = serie.map(s => ({x:s.ts, y: Number(s.row.contrapresion)})).filter(p=>Number.isFinite(p.y));
+        const ptsAire     = serie.map(s => ({x:s.ts, y: Number(s.row.inyeccion_de_aire)})).filter(p=>Number.isFinite(p.y));
+        const ptsDensidad = serie.map(s => ({x:s.ts, y: Number(s.row.densidad)})).filter(p=>Number.isFinite(p.y));
+        const ptsTemp     = serie.map(s => ({x:s.ts, y: Number(s.row.t_final)})).filter(p=>Number.isFinite(p.y));
+
+        chartBomba    = buildLineChart(document.getElementById('chartBomba').getContext('2d'),    ptsBomba,    'Velocidad bomba', 'RPM');
+        chartTurbo    = buildLineChart(document.getElementById('chartTurbo').getContext('2d'),    ptsTurbo,    'Velocidad turbo', 'RPM');
+        chartContra   = buildLineChart(document.getElementById('chartContra').getContext('2d'),   ptsContra,   'Contrapresión',   'bar');
+        chartAire     = buildLineChart(document.getElementById('chartAire').getContext('2d'),     ptsAire,     'Inyección de aire','mm');
+        chartDensidad = buildLineChart(document.getElementById('chartDensidad').getContext('2d'), ptsDensidad, 'Densidad',        'g/ml');
+        chartTemp     = buildLineChart(document.getElementById('chartTemp').getContext('2d'),     ptsTemp,     'Temperatura',     '°C');
+    }
+
+    // ========= 7. eventos de botones =========
+    $('btn-aplicar').addEventListener('click', e => {
+        e.preventDefault();
+        aplicar();
+    });
+
+    $('btn-limpiar').addEventListener('click', e => {
+        e.preventDefault();
+        ['f-cliente','f-producto','f-tm','f-turno','f-lote','f-desde','f-hasta'].forEach(id => {
+        const el = $(id);
+        el.value = '';
+        });
+        localStorage.removeItem(STORAGE_KEY);
+        history.replaceState(null, '', location.pathname);
+        aplicar();
+    });
+
+    // ========= 8. init =========
     loadFilters();
     aplicar();
     });
