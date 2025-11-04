@@ -102,11 +102,6 @@ def api_productos_por_cliente(request):
 @login_required
 @require_GET
 def api_graficos_control_pesos(request):
-    """
-    Datos para las gráficas.
-    Filtros: ?cliente=&producto=&turno=&lote=&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
-    Cliente/Producto: contains (normalizados); Turno/Lote: exacto; Fechas por date.
-    """
     qs = (
         DatosFormularioControlDePesos.objects
         .annotate(
@@ -124,10 +119,14 @@ def api_graficos_control_pesos(request):
     desde    = (request.GET.get('desde') or '').strip()
     hasta    = (request.GET.get('hasta') or '').strip()
 
+    # cliente: si quieres lo puedes dejar con contains
     if cliente:
         qs = qs.filter(cliente_norm__contains=cliente.upper())
+
+    # producto: aquí el ajuste importante
     if producto:
-        qs = qs.filter(producto_norm__contains=producto.upper())
+        qs = qs.filter(producto_norm=producto.upper())
+
     if turno:
         qs = qs.filter(turno_norm=turno.upper())
     if lote:
@@ -153,7 +152,6 @@ def api_graficos_control_pesos(request):
 
     registros = []
     for r in qs:
-        # coerción defensiva (por si en BD hay nulls)
         peso_receta = int(r['peso_receta']) if r['peso_receta'] is not None else None
         peso_real   = int(r['peso_real'])   if r['peso_real']   is not None else None
         registros.append({
