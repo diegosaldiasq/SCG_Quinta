@@ -103,10 +103,6 @@ def api_productos_por_cliente_prelistos(request):
 @login_required
 @require_GET
 def api_graficos_control_pesos_prelistos(request):
-    """
-    Endpoint de datos para las gráficas de PRELISTOS.
-    Filtros: ?cliente=&producto=&turno=&lote=&desde=YYYY-MM-DD&hasta=YYYY-MM-DD
-    """
     qs = DatosFormularioControlDePesosPrelistos.objects.all()
 
     cliente = (request.GET.get('cliente') or '').strip()
@@ -116,14 +112,19 @@ def api_graficos_control_pesos_prelistos(request):
     desde    = (request.GET.get('desde') or '').strip()
     hasta    = (request.GET.get('hasta') or '').strip()
 
+    # si quieres mantener cliente “laxo”, déjalo así
     if cliente:
-        qs = qs.filter(cliente__icontains=cliente)     # “laxo”
+        qs = qs.filter(cliente__icontains=cliente)
+
+    # acá el cambio importante
     if producto:
-        qs = qs.filter(producto__icontains=producto)   # “laxo”
+        qs = qs.filter(producto__iexact=producto)   # coincidencia exacta, sin importar mayúsculas
+
+    # estos los puedes dejar así o pasarlos a exacto si en BD vienen limpios
     if turno:
-        qs = qs.filter(turno__icontains=turno)
+        qs = qs.filter(turno__iexact=turno)
     if lote:
-        qs = qs.filter(lote__icontains=lote)
+        qs = qs.filter(lote__iexact=lote)
 
     if desde:
         try:
@@ -149,7 +150,7 @@ def api_graficos_control_pesos_prelistos(request):
         p  = r['peso_real']
         registros.append({
             'id': r['id'],
-            'ts': r['fecha_registro'].isoformat(),  # ISO 8601
+            'ts': r['fecha_registro'].isoformat(),
             'cliente': r['cliente'],
             'producto': r['producto'],
             'codigo_producto': r['codigo_producto'],
