@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"> 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+  <!-- puedes usar el mismo css que usas en control de pesos -->
   <link rel="stylesheet" href="{% static 'control_de_pesos/estilos_graficos_control_pesos.css' %}">
   <link rel="icon" href="{% static 'control_parametros_bizcocho/images/logoquinta2.png' %}" />
 
@@ -18,6 +19,9 @@
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3/locale/es/index.min.js"></script>
+
+  <!-- SheetJS para exportar Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <div class="login">
@@ -33,7 +37,6 @@
           <label>Proveedor</label>
           <select id="f-proveedor">
             <option value="">Todos</option>
-            <!-- si quieres que vengan desde BD, se pueden poblar también -->
             <option value="San Cristobal">San Cristobal</option>
             <option value="Puratos">Puratos</option>
             <option value="Bakels">Bakels</option>
@@ -70,6 +73,7 @@
       <div class="acciones">
         <button class="primary-button" id="btn-aplicar">Aplicar filtros</button>
         <button class="primary-button" id="btn-limpiar">Limpiar</button>
+        <button class="primary-button" id="btn-descargar" type="button">Descargar Excel</button>
         <span id="resumen" class="badge">0 registros</span>
       </div>
     </div>
@@ -113,6 +117,7 @@
         <div class="chart-wrap"><canvas id="ch-temp"></canvas></div>
       </div>
     </div>
+
     <div class="botones" style="margin-top:16px;">
       <form class="form" action="{% url 'redireccionar_intermedio_4' %}">
         <button class="primary-button">Salir</button>
@@ -123,9 +128,9 @@
   <script type="module">
     const $ = id => document.getElementById(id);
     const STORAGE_KEY = 'filtros_graficos_bizcocho_v1';
-
-    // 9 charts
     let chAgua, chHuevo, chBomba, chTurbo, chContra, chContra2, chIny, chDens, chTemp;
+    // guardamos los datos actuales para descargar
+    window.__datosActuales = [];
 
     function parseFecha(ts) {
       const d = new Date(ts);
@@ -181,7 +186,6 @@
         $('f-desde').value     = f.desde     || '';
         $('f-hasta').value     = f.hasta     || '';
 
-        // producto depende del proveedor
         if (f.proveedor) {
           await cargarProductosPorProveedor(f.proveedor, f.producto || '');
         } else {
@@ -242,10 +246,71 @@
       });
     }
 
+    function descargarExcel(rows) {
+      if (!rows.length) {
+        alert('No hay datos para descargar.');
+        return;
+      }
+      if (typeof XLSX === 'undefined') {
+        alert('Librería Excel no disponible.');
+        return;
+      }
+
+      const headers = [[
+        'ID','Fecha registro','Proveedor','Producto','Lote','Turno',
+        'Cant. Agua (L)','Cant. Huevo (L)',
+        'Vel. bomba (rpm)','Vel. turbo (rpm)',
+        'Contrapresión (bar)','Contrapresión trasera (bar)',
+        'Inyección de aire (mm)','Densidad (g/ml)','Temp. batido (°C)'
+      ]];
+
+      const body = rows.map(r => [
+        r.id,
+        r.ts,
+        r.proveedor || '',
+        r.producto || '',
+        r.lote || '',
+        r.turno || '',
+        r.cantidad_agua ?? '',
+        r.cantidad_huevo ?? '',
+        r.velocidad_bomba ?? '',
+        r.velocidad_turbo ?? '',
+        r.contrapresion ?? '',
+        r.contrapresion_trasera ?? '',
+        r.inyeccion_de_aire ?? '',
+        r.densidad ?? '',
+        r.t_final ?? '',
+      ]);
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([...headers, ...body]);
+      ws['!cols'] = [
+        {wch:6},  // ID
+        {wch:22}, // fecha
+        {wch:16}, // proveedor
+        {wch:24}, // producto
+        {wch:14}, // lote
+        {wch:8},  // turno
+        {wch:14}, // agua
+        {wch:14}, // huevo
+        {wch:16}, // vel bomba
+        {wch:16}, // vel turbo
+        {wch:18}, // contra
+        {wch:22}, // contra trasera
+        {wch:18}, // inyeccion
+        {wch:14}, // densidad
+        {wch:18}, // temp
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, 'ParametrosBizcocho');
+      XLSX.writeFile(wb, 'parametros_bizcocho_filtrado.xlsx');
+    }
+
     async function aplicar() {
       saveFilters();
       const data = await cargarDatos();
       $('resumen').textContent = `${data.length} registros`;
+      window.__datosActuales = data;  // guardar para descargar
 
       destruir(chAgua, chHuevo, chBomba, chTurbo, chContra, chContra2, chIny, chDens, chTemp);
 
@@ -286,6 +351,11 @@
       $('f-producto').disabled = true;
       localStorage.removeItem(STORAGE_KEY);
       aplicar();
+    });
+
+    $('btn-descargar').addEventListener('click', e => {
+      e.preventDefault();
+      descargarExcel(window.__datosActuales || []);
     });
 
     // cuando cambie proveedor, cargar productos
