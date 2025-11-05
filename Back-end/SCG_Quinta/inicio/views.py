@@ -424,3 +424,8 @@ def redireccionar_lista_turnos(request):
 def redireccionar_graficos_parametros_gorreri(request):
     url_graficos_parametros_gorreri = reverse('graficos_parametros_gorreri')
     return HttpResponseRedirect(url_graficos_parametros_gorreri)
+
+@login_required
+def redireccionar_graficos_control_parametros_bizcocho(request):
+    url_graficos_control_parametros_bizcocho = reverse('graficos_control_parametros_bizcocho')
+    return HttpResponseRedirect(url_graficos_control_parametros_bizcocho)

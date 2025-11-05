@@ -40,4 +40,5 @@ urlpatterns = [
     path("panel_oee_y_detenciones/", views.redireccionar_panel_oee_y_detenciones, name="redireccionar_panel_oee_y_detenciones"),
     path("lista_turnos/", views.redireccionar_lista_turnos, name="redireccionar_lista_turnos"),
     path("graficos_parametros_gorreri/", views.redireccionar_graficos_parametros_gorreri, name="redireccionar_graficos_parametros_gorreri"),
+    path("graficos_control_parametros_bizcocho/", views.redireccionar_graficos_control_parametros_bizcocho, name="redireccionar_graficos_control_parametros_bizcocho"),
 ]

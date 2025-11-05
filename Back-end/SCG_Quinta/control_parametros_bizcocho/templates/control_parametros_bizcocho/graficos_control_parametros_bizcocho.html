@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gráficos · Parámetros Gorreri Bizcocho</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'control_parametros_bizcocho/estilos_graficos_bizcocho.css' %}">
+  <link rel="icon" href="{% static 'control_parametros_bizcocho/images/logoquinta2.png' %}" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@3/locale/es/index.min.js"></script>
+</head>
+<body>
+  <div class="login">
+    <img src="{% static 'control_parametros_bizcocho/images/logoquinta.png' %}" alt="logo" class="logo">
+    <div class="login-container">
+      <h1 class="title">Gráficos · Parámetros Gorreri Bizcocho</h1>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="card">
+      <div class="filtros">
+        <div>
+          <label>Proveedor</label>
+          <select id="f-proveedor">
+            <option value="">Todos</option>
+            <option value="San Cristobal">San Cristobal</option>
+            <option value="Puratos">Puratos</option>
+            <option value="Bakels">Bakels</option>
+          </select>
+        </div>
+        <div>
+          <label>Producto</label>
+          <select id="f-producto">
+            <option value="">Todos</option>
+            <option value="Bizcocho Vainilla">Bizcocho Vainilla</option>
+            <option value="Bizcocho Chocolate">Bizcocho Chocolate</option>
+            <option value="Bizcocho Tres Leches">Bizcocho Tres Leches</option>
+          </select>
+        </div>
+        <div>
+          <label>Turno</label>
+          <select id="f-turno">
+            <option value="">Todos</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+          </select>
+        </div>
+        <div>
+          <label>Lote</label>
+          <input id="f-lote" type="text" placeholder="Ej: 250101-01" />
+        </div>
+        <div>
+          <label>Desde</label>
+          <input id="f-desde" type="date" />
+        </div>
+        <div>
+          <label>Hasta</label>
+          <input id="f-hasta" type="date" />
+        </div>
+      </div>
+      <div class="acciones">
+        <button class="primary-button" id="btn-aplicar">Aplicar filtros</button>
+        <button class="primary-button" id="btn-limpiar">Limpiar</button>
+        <span id="resumen" class="badge">0 registros</span>
+      </div>
+    </div>
+
+    <!-- 9 GRÁFICOS -->
+    <div class="grid">
+      <div class="card"><h3 class="title">Cantidad de agua (L)</h3><div class="chart-wrap"><canvas id="ch-agua"></canvas></div></div>
+      <div class="card"><h3 class="title">Cantidad de huevo (L)</h3><div class="chart-wrap"><canvas id="ch-huevo"></canvas></div></div>
+      <div class="card"><h3 class="title">Velocidad bomba (rpm)</h3><div class="chart-wrap"><canvas id="ch-bomba"></canvas></div></div>
+      <div class="card"><h3 class="title">Velocidad turbo (rpm)</h3><div class="chart-wrap"><canvas id="ch-turbo"></canvas></div></div>
+      <div class="card"><h3 class="title">Contrapresión (bar)</h3><div class="chart-wrap"><canvas id="ch-contra"></canvas></div></div>
+      <div class="card"><h3 class="title">Contrapresión trasera (bar)</h3><div class="chart-wrap"><canvas id="ch-contra2"></canvas></div></div>
+      <div class="card"><h3 class="title">Inyección de aire (mm)</h3><div class="chart-wrap"><canvas id="ch-iny"></canvas></div></div>
+      <div class="card"><h3 class="title">Densidad (g/ml)</h3><div class="chart-wrap"><canvas id="ch-dens"></canvas></div></div>
+      <div class="card"><h3 class="title">Temperatura batido (°C)</h3><div class="chart-wrap"><canvas id="ch-temp"></canvas></div></div>
+    </div>
+  </div>
+
+  <script type="module">
+    const $ = id => document.getElementById(id);
+    const STORAGE_KEY = 'filtros_graficos_bizcocho_v1';
+
+    // referencias a los 9 charts
+    let chAgua, chHuevo, chBomba, chTurbo, chContra, chContra2, chIny, chDens, chTemp;
+
+    function parseFecha(ts){
+      const d = new Date(ts);
+      return isNaN(d) ? null : d;
+    }
+
+    function destruir(...charts){
+      charts.forEach(c => { try { c?.destroy(); } catch {} });
+    }
+
+    function saveFilters(){
+      const f = {
+        proveedor: $('f-proveedor').value,
+        producto: $('f-producto').value,
+        turno: $('f-turno').value,
+        lote: $('f-lote').value,
+        desde: $('f-desde').value,
+        hasta: $('f-hasta').value,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
+    }
+
+    function loadFilters(){
+      try {
+        const f = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        $('f-proveedor').value = f.proveedor || '';
+        $('f-producto').value  = f.producto  || '';
+        $('f-turno').value     = f.turno     || '';
+        $('f-lote').value      = f.lote      || '';
+        $('f-desde').value     = f.desde     || '';
+        $('f-hasta').value     = f.hasta     || '';
+      } catch {}
+    }
+
+    async function cargarDatos(){
+      const q = new URLSearchParams({
+        proveedor: $('f-proveedor').value || '',
+        producto: $('f-producto').value || '',
+        turno: $('f-turno').value || '',
+        lote: $('f-lote').value || '',
+        desde: $('f-desde').value || '',
+        hasta: $('f-hasta').value || '',
+      });
+      const resp = await fetch("{% url 'api_graficos_control_parametros_bizcocho' %}?" + q.toString(), {
+        credentials: 'same-origin'
+      });
+      const ct = resp.headers.get('content-type') || '';
+      if (!ct.includes('application/json')) return [];
+      const data = await resp.json();
+      return data.ok ? data.registros : [];
+    }
+
+    function crearChartLinea(ctx, label, datos, unidadY=''){
+      return new Chart(ctx, {
+        type: 'line',
+        data: { datasets: [
+          { label, data: datos, borderWidth: 2, pointRadius: 2, tension: .25 }
+        ]},
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          scales: {
+            x: {
+              type: 'time',
+              time: { unit: 'day', displayFormats: { day: 'MMM d' } }
+            },
+            y: {
+              beginAtZero: false,
+              title: { display: !!unidadY, text: unidadY }
+            }
+          }
+        }
+      });
+    }
+
+    async function aplicar(){
+      saveFilters();
+      const data = await cargarDatos();
+      $('resumen').textContent = `${data.length} registros`;
+
+      destruir(chAgua, chHuevo, chBomba, chTurbo, chContra, chContra2, chIny, chDens, chTemp);
+
+      // construir datasets (x = fecha, y = valor)
+      const agua   = data.map(r => ({x: parseFecha(r.ts), y: r.cantidad_agua}));
+      const huevo  = data.map(r => ({x: parseFecha(r.ts), y: r.cantidad_huevo}));
+      const bomba  = data.map(r => ({x: parseFecha(r.ts), y: r.velocidad_bomba}));
+      const turbo  = data.map(r => ({x: parseFecha(r.ts), y: r.velocidad_turbo}));
+      const contra = data.map(r => ({x: parseFecha(r.ts), y: r.contrapresion}));
+      const contra2= data.map(r => ({x: parseFecha(r.ts), y: r.contrapresion_trasera}));
+      const iny    = data.map(r => ({x: parseFecha(r.ts), y: r.inyeccion_de_aire}));
+      const dens   = data.map(r => ({x: parseFecha(r.ts), y: r.densidad}));
+      const temp   = data.map(r => ({x: parseFecha(r.ts), y: r.t_final}));
+
+      // crear charts
+      chAgua   = crearChartLinea($('ch-agua').getContext('2d'),  'Agua (L)', agua, 'L');
+      chHuevo  = crearChartLinea($('ch-huevo').getContext('2d'), 'Huevo (L)', huevo, 'L');
+      chBomba  = crearChartLinea($('ch-bomba').getContext('2d'), 'Vel. bomba (rpm)', bomba, 'rpm');
+      chTurbo  = crearChartLinea($('ch-turbo').getContext('2d'), 'Vel. turbo (rpm)', turbo, 'rpm');
+      chContra = crearChartLinea($('ch-contra').getContext('2d'),'Contrapresión (bar)', contra, 'bar');
+      chContra2= crearChartLinea($('ch-contra2').getContext('2d'),'Contrapresión trasera (bar)', contra2, 'bar');
+      chIny    = crearChartLinea($('ch-iny').getContext('2d'),   'Inyección de aire (mm)', iny, 'mm');
+      chDens   = crearChartLinea($('ch-dens').getContext('2d'),  'Densidad (g/ml)', dens, 'g/ml');
+      chTemp   = crearChartLinea($('ch-temp').getContext('2d'),  'T° batido (°C)', temp, '°C');
+    }
+
+    $('btn-aplicar').addEventListener('click', e => { e.preventDefault(); aplicar(); });
+    $('btn-limpiar').addEventListener('click', e => {
+      e.preventDefault();
+      ['f-proveedor','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id => $(id).value = '');
+      localStorage.removeItem(STORAGE_KEY);
+      aplicar();
+    });
+
+    loadFilters();
+    aplicar();
+  </script>
+</body>
+</html>
