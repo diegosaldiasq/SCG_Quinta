@@ -160,3 +160,35 @@ def api_graficos_control_parametros_bizcocho(request):
 @login_required
 def graficos_control_parametros_bizcocho(request):
     return render(request, 'control_parametros_bizcocho/graficos_control_parametros_bizcocho.html')
+
+@login_required
+def redireccionar_intermedio_4(request):
+    url_intermedio_4 = reverse('intermedio_4')
+    return HttpResponseRedirect(url_intermedio_4)
+
+@login_required
+@require_GET
+def api_productos_por_proveedor(request):
+    """
+    Devuelve los productos existentes para un proveedor dado
+    ?proveedor=Puratos
+    """
+    proveedor = (request.GET.get('proveedor') or '').strip()
+    if not proveedor:
+        return JsonResponse({'ok': False, 'productos': []})
+
+    # normalizamos igual que en el endpoint grande
+    qs = (
+        DatosFormularioControlParametrosBizcocho.objects
+        .annotate(
+            proveedor_norm=Upper(Trim('proveedor')),
+            producto_norm=Upper(Trim('producto')),
+        )
+        .filter(proveedor_norm=proveedor.upper())
+        .order_by('producto_norm')
+        .values_list('producto', flat=True)
+        .distinct()
+    )
+
+    productos = list(qs)
+    return JsonResponse({'ok': True, 'productos': productos})

@@ -6,12 +6,14 @@
   <title>Gráficos · Parámetros Gorreri Bizcocho</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Fuentes y estilos -->
   <link rel="preconnect" href="https://fonts.googleapis.com"> 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'control_de_pesos/estilos_graficos_control_pesos.css' %}">
+  <link rel="stylesheet" href="{% static 'control_parametros_bizcocho/estilos_graficos_bizcocho.css' %}">
   <link rel="icon" href="{% static 'control_parametros_bizcocho/images/logoquinta2.png' %}" />
 
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
@@ -31,6 +33,7 @@
           <label>Proveedor</label>
           <select id="f-proveedor">
             <option value="">Todos</option>
+            <!-- si quieres que vengan desde BD, se pueden poblar también -->
             <option value="San Cristobal">San Cristobal</option>
             <option value="Puratos">Puratos</option>
             <option value="Bakels">Bakels</option>
@@ -38,11 +41,8 @@
         </div>
         <div>
           <label>Producto</label>
-          <select id="f-producto">
+          <select id="f-producto" disabled>
             <option value="">Todos</option>
-            <option value="Bizcocho Vainilla">Bizcocho Vainilla</option>
-            <option value="Bizcocho Chocolate">Bizcocho Chocolate</option>
-            <option value="Bizcocho Tres Leches">Bizcocho Tres Leches</option>
           </select>
         </div>
         <div>
@@ -76,15 +76,47 @@
 
     <!-- 9 GRÁFICOS -->
     <div class="grid">
-      <div class="card"><h3 class="title">Cantidad de agua (L)</h3><div class="chart-wrap"><canvas id="ch-agua"></canvas></div></div>
-      <div class="card"><h3 class="title">Cantidad de huevo (L)</h3><div class="chart-wrap"><canvas id="ch-huevo"></canvas></div></div>
-      <div class="card"><h3 class="title">Velocidad bomba (rpm)</h3><div class="chart-wrap"><canvas id="ch-bomba"></canvas></div></div>
-      <div class="card"><h3 class="title">Velocidad turbo (rpm)</h3><div class="chart-wrap"><canvas id="ch-turbo"></canvas></div></div>
-      <div class="card"><h3 class="title">Contrapresión (bar)</h3><div class="chart-wrap"><canvas id="ch-contra"></canvas></div></div>
-      <div class="card"><h3 class="title">Contrapresión trasera (bar)</h3><div class="chart-wrap"><canvas id="ch-contra2"></canvas></div></div>
-      <div class="card"><h3 class="title">Inyección de aire (mm)</h3><div class="chart-wrap"><canvas id="ch-iny"></canvas></div></div>
-      <div class="card"><h3 class="title">Densidad (g/ml)</h3><div class="chart-wrap"><canvas id="ch-dens"></canvas></div></div>
-      <div class="card"><h3 class="title">Temperatura batido (°C)</h3><div class="chart-wrap"><canvas id="ch-temp"></canvas></div></div>
+      <div class="card">
+        <h3 class="title">Cantidad de agua (L)</h3>
+        <div class="chart-wrap"><canvas id="ch-agua"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Cantidad de huevo (L)</h3>
+        <div class="chart-wrap"><canvas id="ch-huevo"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Velocidad bomba (rpm)</h3>
+        <div class="chart-wrap"><canvas id="ch-bomba"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Velocidad turbo (rpm)</h3>
+        <div class="chart-wrap"><canvas id="ch-turbo"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Contrapresión (bar)</h3>
+        <div class="chart-wrap"><canvas id="ch-contra"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Contrapresión trasera (bar)</h3>
+        <div class="chart-wrap"><canvas id="ch-contra2"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Inyección de aire (mm)</h3>
+        <div class="chart-wrap"><canvas id="ch-iny"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Densidad (g/ml)</h3>
+        <div class="chart-wrap"><canvas id="ch-dens"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 class="title">Temperatura batido (°C)</h3>
+        <div class="chart-wrap"><canvas id="ch-temp"></canvas></div>
+      </div>
+    </div>
+    <div class="botones" style="margin-top:16px;">
+      <form class="form" action="{% url 'redireccionar_intermedio_4' %}">
+        <button class="primary-button">Salir</button>
+      </form>
     </div>
   </div>
 
@@ -92,19 +124,43 @@
     const $ = id => document.getElementById(id);
     const STORAGE_KEY = 'filtros_graficos_bizcocho_v1';
 
-    // referencias a los 9 charts
+    // 9 charts
     let chAgua, chHuevo, chBomba, chTurbo, chContra, chContra2, chIny, chDens, chTemp;
 
-    function parseFecha(ts){
+    function parseFecha(ts) {
       const d = new Date(ts);
       return isNaN(d) ? null : d;
     }
 
-    function destruir(...charts){
-      charts.forEach(c => { try { c?.destroy(); } catch {} });
+    function destruir(...charts) {
+      charts.forEach(c => { try { c?.destroy(); } catch(e) {} });
     }
 
-    function saveFilters(){
+    async function cargarProductosPorProveedor(proveedor, preselect='') {
+      const sel = $('f-producto');
+      sel.innerHTML = '<option value="">Todos</option>';
+      sel.disabled = true;
+      if (!proveedor) return;
+
+      const resp = await fetch("{% url 'api_productos_por_proveedor' %}?proveedor=" + encodeURIComponent(proveedor), {
+        credentials: 'same-origin'
+      });
+      const ct = resp.headers.get('content-type') || '';
+      if (!ct.includes('application/json')) return;
+      const data = await resp.json();
+      if (!data.ok) return;
+
+      (data.productos || []).forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        sel.appendChild(opt);
+      });
+      sel.disabled = false;
+      if (preselect) sel.value = preselect;
+    }
+
+    function saveFilters() {
       const f = {
         proveedor: $('f-proveedor').value,
         producto: $('f-producto').value,
@@ -116,19 +172,26 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
     }
 
-    function loadFilters(){
+    async function loadFilters() {
       try {
         const f = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         $('f-proveedor').value = f.proveedor || '';
-        $('f-producto').value  = f.producto  || '';
         $('f-turno').value     = f.turno     || '';
         $('f-lote').value      = f.lote      || '';
         $('f-desde').value     = f.desde     || '';
         $('f-hasta').value     = f.hasta     || '';
-      } catch {}
+
+        // producto depende del proveedor
+        if (f.proveedor) {
+          await cargarProductosPorProveedor(f.proveedor, f.producto || '');
+        } else {
+          $('f-producto').innerHTML = '<option value="">Todos</option>';
+          $('f-producto').disabled = true;
+        }
+      } catch(e) {}
     }
 
-    async function cargarDatos(){
+    async function cargarDatos() {
       const q = new URLSearchParams({
         proveedor: $('f-proveedor').value || '',
         producto: $('f-producto').value || '',
@@ -137,6 +200,7 @@
         desde: $('f-desde').value || '',
         hasta: $('f-hasta').value || '',
       });
+
       const resp = await fetch("{% url 'api_graficos_control_parametros_bizcocho' %}?" + q.toString(), {
         credentials: 'same-origin'
       });
@@ -146,12 +210,20 @@
       return data.ok ? data.registros : [];
     }
 
-    function crearChartLinea(ctx, label, datos, unidadY=''){
+    function crearChartLinea(ctx, label, datos, unidadY='') {
       return new Chart(ctx, {
         type: 'line',
-        data: { datasets: [
-          { label, data: datos, borderWidth: 2, pointRadius: 2, tension: .25 }
-        ]},
+        data: {
+          datasets: [
+            {
+              label,
+              data: datos,
+              borderWidth: 2,
+              pointRadius: 2,
+              tension: .25,
+            }
+          ]
+        },
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -170,46 +242,63 @@
       });
     }
 
-    async function aplicar(){
+    async function aplicar() {
       saveFilters();
       const data = await cargarDatos();
       $('resumen').textContent = `${data.length} registros`;
 
       destruir(chAgua, chHuevo, chBomba, chTurbo, chContra, chContra2, chIny, chDens, chTemp);
 
-      // construir datasets (x = fecha, y = valor)
-      const agua   = data.map(r => ({x: parseFecha(r.ts), y: r.cantidad_agua}));
-      const huevo  = data.map(r => ({x: parseFecha(r.ts), y: r.cantidad_huevo}));
-      const bomba  = data.map(r => ({x: parseFecha(r.ts), y: r.velocidad_bomba}));
-      const turbo  = data.map(r => ({x: parseFecha(r.ts), y: r.velocidad_turbo}));
-      const contra = data.map(r => ({x: parseFecha(r.ts), y: r.contrapresion}));
-      const contra2= data.map(r => ({x: parseFecha(r.ts), y: r.contrapresion_trasera}));
-      const iny    = data.map(r => ({x: parseFecha(r.ts), y: r.inyeccion_de_aire}));
-      const dens   = data.map(r => ({x: parseFecha(r.ts), y: r.densidad}));
-      const temp   = data.map(r => ({x: parseFecha(r.ts), y: r.t_final}));
+      const agua    = data.map(r => ({ x: parseFecha(r.ts), y: r.cantidad_agua }));
+      const huevo   = data.map(r => ({ x: parseFecha(r.ts), y: r.cantidad_huevo }));
+      const bomba   = data.map(r => ({ x: parseFecha(r.ts), y: r.velocidad_bomba }));
+      const turbo   = data.map(r => ({ x: parseFecha(r.ts), y: r.velocidad_turbo }));
+      const contra  = data.map(r => ({ x: parseFecha(r.ts), y: r.contrapresion }));
+      const contra2 = data.map(r => ({ x: parseFecha(r.ts), y: r.contrapresion_trasera }));
+      const iny     = data.map(r => ({ x: parseFecha(r.ts), y: r.inyeccion_de_aire }));
+      const dens    = data.map(r => ({ x: parseFecha(r.ts), y: r.densidad }));
+      const temp    = data.map(r => ({ x: parseFecha(r.ts), y: r.t_final }));
 
-      // crear charts
-      chAgua   = crearChartLinea($('ch-agua').getContext('2d'),  'Agua (L)', agua, 'L');
-      chHuevo  = crearChartLinea($('ch-huevo').getContext('2d'), 'Huevo (L)', huevo, 'L');
-      chBomba  = crearChartLinea($('ch-bomba').getContext('2d'), 'Vel. bomba (rpm)', bomba, 'rpm');
-      chTurbo  = crearChartLinea($('ch-turbo').getContext('2d'), 'Vel. turbo (rpm)', turbo, 'rpm');
-      chContra = crearChartLinea($('ch-contra').getContext('2d'),'Contrapresión (bar)', contra, 'bar');
+      chAgua   = crearChartLinea($('ch-agua').getContext('2d'),   'Agua (L)', agua, 'L');
+      chHuevo  = crearChartLinea($('ch-huevo').getContext('2d'),  'Huevo (L)', huevo, 'L');
+      chBomba  = crearChartLinea($('ch-bomba').getContext('2d'),  'Vel. bomba (rpm)', bomba, 'rpm');
+      chTurbo  = crearChartLinea($('ch-turbo').getContext('2d'),  'Vel. turbo (rpm)', turbo, 'rpm');
+      chContra = crearChartLinea($('ch-contra').getContext('2d'), 'Contrapresión (bar)', contra, 'bar');
       chContra2= crearChartLinea($('ch-contra2').getContext('2d'),'Contrapresión trasera (bar)', contra2, 'bar');
-      chIny    = crearChartLinea($('ch-iny').getContext('2d'),   'Inyección de aire (mm)', iny, 'mm');
-      chDens   = crearChartLinea($('ch-dens').getContext('2d'),  'Densidad (g/ml)', dens, 'g/ml');
-      chTemp   = crearChartLinea($('ch-temp').getContext('2d'),  'T° batido (°C)', temp, '°C');
+      chIny    = crearChartLinea($('ch-iny').getContext('2d'),    'Inyección de aire (mm)', iny, 'mm');
+      chDens   = crearChartLinea($('ch-dens').getContext('2d'),   'Densidad (g/ml)', dens, 'g/ml');
+      chTemp   = crearChartLinea($('ch-temp').getContext('2d'),   'Temp. batido (°C)', temp, '°C');
     }
 
-    $('btn-aplicar').addEventListener('click', e => { e.preventDefault(); aplicar(); });
+    // eventos
+    $('btn-aplicar').addEventListener('click', e => {
+      e.preventDefault();
+      aplicar();
+    });
+
     $('btn-limpiar').addEventListener('click', e => {
       e.preventDefault();
-      ['f-proveedor','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id => $(id).value = '');
+      ['f-proveedor','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id => {
+        const el = $(id);
+        el.value = '';
+      });
+      $('f-producto').innerHTML = '<option value="">Todos</option>';
+      $('f-producto').disabled = true;
       localStorage.removeItem(STORAGE_KEY);
       aplicar();
     });
 
-    loadFilters();
-    aplicar();
+    // cuando cambie proveedor, cargar productos
+    $('f-proveedor').addEventListener('change', () => {
+      const prov = $('f-proveedor').value;
+      cargarProductosPorProveedor(prov, '');
+    });
+
+    // init
+    (async () => {
+      await loadFilters();
+      await aplicar();
+    })();
   </script>
 </body>
 </html>
