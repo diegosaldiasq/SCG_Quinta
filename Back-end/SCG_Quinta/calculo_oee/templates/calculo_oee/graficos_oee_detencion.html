@@ -154,7 +154,10 @@
         const r = await fetch(url, {credentials:'same-origin'});
         if (!r.ok) return;
         const data = await r.json();
-        if (!Array.isArray(data) || !data.length) { if (chartOEE) { chartOEE.destroy(); chartOEE = null; } return; }
+        if (!Array.isArray(data) || !data.length) { 
+          if (chartOEE) { chartOEE.destroy(); chartOEE = null; } 
+          return; 
+        }
 
         // Orden por fecha y turno A→B→C
         data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
@@ -164,41 +167,76 @@
         const efic    = data.map(d => +d.eficiencia || 0);
         const oee     = data.map(d => +d.oee || 0);
         const target  = data.map(d => +d.target || 0);
-        const loteIds = data.map(d => d.lote_id); // 👈 necesario para click
+        const loteIds = data.map(d => d.lote_id);
+
+        // plugin para mostrar valores (solo OEE) con 1 decimal
+        const showValuesPlugin = {
+          id: 'showValuesPlugin',
+          afterDatasetsDraw(chart, args, pluginOptions) {
+            const { ctx } = chart;
+            chart.data.datasets.forEach((dataset, datasetIndex) => {
+              if (dataset.label !== 'OEE') return;  // 👈 solo la línea OEE
+              const meta = chart.getDatasetMeta(datasetIndex);
+              meta.data.forEach((element, index) => {
+                const value = dataset.data[index];
+                if (value == null) return;
+                const pos = element.tooltipPosition();
+                ctx.save();
+                ctx.font = '10px sans-serif';
+                ctx.fillStyle = dataset.borderColor || '#000';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(
+                  Number(value).toFixed(1) + '%',
+                  pos.x,
+                  pos.y - 6
+                );
+                ctx.restore();
+              });
+            });
+          }
+        };
 
         if (chartOEE) chartOEE.destroy();
         chartOEE = new Chart(ctxOEE, {
             type:'line',
             data:{
-            labels,
-            datasets:[
+              labels,
+              datasets:[
                 {label:'Disponibilidad', data:disp,   borderColor:'blue',  fill:false, tension:.25},
                 {label:'Eficiencia',     data:efic,   borderColor:'red',   fill:false, tension:.25},
                 {label:'OEE',            data:oee,    borderColor:'green', fill:false, tension:.25},
                 {label:'Target',         data:target, borderColor:'purple', borderDash:[6,6], fill:false},
-            ]
+              ]
             },
             options:{
-            responsive:true, maintainAspectRatio:false,
-            interaction:{ mode:'nearest', intersect:true },
-            // 👇 Click en punto → resumen_turno/<lote_id>?next=<ruta+query>
-            onClick(evt, elements){
-                if (!elements.length) return;
-                const idx = elements[0].index;
-                const lid = loteIds[idx];
-                if (lid) {
-                const urlRes   = `{% url 'resumen_turno' 0 %}`.replace('0', lid);
-                const returnTo = window.location.pathname + window.location.search;
-                window.location.href = `${urlRes}?next=${encodeURIComponent(returnTo)}`;
-                }
+              responsive:true, 
+              maintainAspectRatio:false,
+              interaction:{ mode:'nearest', intersect:true },
+              onClick(evt, elements){
+                  if (!elements.length) return;
+                  const idx = elements[0].index;
+                  const lid = loteIds[idx];
+                  if (lid) {
+                    const urlRes   = `{% url 'resumen_turno' 0 %}`.replace('0', lid);
+                    const returnTo = window.location.pathname + window.location.search;
+                    window.location.href = `${urlRes}?next=${encodeURIComponent(returnTo)}`;
+                  }
+              },
+              plugins:{
+                  legend:{position:'right'},
+                  title:{display:true, text:'Tendencia OEE'},
+                  tooltip:{mode:'index', intersect:false},
+              },
+              scales:{ 
+                y:{ 
+                  beginAtZero:true, 
+                  suggestedMax:100, 
+                  ticks:{ callback:v=>v+'%' } 
+                } 
+              }
             },
-            plugins:{
-                legend:{position:'right'},
-                title:{display:true, text:'Tendencia OEE'},
-                tooltip:{mode:'index', intersect:false},
-            },
-            scales:{ y:{ beginAtZero:true, suggestedMax:100, ticks:{ callback:v=>v+'%' } } }
-            }
+            plugins:[showValuesPlugin]   // 👈 aquí se activa
         });
     }
 
@@ -208,7 +246,10 @@
         const r = await fetch(url, {credentials:'same-origin'});
         if (!r.ok) return;
         const data = await r.json();
-        if (!Array.isArray(data) || !data.length) { if (chartDet) { chartDet.destroy(); chartDet = null; } return; }
+        if (!Array.isArray(data) || !data.length) { 
+          if (chartDet) { chartDet.destroy(); chartDet = null; } 
+          return; 
+        }
 
         data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
 
@@ -216,8 +257,8 @@
         for (const d of data) {
             const lid = d.lote_id; if (!lid) continue;
             if (!byLote.has(lid)) {
-            byLote.set(lid, { label:[fmtFecha(d.fecha), String(d.turno)], motivos:{} });
-            loteOrder.push(lid); // 👈 orden correcto
+              byLote.set(lid, { label:[fmtFecha(d.fecha), String(d.turno)], motivos:{} });
+              loteOrder.push(lid);
             }
             byLote.get(lid).motivos[d.motivo] = d.porcentaje;
             motivosSet.add(d.motivo);
@@ -250,28 +291,33 @@
             data:{ labels, datasets },
             plugins:[hLine],
             options:{
-            responsive:true, maintainAspectRatio:false,
-            // 👇 Click en barra → detalle_turno/<lote_id>?next=<ruta+query>
-            onClick(evt, elements){
-                if (!elements.length) return;
-                const idx = elements[0].index;
-                const lid = loteOrder[idx];
-                if (lid) {
-                const urlDet   = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
-                const returnTo = window.location.pathname + window.location.search;
-                window.location.href = `${urlDet}?next=${encodeURIComponent(returnTo)}`;
-                }
-            },
-            plugins:{
-                legend:{position:'right'},
-                title:{display:true, text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
-                tooltip:{ callbacks:{
-                title(items){ const lbl = items[0].label; return Array.isArray(lbl) ? lbl.join(' · ') : lbl; },
-                label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
-                }}
-            },
-            scales:{ x:{ stacked:true }, y:{ stacked:true, min:0, max:100, ticks:{ callback:v=>v+'%' } } },
-            hLine:{ yValue:30 }
+              responsive:true, maintainAspectRatio:false,
+              onClick(evt, elements){
+                  if (!elements.length) return;
+                  const idx = elements[0].index;
+                  const lid = loteOrder[idx];
+                  if (lid) {
+                    const urlDet   = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
+                    const returnTo = window.location.pathname + window.location.search;
+                    window.location.href = `${urlDet}?next=${encodeURIComponent(returnTo)}`;
+                  }
+              },
+              plugins:{
+                  legend:{position:'right'},
+                  title:{display:true, text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
+                  tooltip:{ callbacks:{
+                    title(items){ 
+                      const lbl = items[0].label; 
+                      return Array.isArray(lbl) ? lbl.join(' · ') : lbl; 
+                    },
+                    label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
+                  }}
+              },
+              scales:{ 
+                x:{ stacked:true }, 
+                y:{ stacked:true, min:0, max:100, ticks:{ callback:v=>v+'%' } } 
+              },
+              hLine:{ yValue:30 }
             }
         });
     }
