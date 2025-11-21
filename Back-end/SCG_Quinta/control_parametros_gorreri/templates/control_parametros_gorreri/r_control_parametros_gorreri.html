@@ -25,6 +25,7 @@
             <label for="cliente">Cliente</label>
             <select id="cliente" class="input">
                 <option value="">-- Selecciona cliente --</option>
+                <option value="JUMBO">JUMBO</option>
                 <option value="SISA">Santa Isabel</option>
                 <option value="Walmart">Walmart</option>
                 <option value="Unimarc">Unimarc</option>
@@ -43,6 +44,9 @@
             <script>
                 // Definimos clientes → productos → peso
                 const productosPorCliente = {
+                JUMBO: [
+                    { codigo: '405598', value: 'Torta tentacion de chocolate', text: 'Torta tentacion de chocolate' },
+                ],
                 SISA: [
                     { codigo: '392518', value: 'Torta crema manjar mediana', text: 'Torta crema manjar mediana' },
                     { codigo: '393011', value: 'Torta crema piña', text: 'Torta crema piña' },
