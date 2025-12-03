@@ -770,7 +770,7 @@ body {
     align-items: center;
     background-color: var(--rojo-quinta);
     color: var(--white);
-    font-size: 12px;
+    font-size:12px;
     font-weight: bold;
     border-top: 1px solid black;
     border-bottom: 1px solid black;
@@ -805,6 +805,51 @@ body {
     background-color: var(--rojo-quinta);
 }
 .usuario_control_parametros_gorreri input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.control_parametros_bizcocho {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    align-items: center;
+    background-color: var(--rojo-quinta);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: bold;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.control_parametros_bizcocho span {
+    display: block;
+    text-align: center;
+    margin: auto;                           
+}
+.usuario_control_parametros_bizcocho {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid black;
+    font-size: var(--sm);
+    padding: 10px;
+    align-items: center;
+}
+.usuario_control_parametros_bizcocho li {
+    list-style-type: none;
+    display: contents;  /* Esto hará que el <li> adopte los estilos de su contenedor padre */
+}
+.usuario_control_parametros_bizcocho span, .usuario_control_parametros_bizcocho input[type="checkbox"] {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+.usuario_control_parametros_bizcocho input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.usuario_control_parametros_bizcocho input[type="checkbox"]:checked {
+    background-color: var(--rojo-quinta);
+}
+.usuario_control_parametros_bizcocho input[type="checkbox"]:hover {
     cursor: pointer;
 }
 .control_de_pesos_prelistos {

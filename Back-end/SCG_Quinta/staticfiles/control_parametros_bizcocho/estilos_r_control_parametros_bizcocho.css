@@ -13,33 +13,29 @@
     --lg: 18px;
 }
 body {
-    margin: 0;
+    margin: 24;
     font-family: 'Quicksand', sans-serif;
     background-image: url(./images/Fondo.png);
 }
-.header-img {
-    display: grid;
-    justify-items: center;
-    border: 0;
-    width: 100%;
-}
 .login {
     width: 100%;
-    height: 120vh;
+    height: 100vh;
     display: grid;
     justify-content: center;
 }
-.card {
-    width: 500px;
-    height: 650px;
-    background: var(--amarillo-quinta);
-    border-radius: 20px;
-    overflow: hidden;
-}
 .logo {
-    width: 500px;
+    width: 200px;
     margin-bottom: 16px;
     justify-self: center;
+}
+.login-container {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    width: 600px;
+    justify-items: center;
+    background-color: var(--naranjo-claro-quinta);
+    border-radius: 32px;
+    margin-bottom: 30px;
 }
 .title {
     font-size: var(--lg);
@@ -55,35 +51,60 @@ body {
     margin-bottom: 32px;
     text-align: center;
 }
-.form {
-    display:  grid;
-    flex-direction: column;
-    justify-items: center;
+.label {
+    font-size: var(--sm);
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.input {
+    background-color: var(--text-input-field);
+    border: none;
+    border-radius: 8px;
+    height: 32px;
+    font-size: var(--md);
+    padding: 6px;
+    margin-bottom: 12px;
+}
+.sub-subtitle {
+    color: var(--black);
+    font-size: var(--sm);
+    font-weight: 300;
+    margin-top: 0;
+    font-weight: bold;
+    margin-bottom: 32px;
+    text-align: center;
+}
+.botones {
+    display:  flex;
+    flex-direction: row;
+    justify-self: center;
+    gap: 16px;
 }
 .primary-button {
     background-color: var(--rojo-quinta);
     border-radius: 8px;
     border: none;
     color: var(--white);
-    width: 80%;
+    width: 180px;
     cursor: pointer;
     font-size: var(--md);
     font-weight: bold;
-    height: 20px;
+    height: 40px;
 }
 .login-button {
     margin-top: 14px;
-    margin-bottom: 4px;
+    margin-bottom: 30px;
 }
 @media (max-width: 650px) {
-    .login {
+    .login-container {
         width: 100%;
     }
-    .card {
-        width: 100%;
-        height: 90%;
+    .botones {
+        gap: 8px;
     }
-    .logo {
-        width: 100%;
+    .primary-button {
+        width: 120px;
+        font-size: 10px;
+        height: 40px;
     }
 }
