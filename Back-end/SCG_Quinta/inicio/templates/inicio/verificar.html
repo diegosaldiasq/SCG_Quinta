@@ -18,35 +18,18 @@
     <div class="login">
         <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
         <h1 class="title">Verifica estos registros</h1>
-
         <div class="login-container">
             <p class="subtitle">Registros no verificados {{ config }}</p>
-
-            <!-- Encabezados -->
             <div class="{{ config }}">
             {% for nombres in nombres_campos %}
-                {% if nombres == 'verificado' %}
-                    <span>
-                        {{ nombres }}
-                        <input type="checkbox" id="check_all_{{ config }}">
-                    </span>
-                {% else %}
-                    <span>{{ nombres }}</span>
-                {% endif %}
+                <span>{{ nombres }}</span>
             {% endfor %}
             </div>
-
-            <!-- Filas -->
             {% for dato in datos %}
                 <div class="usuario_{{ config }}" id="usuario">
                     {% for nombre in nombres_campos %}
                         {% if nombre == 'verificado' %}
-                            <input
-                                type="checkbox"
-                                class="checkbox_{{ config }}"
-                                data-id="{{ dato.id }}"
-                                {% if dato.verificado %}checked{% endif %}
-                            >
+                            <input type="checkbox" class="checkbox_{{ config }}">
                         {% elif nombre == 'archivo_foto' %}
                             <a href="{% url 'ver_foto' %}?id={{dato.id}}&config={{config}}">Ver foto</a>
                         {% else %}
@@ -55,48 +38,40 @@
                     {% endfor %}
                 </div>
             {% endfor %}
-        </div>
-
-        <!-- Paginación -->
+        </div> 
         <div class="pagination">
             <span class="step-links">
                 {% if datos.has_previous %}
                     <a href="?config={{ config }}&page=1">&laquo; primero</a>
                     <a href="?config={{ config }}&page={{ datos.previous_page_number }}">anterior</a>
                 {% endif %}
-
+        
                 <span class="current">
                     Página {{ datos.number }} de {{ datos.paginator.num_pages }}
                 </span>
-
+        
                 {% if datos.has_next %}
                     <a href="?config={{ config }}&page={{ datos.next_page_number }}">siguiente</a>
                     <a href="?config={{ config }}&page={{ datos.paginator.num_pages }}">último &raquo;</a>
                 {% endif %}
             </span>
-        </div>
-
-        <!-- Botones -->
+        </div>  
         <div class="button-container">
             <form class="form" id="miBoton">
                 {% csrf_token %}
-                <button type="submit" class="primary-button button">Guardar cambios</button>
+                <button class="primary-button button">Guardar cambios</button>  
             </form>
-
             <form class="form" action="{% url 'seleccion_verifica' %}">
-                <button type="submit" class="primary-button button">Volver inicio</button>
+                <button class="primary-button button">Volver inicio</button>
             </form>
         </div>
     </div>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
     <script type="text/javascript">
         let config = "{{ config }}";  // Asignando el valor de Django 'config' a una variable JS
     </script>
-
     <script>
-        // Definir el token CSRF para su uso en las solicitudes AJAX (solo aplica a $.ajax)
+        // Definir el token CSRF para su uso en las solicitudes AJAX
         var csrftoken = "{{ csrf_token }}";
     </script>
     <script src="{% static 'inicio/scrips_verificar.js' %}"></script>
