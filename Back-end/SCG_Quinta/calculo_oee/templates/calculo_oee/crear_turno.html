@@ -56,6 +56,29 @@
     .small-select {
       min-width: 120px;
     }
+    @media (max-width: 600px) {
+      .tabla-productos th,
+      .tabla-productos td,
+      #tabla-detenciones th,
+      #tabla-detenciones td,
+      #tabla-reprocesos th,
+      #tabla-reprocesos td {
+        font-size: 0.8rem;
+        padding: 4px 6px;
+      }
+      .tabla-productos select,
+      .tabla-productos input,
+      #tabla-detenciones select,
+      #tabla-detenciones input,
+      #tabla-reprocesos select,
+      #tabla-reprocesos input {
+        font-size: 0.8rem;
+        padding: 4px 6px;
+      }
+      .botones {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 
