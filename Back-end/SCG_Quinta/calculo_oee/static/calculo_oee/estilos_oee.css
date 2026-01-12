@@ -205,7 +205,7 @@ a.primary-button:hover {
   margin: 24px auto; /* centrado horizontal y separacion */
 }
 
-@media (max-width: 700px) {
+@media (max-width: 600px) {
     table th, table td {
         font-size: var(--sm);
         padding: 6px;

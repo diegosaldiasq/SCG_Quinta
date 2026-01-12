@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
             var producto = $("#producto").val();
             var pesoReceta = $("#peso").val();
             var pesoReal = $("#peso-real").val();
+            var altura = $("#altura").val();
             var lote = $("#lote").val();
             var turno = $("#turno").val();
 
@@ -41,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 codigo_producto: codigoProducto,
                 peso_receta: pesoReceta,
                 peso_real: pesoReal,
+                altura: altura,
                 lote: lote,
                 turno: turno
             }

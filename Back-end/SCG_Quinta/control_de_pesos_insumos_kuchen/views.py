@@ -29,6 +29,7 @@ def vista_control_de_pesos_insumos_kuchen(request):
             producto = dato.get('producto')
             peso_receta = dato.get('peso_receta')
             peso_real = dato.get('peso_real')
+            altura = dato.get('altura')
             lote = dato.get('lote')
             turno = dato.get('turno')
 
@@ -40,6 +41,7 @@ def vista_control_de_pesos_insumos_kuchen(request):
                 producto=producto,
                 peso_receta=peso_receta,
                 peso_real=peso_real,
+                altura=altura,
                 lote=lote,
                 turno=turno
                 )
@@ -146,6 +148,7 @@ def api_graficos_control_pesos_insumos_kuchen(request):
                 "codigo_producto": r.codigo_producto,
                 "peso_receta": peso_receta,
                 "peso_real": peso_real,
+                "altura": r.altura,
                 "desviacion": desv,
                 "lote": r.lote,
                 "turno": r.turno,

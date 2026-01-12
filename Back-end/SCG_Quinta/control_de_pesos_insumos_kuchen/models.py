@@ -10,6 +10,7 @@ class DatosFormularioControlDePesosInsumosKuchen(models.Model):
     producto = models.TextField()
     peso_receta = models.IntegerField()
     peso_real = models.IntegerField()
+    altura = models.IntegerField(null=True, blank=True)
     lote = models.TextField(null=False, blank=False)
     turno = models.TextField(null=False, blank=False)
     verificado = models.BooleanField(default=False)
