@@ -142,14 +142,14 @@
         };
 
         // ===== Helpers =====
-        const $ = (id) => document.getElementById(id);
+        const byId = (id) => document.getElementById(id);
 
-        const selectCliente = $('cliente');
-        const selectProducto = $('producto');
-        const inputPeso = $('peso');
-        const inputCodigo = $('codigo');
-        const inputAltura = $('altura');
-        const labelAltura = $('label-altura');
+        const selectCliente = byId('cliente');
+        const selectProducto = byId('producto');
+        const inputPeso = byId('peso');
+        const inputCodigo = byId('codigo');
+        const inputAltura = byId('altura');
+        const labelAltura = byId('label-altura');
 
         function resetProducto() {
           selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
