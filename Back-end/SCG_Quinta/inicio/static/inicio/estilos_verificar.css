@@ -899,7 +899,7 @@ body {
 
 .control_de_pesos_insumos_kuchen {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 10px;
     align-items: center;
     background-color: var(--rojo-quinta);
