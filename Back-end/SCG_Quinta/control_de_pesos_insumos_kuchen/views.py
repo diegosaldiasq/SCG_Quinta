@@ -33,6 +33,9 @@ def vista_control_de_pesos_insumos_kuchen(request):
             lote = dato.get('lote')
             turno = dato.get('turno')
 
+            if altura == '':
+                altura = None
+
             datos = DatosFormularioControlDePesosInsumosKuchen(
                 nombre_tecnologo=nombre_tecnologo,
                 fecha_registro=fecha_registro,
