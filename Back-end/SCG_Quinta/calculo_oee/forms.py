@@ -132,7 +132,7 @@ class TurnoOEEForm(forms.ModelForm):
         required=True,
         help_text="Lote del turno, ej: 123BCA",
         widget=forms.TextInput(attrs={
-            'id': 'id_turno',
+            'id': 'id_lote',
             'placeholder': '123BCA'
         })
     )

@@ -19,7 +19,6 @@
     :root{
       --text-input-field: #F7F7F7;
       --rojo-quinta: #B43C2C;
-      --amarillo-quinta: #f3ba14;
       --naranjo-quinta: #d07020;
       --naranjo-claro-quinta: #d4841c;
       --white: #FFFFFF;
@@ -29,7 +28,6 @@
 
     *{ box-sizing:border-box; }
     html, body { width:100%; }
-
     body{
       margin:0;
       font-family:'Quicksand', sans-serif;
@@ -39,7 +37,6 @@
     /* ===== Layout ===== */
     .login{
       min-height: 100dvh;
-      min-height: 100vh;
       display:grid;
       justify-content:center;
       align-content:start;
@@ -72,11 +69,7 @@
       font-weight: 700;
     }
 
-    /* ===== Form ===== */
-    form{
-      display: grid;
-      gap: 14px;
-    }
+    form{ display: grid; gap: 14px; }
 
     fieldset{
       border: 2px solid rgba(209,161,77,0.55);
@@ -103,31 +96,31 @@
       border: 1px solid rgba(199,199,199,0.85);
       border-radius: 10px;
       padding: 8px 10px;
-      height: 38px;
+      height: 40px;
       font-size: var(--md);
       outline: none;
     }
 
-    textarea{ height:auto; min-height: 38px; }
+    textarea{ height:auto; min-height: 40px; }
 
     input:focus, select:focus, textarea:focus{
       border-color: rgba(209,161,77,0.85);
       box-shadow: 0 0 0 3px rgba(243,186,20,0.22);
     }
 
-    /* ===== Tabla del form Django (SOLO esta tabla) ===== */
+    /* ===== Tabla del form.as_table (SOLO ESTA) ===== */
     .form-table{
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
       border-radius: 12px;
-      overflow: visible; /* iOS select */
+      overflow: visible; /* importante para selects iOS */
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
-    .form-table th,
-    .form-table td{
+    .form-table td,
+    .form-table th{
       padding: 10px 12px;
       border-bottom: 1px solid rgba(199,199,199,0.6);
       vertical-align: middle;
@@ -135,12 +128,13 @@
 
     .form-table th{
       text-align: left;
+      font-weight: 700;
+      width: 34%;
       white-space: nowrap;
-      width: 32%;
     }
 
     .helptext{
-      display: block;
+      display:block;
       margin-top: 6px;
       font-size: 12px;
       color: rgba(0,0,0,0.65);
@@ -152,8 +146,8 @@
       background: var(--rojo-quinta);
       color: var(--white);
       border: 0;
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 12px;
+      padding: 12px 14px;
       font-size: var(--md);
       font-weight: 700;
       cursor: pointer;
@@ -177,7 +171,7 @@
     }
     .botones .primary-button{ min-width: 220px; }
 
-    /* ===== Tablas grandes (Productos / Detenciones / Mermas) ===== */
+    /* ===== Tablas grandes (Productos/Detenciones/Mermas) ===== */
     .table-scroll{
       width: 100%;
       overflow-x: auto;
@@ -187,21 +181,17 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
-    .tabla-productos, #tabla-detenciones, #tabla-reprocesos{
+    .data-table{
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       margin: 0;
       background: transparent;
-      min-width: 860px; /* SIEMPRE, para que el wrapper haga scroll */
+      min-width: 860px; /* fuerza scroll en móvil */
     }
 
-    .tabla-productos th,
-    .tabla-productos td,
-    #tabla-detenciones th,
-    #tabla-detenciones td,
-    #tabla-reprocesos th,
-    #tabla-reprocesos td{
+    .data-table th,
+    .data-table td{
       padding: 8px 10px;
       border: 1px solid rgba(209,161,77,0.55);
       background: #fff;
@@ -210,9 +200,7 @@
       white-space: nowrap;
     }
 
-    .tabla-productos thead th,
-    #tabla-detenciones thead th,
-    #tabla-reprocesos thead th{
+    .data-table thead th{
       background: var(--naranjo-claro-quinta);
       color: var(--black);
       font-weight: 800;
@@ -222,14 +210,10 @@
       z-index: 1;
     }
 
-    .tabla-productos select,
-    .tabla-productos input,
-    #tabla-detenciones select,
-    #tabla-detenciones input,
-    #tabla-reprocesos select,
-    #tabla-reprocesos input{
+    .data-table select,
+    .data-table input{
       min-width: 120px;
-      height: 36px;
+      height: 38px;
       border-radius: 10px;
       background: var(--text-input-field);
       border: 1px solid rgba(199,199,199,0.85);
@@ -251,7 +235,6 @@
     /* ===== Responsive ===== */
     @media (max-width: 768px){
       body{ background-attachment: scroll; }
-
       .login{ padding: 12px; }
       .login_container{ padding: 14px; }
       .title{ font-size: 22px; }
@@ -265,48 +248,46 @@
         min-width: 0;
       }
 
-      input[type="text"], input[type="date"], input[type="number"], input[type="time"], select, textarea{
-        font-size: 15px; /* iOS */
+      input, select, textarea{
+        font-size: 16px; /* evita zoom iOS */
       }
+
+      .data-table{ min-width: 920px; }
     }
 
-    /* Mobile: SOLO convertimos la .form-table a "tarjetas" verticales */
+    /* Móvil: SOLO el form-table se vuelve “tarjeta vertical” */
     @media (max-width: 600px){
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
 
-      .login_container{
-        width: 100%;
-      }
-
       .form-table{
-        display: block;
-        box-shadow: none;
+        display:block;
+        box-shadow:none;
         background: transparent;
       }
-      .form-table tbody{
-        display: block;
-        width: 100%;
-      }
+      .form-table tbody{ display:block; }
+
       .form-table tr{
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 6px;
-        padding: 10px 12px;
+        display:block;
+        padding: 12px 12px;
         border-bottom: 1px solid rgba(199,199,199,0.6);
-        background: rgba(255,255,255,0.9);
+        background: rgba(255,255,255,0.92);
         border-radius: 12px;
         margin-bottom: 10px;
       }
-      .form-table th,
+
+      .form-table th{
+        display:block;
+        width:100%;
+        padding: 0 0 6px 0;
+        white-space: normal;
+      }
+
       .form-table td{
-        display: block;
-        width: 100%;
+        display:block;
+        width:100%;
         padding: 0;
         border-bottom: none;
-      }
-      .form-table th{
-        white-space: normal;
       }
     }
   </style>
@@ -326,7 +307,7 @@
         <fieldset>
           <legend>📑 Datos del Turno</legend>
 
-          <!-- IMPORTANTE: form.as_table SOLO trae <tr>... por eso lo envolvemos en <table> -->
+          <!-- IMPORTANTE: as_table debe ir dentro de table -->
           <table class="form-table">
             {{ form.as_table }}
           </table>
@@ -341,7 +322,7 @@
           <legend>🍰 Productos</legend>
 
           <div class="table-scroll">
-            <table id="tabla-productos" class="tabla-productos">
+            <table id="tabla-productos" class="data-table">
               <thead>
                 <tr>
                   <th>Cliente</th>
@@ -367,7 +348,7 @@
           <legend>⛔ Detenciones</legend>
 
           <div class="table-scroll">
-            <table id="tabla-detenciones">
+            <table id="tabla-detenciones" class="data-table">
               <thead>
                 <tr>
                   <th>Motivo</th>
@@ -392,7 +373,7 @@
           <legend>♻️ Mermas</legend>
 
           <div class="table-scroll">
-            <table id="tabla-reprocesos">
+            <table id="tabla-reprocesos" class="data-table">
               <thead>
                 <tr>
                   <th>Motivo</th>
@@ -443,91 +424,8 @@
   </template>
 
   <script>
-    const catalogo = {
-      'Jumbo': [
-        { producto: 'Torta Beatriz', codigo: '393241' },
-        { producto: 'Torta Bom Bom', codigo: '393240' },
-        { producto: 'Torta tres leches', codigo: '393149' },
-        { producto: 'Torta cuatro leches', codigo: '393191' },
-        { producto: 'Torta piña', codigo: '393129' },
-        { producto: 'Torta lucuma', codigo: '393141' },
-        { producto: 'Torta panqueque naranja', codigo: '393171' },
-        { producto: 'Torta selva negra', codigo: '393145' },
-        { producto: 'Torta truffa', codigo: '393167' },
-        { producto: 'Torta viena', codigo: '393153' },
-        { producto: 'Torta San Jorge lucuma', codigo: '393396' },
-        { producto: 'Torta San Jorge guinda', codigo: '393397' },
-        { producto: 'Torta San Jorge chocolate', codigo: '393398' },
-        { producto: 'Torta merengue lucuma', codigo: '405220' },
-        { producto: 'Torta merengue frambuesa', codigo: '405217' },
-        { producto: 'Torta merengue nugat', codigo: '393443' },
-        { producto: 'Torta merengue manzana frambuesa', codigo: '405458' },
-        { producto: 'Torta chocolate real', codigo: '405254' },
-        { producto: 'Torta caluga frambuesa', codigo: '393414' },
-        { producto: 'Torta caluga nuez', codigo: '405548' },
-        { producto: 'Torta selva negra vegana', codigo: '405258' },
-        { producto: 'Torta panqueque guinda chocolate', codigo: '402261' },
-        { producto: 'Torta tentacion de chocolate', codigo: '405598' },
-        { producto: 'Pie de frambuesa familiar', codigo: '393429' },
-        { producto: 'Pie de maracuya familiar', codigo: '393430' },
-        { producto: 'Pie de limon familiar', codigo: '393431' },
-        { producto: 'Media torta San Jorge lucuma', codigo: '405414' },
-        { producto: 'Tarta soft familiar', codigo: '393433' },
-        { producto: 'Tartaleta fruta mixta familiar', codigo: '393432' },
-        { producto: 'Chocotorta', codigo: '405606' },
-        { producto: 'Reparaciones tortas', codigo: '111111' },
-      ],
-      'SISA': [
-        { producto: 'Torta amor', codigo: '393266' },
-        { producto: 'Torta crema piña', codigo: '393011' },
-        { producto: 'Torta crema selva negra', codigo: '393013' },
-        { producto: 'Torta chocolate mediana', codigo: '405523' },
-        { producto: 'Torta merengue frambuesa', codigo: '393036' },
-        { producto: 'Torta merengue lucuma', codigo: '393212' },
-        { producto: 'Torta mocaccino mediana', codigo: '353253' },
-        { producto: 'Torta panqueque naranja', codigo: '393018' },
-        { producto: 'Torta tres leches', codigo: '393015' },
-        { producto: 'Torta yogurt', codigo: '393017' },
-        { producto: 'Torta viena', codigo: '393019' },
-        { producto: 'Torta sabor lucuma', codigo: '393356' },
-        { producto: 'Torta sacher', codigo: '393354' },
-        { producto: 'Torta doña isabel', codigo: '405256' },
-        { producto: 'Torta cookies & cream', codigo: '405295' },
-        { producto: 'Torta panqueque chocolate manjar', codigo: '405460' },
-        { producto: 'Tartaleta fruta mixta mediana', codigo: '393270' },
-        { producto: 'Pie de limon familiar', codigo: '393000' },
-        { producto: 'Pastel de yogurt frutilla', codigo: '392488' },
-        { producto: 'Reparaciones tortas', codigo: '222222' },
-      ],
-      'Walmart': [
-        { producto: 'Torta chocoguinda', codigo: '393058' },
-        { producto: 'Torta chocolate manjar', codigo: '393347' },
-        { producto: 'Torta chocolate 8pp', codigo: '393275' },
-        { producto: 'Torta crema frambuesa', codigo: '393402' },
-        { producto: 'Torta crema moka 15pp', codigo: '392500' },
-        { producto: 'Torta crema piña 15pp', codigo: '393033' },
-        { producto: 'Torta holandesa 15pp', codigo: '392498' },
-        { producto: 'Torta mousse manjar 15pp', codigo: '392495' },
-        { producto: 'Torta panqueque naranja', codigo: '393295' },
-        { producto: 'Torta san jorge 15pp', codigo: '393250' },
-        { producto: 'Torta selva negra 15pp', codigo: '393020' },
-        { producto: 'Torta tres leches 15pp', codigo: '392494' },
-        { producto: 'Torta hoja manjar chocolate artesanal', codigo: '405262' },
-        { producto: 'Torta frutos del bosque', codigo: '405315' },
-        { producto: 'Torta chocolate avellana', codigo: '393445' },
-        { producto: 'Torta selva negra crema lactea', codigo: '405488' },
-        { producto: 'Torta piña crema lactea', codigo: '405487' },
-      ],
-      'Unimarc': [
-        { producto: 'Torta crema manjar mini', codigo: '393272' },
-        { producto: 'Torta guinda mini', codigo: '393273' },
-        { producto: 'Torta hoja manjar 15pp', codigo: '392332' },
-        { producto: 'Torta holandesa smu', codigo: '393391' },
-        { producto: 'Torta panqueque naranja', codigo: '393409' },
-        { producto: 'Torta yogurt frutilla', codigo: '393441' },
-        { producto: 'Torta cuatro leches', codigo: '393440' },
-      ],
-    };
+    const catalogo = {{ CATALOGO|safe|default:"{}" }};
+    // Si no estás pasando CATALOGO desde la vista, puedes dejar tu objeto literal como lo tenías.
 
     const motivosDetenciones = [
       "1-Colacion",
@@ -611,7 +509,7 @@
         document.querySelector("#tabla-reprocesos tbody").append(fila);
       }
 
-      // Productos (múltiples filas)
+      // Productos
       const tablaBodyProd = document.querySelector('#tabla-productos tbody');
       const templateProd = document.getElementById('fila-producto-template').content;
       const btnAgregarProd = document.getElementById('btn-agregar-producto');
@@ -675,7 +573,7 @@
 
       btnAgregarProd.addEventListener('click', agregarFilaProductoInterna);
 
-      // exponer para onclick
+      // Exponer para onclick
       window.agregarFilaDetencion = agregarFilaDetencion;
       window.agregarFilaReproceso = agregarFilaReproceso;
       window.agregarFilaProducto = agregarFilaProductoInterna;
