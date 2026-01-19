@@ -6,176 +6,281 @@
   <meta charset="UTF-8" />
   <title>Registrar Turno OEE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Fuente -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="{% static 'calculo_oee/estilos_oee.css' %}" />
+
+  <!-- Favicon -->
   <link rel="icon" href="{% static 'calculo_oee/images/logoquinta2.png' %}" />
 
+  {# IMPORTANTE:
+     - No cargamos estilos_oee.css (para “omitir lo del .css”)
+     - Todo queda encapsulado en este template #}
+
   <style>
-    .tabla-productos, #tabla-detenciones, #tabla-reprocesos {
+    :root{
+      --very-light-pink: #C7C7C7;
+      --text-input-field: #F7F7F7;
+      --hospital-green: #ACD9B2;
+      --rojo-quinta: #B43C2C;
+      --amarillo-quinta: #f3ba14;
+      --naranjo-quinta: #d07020;
+      --naranjo-claro-quinta: #d4841c;
+      --white: #FFFFFF;
+      --black: #000000;
+      --sm: 14px;
+      --md: 16px;
+      --lg: 20px;
+    }
+
+    /* ===== Base ===== */
+    *{ box-sizing:border-box; }
+    html, body { width:100%; }
+    body{
+      margin:0;
+      font-family:'Quicksand', sans-serif;
+      background-image: url("{% static 'calculo_oee/images/Fondo.png' %}");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    /* ===== Layout ===== */
+    .login{
+      min-height: 100dvh;
+      min-height: 100vh;
+      display:grid;
+      justify-content:center;
+      align-content:start;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .logo{
+      width: 200px;
+      max-width: 70vw;
+      height: auto;
+      justify-self: center;
+      margin-top: 10px;
+    }
+
+    .login_container{
+      width: min(980px, 100%);
+      margin: 0 auto;
+      background: rgba(255,255,255,0.92);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .title{
+      color: var(--rojo-quinta);
+      text-align:center;
+      margin: 0 0 12px 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    /* ===== Form ===== */
+    form{
+      display: grid;
+      gap: 14px;
+    }
+
+    fieldset{
+      border: 2px solid rgba(209,161,77,0.55);
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(208,112,32,0.08);
+    }
+
+    legend{
+      padding: 0 10px;
+      color: var(--rojo-quinta);
+      font-weight: 700;
+    }
+
+    /* Tabla del form.as_table (inputs del turno) */
+    fieldset > table{
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      margin-bottom: 0.75rem;
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
+
+    fieldset > table td,
+    fieldset > table th{
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(199,199,199,0.6);
+      vertical-align: middle;
+    }
+
+    /* inputs/selects globales de este template */
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="time"],
+    select,
+    textarea{
+      width: 100%;
+      background: var(--text-input-field);
+      border: 1px solid rgba(199,199,199,0.85);
+      border-radius: 10px;
+      padding: 8px 10px;
+      height: 38px;
+      font-size: var(--md);
+      outline: none;
+    }
+
+    textarea{ height:auto; min-height: 38px; }
+
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(209,161,77,0.85);
+      box-shadow: 0 0 0 3px rgba(243,186,20,0.22);
+    }
+
+    /* ===== Botones ===== */
+    .primary-button{
+      background: var(--rojo-quinta);
+      color: var(--white);
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: var(--md);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .05s ease, background-color .2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .primary-button:hover{ background: var(--naranjo-quinta); }
+    .primary-button:active{ transform: translateY(1px); }
+
+    .botones{
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .botones .primary-button{ min-width: 220px; }
+
+    /* ===== Tablas grandes (Productos / Detenciones / Mermas) ===== */
+    .table-scroll{
+      width: 100%;
+      overflow-x: auto;                 /* <-- clave para móvil */
+      -webkit-overflow-scrolling: touch;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.75);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .tabla-productos, #tabla-detenciones, #tabla-reprocesos{
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 0;
+      background: transparent;
+      min-width: 860px;                 /* <-- fuerza scroll sin romper body */
+    }
+
     .tabla-productos th,
     .tabla-productos td,
     #tabla-detenciones th,
     #tabla-detenciones td,
     #tabla-reprocesos th,
-    #tabla-reprocesos td {
-      padding: 6px 8px;
-      border: 1px solid #d1a14d;
-      vertical-align: middle;
-      font-size: 0.9rem;
+    #tabla-reprocesos td{
+      padding: 8px 10px;
+      border: 1px solid rgba(209,161,77,0.55);
       background: #fff;
-      white-space: nowrap;
+      font-size: 0.92rem;
+      vertical-align: middle;
+      white-space: nowrap;              /* <-- evita que se “desarme” */
     }
+
+    .tabla-productos thead th,
+    #tabla-detenciones thead th,
+    #tabla-reprocesos thead th{
+      background: var(--naranjo-claro-quinta);
+      color: var(--black);
+      font-weight: 800;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
     .tabla-productos select,
     .tabla-productos input,
     #tabla-detenciones select,
     #tabla-detenciones input,
     #tabla-reprocesos select,
-    #tabla-reprocesos input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: #f9f9f9;
-      font-size: 0.9rem;
+    #tabla-reprocesos input{
       min-width: 120px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--text-input-field);
+      border: 1px solid rgba(199,199,199,0.85);
+      padding: 6px 10px;
+      font-size: 0.92rem;
     }
-    .btn-eliminar {
+
+    .btn-eliminar{
       background: #b33a2d;
       color: #fff;
       border: none;
       padding: 8px 12px;
-      border-radius: 6px;
+      border-radius: 10px;
       cursor: pointer;
+      font-weight: 700;
     }
-    .small-select {
-      min-width: 120px;
-    }
-    /* ====== Responsive: móvil ====== */
-    @media (max-width: 500px) {
+    .btn-eliminar:hover{ filter: brightness(0.95); }
 
-      /* Contenedor general */
-      .login {
-        padding: 12px;
-      }
+    /* ===== Responsive ===== */
+    @media (max-width: 768px){
+      body{ background-attachment: scroll; } /* mejora rendimiento móvil */
 
-      /* Logo */
-      .logo {
-        max-width: 160px;
-        height: auto;
-        margin-bottom: 10px;
-      }
+      .login{ padding: 12px; }
+      .login_container{ padding: 14px; }
+      .title{ font-size: 22px; }
 
-      /* OJO: en tu HTML usas "login_container" (con guion bajo) */
-      .login_container {
-        width: 100%;
-        max-width: 100%;
-        margin: 0 auto;
-        padding: 0;
-      }
+      fieldset{ padding: 12px; }
+      legend{ font-size: 14px; }
 
-      /* Título */
-      .title {
-        font-size: 1.15rem;
-        text-align: center;
-      }
-
-      /* Fieldsets */
-      fieldset {
-        padding: 10px;
-        margin: 10px 0;
-      }
-
-      legend {
-        font-size: 0.95rem;
-      }
-
-      /* Botones apilados */
-      .botones {
-        display: flex;
+      .botones{
         flex-direction: column;
-        gap: 10px;
         align-items: stretch;
       }
-
-      .primary-button.login-button,
-      .primary-button {
+      .botones .primary-button{
         width: 100%;
+        min-width: 0;
       }
 
-      /* Tablas: activar scroll horizontal */
-      .tabla-productos,
-      #tabla-detenciones,
-      #tabla-reprocesos {
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        width: 100%;
+      /* inputs un poco más compactos */
+      input[type="text"], input[type="date"], input[type="number"], input[type="time"], select, textarea{
+        font-size: 15px; /* evita zoom raro en iOS si queda muy chico */
       }
 
-      /* Mantener ancho mínimo para que no se rompa el layout */
-      .tabla-productos table,
-      #tabla-detenciones table,
-      #tabla-reprocesos table {
-        min-width: 760px;
+      /* tablas grandes: seguimos con scroll por wrapper */
+      .tabla-productos, #tabla-detenciones, #tabla-reprocesos{
+        min-width: 920px; /* más ancho si tienes muchas columnas */
       }
+    }
 
-      /* Como no tienes wrappers con <table> dentro, aplica directo al <table> */
-      .tabla-productos,
-      #tabla-detenciones,
-      #tabla-reprocesos {
-        min-width: 760px; /* si prefieres scroll sí o sí */
-      }
-
-      /* Tipografía más chica en tablas */
-      .tabla-productos th,
-      .tabla-productos td,
-      #tabla-detenciones th,
-      #tabla-detenciones td,
-      #tabla-reprocesos th,
-      #tabla-reprocesos td {
-        font-size: 0.8rem;
-        padding: 6px 6px;
-        white-space: nowrap; /* evita que se partan raro los textos */
-      }
-
-      /* Inputs/selects más compactos */
-      .tabla-productos select,
-      .tabla-productos input,
-      #tabla-detenciones select,
-      #tabla-detenciones input,
-      #tabla-reprocesos select,
-      #tabla-reprocesos input {
-        font-size: 0.8rem;
-        padding: 6px 6px;
-        min-width: 90px;  
-      }
-
-      /* Botón eliminar más compacto */
-      .btn-eliminar {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-      }
-      .table-scroll{
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 12px;
-      }
-      html, body {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: hidden;
-      }
-      *, *::before, *::after {
-        box-sizing: border-box;
+    @media (max-width: 420px){
+      .title{ font-size: 20px; }
+      .logo{ width: 170px; }
+      .tabla-productos, #tabla-detenciones, #tabla-reprocesos{
+        min-width: 980px;
       }
     }
   </style>
@@ -184,87 +289,102 @@
 <body>
   <div class="login">
     <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo" />
+
     <div class="login_container">
       <h1 class="title">📋 Crear Turno OEE</h1>
 
       <form method="post" action="{% url 'crear_turno' %}">
         {% csrf_token %}
 
-        <!-- 📑 Datos del Turno -->
+        <!-- Datos del turno -->
         <fieldset>
           <legend>📑 Datos del Turno</legend>
           <table>
             {{ form.as_table }}
           </table>
-          {# — luego, los hidden — #}
           {% for hidden in form.hidden_fields %}
             {{ hidden }}
           {% endfor %}
         </fieldset>
 
-        <!-- 🏭 Productos del Turno -->
+        <!-- Productos -->
         <fieldset>
           <legend>🍰 Productos</legend>
 
-          <table id="tabla-productos" class="tabla-productos">
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Producto</th>
-                <th>Código</th>
-                <th>Planeado</th>
-                <th>Real</th>
-                <th>Comentarios</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <div class="table-scroll">
+            <table id="tabla-productos" class="tabla-productos">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Producto</th>
+                  <th>Código</th>
+                  <th>Planeado</th>
+                  <th>Real</th>
+                  <th>Comentarios</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
 
-          <button type="button" class="primary-button" id="btn-agregar-producto">➕ Agregar Producto</button>
+          <div style="margin-top:10px; display:flex; justify-content:flex-start;">
+            <button type="button" class="primary-button" id="btn-agregar-producto">➕ Agregar Producto</button>
+          </div>
         </fieldset>
 
-        <!-- ⛔ Detenciones -->
+        <!-- Detenciones -->
         <fieldset>
           <legend>⛔ Detenciones</legend>
-          <table id="tabla-detenciones">
-            <thead>
-              <tr>
-                <th>Motivo</th>
-                <th>Hora inicio</th>
-                <th>Hora fin</th>
-                <th>Duración (min)</th>
-                <th>Comentarios</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <button type="button" class="primary-button" onclick="agregarFilaDetencion()">➕ Agregar Detención</button>
+
+          <div class="table-scroll">
+            <table id="tabla-detenciones">
+              <thead>
+                <tr>
+                  <th>Motivo</th>
+                  <th>Hora inicio</th>
+                  <th>Hora fin</th>
+                  <th>Duración (min)</th>
+                  <th>Comentarios</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:10px; display:flex; justify-content:flex-start;">
+            <button type="button" class="primary-button" onclick="agregarFilaDetencion()">➕ Agregar Detención</button>
+          </div>
         </fieldset>
 
-        <!-- ♻️ Reprocesos -->
+        <!-- Mermas -->
         <fieldset>
           <legend>♻️ Mermas</legend>
-          <table id="tabla-reprocesos">
-            <thead>
-              <tr>
-                <th>Motivo</th>
-                <th>Cantidad</th>
-                <th>Comentarios</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <button type="button" class="primary-button" onclick="agregarFilaReproceso()">➕ Agregar Reproceso</button>
+
+          <div class="table-scroll">
+            <table id="tabla-reprocesos">
+              <thead>
+                <tr>
+                  <th>Motivo</th>
+                  <th>Cantidad</th>
+                  <th>Comentarios</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:10px; display:flex; justify-content:flex-start;">
+            <button type="button" class="primary-button" onclick="agregarFilaReproceso()">➕ Agregar Reproceso</button>
+          </div>
         </fieldset>
 
-        <!-- ✅ Botones -->
+        <!-- Botones -->
         <div class="botones">
-          <button type="submit" class="primary-button login-button" onclick="return confirm('¿Estás seguro de guardar este turno?')">💾 Guardar Turno</button>
-          <!--<a href="{% url 'lista_turnos' %}" class="primary-button login-button">🚪 Turnos Registrados</a>-->
-          <a href="{% url 'intermedio' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+          <button type="submit" class="primary-button" onclick="return confirm('¿Estás seguro de guardar este turno?')">💾 Guardar Turno</button>
+          <a href="{% url 'intermedio' %}" class="primary-button">🏠 Volver al Inicio</a>
         </div>
       </form>
     </div>
@@ -293,7 +413,6 @@
     </tr>
   </template>
 
-  <!-- JS: catálogo, detenciones, reprocesos y sincronización principal -->
   <script>
     const catalogo = {
       'Jumbo': [
@@ -318,7 +437,6 @@
         { producto: 'Torta caluga frambuesa', codigo: '393414' },
         { producto: 'Torta caluga nuez', codigo: '405548' },
         { producto: 'Torta selva negra vegana', codigo: '405258' },
-        //{ producto: 'Torta piña vegana', codigo: '405260' }, Descontinuado 30-10-25
         { producto: 'Torta panqueque guinda chocolate', codigo: '402261' },
         { producto: 'Torta tentacion de chocolate', codigo: '405598' },
         { producto: 'Pie de frambuesa familiar', codigo: '393429' },
@@ -328,11 +446,10 @@
         { producto: 'Tarta soft familiar', codigo: '393433' },
         { producto: 'Tartaleta fruta mixta familiar', codigo: '393432' },
         { producto: 'Chocotorta', codigo: '405606' },
-        { producto: 'Reparaciones tortas', codigo: '111111' },  // código ficticio para reparaciones jumbo
+        { producto: 'Reparaciones tortas', codigo: '111111' },
       ],
       'SISA': [
         { producto: 'Torta amor', codigo: '393266' },
-        //{ producto: 'Torta crema manjar mediana', codigo: '392518' }, Descontinuado 30-10-25
         { producto: 'Torta crema piña', codigo: '393011' },
         { producto: 'Torta crema selva negra', codigo: '393013' },
         { producto: 'Torta chocolate mediana', codigo: '405523' },
@@ -343,20 +460,15 @@
         { producto: 'Torta tres leches', codigo: '393015' },
         { producto: 'Torta yogurt', codigo: '393017' },
         { producto: 'Torta viena', codigo: '393019' },
-        //{ producto: 'Torta guinda chocolate', codigo: '393362' }, Descontinuado 30-10-25
         { producto: 'Torta sabor lucuma', codigo: '393356' },
         { producto: 'Torta sacher', codigo: '393354' },
         { producto: 'Torta doña isabel', codigo: '405256' },
         { producto: 'Torta cookies & cream', codigo: '405295' },
-        //{ producto: 'Torta caramel macchiato', codigo: '405294' }, Descontinuado 30-10-25
-        //{ producto: 'Torta piña colada', codigo: '405292' }, Descontinuado 30-10-25
         { producto: 'Torta panqueque chocolate manjar', codigo: '405460' },
         { producto: 'Tartaleta fruta mixta mediana', codigo: '393270' },
         { producto: 'Pie de limon familiar', codigo: '393000' },
-        //{ producto: 'Pie de limon mediano', codigo: '405396' }, Descontinuado 30-10-25
-        //{ producto: 'Pie de maracuya mediano', codigo: '405397' }, Descontinuado 30-10-25
         { producto: 'Pastel de yogurt frutilla', codigo: '392488' },
-        { producto: 'Reparaciones tortas', codigo: '222222' },  // código ficticio para reparaciones sisa
+        { producto: 'Reparaciones tortas', codigo: '222222' },
       ],
       'Walmart': [
         { producto: 'Torta chocoguinda', codigo: '393058' },
@@ -417,45 +529,7 @@
     ];
 
     document.addEventListener('DOMContentLoaded', function() {
-      // ---------------------- lógica principal cliente/producto/código ----------------------
-      const mainCliente = document.getElementById('id_cliente');
-      const mainProducto = document.getElementById('id_producto');
-      const mainCodigo = document.getElementById('id_codigo');
-
-      function poblarProductosCliente(cliente, select, seleccionado = "") {
-        select.innerHTML = '<option value="">--Seleccionar--</option>';
-        const lista = catalogo[cliente] || [];
-        lista.forEach(item => {
-          const opt = document.createElement('option');
-          opt.value = item.producto;
-          opt.textContent = item.producto;
-          if (item.producto === seleccionado) opt.selected = true;
-          select.appendChild(opt);
-        });
-      }
-
-      if (mainCliente && mainProducto && mainCodigo) {
-        mainCliente.addEventListener('change', () => {
-          poblarProductosCliente(mainCliente.value, mainProducto);
-          mainCodigo.value = '';
-        });
-        mainProducto.addEventListener('change', () => {
-          const lista = catalogo[mainCliente.value] || [];
-          const sel = lista.find(i => i.producto === mainProducto.value);
-          mainCodigo.value = sel ? sel.codigo : '';
-        });
-        // inicializar si venía seleccionado
-        if (mainCliente.value) {
-          poblarProductosCliente(mainCliente.value, mainProducto, mainProducto.value);
-          if (mainProducto.value) {
-            const lista = catalogo[mainCliente.value] || [];
-            const sel = lista.find(i => i.producto === mainProducto.value);
-            mainCodigo.value = sel ? sel.codigo : '';
-          }
-        }
-      }
-
-      // ---------------------- detenciones ----------------------
+      // Detenciones
       function agregarFilaDetencion() {
         const opciones = motivosDetenciones.map(m => `<option value="${m}">${m}</option>`).join('');
         const fila = document.createElement('tr');
@@ -477,6 +551,7 @@
         const hi = fila.querySelector('input[name="hora_inicio_det[]"]');
         const hf = fila.querySelector('input[name="hora_fin_det[]"]');
         const dur = fila.querySelector('input[name="duracion_det[]"]');
+
         function recalcular() {
           if (!hi.value || !hf.value) { dur.value = ''; return; }
           let [h1,m1] = hi.value.split(':').map(n=>+n);
@@ -489,9 +564,9 @@
         hf.addEventListener('change', recalcular);
       }
 
-      // ---------------------- reprocesos ----------------------
+      // Reprocesos
       function agregarFilaReproceso() {
-        let opciones = motivosReprocesos.map(m => `<option value="${m}">${m}</option>`).join('');
+        const opciones = motivosReprocesos.map(m => `<option value="${m}">${m}</option>`).join('');
         const fila = document.createElement('tr');
         fila.innerHTML = `
           <td>
@@ -507,7 +582,7 @@
         document.querySelector("#tabla-reprocesos tbody").append(fila);
       }
 
-      // ---------------------- productos múltiples ----------------------
+      // Productos (múltiples filas)
       const tablaBodyProd = document.querySelector('#tabla-productos tbody');
       const templateProd = document.getElementById('fila-producto-template').content;
       const btnAgregarProd = document.getElementById('btn-agregar-producto');
@@ -544,16 +619,19 @@
       function agregarFilaProductoInterna() {
         const clone = document.importNode(templateProd, true);
         const fila = clone.querySelector('tr');
+
         const selectCliente = fila.querySelector('.cliente-en-producto');
         const selectProducto = fila.querySelector('.producto-en-turno');
         const inputCodigo = fila.querySelector('.codigo-en-turno');
         const btnEliminar = fila.querySelector('.btn-eliminar');
 
         llenarSelectCliente(selectCliente);
+        selectProducto.disabled = true;
 
         selectCliente.addEventListener('change', () => {
           const cliente = selectCliente.value;
           llenarSelectProducto(selectProducto, cliente);
+          selectProducto.disabled = !cliente;
           inputCodigo.value = '';
         });
 
@@ -562,15 +640,13 @@
           inputCodigo.value = obtenerCodigo(cliente, selectProducto.value);
         });
 
-        btnEliminar.addEventListener('click', () => {
-          fila.remove();
-        });
-
+        btnEliminar.addEventListener('click', () => fila.remove());
         tablaBodyProd.appendChild(fila);
       }
 
-      // ganchos
       btnAgregarProd.addEventListener('click', agregarFilaProductoInterna);
+
+      // exponer para onclick
       window.agregarFilaDetencion = agregarFilaDetencion;
       window.agregarFilaReproceso = agregarFilaReproceso;
       window.agregarFilaProducto = agregarFilaProductoInterna;
