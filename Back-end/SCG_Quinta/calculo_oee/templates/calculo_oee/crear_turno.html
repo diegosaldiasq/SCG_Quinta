@@ -30,6 +30,7 @@
       vertical-align: middle;
       font-size: 0.9rem;
       background: #fff;
+      white-space: nowrap;
     }
     .tabla-productos select,
     .tabla-productos input,
@@ -44,6 +45,7 @@
       border: 1px solid #ccc;
       background: #f9f9f9;
       font-size: 0.9rem;
+      min-width: 120px;
     }
     .btn-eliminar {
       background: #b33a2d;
@@ -153,12 +155,27 @@
       #tabla-reprocesos input {
         font-size: 0.8rem;
         padding: 6px 6px;
+        min-width: 90px;  
       }
 
       /* Botón eliminar más compacto */
       .btn-eliminar {
         padding: 6px 10px;
         font-size: 0.85rem;
+      }
+      .table-scroll{
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+      }
+      html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      *, *::before, *::after {
+        box-sizing: border-box;
       }
     }
   </style>
