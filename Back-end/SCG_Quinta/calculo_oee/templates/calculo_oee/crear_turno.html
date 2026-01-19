@@ -282,9 +282,48 @@
       .login_container{
         width: 400px; 
       }
-      form{
+      /* 1) Evita que la tabla del form se comporte rígida */
+      fieldset > table{
         width: 100%;
-        overflow-x: auto; /* permite scroll si es necesario */
+        display: block;
+        box-shadow: none;      /* opcional */
+        background: transparent; /* opcional */
+      }
+
+      fieldset > table tbody{
+        display: block;
+        width: 100%;
+      }
+
+      /* 2) Cada fila del form (label + input) pasa a ser “tarjeta” vertical */
+      fieldset > table tr{
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(199,199,199,0.6);
+      }
+
+      /* 3) Label arriba */
+      fieldset > table th{
+        display: block;
+        width: 100%;
+        padding: 0 0 6px 0;
+        text-align: left;
+        white-space: normal; /* importante para que el texto corte línea */
+      }
+
+      /* 4) Input abajo ocupando todo */
+      fieldset > table td{
+        display: block;
+        width: 100%;
+        padding: 0;
+      }
+
+      /* 5) Inputs al 100% */
+      fieldset > table td input,
+      fieldset > table td select,
+      fieldset > table td textarea{
+        width: 100%;
       }
     }
   </style>
