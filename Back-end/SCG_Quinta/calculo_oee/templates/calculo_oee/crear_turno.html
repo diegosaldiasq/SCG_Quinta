@@ -56,7 +56,83 @@
     .small-select {
       min-width: 120px;
     }
+    /* ====== Responsive: móvil ====== */
     @media (max-width: 600px) {
+
+      /* Contenedor general */
+      .login {
+        padding: 12px;
+      }
+
+      /* Logo */
+      .logo {
+        max-width: 160px;
+        height: auto;
+        margin-bottom: 10px;
+      }
+
+      /* OJO: en tu HTML usas "login_container" (con guion bajo) */
+      .login_container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      /* Título */
+      .title {
+        font-size: 1.15rem;
+        text-align: center;
+      }
+
+      /* Fieldsets */
+      fieldset {
+        padding: 10px;
+        margin: 10px 0;
+      }
+
+      legend {
+        font-size: 0.95rem;
+      }
+
+      /* Botones apilados */
+      .botones {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .primary-button.login-button,
+      .primary-button {
+        width: 100%;
+      }
+
+      /* Tablas: activar scroll horizontal */
+      .tabla-productos,
+      #tabla-detenciones,
+      #tabla-reprocesos {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+      }
+
+      /* Mantener ancho mínimo para que no se rompa el layout */
+      .tabla-productos table,
+      #tabla-detenciones table,
+      #tabla-reprocesos table {
+        min-width: 760px;
+      }
+
+      /* Como no tienes wrappers con <table> dentro, aplica directo al <table> */
+      .tabla-productos,
+      #tabla-detenciones,
+      #tabla-reprocesos {
+        min-width: 760px; /* si prefieres scroll sí o sí */
+      }
+
+      /* Tipografía más chica en tablas */
       .tabla-productos th,
       .tabla-productos td,
       #tabla-detenciones th,
@@ -64,8 +140,11 @@
       #tabla-reprocesos th,
       #tabla-reprocesos td {
         font-size: 0.8rem;
-        padding: 4px 6px;
+        padding: 6px 6px;
+        white-space: nowrap; /* evita que se partan raro los textos */
       }
+
+      /* Inputs/selects más compactos */
       .tabla-productos select,
       .tabla-productos input,
       #tabla-detenciones select,
@@ -73,14 +152,13 @@
       #tabla-reprocesos select,
       #tabla-reprocesos input {
         font-size: 0.8rem;
-        padding: 4px 6px;
+        padding: 6px 6px;
       }
-      .botones {
-        flex-direction: column;
-      }
-      .login_container {
-        width: 450px;
-        justify-items: center;
+
+      /* Botón eliminar más compacto */
+      .btn-eliminar {
+        padding: 6px 10px;
+        font-size: 0.85rem;
       }
     }
   </style>
