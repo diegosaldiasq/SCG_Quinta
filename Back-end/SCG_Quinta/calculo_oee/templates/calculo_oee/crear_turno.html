@@ -17,23 +17,19 @@
 
   <style>
     :root{
-      --very-light-pink: #C7C7C7;
       --text-input-field: #F7F7F7;
-      --hospital-green: #ACD9B2;
       --rojo-quinta: #B43C2C;
       --amarillo-quinta: #f3ba14;
       --naranjo-quinta: #d07020;
       --naranjo-claro-quinta: #d4841c;
       --white: #FFFFFF;
       --black: #000000;
-      --sm: 14px;
       --md: 16px;
-      --lg: 20px;
     }
 
-    /* ===== Base ===== */
     *{ box-sizing:border-box; }
     html, body { width:100%; }
+
     body{
       margin:0;
       font-family:'Quicksand', sans-serif;
@@ -95,7 +91,7 @@
       font-weight: 700;
     }
 
-    /* ===== Inputs/selects globales ===== */
+    /* ===== Inputs globales ===== */
     input[type="text"],
     input[type="date"],
     input[type="number"],
@@ -119,26 +115,32 @@
       box-shadow: 0 0 0 3px rgba(243,186,20,0.22);
     }
 
-    /* ===== Tabla del TURNO (solo Django form.as_table) ===== */
-    .turno-form table{
+    /* ===== Tabla del form Django (SOLO esta tabla) ===== */
+    .form-table{
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       background: rgba(255,255,255,0.9);
       border-radius: 12px;
-      overflow: visible; /* iOS */
+      overflow: visible; /* iOS select */
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
-    .turno-form table td,
-    .turno-form table th{
+    .form-table th,
+    .form-table td{
       padding: 10px 12px;
       border-bottom: 1px solid rgba(199,199,199,0.6);
       vertical-align: middle;
     }
 
-    .turno-form .helptext{
-      display:block;
+    .form-table th{
+      text-align: left;
+      white-space: nowrap;
+      width: 32%;
+    }
+
+    .helptext{
+      display: block;
       margin-top: 6px;
       font-size: 12px;
       color: rgba(0,0,0,0.65);
@@ -191,7 +193,7 @@
       border-spacing: 0;
       margin: 0;
       background: transparent;
-      min-width: 860px; /* mantiene scroll horizontal en móvil */
+      min-width: 860px; /* SIEMPRE, para que el wrapper haga scroll */
     }
 
     .tabla-productos th,
@@ -254,9 +256,6 @@
       .login_container{ padding: 14px; }
       .title{ font-size: 22px; }
 
-      fieldset{ padding: 12px; }
-      legend{ font-size: 14px; }
-
       .botones{
         flex-direction: column;
         align-items: stretch;
@@ -267,52 +266,47 @@
       }
 
       input[type="text"], input[type="date"], input[type="number"], input[type="time"], select, textarea{
-        font-size: 15px; /* evita zoom raro en iOS */
-      }
-
-      /* si quieres un poquito más de ancho para scroll en tablets */
-      .tabla-productos, #tabla-detenciones, #tabla-reprocesos{
-        min-width: 920px;
+        font-size: 15px; /* iOS */
       }
     }
 
-    /* Móvil chico: SOLO apilar el turno (NO tocar productos/detenciones/mermas) */
+    /* Mobile: SOLO convertimos la .form-table a "tarjetas" verticales */
     @media (max-width: 600px){
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
-      .login_container{ width: 100%; }
 
-      /* modo “tarjeta” SOLO para la tabla del turno */
-      .turno-form table tr{
+      .login_container{
+        width: 100%;
+      }
+
+      .form-table{
+        display: block;
+        box-shadow: none;
+        background: transparent;
+      }
+      .form-table tbody{
+        display: block;
+        width: 100%;
+      }
+      .form-table tr{
         display: grid;
         grid-template-columns: 1fr;
         gap: 6px;
         padding: 10px 12px;
         border-bottom: 1px solid rgba(199,199,199,0.6);
+        background: rgba(255,255,255,0.9);
+        border-radius: 12px;
+        margin-bottom: 10px;
       }
-
-      .turno-form table th,
-      .turno-form table td{
+      .form-table th,
+      .form-table td{
         display: block;
         width: 100%;
         padding: 0;
         border-bottom: none;
       }
-
-      .turno-form table th{
-        text-align: left;
+      .form-table th{
         white-space: normal;
-      }
-
-      .turno-form table td input,
-      .turno-form table td select,
-      .turno-form table td textarea{
-        width: 100%;
-      }
-
-      /* IMPORTANTE: NO pongas min-width:100px a las tablas grandes */
-      .tabla-productos, #tabla-detenciones, #tabla-reprocesos{
-        min-width: 860px; /* mantiene scroll */
       }
     }
   </style>
@@ -332,10 +326,10 @@
         <fieldset>
           <legend>📑 Datos del Turno</legend>
 
-          <!-- Wrapper para que el CSS móvil afecte SOLO esta tabla -->
-          <div class="turno-form">
+          <!-- IMPORTANTE: form.as_table SOLO trae <tr>... por eso lo envolvemos en <table> -->
+          <table class="form-table">
             {{ form.as_table }}
-          </div>
+          </table>
 
           {% for hidden in form.hidden_fields %}
             {{ hidden }}
@@ -564,6 +558,7 @@
     ];
 
     document.addEventListener('DOMContentLoaded', function() {
+      // Detenciones
       function agregarFilaDetencion() {
         const opciones = motivosDetenciones.map(m => `<option value="${m}">${m}</option>`).join('');
         const fila = document.createElement('tr');
@@ -598,6 +593,7 @@
         hf.addEventListener('change', recalcular);
       }
 
+      // Reprocesos
       function agregarFilaReproceso() {
         const opciones = motivosReprocesos.map(m => `<option value="${m}">${m}</option>`).join('');
         const fila = document.createElement('tr');
@@ -615,6 +611,7 @@
         document.querySelector("#tabla-reprocesos tbody").append(fila);
       }
 
+      // Productos (múltiples filas)
       const tablaBodyProd = document.querySelector('#tabla-productos tbody');
       const templateProd = document.getElementById('fila-producto-template').content;
       const btnAgregarProd = document.getElementById('btn-agregar-producto');
@@ -678,6 +675,7 @@
 
       btnAgregarProd.addEventListener('click', agregarFilaProductoInterna);
 
+      // exponer para onclick
       window.agregarFilaDetencion = agregarFilaDetencion;
       window.agregarFilaReproceso = agregarFilaReproceso;
       window.agregarFilaProducto = agregarFilaProductoInterna;
