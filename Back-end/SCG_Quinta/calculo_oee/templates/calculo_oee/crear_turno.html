@@ -177,11 +177,18 @@
       cursor: pointer;
       transition: transform .05s ease, background-color .2s ease;
       text-decoration: none;
+
       display: inline-flex;
-      align-items:center;
-      justify-content:center;
+      align-items: center;
+      justify-content: center;
       gap: 8px;
-      white-space: nowrap;
+
+      /* ✅ FIX overflow móvil */
+      max-width: 100%;
+      white-space: normal;          /* permite salto de línea */
+      overflow-wrap: anywhere;      /* si hay palabras largas */
+      flex-wrap: wrap;              /* si el contenido no cabe */
+      text-align: center;
     }
     .primary-button:hover{ background: var(--naranjo-quinta); }
     .primary-button:active{ transform: translateY(1px); }
