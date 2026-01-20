@@ -67,7 +67,7 @@
     /* ✅ Encierra el contenido para que no “agrande” el body */
     .login_container{
       width: min(980px, 100%);
-      max-width: 100%;
+      /*max-width: 100%;*/
       margin: 0 auto;
       background: rgba(255,255,255,0.99);
       border-radius: 16px;
@@ -274,22 +274,22 @@
     @media (max-width: 768px){
       body{ background-attachment: scroll; }
 
-      /* ✅ en mobile, que el contenedor principal use todo el ancho (evita “correrse” a la derecha) */
+      /* ✅ SOLO mobile: estirar para evitar corrimiento */
       .login{
         padding: 12px;
-        justify-content: stretch;   /* antes: center */
+        justify-content: stretch;   /* solo aquí */
       }
 
       .login_container{
         padding: 14px;
         width: 100%;
         max-width: 100%;
-        margin: 0;                  /* evita centrados raros en Safari */
+        margin: 0;                  /* solo aquí */
       }
 
       .title{ font-size: 22px; }
 
-      /* ✅ BOTONES: full width, centrados y sin min-width */
+      /* ✅ BOTONES ABAJO */
       .botones{
         width: 100%;
         flex-direction: column;
@@ -301,7 +301,7 @@
       .botones .primary-button{
         width: 100%;
         min-width: 0 !important;
-        display: flex;              /* en mobile mejor que inline-flex */
+        display: flex;
         justify-content: center;
         margin: 0;
       }
@@ -310,13 +310,12 @@
       input, select, textarea{ font-size: 16px; }
       .data-table select, .data-table input{ font-size: 16px; }
 
-      /* ✅ iOS: sticky + overflow a veces rompe => off */
+      /* iOS: sticky + overflow rompe */
       .data-table thead th{
         position: static !important;
         top: auto !important;
       }
 
-      /* un poco más de ancho mínimo para que se note el scroll */
       .data-table{ min-width: 920px; }
     }
 
@@ -324,19 +323,8 @@
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
 
-      .login{
-        padding: 10px;
-        gap: 10px;
-        justify-content: stretch;   /* ✅ refuerzo */
-      }
-
-      .login_container{
-        padding: 12px;
-        border-radius: 14px;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;                  /* ✅ refuerzo */
-      }
+      .login{ padding: 10px; gap: 10px; justify-content: stretch; }
+      .login_container{ padding: 12px; border-radius: 14px; width: 100%; max-width: 100%; margin: 0; }
 
       fieldset{ padding: 12px; border-radius: 12px; }
       legend{ font-size: 14px; }
@@ -371,15 +359,6 @@
       }
 
       textarea{ min-height: 38px; }
-
-      /* ✅ no repetir: ya queda controlado en 768, pero lo dejamos por seguridad */
-      .botones .primary-button{
-        width: 100%;
-        min-width: 0 !important;
-        display: flex;
-        justify-content: center;
-        margin: 0;
-      }
     }
   </style>
 </head>
