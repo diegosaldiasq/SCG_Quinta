@@ -108,37 +108,42 @@
       box-shadow: 0 0 0 3px rgba(243,186,20,0.22);
     }
 
-    /* ===== Tabla del form.as_table (SOLO ESTA) ===== */
-    .form-table{
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
+    /* ===== FORM STACK (para {{ form.as_p }}) ===== */
+    .form-stack{
+      display: grid;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .form-stack p{
+      margin: 0;
+      padding: 12px;
       background: rgba(255,255,255,0.92);
       border-radius: 12px;
-      overflow: visible; /* importante para selects iOS */
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      border: 1px solid rgba(199,199,199,0.6);
     }
 
-    .form-table td,
-    .form-table th{
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(199,199,199,0.6);
-      vertical-align: middle;
+    .form-stack label{
+      display:block;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: rgba(0,0,0,0.9);
     }
 
-    .form-table th{
-      text-align: left;
-      font-weight: 700;
-      width: 34%;
-      white-space: nowrap;
-    }
-
-    .helptext{
+    .form-stack .helptext{
       display:block;
       margin-top: 6px;
       font-size: 12px;
       color: rgba(0,0,0,0.65);
       line-height: 1.2;
+    }
+
+    /* Django a veces mete ul.errorlist */
+    .errorlist{
+      margin: 0 0 8px 0;
+      padding-left: 18px;
+      color: #b00020;
+      font-weight: 700;
     }
 
     /* ===== Botones ===== */
@@ -205,7 +210,7 @@
       color: var(--black);
       font-weight: 800;
       text-align: center;
-      position: sticky;
+      position: sticky; /* OK en desktop */
       top: 0;
       z-index: 1;
     }
@@ -248,48 +253,27 @@
         min-width: 0;
       }
 
+      /* evita zoom iOS */
       input, select, textarea{
-        font-size: 16px; /* evita zoom iOS */
+        font-size: 16px;
+      }
+      .data-table select,
+      .data-table input{
+        font-size: 16px;
       }
 
       .data-table{ min-width: 920px; }
+
+      /* ✅ FIX iOS: sticky + overflow rompe el layout */
+      .data-table thead th{
+        position: static !important;
+        top: auto !important;
+      }
     }
 
-    /* Móvil: SOLO el form-table se vuelve “tarjeta vertical” */
     @media (max-width: 600px){
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
-      .login_container{ width: 100%; }
-
-      .form-table{
-        display:block;
-        box-shadow:none;
-        background: transparent;
-      }
-      .form-table tbody{ display:block; }
-
-      .form-table tr{
-        display:block;
-        padding: 12px 12px;
-        border-bottom: 1px solid rgba(199,199,199,0.6);
-        background: rgba(255,255,255,0.92);
-        border-radius: 12px;
-        margin-bottom: 10px;
-      }
-
-      .form-table th{
-        display:block;
-        width:100%;
-        padding: 0 0 6px 0;
-        white-space: normal;
-      }
-
-      .form-table td{
-        display:block;
-        width:100%;
-        padding: 0;
-        border-bottom: none;
-      }
     }
   </style>
 </head>
@@ -308,11 +292,12 @@
         <fieldset>
           <legend>📑 Datos del Turno</legend>
 
-          <!-- IMPORTANTE: as_table debe ir dentro de table -->
-          <table class="form-table">
-            {{ form.as_table }}
-          </table>
+          <!-- ✅ iOS SAFE: sin tabla -->
+          <div class="form-stack">
+            {{ form.as_p }}
+          </div>
 
+          <!-- ✅ hidden fields por separado (para no depender del renderer) -->
           {% for hidden in form.hidden_fields %}
             {{ hidden }}
           {% endfor %}
@@ -426,7 +411,6 @@
 
   <script>
     const catalogo = {{ CATALOGO|safe|default:"{}" }};
-    // Si no estás pasando CATALOGO desde la vista, puedes dejar tu objeto literal como lo tenías.
 
     const motivosDetenciones = [
       "1-Colacion",
@@ -457,6 +441,7 @@
     ];
 
     document.addEventListener('DOMContentLoaded', function() {
+
       // Detenciones
       function agregarFilaDetencion() {
         const opciones = motivosDetenciones.map(m => `<option value="${m}">${m}</option>`).join('');
