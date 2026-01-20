@@ -274,6 +274,53 @@
     @media (max-width: 600px){
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
+
+      /* Compactar contenedor */
+      .login{ padding: 10px; gap: 10px; }
+      .login_container{ padding: 12px; border-radius: 14px; }
+
+      /* Compactar fieldset */
+      fieldset{ padding: 12px; border-radius: 12px; }
+      legend{ font-size: 14px; }
+
+      /* ✅ FIX real para el form: convertir cada <p> en "tarjeta" con layout estable */
+      .form-stack p{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 10px;
+        margin: 0 0 10px 0;
+        border-radius: 12px;
+      }
+
+      .form-stack label{
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.15;
+        white-space: normal;
+      }
+
+      /* Evitar alturas raras */
+      .form-stack p br{ display:none; }
+      .form-stack p > *{ min-height: 0; }
+
+      /* Inputs más compactos */
+      input[type="text"],
+      input[type="date"],
+      input[type="number"],
+      input[type="time"],
+      select,
+      textarea{
+        height: 38px;
+        padding: 8px 10px;
+      }
+
+      textarea{ min-height: 38px; }
+
+      /* Botones full width */
+      .botones .primary-button{
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -298,9 +345,9 @@
           </div>
 
           <!-- ✅ hidden fields por separado (para no depender del renderer) -->
-          {% for hidden in form.hidden_fields %}
+          <!--{% for hidden in form.hidden_fields %}
             {{ hidden }}
-          {% endfor %}
+          {% endfor %}-->
         </fieldset>
 
         <!-- Productos -->
