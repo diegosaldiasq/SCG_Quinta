@@ -210,10 +210,8 @@
     .botones .primary-button{ min-width: 220px; }
 
     /* ===== Tablas grandes ===== */
-    /* ✅ El ÚNICO lugar con overflow horizontal permitido */
     .table-scroll{
       width: 100%;
-      padding: 10px;
       max-width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
@@ -221,48 +219,55 @@
       border-radius: 12px;
       background: rgba(255,255,255,0.75);
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      min-width: 0; /* ✅ clave */
+      padding: 10px;
     }
 
-    /* ✅ tabla normal (sin inline-table / max-content) */
+    /* La tabla se adapta al contenido, pero sin romper layout */
     .data-table{
-      width: 100%;
+      width: max-content;      /* 👈 clave para que el ancho sea “real” y el scroll funcione bien */
+      min-width: 100%;         /* 👈 en escritorio llena el contenedor si es más chica */
       border-collapse: separate;
       border-spacing: 0;
       margin: 0;
       background: transparent;
-      min-width: 920px; /* fuerza scroll dentro del wrapper */
     }
 
+    /* Tipografía de tabla */
     .data-table th,
     .data-table td{
-      padding: 8px 10px;
+      font-size: 10px;         /* ✅ lo que pediste */
+      padding: 6px 8px;
       border: 1px solid rgba(209,161,77,0.55);
       background: #fff;
-      font-size: 0.92rem;
       vertical-align: middle;
       white-space: nowrap;
     }
 
+    /* Encabezado */
     .data-table thead th{
       background: var(--naranjo-claro-quinta);
       color: var(--black);
       font-weight: 800;
       text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 1;
     }
 
+    /* ✅ Reduce el tamaño de la columna Acción */
+    .data-table th:last-child,
+    .data-table td:last-child{
+      width: 1%;
+      min-width: 90px;         /* ajusta si quieres 70-120 */
+    }
+
+    /* Inputs dentro de tabla: bajar tamaño y min-width */
     .data-table select,
     .data-table input{
-      min-width: 120px;
-      height: 38px;
+      min-width: 90px;         /* 👈 antes 120px (esto te inflaba todo) */
+      height: 32px;
       border-radius: 10px;
       background: var(--text-input-field);
       border: 1px solid rgba(199,199,199,0.85);
-      padding: 6px 10px;
-      font-size: 0.92rem;
+      padding: 4px 8px;
+      font-size: 10px;         /* ✅ 10px */
     }
 
     .btn-eliminar{
@@ -324,14 +329,21 @@
        /* ✅ Inputs más angostos dentro de tablas */
       .data-table select,
       .data-table input{
-        min-width: 90px;     /* antes 120px */
-        width: 100%;
+        min-width: 80px;     /* antes 120px */
+        height: 30px;
+        font-size: 16px;
       }
 
       /* ✅ Opcional: reduce un poco padding de celdas */
       .data-table th,
       .data-table td{
-        padding: 6px 8px;
+        font-size: 10px;
+        padding: 5px 6px;
+      }
+      /* Acción más angosta */
+      .data-table th:last-child,
+      .data-table td:last-child{
+        min-width: 80px;
       }
     }
 
