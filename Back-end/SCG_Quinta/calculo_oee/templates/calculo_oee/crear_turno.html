@@ -213,6 +213,7 @@
     /* ✅ El ÚNICO lugar con overflow horizontal permitido */
     .table-scroll{
       width: 100%;
+      padding: 10px;
       max-width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
@@ -320,11 +321,27 @@
         position: static !important;
         top: auto !important;
       }
+       /* ✅ Inputs más angostos dentro de tablas */
+      .data-table select,
+      .data-table input{
+        min-width: 90px;     /* antes 120px */
+        width: 100%;
+      }
+
+      /* ✅ Opcional: reduce un poco padding de celdas */
+      .data-table th,
+      .data-table td{
+        padding: 6px 8px;
+      }
     }
 
     @media (max-width: 600px){
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
+
+      .data-table{
+        min-width: 760px;   /* en vez de 920px */
+      }
 
       .login{ padding: 10px; gap: 10px; justify-content: stretch; }
       .login_container{ padding: 12px; border-radius: 14px; width: 100%; max-width: 100%; margin: 0; }
