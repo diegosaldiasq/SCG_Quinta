@@ -189,6 +189,9 @@
       overflow-wrap: anywhere;      /* si hay palabras largas */
       flex-wrap: wrap;              /* si el contenido no cabe */
       text-align: center;
+      min-width: 0;
+      flex: 1 1 auto;
+      line-height: 1.1;
     }
     .primary-button:hover{ background: var(--naranjo-quinta); }
     .primary-button:active{ transform: translateY(1px); }
@@ -283,7 +286,7 @@
       }
       .botones .primary-button{
         width: 100%;
-        min-width: 0;
+        min-width: 0 !important;
       }
 
       /* evita zoom iOS */
@@ -341,7 +344,10 @@
 
       textarea{ min-height: 38px; }
 
-      .botones .primary-button{ width: 100%; }
+      .botones .primary-button{ 
+        width: 100%;
+        min-width: 0 !important;
+      }
     }
   </style>
 </head>
