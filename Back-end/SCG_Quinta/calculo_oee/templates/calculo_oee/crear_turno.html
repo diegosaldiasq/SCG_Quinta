@@ -183,15 +183,12 @@
       justify-content: center;
       gap: 8px;
 
-      /* ✅ FIX overflow móvil */
       max-width: 100%;
-      white-space: normal;          /* permite salto de línea */
-      overflow-wrap: anywhere;      /* si hay palabras largas */
-      flex-wrap: wrap;              /* si el contenido no cabe */
+      min-width: 0;            /* ✅ sí, esto se queda */
+      white-space: normal;
+      overflow-wrap: anywhere;
+      flex-wrap: wrap;
       text-align: center;
-      min-width: 0;
-      flex: 1 1 auto;
-      line-height: 1.1;
     }
     .primary-button:hover{ background: var(--naranjo-quinta); }
     .primary-button:active{ transform: translateY(1px); }
@@ -276,17 +273,37 @@
     /* ===== Responsive ===== */
     @media (max-width: 768px){
       body{ background-attachment: scroll; }
-      .login{ padding: 12px; }
-      .login_container{ padding: 14px; }
+
+      /* ✅ en mobile, que el contenedor principal use todo el ancho (evita “correrse” a la derecha) */
+      .login{
+        padding: 12px;
+        justify-content: stretch;   /* antes: center */
+      }
+
+      .login_container{
+        padding: 14px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;                  /* evita centrados raros en Safari */
+      }
+
       .title{ font-size: 22px; }
 
+      /* ✅ BOTONES: full width, centrados y sin min-width */
       .botones{
+        width: 100%;
         flex-direction: column;
         align-items: stretch;
+        justify-content: stretch;
+        gap: 12px;
       }
+
       .botones .primary-button{
         width: 100%;
         min-width: 0 !important;
+        display: flex;              /* en mobile mejor que inline-flex */
+        justify-content: center;
+        margin: 0;
       }
 
       /* evita zoom iOS */
@@ -307,8 +324,19 @@
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
 
-      .login{ padding: 10px; gap: 10px; }
-      .login_container{ padding: 12px; border-radius: 14px; }
+      .login{
+        padding: 10px;
+        gap: 10px;
+        justify-content: stretch;   /* ✅ refuerzo */
+      }
+
+      .login_container{
+        padding: 12px;
+        border-radius: 14px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;                  /* ✅ refuerzo */
+      }
 
       fieldset{ padding: 12px; border-radius: 12px; }
       legend{ font-size: 14px; }
@@ -344,9 +372,13 @@
 
       textarea{ min-height: 38px; }
 
-      .botones .primary-button{ 
+      /* ✅ no repetir: ya queda controlado en 768, pero lo dejamos por seguridad */
+      .botones .primary-button{
         width: 100%;
         min-width: 0 !important;
+        display: flex;
+        justify-content: center;
+        margin: 0;
       }
     }
   </style>
