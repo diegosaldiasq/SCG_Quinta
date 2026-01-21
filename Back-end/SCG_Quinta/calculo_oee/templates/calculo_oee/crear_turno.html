@@ -28,24 +28,10 @@
 
     *{ box-sizing:border-box; }
 
-    /* DEBUG TEMPORAL – quitar después */
-    *{
-      outline: 2px solid rgba(255,0,0,0.65) !important;
-    }
-
-    /* 🔧 Para depurar: mejor NO ocultar overflow global.
-      Si quieres, déjalo comentado mientras pruebas. */
-    /*
     html, body{
       width: 100%;
       max-width: 100%;
       overflow-x: hidden;
-    }
-    */
-
-    html, body{
-      width: 100%;
-      max-width: 100%;
     }
 
     body{
@@ -72,7 +58,6 @@
       margin-top: 10px;
     }
 
-    /* ✅ Encierra el contenido */
     .login_container{
       width: min(980px, 100%);
       margin: 0 auto;
@@ -80,8 +65,7 @@
       border-radius: 16px;
       padding: 18px;
       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      overflow: hidden;
-      min-width: 0; /* ✅ clave */
+      overflow: hidden; /* ✅ mantiene el body controlado */
     }
 
     .title{
@@ -94,14 +78,14 @@
 
     form{ display: grid; gap: 14px; }
 
+    /* ✅ IMPORTANTE: NO cortar el scroll interno */
     fieldset{
       border: 2px solid rgba(209,161,77,0.55);
       border-radius: 14px;
       padding: 14px;
       background: rgba(208,112,32,0.08);
       max-width: 100%;
-      overflow: hidden;
-      min-width: 0; /* ✅ clave */
+      overflow: visible; /* ✅ CLAVE (antes estaba hidden) */
     }
 
     legend{
@@ -135,7 +119,7 @@
       box-shadow: 0 0 0 3px rgba(243,186,20,0.22);
     }
 
-    /* ===== FORM STACK ===== */
+    /* ===== FORM STACK (para {{ form.as_p }}) ===== */
     .form-stack{
       display: grid;
       gap: 10px;
@@ -213,61 +197,55 @@
     .table-scroll{
       width: 100%;
       max-width: 100%;
-      overflow-x: auto;
+      overflow-x: auto;                 /* ✅ el scroll vive aquí */
       overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       border-radius: 12px;
       background: rgba(255,255,255,0.75);
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      padding: 10px;
     }
 
-    /* La tabla se adapta al contenido, pero sin romper layout */
+    /* ✅ volver a tabla “normal” para evitar corrimientos al agregar filas */
     .data-table{
-      width: max-content;      /* 👈 clave para que el ancho sea “real” y el scroll funcione bien */
-      min-width: 100%;         /* 👈 en escritorio llena el contenedor si es más chica */
+      width: 100%;
+      min-width: 860px;                 /* fuerza scroll en móvil */
       border-collapse: separate;
       border-spacing: 0;
       margin: 0;
       background: transparent;
     }
 
-    /* Tipografía de tabla */
     .data-table th,
     .data-table td{
-      font-size: 16px;         /* ✅ lo que pediste */
-      padding: 6px 8px;
+      padding: 8px 10px;
       border: 1px solid rgba(209,161,77,0.55);
       background: #fff;
+      font-size: 10px;                  /* ✅ tu pedido: letra 10px */
       vertical-align: middle;
       white-space: nowrap;
     }
 
-    /* Encabezado */
     .data-table thead th{
       background: var(--naranjo-claro-quinta);
       color: var(--black);
       font-weight: 800;
       text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
-    /* ✅ Reduce el tamaño de la columna Acción */
-    .data-table th:last-child,
-    .data-table td:last-child{
-      width: 1%;
-      min-width: 90px;         /* ajusta si quieres 70-120 */
-    }
-
-    /* Inputs dentro de tabla: bajar tamaño y min-width */
+    /* ✅ inputs dentro de tablas: ancho controlado (sin “inflar” columnas) */
     .data-table select,
     .data-table input{
-      min-width: 90px;         /* 👈 antes 120px (esto te inflaba todo) */
-      height: 32px;
+      width: 100%;
+      min-width: 0;                     /* ✅ clave */
+      height: 34px;
       border-radius: 10px;
       background: var(--text-input-field);
       border: 1px solid rgba(199,199,199,0.85);
-      padding: 4px 8px;
-      font-size: 16px;         /* ✅ 10px */
+      padding: 6px 8px;
+      font-size: 10px;                  /* ✅ 10px en escritorio */
     }
 
     .btn-eliminar{
@@ -284,23 +262,10 @@
     /* ===== Responsive ===== */
     @media (max-width: 768px){
       body{ background-attachment: scroll; }
-
-      /* ✅ SOLO mobile: estirar para evitar corrimiento */
-      .login{
-        padding: 12px;
-        justify-content: stretch;   /* solo aquí */
-      }
-
-      .login_container{
-        padding: 14px;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;                  /* solo aquí */
-      }
-
+      .login{ padding: 12px; justify-content: stretch; }
+      .login_container{ padding: 14px; width: 100%; margin: 0; }
       .title{ font-size: 22px; }
 
-      /* ✅ BOTONES ABAJO */
       .botones{
         width: 100%;
         flex-direction: column;
@@ -317,46 +282,24 @@
         margin: 0;
       }
 
-      /* evita zoom iOS */
+      /* ✅ iOS: si pones inputs a 10px hace zoom. Mantén 16px en inputs */
       input, select, textarea{ font-size: 16px; }
       .data-table select, .data-table input{ font-size: 16px; }
 
-      /* iOS: sticky + overflow rompe */
+      /* iOS: sticky + overflow puede fallar */
       .data-table thead th{
         position: static !important;
         top: auto !important;
       }
-       /* ✅ Inputs más angostos dentro de tablas */
-      .data-table select,
-      .data-table input{
-        min-width: 80px;     /* antes 120px */
-        height: 30px;
-        font-size: 16px;
-      }
 
-      /* ✅ Opcional: reduce un poco padding de celdas */
-      .data-table th,
-      .data-table td{
-        font-size: 10px;
-        padding: 5px 6px;
-      }
-      /* Acción más angosta */
-      .data-table th:last-child,
-      .data-table td:last-child{
-        min-width: 80px;
-      }
+      .data-table{ min-width: 920px; }
     }
 
     @media (max-width: 600px){
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
-
-      .data-table{
-        min-width: 760px;   /* en vez de 920px */
-      }
-
       .login{ padding: 10px; gap: 10px; justify-content: stretch; }
-      .login_container{ padding: 12px; border-radius: 14px; width: 100%; max-width: 100%; margin: 0; }
+      .login_container{ padding: 12px; border-radius: 14px; width: 100%; margin: 0; }
 
       fieldset{ padding: 12px; border-radius: 12px; }
       legend{ font-size: 14px; }
