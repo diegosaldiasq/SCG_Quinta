@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Respuesta JSON de vista_main:", data);
 
             if (data.existe) {
-                alert("Ingreso correcto!!!");
+                //alert("Ingreso correcto!!!");
                 // Aquí puedes redirigir a otra URL si lo deseas
                 window.location.href = "/inicio/index/";
             } else {
