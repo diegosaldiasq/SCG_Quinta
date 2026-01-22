@@ -65,7 +65,8 @@
       border-radius: 16px;
       padding: 18px;
       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      overflow: hidden; /* ✅ mantiene el body controlado */
+      overflow: hidden;
+      min-width: 0;
     }
 
     .title{
@@ -78,14 +79,14 @@
 
     form{ display: grid; gap: 14px; }
 
-    /* ✅ IMPORTANTE: NO cortar el scroll interno */
     fieldset{
       border: 2px solid rgba(209,161,77,0.55);
       border-radius: 14px;
       padding: 14px;
       background: rgba(208,112,32,0.08);
       max-width: 100%;
-      overflow: visible; /* ✅ CLAVE (antes estaba hidden) */
+      overflow: visible;
+      min-width: 0;
     }
 
     legend{
@@ -149,6 +150,7 @@
       line-height: 1.2;
     }
 
+    /* Django a veces mete ul.errorlist */
     .errorlist{
       margin: 0 0 8px 0;
       padding-left: 18px;
@@ -193,11 +195,14 @@
     }
     .botones .primary-button{ min-width: 220px; }
 
-    /* ===== Tablas grandes ===== */
+    /* =======================================================================
+      ✅ TABLAS (FIX DEFINITIVO): layout fijo + anchos por columna + inputs 100%
+       ======================================================================= */
+
     .table-scroll{
       width: 100%;
       max-width: 100%;
-      overflow-x: auto;                 /* ✅ el scroll vive aquí */
+      overflow-x: auto;
       overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       border-radius: 12px;
@@ -205,14 +210,13 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
-    /* ✅ volver a tabla “normal” para evitar corrimientos al agregar filas */
     .data-table{
       width: 100%;
-      min-width: 860px;                 /* fuerza scroll en móvil */
       border-collapse: separate;
       border-spacing: 0;
       margin: 0;
       background: transparent;
+      table-layout: fixed; /* 🔑 CLAVE: no se “recalcula” al agregar filas */
     }
 
     .data-table th,
@@ -220,8 +224,11 @@
       padding: 8px 10px;
       border: 1px solid rgba(209,161,77,0.55);
       background: #fff;
-      font-size: 10px;                  /* ✅ tu pedido: letra 10px */
+      font-size: 12px; /* escritorio */
       vertical-align: middle;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
@@ -230,34 +237,60 @@
       color: var(--black);
       font-weight: 800;
       text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 1;
     }
 
-    /* ✅ inputs dentro de tablas: ancho controlado (sin “inflar” columnas) */
+    /* ✅ Controles dentro de tabla: nunca inflan la celda */
     .data-table select,
     .data-table input{
       width: 100%;
-      min-width: 0;                     /* ✅ clave */
+      max-width: 100%;
+      min-width: 0;         /* 🔑 CLAVE */
+      box-sizing: border-box;
       height: 34px;
       border-radius: 10px;
       background: var(--text-input-field);
       border: 1px solid rgba(199,199,199,0.85);
       padding: 6px 8px;
-      font-size: 10px;                  /* ✅ 10px en escritorio */
+      font-size: 12px;      /* escritorio */
     }
 
+    /* Botón eliminar: no debe inflar */
     .btn-eliminar{
+      width: 100%;
+      max-width: 110px;
       background: #b33a2d;
       color: #fff;
       border: none;
-      padding: 8px 12px;
+      padding: 8px 10px;
       border-radius: 10px;
       cursor: pointer;
       font-weight: 700;
     }
     .btn-eliminar:hover{ filter: brightness(0.95); }
+
+    /* ===== Anchos por tabla (para que “Acción” se vea) ===== */
+    /* Productos: 7 columnas */
+    #tabla-productos th:nth-child(1), #tabla-productos td:nth-child(1){ width: 14%; } /* Cliente */
+    #tabla-productos th:nth-child(2), #tabla-productos td:nth-child(2){ width: 18%; } /* Producto */
+    #tabla-productos th:nth-child(3), #tabla-productos td:nth-child(3){ width: 10%; } /* Código */
+    #tabla-productos th:nth-child(4), #tabla-productos td:nth-child(4){ width: 10%; } /* Planeado */
+    #tabla-productos th:nth-child(5), #tabla-productos td:nth-child(5){ width: 10%; } /* Real */
+    #tabla-productos th:nth-child(6), #tabla-productos td:nth-child(6){ width: 26%; } /* Comentarios */
+    #tabla-productos th:nth-child(7), #tabla-productos td:nth-child(7){ width: 12%; } /* Acción */
+
+    /* Detenciones: 6 columnas */
+    #tabla-detenciones th:nth-child(1), #tabla-detenciones td:nth-child(1){ width: 26%; } /* Motivo */
+    #tabla-detenciones th:nth-child(2), #tabla-detenciones td:nth-child(2){ width: 12%; } /* Inicio */
+    #tabla-detenciones th:nth-child(3), #tabla-detenciones td:nth-child(3){ width: 12%; } /* Fin */
+    #tabla-detenciones th:nth-child(4), #tabla-detenciones td:nth-child(4){ width: 12%; } /* Duración */
+    #tabla-detenciones th:nth-child(5), #tabla-detenciones td:nth-child(5){ width: 26%; } /* Comentarios */
+    #tabla-detenciones th:nth-child(6), #tabla-detenciones td:nth-child(6){ width: 12%; } /* Acción */
+
+    /* Mermas: 4 columnas */
+    #tabla-reprocesos th:nth-child(1), #tabla-reprocesos td:nth-child(1){ width: 28%; } /* Motivo */
+    #tabla-reprocesos th:nth-child(2), #tabla-reprocesos td:nth-child(2){ width: 14%; } /* Cantidad */
+    #tabla-reprocesos th:nth-child(3), #tabla-reprocesos td:nth-child(3){ width: 40%; } /* Comentarios */
+    #tabla-reprocesos th:nth-child(4), #tabla-reprocesos td:nth-child(4){ width: 18%; } /* Acción */
 
     /* ===== Responsive ===== */
     @media (max-width: 768px){
@@ -273,7 +306,6 @@
         justify-content: stretch;
         gap: 12px;
       }
-
       .botones .primary-button{
         width: 100%;
         min-width: 0 !important;
@@ -282,22 +314,33 @@
         margin: 0;
       }
 
-      /* ✅ iOS: si pones inputs a 10px hace zoom. Mantén 16px en inputs */
+      /* iOS: si pones inputs < 16px hace zoom */
       input, select, textarea{ font-size: 16px; }
-      .data-table select, .data-table input{ font-size: 16px; }
 
-      /* iOS: sticky + overflow puede fallar */
-      .data-table thead th{
-        position: static !important;
-        top: auto !important;
+      /* En móvil permitimos scroll horizontal (tabla más ancha que el contenedor) */
+      .data-table{
+        min-width: 860px;
       }
 
-      .data-table{ min-width: 920px; }
+      /* Texto de tabla sí puede bajar */
+      .data-table th,
+      .data-table td{
+        font-size: 10px;
+        padding: 6px 8px;
+      }
+
+      /* Inputs dentro de tabla en móvil: 16px para evitar zoom */
+      .data-table select,
+      .data-table input{
+        font-size: 16px;
+        height: 32px;
+      }
     }
 
     @media (max-width: 600px){
       .title{ font-size: 20px; }
       .logo{ width: 170px; }
+
       .login{ padding: 10px; gap: 10px; justify-content: stretch; }
       .login_container{ padding: 12px; border-radius: 14px; width: 100%; margin: 0; }
 
@@ -352,15 +395,9 @@
         <fieldset>
           <legend>📑 Datos del Turno</legend>
 
-          <!-- ✅ iOS SAFE: sin tabla -->
           <div class="form-stack">
             {{ form.as_p }}
           </div>
-
-          <!-- ✅ hidden fields por separado (para no depender del renderer) -->
-          <!--{% for hidden in form.hidden_fields %}
-            {{ hidden }}
-          {% endfor %}-->
         </fieldset>
 
         <!-- Productos -->
@@ -446,6 +483,9 @@
     </div>
   </div>
 
+  <!-- ✅ FIX JSON: evita que CATALOGO rompa JS (comillas simples, etc.) -->
+  {{ CATALOGO|json_script:"catalogo-data" }}
+
   <!-- Templates invisibles -->
   <template id="fila-producto-template">
     <tr>
@@ -470,7 +510,8 @@
   </template>
 
   <script>
-    const catalogo = {{ CATALOGO|safe|default:"{}" }};
+    // ✅ JSON seguro (Django -> JS)
+    const catalogo = JSON.parse(document.getElementById('catalogo-data').textContent);
 
     const motivosDetenciones = [
       "1-Colacion",
