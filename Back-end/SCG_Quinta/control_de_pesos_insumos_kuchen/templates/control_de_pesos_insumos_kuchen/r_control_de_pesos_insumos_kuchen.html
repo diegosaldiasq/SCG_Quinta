@@ -198,7 +198,7 @@
           const cliente = selectCliente.value;
 
           // Mostrar altura solo para Pasteles
-          setAlturaVisible(cliente === 'Pasteles');
+          setAlturaVisible(cliente === 'Pasteles' || cliente === 'Insumo');
 
           // Cargar productos
           poblarProductos(cliente);
@@ -215,7 +215,7 @@
         });
 
         // Estado inicial (por si vienes con valores precargados)
-        setAlturaVisible(selectCliente.value === 'Pasteles');
+        setAlturaVisible(selectCliente.value === 'Pasteles' || selectCliente.value === 'Insumo');
         if (selectCliente.value) poblarProductos(selectCliente.value);
       </script>
 
