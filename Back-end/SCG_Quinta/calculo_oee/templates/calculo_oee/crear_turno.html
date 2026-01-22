@@ -481,9 +481,40 @@
       const templateProd = document.getElementById('fila-producto-template').content;
       const btnAgregarProd = document.getElementById('btn-agregar-producto');
 
+      function getClientesDesdeCatalogo(cat) {
+        // Caso correcto: dict { Jumbo: [...], SISA: [...] }
+        if (cat && typeof cat === 'object' && !Array.isArray(cat)) {
+          return Object.keys(cat);
+        }
+
+        // Si por error llega como array, no uses Object.keys (serían 0..N)
+        // Intento de rescate: si el array trae objetos con "cliente"
+        if (Array.isArray(cat)) {
+          const set = new Set();
+          for (const item of cat) {
+            if (item && typeof item === 'object' && item.cliente) set.add(item.cliente);
+          }
+          return Array.from(set);
+        }
+
+        return [];
+      }
+
       function llenarSelectCliente(select, seleccionado = '') {
         select.innerHTML = `<option value="">--Seleccionar cliente--</option>`;
-        Object.keys(catalogo).forEach(c => {
+
+        const clientes = getClientesDesdeCatalogo(catalogo);
+
+        if (!clientes.length) {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = '⚠️ Catálogo no cargó (revisa catalogo-data)';
+          opt.disabled = true;
+          select.appendChild(opt);
+          return;
+        }
+
+        clientes.forEach(c => {
           const opt = document.createElement('option');
           opt.value = c;
           opt.textContent = c;

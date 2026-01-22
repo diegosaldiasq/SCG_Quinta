@@ -115,13 +115,26 @@ def crear_turno(request):
             return redirect('lista_turnos')
     else:
         form = TurnoOEEForm()
+    
+    catalogo_obj = CATALOGO
 
-    # ✅ CATALOGO como JSON real (no dict de Python)
-    catalogo_json = json.dumps(CATALOGO, ensure_ascii=False)
+    # ✅ si por cualquier motivo llega como lista (o string), lo corregimos/frenamos
+    if isinstance(catalogo_obj, str):
+        # si ya venía como string JSON
+        try:
+            catalogo_obj = json.loads(catalogo_obj)
+        except Exception:
+            catalogo_obj = {}
+
+    # si NO es dict, lo forzamos a dict vacío para no romper todo
+    if not isinstance(catalogo_obj, dict):
+        catalogo_obj = {}
+
+    catalogo_json = json.dumps(catalogo_obj, ensure_ascii=False)
 
     return render(request, 'calculo_oee/crear_turno.html', {
         'form': form,
-        'catalogo_json': catalogo_json,  # ✅
+        'catalogo_json': catalogo_json,
     })
 
 
