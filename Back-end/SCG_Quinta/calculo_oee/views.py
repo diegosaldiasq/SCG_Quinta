@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import TurnoOEEForm
+from .forms import TurnoOEEForm, CATALOGO
 from .models import TurnoOEE, Producto, Detencion, Reproceso, ResumenTurnoOee
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -28,6 +28,7 @@ from django.db.models.functions import ExtractWeek, ExtractYear
 from django.db.models import Sum
 
 
+
 # Create your views here.
 
 @csrf_exempt
@@ -43,8 +44,8 @@ def crear_turno(request):
             productos = request.POST.getlist('producto[]')
             codigos = request.POST.getlist('codigo[]')
             planeadas = request.POST.getlist('produccion_planeada[]')
-            reales = request.POST.getlist('produccion_real[]')  # si ya se ingresan
-            comentarios_pro = request.POST.getlist('comentarios_producto[]')  # <-- nuevo campo
+            reales = request.POST.getlist('produccion_real[]')
+            comentarios_pro = request.POST.getlist('comentarios_producto[]')
 
             for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios_pro):
                 Producto.objects.create(
@@ -54,32 +55,33 @@ def crear_turno(request):
                     codigo=cod,
                     produccion_planeada=int(plan) if plan else None,
                     produccion_real=int(real) if real else None,
-                    comentarios=com.strip() if com else None  # <-- nuevo campo 
+                    comentarios=com.strip() if com else None
                 )
-            # 3) Con base en los productos guardados, actualizar el mismo TurnoOEE
-            lote.cliente = cliente[0]
-            lote.producto = productos[0]
-            lote.codigo = codigos[0] or None
+
+            # Actualizar cabecera TurnoOEE con el 1er producto (si existe)
+            if cliente and productos and codigos:
+                lote.cliente = cliente[0]
+                lote.producto = productos[0]
+                lote.codigo = codigos[0] or None
 
             # Sumar producción de todos los productos
-            lote.produccion_planeada = sum(
-                int(p) for p in planeadas if p.isdigit()
-            )
-            lote.produccion_real = sum(
-                int(r) for r in reales if r.isdigit()
-            )
+            lote.produccion_planeada = sum(int(p) for p in planeadas if str(p).isdigit())
+            lote.produccion_real = sum(int(r) for r in reales if str(r).isdigit())
             lote.save()
-            
+
             # Guardar detenciones
-            motivos   = request.POST.getlist('motivo_det[]')
-            inicios   = request.POST.getlist('hora_inicio_det[]')
-            finales   = request.POST.getlist('hora_fin_det[]')
-            comentarios_det = request.POST.getlist('comentarios_det[]')  # <-- nuevo campo
+            motivos = request.POST.getlist('motivo_det[]')
+            inicios = request.POST.getlist('hora_inicio_det[]')
+            finales = request.POST.getlist('hora_fin_det[]')
+            comentarios_det = request.POST.getlist('comentarios_det[]')
 
             from datetime import datetime, timedelta
             fmt = "%H:%M"
+
             for mot, hi, hf, com in zip(motivos, inicios, finales, comentarios_det):
-                # parseamos las horas
+                if not hi or not hf:
+                    continue
+
                 t1 = datetime.strptime(hi, fmt)
                 t2 = datetime.strptime(hf, fmt)
                 if t2 < t1:
@@ -89,25 +91,38 @@ def crear_turno(request):
                 Detencion.objects.create(
                     lote=lote,
                     motivo=mot,
-                    hora_inicio=t1.time(),   # <-- aquí
-                    hora_fin=   t2.time(),   # <-- y aquí
-                    duracion=   dur,
-                    comentarios= com # <-- nuevo campo
+                    hora_inicio=t1.time(),
+                    hora_fin=t2.time(),
+                    duracion=dur,
+                    comentarios=com.strip() if com else None
                 )
 
             # Guardar reprocesos
             motivos_rep = request.POST.getlist('motivo_rep[]')
             cantidades_rep = request.POST.getlist('cantidad_rep[]')
-            comentarios_rep = request.POST.getlist('comentarios_rep[]')  # <-- si quieres agregar comentarios a reprocesos
+            comentarios_rep = request.POST.getlist('comentarios_rep[]')
+
             for motivo, cantidad, comentario in zip(motivos_rep, cantidades_rep, comentarios_rep):
-                Reproceso.objects.create(lote=lote, motivo=motivo, comentarios=comentario, cantidad=int(cantidad))
+                if not cantidad:
+                    continue
+                Reproceso.objects.create(
+                    lote=lote,
+                    motivo=motivo,
+                    comentarios=comentario.strip() if comentario else None,
+                    cantidad=int(cantidad)
+                )
 
-            return redirect('lista_turnos')  # Redirige al listado
-
+            return redirect('lista_turnos')
     else:
         form = TurnoOEEForm()
 
-    return render(request, 'calculo_oee/crear_turno.html', {'form': form})
+    # ✅ CATALOGO como JSON real (no dict de Python)
+    catalogo_json = json.dumps(CATALOGO, ensure_ascii=False)
+
+    return render(request, 'calculo_oee/crear_turno.html', {
+        'form': form,
+        'catalogo_json': catalogo_json,  # ✅
+    })
 
 
 @login_required
