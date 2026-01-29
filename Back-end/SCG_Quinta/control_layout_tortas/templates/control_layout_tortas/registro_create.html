@@ -1,0 +1,129 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nuevo registro layout</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    label { font-size: 12px; color: #444; display:block; margin-bottom: 4px; }
+    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+    th { font-size: 12px; color:#555; }
+    .btn { padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #fff; cursor: pointer; }
+    .btn-primary { background:#111; color:#fff; border-color:#111; }
+    .muted { color:#666; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+  <h2>Registro de peso por capas (layout)</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="card">
+      <h3>Cabecera</h3>
+      <div class="grid">
+        <div>
+          <label>Planta</label>
+          {{ form.planta }}
+        </div>
+        <div>
+          <label>Layout (torta)</label>
+          {{ form.layout }}
+        </div>
+        <div>
+          <label>Fecha</label>
+          {{ form.fecha }}
+        </div>
+        <div>
+          <label>Turno</label>
+          {{ form.turno }}
+        </div>
+
+        <div>
+          <label>Línea</label>
+          {{ form.linea }}
+        </div>
+        <div>
+          <label>Lote</label>
+          {{ form.lote }}
+        </div>
+        <div>
+          <label>Operador</label>
+          {{ form.operador }}
+        </div>
+        <div>
+          <label class="muted">Acción</label>
+          <button class="btn" name="_cargar_capas" value="1" type="submit">Cargar capas</button>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Observaciones</label>
+        {{ form.observaciones }}
+      </div>
+
+      {% if form.errors %}
+        <p style="color:red;">Revisa la cabecera: {{ form.errors }}</p>
+      {% endif %}
+    </div>
+
+    {% if formset %}
+      <div class="card">
+        <h3>Detalle por capas</h3>
+        {{ formset.management_form }}
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tipo</th>
+              <th>Nombre</th>
+              <th>Objetivo (g)</th>
+              <th>Peso real (g)</th>
+              <th>Comentario</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in formset.forms %}
+              {% with capa=f.instance.capa %}
+              <tr>
+                <td>{{ capa.orden }}</td>
+                <td>{{ capa.get_tipo_display }}</td>
+                <td>{{ capa.nombre }}</td>
+                <td>{{ capa.peso_objetivo_g }}</td>
+                <td>{{ f.peso_real_g }}</td>
+                <td>{{ f.comentario }}</td>
+              </tr>
+              {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if formset.non_form_errors %}
+          <p style="color:red;">{{ formset.non_form_errors }}</p>
+        {% endif %}
+        {% for f in formset.forms %}
+          {% if f.errors %}
+            <p style="color:red;">Error en una capa: {{ f.errors }}</p>
+          {% endif %}
+        {% endfor %}
+
+        <div style="margin-top:12px;">
+          <button class="btn btn-primary" name="_guardar" value="1" type="submit">Guardar</button>
+        </div>
+      </div>
+    {% else %}
+      <p class="muted">Selecciona planta + layout y presiona “Cargar capas”.</p>
+    {% endif %}
+
+  </form>
+
+</body>
+</html>

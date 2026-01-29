@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle registro</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+    th { font-size: 12px; color:#555; }
+    .ok { color: #0a7; font-weight: 700; }
+    .bad { color: #d22; font-weight: 700; }
+    .muted { color:#666; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+  <h2>Detalle registro</h2>
+  <p class="muted">
+    {{ registro.fecha }} | {{ registro.planta }} | {{ registro.layout }} | Turno: {{ registro.turno }} | Línea: {{ registro.linea }}
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Tipo</th>
+        <th>Nombre</th>
+        <th>Objetivo (g)</th>
+        <th>Real (g)</th>
+        <th>Desv (g)</th>
+        <th>Comentario</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in detalles %}
+      <tr>
+        <td>{{ d.capa.orden }}</td>
+        <td>{{ d.capa.get_tipo_display }}</td>
+        <td>{{ d.capa.nombre }}</td>
+        <td>{{ d.capa.peso_objetivo_g }}</td>
+        <td>{{ d.peso_real_g|default:"-" }}</td>
+        <td>
+          {% if d.desviacion_g is None %}
+            -
+          {% else %}
+            {{ d.desviacion_g }}
+          {% endif %}
+        </td>
+        <td>{{ d.comentario }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p style="margin-top:14px;">
+    <a href="{% url 'control_layout_tortas:registro_nuevo' %}">Crear otro registro</a>
+  </p>
+
+</body>
+</html>
