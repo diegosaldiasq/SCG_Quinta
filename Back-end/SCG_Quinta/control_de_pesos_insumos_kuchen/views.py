@@ -4,7 +4,7 @@ from .models import DatosFormularioControlDePesosInsumosKuchen
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, time
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
