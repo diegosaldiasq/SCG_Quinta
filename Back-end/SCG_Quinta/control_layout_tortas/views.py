@@ -20,10 +20,15 @@ class RegistroCreateView(View):
         form = RegistroLayoutForm(request.POST)
         formset = None
 
-        # Paso 1: si aún no existe cabecera guardada, la creamos y armamos detalles
         if form.is_valid() and ("_cargar_capas" in request.POST or "_guardar" in request.POST):
-            registro = form.save(commit=False)
-            registro.save()
+
+            registro_id = request.POST.get("registro_id")
+
+            if registro_id:
+                registro = get_object_or_404(RegistroLayout, pk=registro_id)
+            else:
+                registro = form.save(commit=False)
+                registro.save()
 
             # Crear detalle por cada capa objetivo (si no existe)
             capas = registro.layout.capas.all()
@@ -32,21 +37,33 @@ class RegistroCreateView(View):
 
             formset = RegistroCapaFormSet(request.POST, instance=registro)
 
-            # Si el usuario solo apretó "Cargar capas", volvemos con formset listo
             if "_cargar_capas" in request.POST:
                 messages.info(request, "Capas cargadas. Ingresa los pesos reales y guarda.")
-                return render(request, self.template_name, {"form": RegistroLayoutForm(instance=registro), "formset": formset, "registro_id": registro.id})
+                return render(
+                    request,
+                    self.template_name,
+                    {
+                        "form": RegistroLayoutForm(instance=registro),
+                        "formset": formset,
+                        "registro_id": registro.id,
+                    },
+                )
 
-            # Paso 2: guardar todo
             if formset.is_valid():
                 formset.save()
                 messages.success(request, "Registro guardado correctamente.")
                 return redirect("control_layout_tortas:registro_detalle", pk=registro.id)
 
-            # Si formset inválido, mostramos errores
-            return render(request, self.template_name, {"form": RegistroLayoutForm(instance=registro), "formset": formset, "registro_id": registro.id})
+            return render(
+                request,
+                self.template_name,
+                {
+                    "form": RegistroLayoutForm(instance=registro),
+                    "formset": formset,
+                    "registro_id": registro.id,
+                },
+            )
 
-        # Si cabecera inválida
         return render(request, self.template_name, {"form": form, "formset": formset})
 
 
@@ -55,5 +72,13 @@ class RegistroDetalleView(View):
 
     def get(self, request, pk):
         registro = get_object_or_404(RegistroLayout, pk=pk)
-        detalles = registro.detalles.select_related("capa").all()
+        detalles = (
+            registro.detalles
+            .select_related(
+                "capa",
+                "capa__ingrediente",
+                "ingrediente_usado",
+            )
+            .all()
+        )
         return render(request, self.template_name, {"registro": registro, "detalles": detalles})
