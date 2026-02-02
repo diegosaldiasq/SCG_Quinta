@@ -88,6 +88,7 @@
               <th>Objetivo (g)</th>
               <th>Peso real (g)</th>
               <th>Comentario</th>
+              <th>Rango</th>
             </tr>
           </thead>
           <tbody>
@@ -100,6 +101,11 @@
                 <td>{{ capa.peso_objetivo_g }}</td>
                 <td>{{ f.peso_real_g }}</td>
                 <td>{{ f.comentario }}</td>
+                <td>
+                  {% with cap=capa %}
+                    {{ cap.peso_objetivo_g|floatformat:1 }} ± {{ cap.tolerancia_mas_g|floatformat:1 }}
+                  {% endwith %}
+                </td>
               </tr>
               {% endwith %}
             {% endfor %}

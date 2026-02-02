@@ -37,12 +37,17 @@ class ProductoTorta(models.Model):
         ordering = ["cliente", "nombre"]
 
     def __str__(self):
-        base = self.nombre
-        if self.codigo:
-            base += f" ({self.codigo})"
+        parts = []
+
         if self.cliente:
-            base = f"{self.cliente} - {base}"
-        return base
+            parts.append(self.cliente)
+
+        if self.codigo:
+            parts.append(self.codigo)
+
+        parts.append(self.nombre)
+
+        return " - ".join(parts)
 
 
 class LayoutTorta(models.Model):
@@ -128,3 +133,12 @@ class RegistroCapa(models.Model):
         if self.peso_real_g is None:
             return None
         return self.peso_real_g - self.capa.peso_objetivo_g
+    
+    @property
+    def cumple(self):
+        if self.peso_real_g is None:
+            return None
+
+        minimo = self.capa.peso_objetivo_g - (self.capa.tolerancia_menos_g or 0)
+        maximo = self.capa.peso_objetivo_g + (self.capa.tolerancia_mas_g or 0)
+        return minimo <= self.peso_real_g <= maximo

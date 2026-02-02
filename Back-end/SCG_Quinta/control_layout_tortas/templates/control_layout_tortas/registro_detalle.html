@@ -31,6 +31,7 @@
         <th>Real (g)</th>
         <th>Desv (g)</th>
         <th>Comentario</th>
+        <th>Cumple
       </tr>
     </thead>
     <tbody>
@@ -49,6 +50,15 @@
           {% endif %}
         </td>
         <td>{{ d.comentario }}</td>
+        <td>
+          {% if d.cumple is None %}
+            -
+          {% elif d.cumple %}
+            <span class="ok">OK</span>
+          {% else %}
+            <span class="bad">NO</span>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
