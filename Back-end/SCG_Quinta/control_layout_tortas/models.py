@@ -22,6 +22,38 @@ class TipoCapa(models.TextChoices):
     CHOCOLATE = "CHOCOLATE", "Chocolate"
     OTRO = "OTRO", "Otro"
 
+class CategoriaIngrediente(models.TextChoices):
+    CREMA = "CREMA", "Crema"
+    MERMELADA = "MERMELADA", "Mermelada"
+    MANJAR = "MANJAR", "Manjar / Dulce"
+    REMOJO = "REMOJO", "Remojo / Jarabe"
+    BIZCOCHO = "BIZCOCHO", "Bizcocho"
+    COBERTURA = "COBERTURA", "Cobertura / Rebozado"
+    DECORACION = "DECORACION", "Decoración"
+    CHOCOLATE = "CHOCOLATE", "Chocolate"
+    OTRO = "OTRO", "Otro"
+
+
+class Ingrediente(models.Model):
+    """
+    Catálogo maestro de ingredientes usados en capas.
+    """
+    nombre = models.CharField(max_length=120)  # Ej: "Crema Blanca", "Mermelada de piña"
+    categoria = models.CharField(max_length=20, choices=CategoriaIngrediente.choices, default=CategoriaIngrediente.OTRO)
+    activo = models.BooleanField(default=True)
+
+    # Opcionales útiles:
+    descripcion = models.CharField(max_length=200, blank=True, default="")
+    codigo_interno = models.CharField(max_length=40, blank=True, default="")  # si quieres mapear a ERP/insumo
+    proveedor = models.CharField(max_length=80, blank=True, default="")
+    creado_en = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["categoria", "nombre"]
+        unique_together = [("nombre", "categoria")]
+
+    def __str__(self):
+        return f"{self.get_categoria_display()} - {self.nombre}"
 
 class ProductoTorta(models.Model):
     """
@@ -69,17 +101,21 @@ class LayoutTorta(models.Model):
 
 
 class LayoutCapa(models.Model):
-    """
-    Capas/ítems del layout objetivo (ordenadas).
-    Ej: Bizcocho 1, Remojo 1, Relleno 1, Relleno 2, Rebozado, etc.
-    """
     layout = models.ForeignKey(LayoutTorta, on_delete=models.CASCADE, related_name="capas")
     orden = models.PositiveIntegerField()
     tipo = models.CharField(max_length=30, choices=TipoCapa.choices)
-    nombre = models.CharField(max_length=120)  # ej: "Bizcocho 1", "Mermelada piña 90", "Piña cubo 100"
-    peso_objetivo_g = models.DecimalField(max_digits=8, decimal_places=1)  # gramos objetivo
-    tolerancia_menos_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)  # opcional
-    tolerancia_mas_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)    # opcional
+
+    ingrediente = models.ForeignKey(Ingrediente, on_delete=models.PROTECT)
+    etiqueta = models.CharField(
+        max_length=120,
+        blank=True,
+        default="",
+        help_text="Texto libre opcional (ej: 'Relleno 1', 'Mermelada guinda'). Si está vacío se usa el ingrediente."
+    )
+
+    peso_objetivo_g = models.DecimalField(max_digits=8, decimal_places=1)
+    tolerancia_menos_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
+    tolerancia_mas_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
     obligatorio = models.BooleanField(default=True)
 
     class Meta:
@@ -87,7 +123,8 @@ class LayoutCapa(models.Model):
         unique_together = [("layout", "orden")]
 
     def __str__(self):
-        return f"{self.layout} #{self.orden} {self.nombre}"
+        label = self.etiqueta.strip() or self.ingrediente.nombre
+        return f"{self.layout} #{self.orden} {label}"
 
 
 class RegistroLayout(models.Model):
@@ -112,11 +149,17 @@ class RegistroLayout(models.Model):
 
 
 class RegistroCapa(models.Model):
-    """
-    Detalle real por capa: peso real + cálculo de desviación.
-    """
     registro = models.ForeignKey(RegistroLayout, on_delete=models.CASCADE, related_name="detalles")
     capa = models.ForeignKey(LayoutCapa, on_delete=models.PROTECT)
+
+    ingrediente_usado = models.ForeignKey(
+        Ingrediente,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        help_text="Si se usó un ingrediente distinto al planificado."
+    )
+
     peso_real_g = models.DecimalField(max_digits=8, decimal_places=1, null=True, blank=True)
     comentario = models.CharField(max_length=200, blank=True, default="")
 
@@ -142,3 +185,7 @@ class RegistroCapa(models.Model):
         minimo = self.capa.peso_objetivo_g - (self.capa.tolerancia_menos_g or 0)
         maximo = self.capa.peso_objetivo_g + (self.capa.tolerancia_mas_g or 0)
         return minimo <= self.peso_real_g <= maximo
+    
+    @property
+    def ingrediente_final(self):
+        return self.ingrediente_usado or self.capa.ingrediente

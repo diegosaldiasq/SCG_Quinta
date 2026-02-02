@@ -5,6 +5,8 @@ import pandas as pd
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
+from control_layout_tortas.models import Ingrediente, CategoriaIngrediente
+
 from control_layout_tortas.models import (
     ProductoTorta,
     LayoutTorta,
@@ -35,6 +37,32 @@ COLUMN_MAP = [
     ("Chocolatera", TipoCapa.CHOCOLATE),
 ]
 
+def categoria_por_tipo(tipo):
+    if tipo in (TipoCapa.RELLENO, TipoCapa.RELLENO_MANUAL, TipoCapa.REBOZADO):
+        return CategoriaIngrediente.CREMA  # por defecto, luego lo afinamos por texto
+    if tipo == TipoCapa.REMOJO:
+        return CategoriaIngrediente.REMOJO
+    if tipo == TipoCapa.BIZCOCHO:
+        return CategoriaIngrediente.BIZCOCHO
+    if tipo in (TipoCapa.DECORADO, TipoCapa.DECORADO_2, TipoCapa.GRANA, TipoCapa.MONOS, TipoCapa.BRILLO):
+        return CategoriaIngrediente.DECORACION
+    if tipo == TipoCapa.CHOCOLATE:
+        return CategoriaIngrediente.CHOCOLATE
+    return CategoriaIngrediente.OTRO
+
+def categoria_por_texto(nombre, default_cat):
+    n = (nombre or "").lower()
+    if "mermel" in n:
+        return CategoriaIngrediente.MERMELADA
+    if "manjar" in n or "dulce" in n:
+        return CategoriaIngrediente.MANJAR
+    if "chocolate" in n:
+        return CategoriaIngrediente.CHOCOLATE
+    if "remojo" in n or "brix" in n:
+        return CategoriaIngrediente.REMOJO
+    if "bizcocho" in n:
+        return CategoriaIngrediente.BIZCOCHO
+    return default_cat
 
 def normalize_planta(value: str) -> str:
     v = (value or "").strip().upper()
@@ -189,22 +217,40 @@ class Command(BaseCommand):
                 if col not in df.columns:
                     continue
 
-                val = row.get(col, None)
-                peso = parse_decimal(val)
-                if peso is None:
-                    # Si está vacío/no numérico, no creamos esa capa
+                raw = str(row.get(col, "")).strip()
+                if not raw:
                     continue
 
-                nombre_capa = col  # puedes cambiarlo si quieres un nombre más “bonito”
+                peso = parse_decimal(raw)
+                if peso is None:
+                    continue
+
+                # 1) Extraer nombre ingrediente eliminando el número
+                # Ej: "Mermelada guinda 150" -> "Mermelada guinda"
+                ing_nombre = re.sub(r"(-?\d+(?:[.,]\d+)?)", "", raw).strip()
+                if not ing_nombre:
+                    ing_nombre = col  # fallback
+
+                # 2) Categoría base por tipo + ajuste por texto
+                cat_default = categoria_por_tipo(tipo)
+                categoria = categoria_por_texto(ing_nombre, cat_default)
+
                 if dry:
                     created_capas += 1
                 else:
+                    ingrediente, _ = Ingrediente.objects.get_or_create(
+                        nombre=ing_nombre,
+                        categoria=categoria,
+                        defaults={"activo": True},
+                    )
+
                     capa, capa_created = LayoutCapa.objects.update_or_create(
                         layout=layout,
                         orden=orden,
                         defaults={
                             "tipo": tipo,
-                            "nombre": nombre_capa,
+                            "ingrediente": ingrediente,
+                            "etiqueta": col,  # ej: "Relleno 1", "Remojo 2"
                             "peso_objetivo_g": peso,
                             "tolerancia_menos_g": tol,
                             "tolerancia_mas_g": tol,
@@ -213,6 +259,7 @@ class Command(BaseCommand):
                     )
                     if capa_created:
                         created_capas += 1
+
                 orden += 1
 
         if dry:

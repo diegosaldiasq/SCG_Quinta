@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import ProductoTorta, LayoutTorta, LayoutCapa, RegistroLayout, RegistroCapa
+from .models import ProductoTorta, LayoutTorta, LayoutCapa, RegistroLayout, RegistroCapa, Ingrediente
 
 
 class LayoutCapaInline(admin.TabularInline):
     model = LayoutCapa
     extra = 0
     ordering = ("orden",)
+    autocomplete_fields = ("ingrediente",)
 
 
 @admin.register(LayoutTorta)
@@ -14,6 +15,7 @@ class LayoutTortaAdmin(admin.ModelAdmin):
     list_filter = ("planta", "activo", "producto__cliente")
     search_fields = ("producto__nombre", "producto__codigo")
     inlines = [LayoutCapaInline]
+    autocomplete_fields = ("producto",)
 
 
 @admin.register(ProductoTorta)
@@ -35,3 +37,9 @@ class RegistroLayoutAdmin(admin.ModelAdmin):
     list_filter = ("planta", "fecha")
     search_fields = ("layout__producto__nombre", "layout__producto__codigo", "lote", "operador")
     inlines = [RegistroCapaInline]
+
+@admin.register(Ingrediente)
+class IngredienteAdmin(admin.ModelAdmin):
+    list_display = ("categoria", "nombre", "activo", "codigo_interno", "proveedor")
+    list_filter = ("categoria", "activo")
+    search_fields = ("nombre", "codigo_interno", "proveedor")
