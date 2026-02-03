@@ -43,3 +43,10 @@ class IngredienteAdmin(admin.ModelAdmin):
     list_display = ("categoria", "nombre", "activo", "codigo_interno", "proveedor")
     list_filter = ("categoria", "activo")
     search_fields = ("nombre", "codigo_interno", "proveedor")
+
+@admin.register(LayoutCapa)
+class LayoutCapaAdmin(admin.ModelAdmin):
+    list_display = ("layout", "orden", "tipo", "peso_objetivo_g")
+    list_filter = ("tipo", "layout__planta", "layout__activo")
+    search_fields = ("layout__producto__nombre", "layout__producto__codigo")
+    ordering = ("layout", "orden")
