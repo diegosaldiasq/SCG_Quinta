@@ -25,27 +25,23 @@ class RegistroLayoutForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # 🚫 1. Por defecto: NO mostrar ningún layout
         self.fields["layout"].required = False
-        self.fields["layout"].queryset = LayoutTorta.objects.none()
 
-        # 🔍 2. Detectar planta (POST o instancia)
+        # ✅ por defecto: mostrar todos los activos
+        self.fields["layout"].queryset = (
+            LayoutTorta.objects
+            .filter(activo=True)
+            .select_related("producto")
+        )
+
         planta = None
-
         if self.data.get("planta"):
-            # cuando el usuario selecciona planta y envía el form
             planta = self.data.get("planta")
         elif self.instance and self.instance.planta:
-            # cuando se vuelve a cargar el form (ej: error)
             planta = self.instance.planta
 
-        # ✅ 3. Si hay planta, mostrar SOLO layouts activos de esa planta
         if planta:
-            self.fields["layout"].queryset = (
-                LayoutTorta.objects
-                .filter(activo=True, planta=planta)
-                .select_related("producto")
-            )
+            self.fields["layout"].queryset = self.fields["layout"].queryset.filter(planta=planta)
 
 RegistroCapaForm = modelform_factory(
     RegistroCapa,
