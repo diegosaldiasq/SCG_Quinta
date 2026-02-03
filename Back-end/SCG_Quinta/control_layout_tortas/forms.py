@@ -26,6 +26,7 @@ class RegistroLayoutForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # 🚫 1. Por defecto: NO mostrar ningún layout
+        self.fields["layout"].required = False
         self.fields["layout"].queryset = LayoutTorta.objects.none()
 
         # 🔍 2. Detectar planta (POST o instancia)
