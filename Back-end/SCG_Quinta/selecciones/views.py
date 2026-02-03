@@ -130,3 +130,8 @@ def redireccionar_crear_turno(request):
 def redireccionar_control_parametros_bizcocho(request):
     url_control_parametros_bizcocho = reverse('control_parametros_bizcocho')
     return HttpResponseRedirect(url_control_parametros_bizcocho)
+
+@login_required
+def redireccionar_RegistroCreateView(request):
+    url_registro_nuevo = reverse('control_layout_tortas:registro_nuevo')
+    return HttpResponseRedirect(url_registro_nuevo)
