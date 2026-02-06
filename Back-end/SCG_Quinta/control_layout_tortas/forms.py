@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import modelform_factory
 from django.forms.models import inlineformset_factory
-from .models import RegistroLayout, RegistroCapa, LayoutTorta
+from .models import RegistroLayout, RegistroCapa, LayoutTorta, Ingrediente
 
 
 class RegistroLayoutForm(forms.ModelForm):
@@ -43,20 +43,28 @@ class RegistroLayoutForm(forms.ModelForm):
         if planta:
             self.fields["layout"].queryset = self.fields["layout"].queryset.filter(planta=planta)
 
-RegistroCapaForm = modelform_factory(
-    RegistroCapa,
-    fields=["peso_real_g", "comentario"],
-    widgets={
-        "peso_real_g": forms.NumberInput(attrs={"step": "0.1", "min": "0"}),
-        "comentario": forms.TextInput(attrs={"placeholder": "Opcional"}),
-    },
-)
+class RegistroCapaForm(forms.ModelForm):
+    class Meta:
+        model = RegistroCapa
+        fields = ["ingrediente_usado", "peso_real_g", "comentario"]
+        widgets = {
+            "peso_real_g": forms.NumberInput(attrs={"step": "0.1", "min": "0"}),
+            "comentario": forms.TextInput(attrs={"placeholder": "Opcional"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Ingrediente usado es opcional (si no seleccionas, se asume el planificado)
+        self.fields["ingrediente_usado"].required = False
+        self.fields["ingrediente_usado"].queryset = (
+            Ingrediente.objects.filter(activo=True).order_by("categoria", "nombre")
+        )
 
 RegistroCapaFormSet = inlineformset_factory(
     RegistroLayout,
     RegistroCapa,
     form=RegistroCapaForm,
-    fields=["peso_real_g", "comentario"],
     extra=0,
     can_delete=False,
 )

@@ -98,6 +98,7 @@
               <th>Tipo</th>
               <th>Etiqueta</th>
               <th>Ingrediente</th>
+              <th>Ingrediente usado</th>
               <th>Objetivo (g)</th>
               <th>Peso real (g)</th>
               <th>Comentario</th>
@@ -131,7 +132,7 @@
                     -
                   {% endif %}
                 </td>
-
+                <td>{{ f.ingrediente_usado }}</td>
                 <td>{{ capa.peso_objetivo_g }}</td>
                 <td>{{ f.peso_real_g }}</td>
                 <td>{{ f.comentario }}</td>
