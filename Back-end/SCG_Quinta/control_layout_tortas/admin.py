@@ -27,8 +27,30 @@ class ProductoTortaAdmin(admin.ModelAdmin):
 class RegistroCapaInline(admin.TabularInline):
     model = RegistroCapa
     extra = 0
-    readonly_fields = ()
-    autocomplete_fields = ("capa",)
+    can_delete = False
+
+    # Lo que el usuario puede editar
+    fields = (
+        "capa",
+        "ingrediente_planificado",
+        "ingrediente_usado",
+        "ingrediente_final_display",
+        "peso_real_g",
+        "comentario",
+    )
+    readonly_fields = ("ingrediente_planificado", "ingrediente_final_display")
+
+    def ingrediente_planificado(self, obj):
+        # ingrediente de LayoutCapa
+        if obj and obj.capa and obj.capa.ingrediente:
+            return obj.capa.ingrediente.nombre
+        return "-"
+    ingrediente_planificado.short_description = "Ingrediente (layout)"
+
+    def ingrediente_final_display(self, obj):
+        ing = obj.ingrediente_final
+        return ing.nombre if ing else "-"
+    ingrediente_final_display.short_description = "Ingrediente final"
 
 
 @admin.register(RegistroLayout)
