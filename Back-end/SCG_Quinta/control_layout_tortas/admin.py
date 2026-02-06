@@ -33,7 +33,7 @@ class RegistroCapaInline(admin.TabularInline):
     fields = (
         "capa",
         "ingrediente_planificado",
-        "ingrediente_usado",
+        #"ingrediente_usado",
         "ingrediente_final_display",
         "peso_real_g",
         "comentario",
