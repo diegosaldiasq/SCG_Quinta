@@ -12,11 +12,12 @@
     label { font-size: 12px; color: #444; display:block; margin-bottom: 4px; }
     input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
     table { width:100%; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top; }
     th { font-size: 12px; color:#555; }
     .btn { padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #fff; cursor: pointer; }
     .btn-primary { background:#111; color:#fff; border-color:#111; }
     .muted { color:#666; font-size: 12px; }
+    .err { color:#c00; font-size: 12px; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -70,21 +71,29 @@
       </div>
 
       {% if form.errors %}
-        <p style="color:red;">Revisa la cabecera: {{ form.errors }}</p>
+        <div class="err">Revisa la cabecera: {{ form.errors }}</div>
       {% endif %}
     </div>
 
     {% if formset %}
       <div class="card">
         <h3>Detalle por capas</h3>
+
+        {# ✅ CLAVE: management_form dentro del <form> #}
         {{ formset.management_form }}
+
+        {# ✅ Muestra non_form_errors arriba para que se vea #}
+        {% if formset.non_form_errors %}
+          <div class="err">{{ formset.non_form_errors }}</div>
+        {% endif %}
 
         <table>
           <thead>
             <tr>
               <th>#</th>
               <th>Tipo</th>
-              <th>Nombre</th>
+              <th>Etiqueta</th>
+              <th>Ingrediente</th>
               <th>Objetivo (g)</th>
               <th>Peso real (g)</th>
               <th>Comentario</th>
@@ -95,31 +104,49 @@
             {% for f in formset.forms %}
               {% with capa=f.instance.capa %}
               <tr>
+                {# ✅ CLAVE: hidden id del formset (y otros hidden si existieran) #}
+                {{ f.id }}
+
                 <td>{{ capa.orden }}</td>
                 <td>{{ capa.get_tipo_display }}</td>
-                <td>{{ capa.nombre }}</td>
+
+                {# Etiqueta: si existe etiqueta, mostrarla; si no, fallback a "nombre" si aún existe #}
+                <td>
+                  {% if capa.etiqueta %}
+                    {{ capa.etiqueta }}
+                  {% else %}
+                    {{ capa.nombre }}
+                  {% endif %}
+                </td>
+
+                {# Ingrediente: si existe FK ingrediente #}
+                <td>
+                  {% if capa.ingrediente %}
+                    {{ capa.ingrediente.nombre }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+
                 <td>{{ capa.peso_objetivo_g }}</td>
                 <td>{{ f.peso_real_g }}</td>
                 <td>{{ f.comentario }}</td>
                 <td>
-                  {% with cap=capa %}
-                    {{ cap.peso_objetivo_g|floatformat:1 }} ± {{ cap.tolerancia_mas_g|floatformat:1 }}
-                  {% endwith %}
+                  {{ capa.peso_objetivo_g|floatformat:1 }} ± {{ capa.tolerancia_mas_g|floatformat:1 }}
                 </td>
               </tr>
+
+              {# Errores por fila #}
+              {% if f.errors %}
+              <tr>
+                <td colspan="8" class="err">Error en capa {{ capa.orden }}: {{ f.errors }}</td>
+              </tr>
+              {% endif %}
+
               {% endwith %}
             {% endfor %}
           </tbody>
         </table>
-
-        {% if formset.non_form_errors %}
-          <p style="color:red;">{{ formset.non_form_errors }}</p>
-        {% endif %}
-        {% for f in formset.forms %}
-          {% if f.errors %}
-            <p style="color:red;">Error en una capa: {{ f.errors }}</p>
-          {% endif %}
-        {% endfor %}
 
         <div style="margin-top:12px;">
           <button class="btn btn-primary" name="_guardar" value="1" type="submit">Guardar</button>
