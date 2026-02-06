@@ -24,10 +24,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--^2f**zyj9i4&tn2@ytw(rk7si&z0qum#($#4c87a3o$^1t*5r'
 
 # SECURITY WARNING: don't run with debug turned on in production!   
-DEBUG = True  # Cambiar a True para desarrollo en servidor AWS
+DEBUG = False  # Cambiar a True para desarrollo en servidor AWS
 
 ALLOWED_HOSTS = ['127.0.0.53','35.174.221.108','controldeprocesosquinta.com','www.controldeprocesosquinta.com']
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://controldeprocesosquinta.com",
+    "https://www.controldeprocesosquinta.com",
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Application definition
 
