@@ -49,7 +49,7 @@ class RegistroCreateView(View):
             for capa in registro.layout.capas.all():
                 RegistroCapa.objects.get_or_create(registro=registro, capa=capa)
 
-            formset = RegistroCapaFormSet(request.POST, instance=registro)
+            formset = RegistroCapaFormSet(request.POST, instance=registro, prefix="detalles")
 
             if "_cargar_capas" in request.POST:
                 messages.info(request, "Capas cargadas. Ingresa los pesos reales y guarda.")
