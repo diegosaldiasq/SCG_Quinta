@@ -27,6 +27,10 @@
   <form method="post">
     {% csrf_token %}
 
+    {% if registro_id %}
+      <input type="hidden" name="registro_id" value="{{ registro_id }}">
+    {% endif %}
+
     <div class="card">
       <h3>Cabecera</h3>
       <div class="grid">
