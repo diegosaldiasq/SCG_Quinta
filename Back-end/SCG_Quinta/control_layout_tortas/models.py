@@ -26,6 +26,7 @@ class CategoriaIngrediente(models.TextChoices):
     CREMA = "CREMA", "Crema"
     MERMELADA = "MERMELADA", "Mermelada"
     MANJAR = "MANJAR", "Manjar / Dulce"
+    RELLENO = "RELLENO", "Relleno (manual)"  
     REMOJO = "REMOJO", "Remojo / Jarabe"
     BIZCOCHO = "BIZCOCHO", "Bizcocho"
     COBERTURA = "COBERTURA", "Cobertura / Rebozado"
