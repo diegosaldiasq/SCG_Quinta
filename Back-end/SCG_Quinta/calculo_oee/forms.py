@@ -59,6 +59,7 @@ CATALOGO = {
     { 'producto': 'Torta panqueque chocolate manjar', 'codigo': '405460' },
     { 'producto': 'Tartaleta fruta mixta mediana',    'codigo': '393270' },
     { 'producto': 'Pie de limon familiar',            'codigo': '393000' },
+    { 'producto': 'Pastel de yogurt',                 'codigo': '392488' },
     #{ 'producto': 'Pie de limon mediano',             'codigo': '405396' }, Descontinuado 30-10-25
     #{ 'producto': 'Pie de maracuya mediano',          'codigo': '405397' }, Descontinuado 30-10-25
   ],
