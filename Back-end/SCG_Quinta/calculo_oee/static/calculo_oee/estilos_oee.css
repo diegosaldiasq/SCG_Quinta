@@ -335,3 +335,48 @@ a.primary-button:hover {
   color: var(--rojo-quinta);
   margin-top: 8px;
 }
+
+/* ===== BLOQUE EXPLICACIÓN OEE ===== */
+
+.oee-explicacion {
+  margin-top: 18px;
+  padding: 18px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.oee-item {
+  padding: 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  border-left: 6px solid;
+}
+
+.oee-titulo {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.oee-texto {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+}
+
+/* Colores alineados al gráfico */
+.oee-item.disponibilidad {
+  border-color: blue;
+}
+
+.oee-item.eficiencia {
+  border-color: red;
+}
+
+.oee-item.oee {
+  border-color: green;
+}
