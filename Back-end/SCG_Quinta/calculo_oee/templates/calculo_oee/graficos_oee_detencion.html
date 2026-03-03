@@ -73,6 +73,14 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', async () => {
+    // ✅ Esperar fuentes (evita offset del legend)
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    // ✅ Fuerza la fuente usada por Chart.js (canvas no hereda CSS del body)
+    Chart.defaults.font.family = 'Quicksand, sans-serif';
+    
     const $ = s => document.querySelector(s);
     const sSemanas = $('#f_semanas');
     const sAnios   = $('#f_anios');

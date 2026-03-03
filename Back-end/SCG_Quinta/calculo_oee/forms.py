@@ -44,6 +44,8 @@ CATALOGO = {
     { 'producto': 'Torta chocolate mediana',          'codigo': '405523' },
     { 'producto': 'Torta merengue frambuesa',         'codigo': '393036' },
     { 'producto': 'Torta merengue lucuma',            'codigo': '393212' },
+    { 'producto': 'Torta merengue cookies',           'codigo': '405605' },
+    { 'producto': 'Torta merengue lemon pie',         'codigo': '405604' },
     { 'producto': 'Torta mocaccino mediana',          'codigo': '353253' },
     { 'producto': 'Torta panqueque naranja',          'codigo': '393018' },
     { 'producto': 'Torta tres leches',                'codigo': '393015' },
