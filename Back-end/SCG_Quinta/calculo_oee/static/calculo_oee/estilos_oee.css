@@ -201,7 +201,7 @@ a.primary-button:hover {
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  max-width: 700px;
+  max-width: 1200px;
   margin: 24px auto; /* centrado horizontal y separacion */
 }
 
@@ -254,3 +254,35 @@ a.primary-button:hover {
 /*}*/
 #graficoOEE { height: 380px !important; }
 #graficoDetenciones { height: 420px !important; }
+
+/* ===== FILTROS RESPONSIVE Y CONTENIDOS ===== */
+
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin: 16px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.filtros label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  font-size: var(--md);
+}
+
+.filtros select,
+.filtros input {
+  width: 100%;
+}
+
+/* Asegura que el panel blanco nunca se desborde */
+.login-container {
+  max-width: 1200px;
+  width: 95%;
+  margin: 24px auto;
+  box-sizing: border-box;
+}
