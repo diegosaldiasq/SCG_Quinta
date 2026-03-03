@@ -18,7 +18,9 @@
 <body>
   <div class="login">
     <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
-    <div class="login_container">
+
+    <!-- OJO: tu CSS tiene .login-container (guion), pero el HTML usaba login_container -->
+    <div class="login-container">
       <h1 class="title">Panel Gráfico · OEE y Detenciones</h1>
 
       <!-- === FILTROS === -->
@@ -51,36 +53,44 @@
         <button id="btn_sel_todo_tur" class="primary-button" type="button">Turnos: seleccionar todo</button>
       </div>
 
-      <!-- === GRÁFICO 1: OEE === -->
       <div class="panel-graficos">
+        <!-- === GRÁFICO 1: OEE === -->
         <h2 style="text-align:center; margin-top:8px;">Gráfico OEE</h2>
         <div style="width:100%; height:380px; background:#fff;">
-            <canvas id="graficoOEE"></canvas>
+          <canvas id="graficoOEE" style="display:block; width:100%; height:380px;"></canvas>
         </div>
 
         <!-- === GRÁFICO 2: DETENCIONES === -->
         <h2 style="text-align:center; margin-top:24px;">Gráfico Detenciones</h2>
+
+        <!-- ✅ Leyenda HTML (marcar/desmarcar sin desfase) -->
+        <div id="legendDet" style="
+          display:grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 6px 14px;
+          margin: 6px 0 10px;
+          align-items:center;
+        "></div>
+
         <div style="width:100%; height:420px; background:#fff; overflow-x:auto;">
-            <canvas id="graficoDetenciones"></canvas>
+          <canvas id="graficoDetenciones" style="display:block; width:100%; height:420px;"></canvas>
         </div>
 
         <div class="botones" style="margin-top:16px;">
-            <a href="{% url 'redireccionar_intermedio_4' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
+          <a href="{% url 'redireccionar_intermedio_4' %}" class="primary-button login-button">🏠 Volver al Inicio</a>
         </div>
-      </div> 
+      </div>
     </div>
   </div>
 
   <script>
   document.addEventListener('DOMContentLoaded', async () => {
-    // ✅ Esperar fuentes (evita offset del legend)
+    // ✅ Esperar fuentes
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
-
-    // ✅ Fuerza la fuente usada por Chart.js (canvas no hereda CSS del body)
     Chart.defaults.font.family = 'Quicksand, sans-serif';
-    
+
     const $ = s => document.querySelector(s);
     const sSemanas = $('#f_semanas');
     const sAnios   = $('#f_anios');
@@ -89,14 +99,16 @@
     const fDesde   = $('#f_desde');
     const fHasta   = $('#f_hasta');
 
-    const btnAplicar   = $('#btn_aplicar');
-    const btnLimpiar   = $('#btn_limpiar');
-    const btnSelTodoSem= $('#btn_sel_todo_sem');
-    const btnSelTodoLin= $('#btn_sel_todo_lin');
-    const btnSelTodoTur= $('#btn_sel_todo_tur');
+    const btnAplicar    = $('#btn_aplicar');
+    const btnLimpiar    = $('#btn_limpiar');
+    const btnSelTodoSem = $('#btn_sel_todo_sem');
+    const btnSelTodoLin = $('#btn_sel_todo_lin');
+    const btnSelTodoTur = $('#btn_sel_todo_tur');
 
     const ctxOEE = $('#graficoOEE').getContext('2d');
     const ctxDet = $('#graficoDetenciones').getContext('2d');
+    const legendDetBox = $('#legendDet');
+
     let chartOEE, chartDet;
 
     // ====== FUNCIONES BASE ======
@@ -118,6 +130,7 @@
       const r = await fetch(urlOpt, {credentials:'same-origin'});
       if (!r.ok) return;
       const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
+
       const fill = (sel, arr, desc=false)=>{
         sel.innerHTML='';
         const lista=[...arr].sort((a,b)=>(desc?b:a)-(desc?a:b));
@@ -126,6 +139,7 @@
           o.value=v; o.textContent=v; sel.appendChild(o);
         });
       };
+
       fill(sSemanas,semanas);
       fill(sAnios,anios,true);
       fill(sLineas,lineas);
@@ -158,178 +172,237 @@
 
     // ====== GRAFICO OEE ======
     async function cargarOEE(){
-        const url = `{% url 'resumen_turno_oee_api' %}?${buildParams().toString()}`;
-        const r = await fetch(url, {credentials:'same-origin'});
-        if (!r.ok) return;
-        const data = await r.json();
-        if (!Array.isArray(data) || !data.length) { 
-          if (chartOEE) { chartOEE.destroy(); chartOEE = null; } 
-          return; 
-        }
+      const url = `{% url 'resumen_turno_oee_api' %}?${buildParams().toString()}`;
+      const r = await fetch(url, {credentials:'same-origin'});
+      if (!r.ok) return;
+      const data = await r.json();
 
-        // Orden por fecha y turno A→B→C
-        data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
+      if (!Array.isArray(data) || !data.length) {
+        if (chartOEE) { chartOEE.destroy(); chartOEE = null; }
+        return;
+      }
 
-        const labels  = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
-        const disp    = data.map(d => +d.disponibilidad || 0);
-        const efic    = data.map(d => +d.eficiencia || 0);
-        const oee     = data.map(d => +d.oee || 0);
-        const target  = data.map(d => +d.target || 0);
-        const loteIds = data.map(d => d.lote_id);
+      data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
 
-        // plugin para mostrar valores (solo OEE) con 1 decimal
-        const showValuesPlugin = {
-          id: 'showValuesPlugin',
-          afterDatasetsDraw(chart, args, pluginOptions) {
-            const { ctx } = chart;
-            chart.data.datasets.forEach((dataset, datasetIndex) => {
-              if (dataset.label !== 'OEE') return;  // 👈 solo la línea OEE
-              const meta = chart.getDatasetMeta(datasetIndex);
-              meta.data.forEach((element, index) => {
-                const value = dataset.data[index];
-                if (value == null) return;
-                const pos = element.tooltipPosition();
-                ctx.save();
-                ctx.font = '12px sans-serif';
-                ctx.fillStyle = dataset.borderColor || '#000';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.fillText(
-                  Number(value).toFixed(1) + '%',
-                  pos.x,
-                  pos.y - 6
-                );
-                ctx.restore();
-              });
+      const labels  = data.map(d => `${fmtFecha(d.fecha)} (${d.turno})`);
+      const disp    = data.map(d => +d.disponibilidad || 0);
+      const efic    = data.map(d => +d.eficiencia || 0);
+      const oee     = data.map(d => +d.oee || 0);
+      const target  = data.map(d => +d.target || 0);
+      const loteIds = data.map(d => d.lote_id);
+
+      const showValuesPlugin = {
+        id: 'showValuesPlugin',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+            if (dataset.label !== 'OEE') return;
+            const meta = chart.getDatasetMeta(datasetIndex);
+            meta.data.forEach((element, index) => {
+              const value = dataset.data[index];
+              if (value == null) return;
+              const pos = element.tooltipPosition();
+              ctx.save();
+              ctx.font = '12px Quicksand, sans-serif';
+              ctx.fillStyle = dataset.borderColor || '#000';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(Number(value).toFixed(1) + '%', pos.x, pos.y - 6);
+              ctx.restore();
             });
+          });
+        }
+      };
+
+      if (chartOEE) chartOEE.destroy();
+      chartOEE = new Chart(ctxOEE, {
+        type:'line',
+        data:{
+          labels,
+          datasets:[
+            {label:'Disponibilidad', data:disp,   borderColor:'blue',  fill:false, tension:.25},
+            {label:'Eficiencia',     data:efic,   borderColor:'red',   fill:false, tension:.25},
+            {label:'OEE',            data:oee,    borderColor:'green', fill:false, tension:.25},
+            {label:'Target',         data:target, borderColor:'purple', borderDash:[6,6], fill:false},
+          ]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          interaction:{ mode:'nearest', intersect:true },
+          onClick(evt, elements){
+            if (!elements.length) return;
+            const idx = elements[0].index;
+            const lid = loteIds[idx];
+            if (lid) {
+              const urlRes   = `{% url 'resumen_turno' 0 %}`.replace('0', lid);
+              const returnTo = window.location.pathname + window.location.search;
+              window.location.href = `${urlRes}?next=${encodeURIComponent(returnTo)}`;
+            }
+          },
+          plugins:{
+            legend:{position:'right'},
+            title:{display:true, text:'Tendencia OEE'},
+            tooltip:{mode:'index', intersect:false},
+          },
+          scales:{
+            y:{
+              beginAtZero:true,
+              suggestedMax:100,
+              ticks:{ callback:v=>v+'%' }
+            }
           }
+        },
+        plugins:[showValuesPlugin]
+      });
+    }
+
+    // ====== LEYENDA HTML DETENCIONES ======
+    function renderLegendDet(chart){
+      legendDetBox.innerHTML = '';
+
+      chart.data.datasets.forEach((ds, i) => {
+        const row = document.createElement('label');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.gap = '8px';
+        row.style.cursor = 'pointer';
+        row.style.userSelect = 'none';
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = chart.isDatasetVisible(i);
+
+        cb.onchange = () => {
+          chart.setDatasetVisibility(i, cb.checked);
+          chart.update();
         };
 
-        if (chartOEE) chartOEE.destroy();
-        chartOEE = new Chart(ctxOEE, {
-            type:'line',
-            data:{
-              labels,
-              datasets:[
-                {label:'Disponibilidad', data:disp,   borderColor:'blue',  fill:false, tension:.25},
-                {label:'Eficiencia',     data:efic,   borderColor:'red',   fill:false, tension:.25},
-                {label:'OEE',            data:oee,    borderColor:'green', fill:false, tension:.25},
-                {label:'Target',         data:target, borderColor:'purple', borderDash:[6,6], fill:false},
-              ]
-            },
-            options:{
-              responsive:true, 
-              maintainAspectRatio:false,
-              interaction:{ mode:'nearest', intersect:true },
-              onClick(evt, elements){
-                  if (!elements.length) return;
-                  const idx = elements[0].index;
-                  const lid = loteIds[idx];
-                  if (lid) {
-                    const urlRes   = `{% url 'resumen_turno' 0 %}`.replace('0', lid);
-                    const returnTo = window.location.pathname + window.location.search;
-                    window.location.href = `${urlRes}?next=${encodeURIComponent(returnTo)}`;
-                  }
-              },
-              plugins:{
-                  legend:{position:'right'},
-                  title:{display:true, text:'Tendencia OEE'},
-                  tooltip:{mode:'index', intersect:false},
-              },
-              scales:{ 
-                y:{ 
-                  beginAtZero:true, 
-                  suggestedMax:100, 
-                  ticks:{ callback:v=>v+'%' } 
-                } 
-              }
-            },
-            plugins:[showValuesPlugin]   // 👈 aquí se activa
-        });
+        const sw = document.createElement('span');
+        sw.style.width = '14px';
+        sw.style.height = '14px';
+        sw.style.borderRadius = '4px';
+        sw.style.display = 'inline-block';
+        sw.style.background = (typeof ds.backgroundColor === 'string') ? ds.backgroundColor : '#999';
+        sw.style.border = '1px solid rgba(0,0,0,.15)';
+
+        const tx = document.createElement('span');
+        tx.textContent = ds.label;
+        tx.style.fontSize = '14px';
+
+        row.appendChild(cb);
+        row.appendChild(sw);
+        row.appendChild(tx);
+        legendDetBox.appendChild(row);
+      });
     }
 
     // ====== GRAFICO DETENCIONES ======
     async function cargarDetenciones(){
-        const url = `{% url 'detenciones_turno_api' %}?${buildParams().toString()}`;
-        const r = await fetch(url, {credentials:'same-origin'});
-        if (!r.ok) return;
-        const data = await r.json();
-        if (!Array.isArray(data) || !data.length) { 
-          if (chartDet) { chartDet.destroy(); chartDet = null; } 
-          return; 
+      const url = `{% url 'detenciones_turno_api' %}?${buildParams().toString()}`;
+      const r = await fetch(url, {credentials:'same-origin'});
+      if (!r.ok) return;
+      const data = await r.json();
+
+      if (!Array.isArray(data) || !data.length) {
+        if (chartDet) { chartDet.destroy(); chartDet = null; }
+        legendDetBox.innerHTML = '';
+        return;
+      }
+
+      data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
+
+      const byLote = new Map(), motivosSet = new Set(), loteOrder = [];
+      for (const d of data) {
+        const lid = d.lote_id; if (!lid) continue;
+        if (!byLote.has(lid)) {
+          byLote.set(lid, { label:[fmtFecha(d.fecha), String(d.turno)], motivos:{} });
+          loteOrder.push(lid);
         }
+        byLote.get(lid).motivos[d.motivo] = d.porcentaje;
+        motivosSet.add(d.motivo);
+      }
 
-        data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
+      // "Tiempo Productivo" al final
+      const motivos = Array.from(motivosSet).sort((a,b)=>(a==='Tiempo Productivo')-(b==='Tiempo Productivo'));
+      const labels  = loteOrder.map(id => byLote.get(id).label);
 
-        const byLote = new Map(), motivosSet = new Set(), loteOrder = [];
-        for (const d of data) {
-            const lid = d.lote_id; if (!lid) continue;
-            if (!byLote.has(lid)) {
-              byLote.set(lid, { label:[fmtFecha(d.fecha), String(d.turno)], motivos:{} });
-              loteOrder.push(lid);
-            }
-            byLote.get(lid).motivos[d.motivo] = d.porcentaje;
-            motivosSet.add(d.motivo);
+      const colorHSL=(i,tot)=>`hsl(${i*360/tot},65%,55%)`;
+      const palette = motivos.map((_,i)=>colorHSL(i, motivos.length));
+
+      const datasets = motivos.map((m,i)=>({
+        label:m,
+        data:loteOrder.map(id => byLote.get(id).motivos[m] ?? 0),
+        backgroundColor: (m==='Tiempo Productivo') ? '#2ca02c' : palette[i],
+        stack:'x',
+        borderWidth:1,
+        borderColor:'rgba(0,0,0,0.1)',
+      }));
+
+      const hLine = {
+        id:'hLine',
+        afterDraw(chart){
+          const {ctx, chartArea:{left,right}, scales:{y}} = chart;
+          const yPix = y.getPixelForValue(30);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(left, yPix);
+          ctx.lineTo(right, yPix);
+          ctx.lineWidth=2;
+          ctx.strokeStyle='red';
+          ctx.setLineDash([6,4]);
+          ctx.stroke();
+          ctx.restore();
         }
+      };
 
-        const motivos = Array.from(motivosSet).sort((a,b)=>(a==='Tiempo Productivo')-(b==='Tiempo Productivo'));
-        const labels  = loteOrder.map(id => byLote.get(id).label);
+      if (chartDet) chartDet.destroy();
 
-        const colorHSL=(i,tot)=>`hsl(${i*360/tot},65%,55%)`;
-        const palette = motivos.map((_,i)=>colorHSL(i, motivos.length));
-        const datasets = motivos.map((m,i)=>({
-            label:m,
-            data:loteOrder.map(id => byLote.get(id).motivos[m] ?? 0),
-            backgroundColor: m==='Tiempo Productivo' ? '#2ca02c' : palette[i],
-            stack:'x',
-            borderWidth:1,
-            borderColor:'rgba(0,0,0,0.1)',
-        }));
-
-        const hLine = { id:'hLine', afterDraw(chart,args,opts){
-            const {ctx, chartArea:{left,right}, scales:{y}} = chart;
-            const yPix = y.getPixelForValue(30);
-            ctx.save(); ctx.beginPath(); ctx.moveTo(left,yPix); ctx.lineTo(right,yPix);
-            ctx.lineWidth=2; ctx.strokeStyle='red'; ctx.setLineDash([6,4]); ctx.stroke(); ctx.restore();
-        }};
-
-        if (chartDet) chartDet.destroy();
-        chartDet = new Chart(ctxDet, {
-            type:'bar',
-            data:{ labels, datasets },
-            plugins:[hLine],
-            options:{
-              responsive:true, maintainAspectRatio:false,
-              onClick(evt, elements){
-                  if (!elements.length) return;
-                  const idx = elements[0].index;
-                  const lid = loteOrder[idx];
-                  if (lid) {
-                    const urlDet   = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
-                    const returnTo = window.location.pathname + window.location.search;
-                    window.location.href = `${urlDet}?next=${encodeURIComponent(returnTo)}`;
-                  }
-              },
-              plugins:{
-                  legend:{position:'right'},
-                  title:{display:true, text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
-                  tooltip:{ callbacks:{
-                    title(items){ 
-                      const lbl = items[0].label; 
-                      return Array.isArray(lbl) ? lbl.join(' · ') : lbl; 
-                    },
-                    label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
-                  }}
-              },
-              scales:{ 
-                x:{ stacked:true }, 
-                y:{ stacked:true, min:0, max:100, ticks:{ callback:v=>v+'%' } } 
-              },
-              hLine:{ yValue:30 }
+      chartDet = new Chart(ctxDet, {
+        type:'bar',
+        data:{ labels, datasets },
+        plugins:[hLine],
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          onClick(evt, elements){
+            if (!elements.length) return;
+            const idx = elements[0].index;
+            const lid = loteOrder[idx];
+            if (lid) {
+              const urlDet   = `{% url 'detalle_turno' 0 %}`.replace('0', lid);
+              const returnTo = window.location.pathname + window.location.search;
+              window.location.href = `${urlDet}?next=${encodeURIComponent(returnTo)}`;
             }
-        });
+          },
+          plugins:{
+            // ✅ Apagamos legend del canvas (evita desfase)
+            legend:{ display:false },
+            title:{display:true, text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
+            tooltip:{ callbacks:{
+              title(items){
+                const lbl = items[0].label;
+                return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
+              },
+              label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
+            }}
+          },
+          scales:{
+            x:{ stacked:true },
+            y:{ stacked:true, min:0, max:100, ticks:{ callback:v=>v+'%' } }
+          }
+        }
+      });
+
+      // ✅ Render legend HTML (checkboxes)
+      renderLegendDet(chartDet);
+
+      // ✅ Opcional: recalcular (por si hay overflow/scroll)
+      requestAnimationFrame(() => {
+        chartDet.resize();
+        chartDet.update();
+      });
     }
-
 
     // === Botones ===
     btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
@@ -342,9 +415,12 @@
       history.replaceState(null,'',p.toString()?`?${p}`:location.pathname);
       cargarOEE(); cargarDetenciones();
     };
+
     btnLimpiar.onclick=()=>{
       [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
-      sAnios.selectedIndex=-1;fDesde.value='';fHasta.value='';
+      sAnios.selectedIndex=-1;
+      fDesde.value='';
+      fHasta.value='';
       history.replaceState(null,'',location.pathname);
       cargarOEE(); cargarDetenciones();
     };

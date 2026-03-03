@@ -248,7 +248,9 @@ a.primary-button:hover {
   border-radius: 12px;
   padding: 8px 8px 16px 8px;
 }
-.panel-graficos canvas {
+/*.panel-graficos canvas {
   width: 100% !important;
   height: 380px !important;   /* O 420px para detenciones */
-}
+/*}*/
+#graficoOEE { height: 380px !important; }
+#graficoDetenciones { height: 420px !important; }
