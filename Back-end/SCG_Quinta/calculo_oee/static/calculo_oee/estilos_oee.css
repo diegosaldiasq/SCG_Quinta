@@ -316,15 +316,15 @@ a.primary-button:hover {
 
 /* Colores asociados */
 .legend-objetivo-item.colacion .dot {
-  background: #f3ba14;
+  background: var(--white);
 }
 
 .legend-objetivo-item.aseo .dot {
-  background: #d07020;
+  background: var(--white);
 }
 
 .legend-objetivo-item.preparacion .dot {
-  background: #8bc34a;
+  background: var(--white);
 }
 
 .legend-total {
