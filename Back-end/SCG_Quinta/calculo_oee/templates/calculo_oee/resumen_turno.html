@@ -43,7 +43,7 @@
                     <li><strong>👍 Productos buenos:</strong> {{ resumen.productos_buenos }} unidades</li>
                     <li><strong>❌ Productos malos:</strong> {{ resumen.productos_malos }} unidades</li>
                     <li><strong>👥 Personas en el turno:</strong> {{ resumen.numero_personas }} personas</li>
-                    <li><strong>👤 Unidades por persona (teorico):</strong> {{ resumen.produccion_teorica|div:resumen.numero_personas }} un/pp</li>
+                    <li><strong>👤 Unidades por persona (teorico):</strong> {{ resumen.produccion_teorica|div:resumen.numero_personas|floatformat:1 }} un/pp</li>
                     <li><strong>👤 Unidades por persona (real):</strong> {{ resumen.unidades_por_persona }} un/pp</li>
                     <li><strong>📊 Unidades por persona por hora:</strong> {{ resumen.unidades_pp_hora }} upp/h</li>
                     <li><strong>📊 Disponibilidad:</strong> {{ resumen.disponibilidad }}%</li>
