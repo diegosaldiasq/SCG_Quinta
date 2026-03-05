@@ -19,7 +19,6 @@
   <div class="login">
     <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
 
-    <!-- OJO: tu CSS tiene .login-container (guion), pero el HTML usaba login_container -->
     <div class="login-container">
       <h1 class="title">Panel Gráfico · OEE y Detenciones</h1>
 
@@ -371,12 +370,26 @@
       data.sort((a,b)=> new Date(a.fecha) - new Date(b.fecha) || turnoRank(a.turno) - turnoRank(b.turno));
 
       const byLote = new Map(), motivosSet = new Set(), loteOrder = [];
+
+      // ✅ Guardamos minutos_turno por lote (Opción B)
       for (const d of data) {
-        const lid = d.lote_id; if (!lid) continue;
+        const lid = d.lote_id; 
+        if (!lid) continue;
+
         if (!byLote.has(lid)) {
-          byLote.set(lid, { label:[fmtFecha(d.fecha), String(d.turno)], motivos:{} });
+          byLote.set(lid, { 
+            label:[fmtFecha(d.fecha), String(d.turno)], 
+            motivos:{}, 
+            minutos_turno: d.minutos_turno ?? null
+          });
           loteOrder.push(lid);
+        } else {
+          const obj = byLote.get(lid);
+          if (obj.minutos_turno == null && d.minutos_turno != null) {
+            obj.minutos_turno = d.minutos_turno;
+          }
         }
+
         byLote.get(lid).motivos[d.motivo] = d.porcentaje;
         motivosSet.add(d.motivo);
       }
@@ -434,7 +447,6 @@
             }
           },
           plugins:{
-            // ✅ Apagamos legend del canvas (evita desfase)
             legend:{ display:false },
             title:{display:true, text:'% Distribución del Tiempo de Turno (Detenciones + Productivo)'},
             tooltip:{ callbacks:{
@@ -442,7 +454,22 @@
                 const lbl = items[0].label;
                 return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
               },
-              label:(item)=>`${item.dataset.label}: ${item.parsed.y?.toFixed?.(0) ?? 0}%`
+              // ✅ Opción B: % + minutos calculados desde minutos_turno
+              label(item){
+                const motivo = item.dataset.label;
+                const pct = item.parsed.y ?? 0;
+
+                const lid = loteOrder[item.dataIndex];
+                const minTurno = byLote.get(lid)?.minutos_turno;
+
+                let minTxt = '';
+                if (minTurno != null) {
+                  const min = (pct / 100) * minTurno;
+                  minTxt = ` · ${min.toFixed(0)} min`;
+                }
+
+                return `${motivo}: ${pct.toFixed(0)}%${minTxt}`;
+              }
             }}
           },
           scales:{
@@ -455,7 +482,6 @@
       // ✅ Render legend HTML (checkboxes)
       renderLegendDet(chartDet);
 
-      // ✅ Opcional: recalcular (por si hay overflow/scroll)
       requestAnimationFrame(() => {
         chartDet.resize();
         chartDet.update();

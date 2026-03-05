@@ -581,6 +581,7 @@ def detenciones_turno_api(request):
                 'linea': res['linea'],
                 'motivo': 'Tiempo Productivo',
                 'porcentaje': porcentaje_restante,
+                'minutos_turno': res['tiempo_planeado'],   # ✅ NUEVO
                 'lote_id': res['lote_id'],  # 👈 también aquí
             })
 
