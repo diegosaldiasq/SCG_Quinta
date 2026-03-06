@@ -33,6 +33,9 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Tarta soft familiar','393433'):  80,
     ('Tartaleta fruta mixta familiar','393432'):  80,
     ('Chocotorta','405606'):  25,
+    ('Torta red velvet','405629'):  25,
+    ('Torta ignacia','405628'):  25,
+    ('Torta carrot cake','405630'):  25,
     ('Reparaciones tortas','111111'):  150,  # código ficticio para reparaciones jumbo
     # SISA
     ('Torta amor','393266'):  100,
