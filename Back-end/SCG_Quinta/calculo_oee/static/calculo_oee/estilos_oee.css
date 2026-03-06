@@ -327,6 +327,10 @@ a.primary-button:hover {
   background: var(--white);
 }
 
+.legend-objetivo-item.tiempo-productivo .dot {
+  background: var(--white);
+}
+
 .legend-total {
   grid-column: 1 / -1;
   text-align: center;
