@@ -44,7 +44,8 @@ urlpatterns = [
     path("control_de_pesos_insumos_kuchen/", include("control_de_pesos_insumos_kuchen.urls")),
     path("calculo_oee/", include("calculo_oee.urls")),
     path("control_parametros_bizcocho/", include("control_parametros_bizcocho.urls")),
-    path("control_layout_tortas/", include("control_layout_tortas.urls"))
+    path("control_layout_tortas/", include("control_layout_tortas.urls")),
+    path("trazabilidad_productos/", include("trazabilidad_productos.urls")),
 ]
 
 if settings.DEBUG:

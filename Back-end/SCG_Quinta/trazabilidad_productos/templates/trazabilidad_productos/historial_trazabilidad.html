@@ -1,0 +1,125 @@
+{% load static %}
+{% load extras %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Trazabilidad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'trazabilidad_productos/estilos_trazabilidad.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <div class="cabecera-app">
+            <h1>Historial de Trazabilidad</h1>
+            <div class="acciones-cabecera">
+                <a href="{% url 'registrar_trazabilidad' %}" class="btn-principal">Nuevo registro</a>
+            </div>
+        </div>
+
+        <form method="get" class="bloque">
+            <h2>Filtros de búsqueda</h2>
+
+            <div class="grid grid-4">
+                <div class="campo">
+                    <label for="{{ form.cliente.id_for_label }}">Cliente</label>
+                    {{ form.cliente }}
+                </div>
+                <div class="campo">
+                    <label for="{{ form.producto.id_for_label }}">Producto</label>
+                    {{ form.producto }}
+                </div>
+                <div class="campo">
+                    <label for="{{ form.desde.id_for_label }}">Desde</label>
+                    {{ form.desde }}
+                </div>
+                <div class="campo">
+                    <label for="{{ form.hasta.id_for_label }}">Hasta</label>
+                    {{ form.hasta }}
+                </div>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="campo">
+                    <label for="{{ form.lote_producto.id_for_label }}">Lote producto</label>
+                    {{ form.lote_producto }}
+                </div>
+                <div class="campo">
+                    <label for="{{ form.lote_ingrediente.id_for_label }}">Lote ingrediente</label>
+                    {{ form.lote_ingrediente }}
+                </div>
+            </div>
+
+            <div class="acciones-form">
+                <button type="submit" class="btn-principal">Filtrar</button>
+                <a href="{% url 'historial_trazabilidad' %}" class="btn-secundario">Limpiar</a>
+            </div>
+        </form>
+
+        <div class="bloque">
+            <h2>Resultados</h2>
+
+            {% if registros %}
+                {% for registro in registros %}
+                    <div class="card-registro">
+                        <div class="card-registro-header">
+                            <div>
+                                <h3>{{ registro.producto.nombre }}</h3>
+                                <p>
+                                    <strong>Cliente:</strong> {{ registro.cliente.nombre }} |
+                                    <strong>Código:</strong> {{ registro.codigo_producto }} |
+                                    <strong>Fecha registro:</strong> {{ registro.fecha_registro|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-4 datos-resumen">
+                            <div><strong>Lote producto:</strong> {{ registro.lote_producto|default:"-" }}</div>
+                            <div><strong>Fecha elab. producto:</strong> {{ registro.fecha_elaboracion_producto|date:"d/m/Y"|default:"-" }}</div>
+                            <div><strong>Turno:</strong> {{ registro.turno|default:"-" }}</div>
+                            <div><strong>Línea:</strong> {{ registro.linea|default:"-" }}</div>
+                            <div><strong>Elaborado por:</strong> {{ registro.elaborado_por|default:"-" }}</div>
+                            <div class="col-span-3"><strong>Observaciones:</strong> {{ registro.observaciones|default:"-" }}</div>
+                        </div>
+
+                        <div class="tabla-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ingrediente</th>
+                                        <th>Lote</th>
+                                        <th>Fecha elaboración</th>
+                                        <th>Fecha vencimiento</th>
+                                        <th>Proveedor</th>
+                                        <th>Acción correctiva</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for detalle in registro.detalles.all %}
+                                        <tr>
+                                            <td>{{ detalle.ingrediente.nombre }}</td>
+                                            <td>{{ detalle.lote }}</td>
+                                            <td>{{ detalle.fecha_elaboracion|date:"d/m/Y" }}</td>
+                                            <td>{{ detalle.fecha_vencimiento|date:"d/m/Y" }}</td>
+                                            <td>{{ detalle.proveedor.nombre }}</td>
+                                            <td>{{ detalle.accion_correctiva|default:"-" }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="6" class="texto-centro">Sin detalles</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="sin-resultados">
+                    No se encontraron registros con los filtros seleccionados.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

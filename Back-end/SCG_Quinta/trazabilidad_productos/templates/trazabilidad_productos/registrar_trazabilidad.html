@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Trazabilidad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'trazabilidad_productos/estilos_trazabilidad.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <div class="cabecera-app">
+            <h1>Registro de Trazabilidad</h1>
+            <div class="acciones-cabecera">
+                <a href="{% url 'historial_trazabilidad' %}" class="btn-secundario">Ver historial</a>
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="mensajes">
+                {% for message in messages %}
+                    <div class="mensaje {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" id="formTrazabilidad">
+            {% csrf_token %}
+
+            <div class="bloque">
+                <h2>Datos del producto</h2>
+
+                <div class="grid grid-4">
+                    <div class="campo">
+                        <label for="id_cliente">Cliente</label>
+                        <select name="cliente" id="id_cliente" required>
+                            <option value="">Seleccione cliente</option>
+                            {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}" {% if form.cliente.value|stringformat:"s" == cliente.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ cliente.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.cliente.errors %}
+                            <small class="error-text">{{ form.cliente.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_producto">Producto</label>
+                        <select name="producto" id="id_producto" required data-selected="{{ form.producto.value|default:'' }}">
+                            <option value="">Seleccione producto</option>
+                        </select>
+                        {% if form.producto.errors %}
+                            <small class="error-text">{{ form.producto.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_codigo_producto">Código</label>
+                        <input type="text" name="codigo_producto" id="id_codigo_producto" value="{{ form.codigo_producto.value|default:'' }}" readonly>
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_lote_producto">Lote producto</label>
+                        <input type="text" name="lote_producto" id="id_lote_producto" value="{{ form.lote_producto.value|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="grid grid-4">
+                    <div class="campo">
+                        <label for="id_fecha_elaboracion_producto">Fecha elaboración producto</label>
+                        <input type="date" name="fecha_elaboracion_producto" id="id_fecha_elaboracion_producto" value="{{ form.fecha_elaboracion_producto.value|default:'' }}">
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_turno">Turno</label>
+                        <input type="text" name="turno" id="id_turno" value="{{ form.turno.value|default:'' }}">
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_linea">Línea</label>
+                        <input type="text" name="linea" id="id_linea" value="{{ form.linea.value|default:'' }}">
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_elaborado_por">Elaborado por</label>
+                        <input type="text" name="elaborado_por" id="id_elaborado_por" value="{{ form.elaborado_por.value|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="grid grid-1">
+                    <div class="campo">
+                        <label for="id_observaciones">Observaciones</label>
+                        <textarea name="observaciones" id="id_observaciones" rows="3">{{ form.observaciones.value|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bloque">
+                <div class="bloque-titulo">
+                    <h2>Ingredientes del producto</h2>
+                    <span class="subtexto">Los ingredientes se cargan automáticamente según el producto seleccionado.</span>
+                </div>
+
+                <div class="tabla-wrapper">
+                    <table id="tablaIngredientes">
+                        <thead>
+                            <tr>
+                                <th>Ingrediente</th>
+                                <th>Lote</th>
+                                <th>Fecha elaboración</th>
+                                <th>Fecha vencimiento</th>
+                                <th>Proveedor</th>
+                                <th>Acción correctiva</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="texto-centro">Seleccione un producto para cargar sus ingredientes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="acciones-form">
+                <button type="submit" class="btn-principal">Guardar registro</button>
+                <a href="{% url 'historial_trazabilidad' %}" class="btn-secundario">Ir a historial</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="{% static 'trazabilidad_productos/trazabilidad_productos.js' %}"></script>
+</body>
+</html>
