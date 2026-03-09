@@ -37,9 +37,9 @@ class IngredienteAdmin(admin.ModelAdmin):
 
 @admin.register(ProductoIngrediente)
 class ProductoIngredienteAdmin(admin.ModelAdmin):
-    list_display = ["producto", "ingrediente", "orden"]
-    list_filter = ["producto__cliente", "producto"]
-    search_fields = ["producto__nombre", "ingrediente__nombre"]
+    list_display = ["producto", "ingrediente", "proveedor", "orden"]
+    list_filter = ["producto__cliente", "producto", "proveedor"]
+    search_fields = ["producto__nombre", "ingrediente__nombre", "proveedor__nombre"]
 
 
 class DetalleTrazabilidadIngredienteInline(admin.TabularInline):
