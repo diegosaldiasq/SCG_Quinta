@@ -56,6 +56,7 @@ class Ingrediente(models.Model):
 class ProductoIngrediente(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="producto_ingredientes")
     ingrediente = models.ForeignKey(Ingrediente, on_delete=models.CASCADE, related_name="ingrediente_productos")
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     orden = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -99,10 +100,10 @@ class DetalleTrazabilidadIngrediente(models.Model):
         related_name="detalles"
     )
     ingrediente = models.ForeignKey(Ingrediente, on_delete=models.PROTECT)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     lote = models.CharField(max_length=100)
     fecha_elaboracion = models.DateField()
     fecha_vencimiento = models.DateField()
-    proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     accion_correctiva = models.TextField(blank=True, null=True)
 
     class Meta:

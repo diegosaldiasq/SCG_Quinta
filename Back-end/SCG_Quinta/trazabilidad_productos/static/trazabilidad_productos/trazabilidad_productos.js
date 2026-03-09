@@ -92,15 +92,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>
                         ${ingrediente.nombre}
                         <input type="hidden" name="ingrediente_id[]" value="${ingrediente.id}">
+                        <input type="hidden" name="proveedor_id[]" value="${ingrediente.proveedor_id}">
                     </td>
+                    <td>${ingrediente.proveedor_nombre}</td>
                     <td><input type="text" name="lote[]" required></td>
                     <td><input type="date" name="fecha_elaboracion[]" required></td>
                     <td><input type="date" name="fecha_vencimiento[]" required></td>
-                    <td>
-                        <select name="proveedor[]" required>
-                            ${proveedoresOptions}
-                        </select>
-                    </td>
                     <td><textarea name="accion_correctiva[]" rows="2"></textarea></td>
                 `;
                 tablaBody.appendChild(fila);

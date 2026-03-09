@@ -48,7 +48,7 @@ def obtener_ingredientes_por_producto(request):
         relaciones = (
             ProductoIngrediente.objects
             .filter(producto_id=producto_id)
-            .select_related("ingrediente")
+            .select_related("ingrediente", "proveedor")
             .order_by("orden", "ingrediente__nombre")
         )
 
@@ -56,6 +56,8 @@ def obtener_ingredientes_por_producto(request):
             {
                 "id": r.ingrediente.id,
                 "nombre": r.ingrediente.nombre,
+                "proveedor_id": r.proveedor.id,
+                "proveedor_nombre": r.proveedor.nombre,
             }
             for r in relaciones
         ]
@@ -80,7 +82,7 @@ def registrar_trazabilidad(request):
         lotes = request.POST.getlist("lote[]")
         fechas_elaboracion = request.POST.getlist("fecha_elaboracion[]")
         fechas_vencimiento = request.POST.getlist("fecha_vencimiento[]")
-        proveedores = request.POST.getlist("proveedor[]")
+        proveedores_ids = request.POST.getlist("proveedor_id[]")
         acciones_correctivas = request.POST.getlist("accion_correctiva[]")
 
         if form.is_valid():
@@ -106,7 +108,7 @@ def registrar_trazabilidad(request):
                         lote = lotes[i].strip() if i < len(lotes) else ""
                         fecha_elab = fechas_elaboracion[i] if i < len(fechas_elaboracion) else ""
                         fecha_venc = fechas_vencimiento[i] if i < len(fechas_vencimiento) else ""
-                        proveedor_id = proveedores[i] if i < len(proveedores) else ""
+                        proveedor_id = proveedores_ids[i] if i < len(proveedores_ids) else None
                         accion = acciones_correctivas[i].strip() if i < len(acciones_correctivas) else ""
 
                         if not ingrediente_id:
