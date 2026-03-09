@@ -23,10 +23,10 @@ body {
     padding: 24px;
     font-family: 'Quicksand', sans-serif;
     background-image: url("./images/Fondo.png");
-    background-size: cover;
+    /*background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    color: #1f2937;
+    color: #1f2937;*/
 }
 
 h1, h2, h3 {
