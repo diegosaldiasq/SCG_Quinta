@@ -65,7 +65,7 @@ LOCAL_APPS = [
     "calculo_oee.apps.CalculoOeeConfig",
     "control_parametros_bizcocho.apps.ControlParametrosBizcochoConfig",
     "control_layout_tortas.apps.ControlLayoutTortasConfig",
-    #"trazabilidad_productos.apps.TrazabilidadProductosConfig",
+    "trazabilidad_productos.apps.TrazabilidadProductosConfig",
 ]
 
 DJANGO_APPS = [
