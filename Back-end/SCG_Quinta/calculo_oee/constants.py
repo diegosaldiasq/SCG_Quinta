@@ -26,6 +26,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Torta piña vegana','405260'):  80,
     ('Torta panqueque guinda chocolate','402261'):  25,
     ('Torta tentacion de chocolate', '405598'):  200,
+    ('Torta lemon cake', '405599'):  100,
     ('Pie de frambuesa familiar','393429'):  80,
     ('Pie de maracuya familiar','393430'):  80,
     ('Pie de limon familiar','393431'):  100,
