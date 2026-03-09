@@ -56,7 +56,7 @@ class Ingrediente(models.Model):
 class ProductoIngrediente(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="producto_ingredientes")
     ingrediente = models.ForeignKey(Ingrediente, on_delete=models.CASCADE, related_name="ingrediente_productos")
-    proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT, null=True, blank=True)
     orden = models.PositiveIntegerField(default=0)
 
     class Meta:
