@@ -6,6 +6,8 @@ from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 from .forms import HistorialTrazabilidadFilterForm, RegistroTrazabilidadForm
 from .models import (
@@ -190,3 +192,7 @@ def historial_trazabilidad(request):
         "registros": registros,
     }
     return render(request, "trazabilidad_productos/historial_trazabilidad.html", contexto)
+
+def redireccionar_intermedio(request):
+    url_index = reverse('intermedio')
+    return HttpResponseRedirect(url_index)
