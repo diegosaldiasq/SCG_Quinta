@@ -29,6 +29,7 @@ CATALOGO = {
     #{ 'producto': 'Torta piña vegana',                'codigo': '405260' }, Descontinuado 30-10-25
     { 'producto': 'Torta panqueque guinda chocolate', 'codigo': '402261' },
     { 'producto': 'Torta tentacion de chocolate',     'codigo': '405598' },
+    { 'producto': 'Torta lemon cake',                 'codigo': '405599' },
     { 'producto': 'Torta red velvet',                 'codigo': '405629' },
     { 'producto': 'Torta ignacia',                    'codigo': '405628' },
     { 'producto': 'Torta carrot cake',                'codigo': '405630' },
