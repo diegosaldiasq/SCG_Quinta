@@ -63,6 +63,7 @@ a {
 
 .login_container {
     justify-items: center;
+    box-sizing: border-box;
 }
 
 .login-container,
