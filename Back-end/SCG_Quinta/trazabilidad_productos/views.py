@@ -206,8 +206,8 @@ def redireccionar_intermedio(request):
     url_index = reverse('intermedio')
     return HttpResponseRedirect(url_index)
 
-@login_required
 @require_POST
+@login_required
 def verificar_trazabilidad(request, registro_id):
     registro = get_object_or_404(RegistroTrazabilidad, id=registro_id)
 
@@ -218,8 +218,18 @@ def verificar_trazabilidad(request, registro_id):
     registro.verificado = True
     registro.fecha_verificacion = timezone.now()
 
-    nombre_usuario = request.user.get_full_name().strip()
-    registro.nombre_verificador = nombre_usuario if nombre_usuario else request.user.username
+    nombre_usuario = ""
+
+    if hasattr(request.user, "nombre") and request.user.nombre:
+        nombre_usuario = request.user.nombre
+    elif hasattr(request.user, "username") and request.user.username:
+        nombre_usuario = request.user.username
+    elif hasattr(request.user, "email") and request.user.email:
+        nombre_usuario = request.user.email
+    else:
+        nombre_usuario = str(request.user)
+
+    registro.nombre_verificador = nombre_usuario
 
     registro.save(update_fields=["verificado", "fecha_verificacion", "nombre_verificador"])
 
