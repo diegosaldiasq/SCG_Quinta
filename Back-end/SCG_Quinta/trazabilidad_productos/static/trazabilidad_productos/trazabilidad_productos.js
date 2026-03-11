@@ -4,27 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const codigoInput = document.getElementById("id_codigo_producto");
     const tablaBody = document.querySelector("#tablaIngredientes tbody");
 
-    let proveedoresCache = [];
-
-    async function cargarProveedores() {
-        try {
-            const response = await fetch("/trazabilidad_productos/ajax/proveedores/");
-            const data = await response.json();
-            proveedoresCache = data.proveedores || [];
-        } catch (error) {
-            console.error("Error cargando proveedores:", error);
-            proveedoresCache = [];
-        }
-    }
-
-    function construirOptionsProveedores() {
-        let html = `<option value="">Seleccione proveedor</option>`;
-        proveedoresCache.forEach((p) => {
-            html += `<option value="${p.id}">${p.nombre}</option>`;
-        });
-        return html;
-    }
-
     function resetearTabla(mensaje) {
         tablaBody.innerHTML = `
             <tr>
@@ -84,21 +63,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const proveedoresOptions = construirOptionsProveedores();
-
             ingredientes.forEach((ingrediente) => {
                 const fila = document.createElement("tr");
                 fila.innerHTML = `
-                    <td>
+                    <td class="celda-ingrediente">
                         ${ingrediente.nombre}
                         <input type="hidden" name="ingrediente_id[]" value="${ingrediente.id}">
-                        <input type="hidden" name="proveedor_id[]" value="${ingrediente.proveedor_id}">
+                        <input type="hidden" name="proveedor_id[]" value="${ingrediente.proveedor_id || ''}">
                     </td>
-                    <td>${ingrediente.proveedor_nombre}</td>
-                    <td><input type="text" name="lote[]" required></td>
-                    <td><input type="date" name="fecha_elaboracion[]" required></td>
-                    <td><input type="date" name="fecha_vencimiento[]" required></td>
-                    <td><textarea name="accion_correctiva[]" rows="2"></textarea></td>
+
+                    <td>
+                        <input type="text" name="lote[]" class="input-tabla" required>
+                    </td>
+
+                    <td>
+                        <input type="date" name="fecha_elaboracion[]" class="input-tabla" required>
+                    </td>
+
+                    <td>
+                        <input type="date" name="fecha_vencimiento[]" class="input-tabla" required>
+                    </td>
+
+                    <td>
+                        <input type="text" class="input-tabla input-readonly" value="${ingrediente.proveedor_nombre || ''}" readonly>
+                    </td>
+
+                    <td>
+                        <textarea name="accion_correctiva[]" class="textarea-tabla" rows="2"></textarea>
+                    </td>
                 `;
                 tablaBody.appendChild(fila);
             });
@@ -123,8 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function inicializarFormulario() {
-        await cargarProveedores();
-
         if (clienteSelect) {
             const clienteSeleccionado = clienteSelect.value;
             const productoSeleccionado = productoSelect?.dataset?.selected || "";

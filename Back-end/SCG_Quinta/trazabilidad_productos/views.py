@@ -56,8 +56,8 @@ def obtener_ingredientes_por_producto(request):
             {
                 "id": r.ingrediente.id,
                 "nombre": r.ingrediente.nombre,
-                "proveedor_id": r.proveedor.id,
-                "proveedor_nombre": r.proveedor.nombre,
+                "proveedor_id": r.proveedor.id if r.proveedor else "",
+                "proveedor_nombre": r.proveedor.nombre if r.proveedor else "",
             }
             for r in relaciones
         ]

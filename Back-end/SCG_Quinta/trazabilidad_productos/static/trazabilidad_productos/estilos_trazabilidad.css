@@ -407,6 +407,96 @@ a.primary-button:hover {
     margin-top: 12px;
 }
 
+
+.tabla-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#tablaIngredientes {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #fff;
+}
+
+#tablaIngredientes th,
+#tablaIngredientes td {
+    border: 1px solid #e5e5e5;
+    padding: 10px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#tablaIngredientes th {
+    background: #d98a17;
+    color: #111;
+    font-weight: 700;
+}
+
+#tablaIngredientes td {
+    background: #fafafa;
+}
+
+#tablaIngredientes .celda-ingrediente {
+    text-align: left;
+    font-weight: 600;
+}
+
+.input-tabla {
+    width: 100%;
+    box-sizing: border-box;
+    height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+    background: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-tabla:focus {
+    border-color: #c65b12;
+    box-shadow: 0 0 0 3px rgba(198, 91, 18, 0.12);
+}
+
+.textarea-tabla {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+    background: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #333;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textarea-tabla:focus {
+    border-color: #c65b12;
+    box-shadow: 0 0 0 3px rgba(198, 91, 18, 0.12);
+}
+
+.input-readonly {
+    background: #f1f1f1;
+    color: #555;
+    font-weight: 600;
+    cursor: not-allowed;
+}
+
+.texto-centro {
+    text-align: center;
+    color: #666;
+    padding: 18px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 1100px) {
