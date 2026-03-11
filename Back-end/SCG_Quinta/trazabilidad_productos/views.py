@@ -8,6 +8,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from django.views.decorators.http import require_POST
 
 from .forms import HistorialTrazabilidadFilterForm, RegistroTrazabilidadForm
 from .models import (
@@ -18,6 +19,9 @@ from .models import (
     RegistroTrazabilidad,
     DetalleTrazabilidadIngrediente,
 )
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.shortcuts import get_object_or_404, redirect
 
 
 @require_GET
@@ -72,6 +76,7 @@ def obtener_proveedores(request):
     return JsonResponse({"proveedores": data})
 
 
+@login_required
 def registrar_trazabilidad(request):
     form = RegistroTrazabilidadForm()
 
@@ -143,6 +148,7 @@ def registrar_trazabilidad(request):
     return render(request, "trazabilidad_productos/registrar_trazabilidad.html", contexto)
 
 
+@login_required
 def historial_trazabilidad(request):
     form = HistorialTrazabilidadFilterForm(request.GET or None)
 
@@ -195,6 +201,27 @@ def historial_trazabilidad(request):
     }
     return render(request, "trazabilidad_productos/historial_trazabilidad.html", contexto)
 
+@login_required
 def redireccionar_intermedio(request):
     url_index = reverse('intermedio')
     return HttpResponseRedirect(url_index)
+
+@login_required
+@require_POST
+def verificar_trazabilidad(request, registro_id):
+    registro = get_object_or_404(RegistroTrazabilidad, id=registro_id)
+
+    if registro.verificado:
+        messages.warning(request, "Este registro ya fue verificado.")
+        return redirect("historial_trazabilidad")
+
+    registro.verificado = True
+    registro.fecha_verificacion = timezone.now()
+
+    nombre_usuario = request.user.get_full_name().strip()
+    registro.nombre_verificador = nombre_usuario if nombre_usuario else request.user.username
+
+    registro.save(update_fields=["verificado", "fecha_verificacion", "nombre_verificador"])
+
+    messages.success(request, "Registro verificado correctamente.")
+    return redirect("historial_trazabilidad")

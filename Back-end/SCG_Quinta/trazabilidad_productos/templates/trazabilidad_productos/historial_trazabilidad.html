@@ -15,12 +15,21 @@
 <body>
     <div class="contenedor">
         <img src="{% static 'trazabilidad_productos/images/logoquinta.png' %}" alt="logo" class="logo">
+
         <div class="cabecera-app">
             <h1>Historial de Trazabilidad</h1>
             <div class="acciones-cabecera">
                 <a href="{% url 'registrar_trazabilidad' %}" class="btn-principal">Nuevo registro</a>
             </div>
         </div>
+
+        {% if messages %}
+            <div class="mensajes">
+                {% for message in messages %}
+                    <div class="mensaje {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <form method="get" class="bloque">
             <h2>Filtros de búsqueda</h2>
@@ -83,8 +92,35 @@
                             <div><strong>Fecha elab. producto:</strong> {{ registro.fecha_elaboracion_producto|date:"d/m/Y"|default:"-" }}</div>
                             <div><strong>Turno:</strong> {{ registro.turno|default:"-" }}</div>
                             <div><strong>Línea:</strong> {{ registro.linea|default:"-" }}</div>
+
                             <div><strong>Elaborado por:</strong> {{ registro.elaborado_por|default:"-" }}</div>
-                            <div class="col-span-3"><strong>Observaciones:</strong> {{ registro.observaciones|default:"-" }}</div>
+
+                            <div>
+                                <strong>Verificado:</strong>
+                                {% if registro.verificado %}
+                                    Sí
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <strong>Fecha verificación:</strong>
+                                {% if registro.fecha_verificacion %}
+                                    {{ registro.fecha_verificacion|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <strong>Nombre verificador:</strong>
+                                {{ registro.nombre_verificador|default:"-" }}
+                            </div>
+
+                            <div class="col-span-3">
+                                <strong>Observaciones:</strong> {{ registro.observaciones|default:"-" }}
+                            </div>
                         </div>
 
                         <div class="tabla-wrapper">
@@ -116,6 +152,17 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div class="acciones-form">
+                            {% if not registro.verificado %}
+                                <form method="post" action="{% url 'verificar_trazabilidad' registro.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-principal">Verificar</button>
+                                </form>
+                            {% else %}
+                                <span class="verificado-info">Registro verificado</span>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
