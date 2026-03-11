@@ -62,8 +62,9 @@ a {
 }
 
 .login_container {
-    justify-items: center;
-    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .login-container,
@@ -109,18 +110,20 @@ a {
 
 .cabecera-app {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     gap: 16px;
     margin-bottom: 20px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .cabecera-app h1 {
     margin: 0;
     font-size: 30px;
-    text-align: left;
+    text-align: center;
 }
+
 
 /* ===== GRILLAS ===== */
 
