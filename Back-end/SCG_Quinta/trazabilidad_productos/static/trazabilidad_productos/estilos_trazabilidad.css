@@ -250,6 +250,10 @@ table tr:hover {
     justify-content: center;
 }
 
+.acciones-form {
+    margin-bottom: 40px;
+}
+
 .acciones-cabecera {
     justify-content: flex-end;
 }
