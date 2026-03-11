@@ -29,6 +29,12 @@ body {
     color: #1f2937;*/
 }
 
+.logo {
+    width: 200px;
+    margin-bottom: 16px;
+    justify-self: center;
+}
+
 h1, h2, h3 {
     color: var(--rojo-quinta);
     text-align: center;
