@@ -70,7 +70,17 @@
 
                     <div class="campo">
                         <label for="id_lote_producto">Lote producto</label>
-                        <input type="text" name="lote_producto" id="id_lote_producto" value="{{ form.lote_producto.value|default:'' }}">
+                        <input 
+                            type="text" 
+                            name="lote_producto" 
+                            id="id_lote_producto"
+                            placeholder="Ej: 123ABC"
+                            pattern="[0-9]{3}[A-Za-z]{3}"
+                            title="Formato requerido: (Ej: 123ABC)"
+                            value="{{ form.lote_producto.value|default:'' }}"
+                            required
+                        >
+                        <small class="subtexto">Formato: (Ej: 123ABC)</small>
                     </div>
                 </div>
 
@@ -82,12 +92,26 @@
 
                     <div class="campo">
                         <label for="id_turno">Turno</label>
-                        <input type="text" name="turno" id="id_turno" value="{{ form.turno.value|default:'' }}">
+                        <select name="turno" id="id_turno" required>
+                            <option value="">Seleccione turno</option>
+                            <option value="Turno A">Turno A</option>
+                            <option value="Turno B">Turno B</option>
+                            <option value="Turno C">Turno C</option>
+                        </select>
                     </div>
 
                     <div class="campo">
                         <label for="id_linea">Línea</label>
-                        <input type="text" name="linea" id="id_linea" value="{{ form.linea.value|default:'' }}">
+                        <select name="linea" id="id_linea" required>
+                            <option value="">Seleccione línea</option>
+                            <option value="L1A">L1A</option>
+                            <option value="L1B">L1B</option>
+                            <option value="L2">L2</option>
+                            <option value="L3A">L3A</option>
+                            <option value="L3B">L3B</option>
+                            <option value="Gorreri pasteleria">Gorreri pasteleria</option>
+                            <option value="Cakematic">Cakematic</option>
+                        </select>
                     </div>
 
                     <div class="campo">
