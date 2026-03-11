@@ -91,6 +91,22 @@ class RegistroTrazabilidad(models.Model):
     def __str__(self):
         fecha = self.fecha_registro.strftime("%d-%m-%Y %H:%M")
         return f"{self.producto.nombre} - {fecha}"
+    
+    verificado = models.BooleanField(default=False, verbose_name="Verificado")
+    fecha_verificacion = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha de verificación"
+    )
+    nombre_verificador = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True,
+        verbose_name="Nombre verificador"
+    )
+
+    def __str__(self):
+        return f"{self.producto} - {self.lote_producto}"
 
 
 class DetalleTrazabilidadIngrediente(models.Model):
