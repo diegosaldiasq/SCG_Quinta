@@ -16,30 +16,24 @@
     --lg: 20px;
 }
 
-/* ===== BASE GENERAL ===== */
+/* ===== RESET / BASE ===== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
     padding: 24px;
     font-family: 'Quicksand', sans-serif;
     background-image: url("./images/Fondo.png");
-    /*background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    color: #1f2937;*/
+    background-repeat: repeat;
 }
 
-.contenedor {
-    width: 100%;
-    height: 100vh;
-    display: grid;
-    justify-content: center;
-}
-
-.logo {
-    width: 200px;
-    margin-bottom: 16px;
-    justify-self: center;
+a {
+    text-decoration: none;
 }
 
 h1, h2, h3 {
@@ -48,18 +42,22 @@ h1, h2, h3 {
     margin-top: 0;
 }
 
-a {
-    text-decoration: none;
-}
-
-/* ===== CONTENEDORES PRINCIPALES ===== */
+/* ===== CONTENEDOR PRINCIPAL ===== */
 
 .contenedor {
     max-width: 1450px;
     margin: 0 auto;
-    width: 95%;
-    box-sizing: border-box;
+    width: 100%;
+    padding: 0 12px 40px 12px;
 }
+
+.logo {
+    width: min(200px, 70vw);
+    display: block;
+    margin: 0 auto 16px auto;
+}
+
+/* ===== CONTENEDORES ===== */
 
 .login_container {
     width: 100%;
@@ -93,18 +91,55 @@ a {
     font-size: 20px;
 }
 
+/* ===== CABECERA ===== */
+
+.cabecera-app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+    text-align: center;
+}
+
+.cabecera-app h1 {
+    margin: 0;
+    font-size: 30px;
+    text-align: center;
+}
+
+.acciones-cabecera {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* ===== BLOQUE TÍTULO ===== */
+
 .bloque-titulo {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.bloque-titulo h2 {
+    margin: 0;
+    text-align: left;
 }
 
 .subtexto {
     font-size: 13px;
     color: var(--gris-suave);
+    display: block;
 }
+
+/* ===== ACCIONES CORRECTIVAS ===== */
 
 .acciones-correctivas-inline {
     margin-bottom: 14px;
@@ -127,24 +162,6 @@ a {
     display: block;
     margin-bottom: 4px;
 }
-/* ===== CABECERA ===== */
-
-.cabecera-app {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-.cabecera-app h1 {
-    margin: 0;
-    font-size: 30px;
-    text-align: center;
-}
-
 
 /* ===== GRILLAS ===== */
 
@@ -152,6 +169,7 @@ a {
     display: grid;
     gap: 16px;
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .grid-1 {
@@ -159,7 +177,7 @@ a {
 }
 
 .grid-4 {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .col-span-3 {
@@ -171,6 +189,7 @@ a {
 .campo {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .campo label {
@@ -187,8 +206,8 @@ a {
     border-radius: 8px;
     font-size: var(--md);
     padding: 10px 12px;
-    box-sizing: border-box;
     width: 100%;
+    min-width: 0;
     font-family: 'Quicksand', sans-serif;
     color: var(--black);
 }
@@ -203,7 +222,7 @@ input[readonly] {
     color: #555;
 }
 
-/* ===== FORMULARIO ===== */
+/* ===== FORMULARIOS ===== */
 
 form {
     display: block;
@@ -218,8 +237,9 @@ form {
 /* ===== TABLAS ===== */
 
 .tabla-wrapper {
-    overflow-x: auto;
     width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -254,15 +274,96 @@ table tr:hover {
     background-color: var(--text-input-field);
 }
 
+#tablaIngredientes {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #fff;
+}
+
+#tablaIngredientes th,
+#tablaIngredientes td {
+    border: 1px solid #e5e5e5;
+    padding: 10px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#tablaIngredientes th {
+    background: #d98a17;
+    color: #111;
+    font-weight: 700;
+}
+
+#tablaIngredientes td {
+    background: #fafafa;
+}
+
+#tablaIngredientes .celda-ingrediente {
+    text-align: left;
+    font-weight: 600;
+}
+
 .texto-centro {
     text-align: center;
     color: var(--gris-suave);
+    padding: 18px;
+}
+
+/* ===== INPUTS DE TABLA ===== */
+
+.input-tabla {
+    width: 100%;
+    box-sizing: border-box;
+    height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+    background: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-tabla:focus {
+    border-color: #c65b12;
+    box-shadow: 0 0 0 3px rgba(198, 91, 18, 0.12);
+}
+
+.textarea-tabla {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+    background: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #333;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textarea-tabla:focus {
+    border-color: #c65b12;
+    box-shadow: 0 0 0 3px rgba(198, 91, 18, 0.12);
+}
+
+.input-readonly {
+    background: #f1f1f1;
+    color: #555;
+    font-weight: 600;
+    cursor: not-allowed;
 }
 
 /* ===== BOTONES ===== */
 
 .acciones-form,
-.acciones-cabecera,
 .botones,
 .botones-resumen {
     display: flex;
@@ -273,10 +374,7 @@ table tr:hover {
 
 .acciones-form {
     margin-bottom: 40px;
-}
-
-.acciones-cabecera {
-    justify-content: flex-end;
+    width: 100%;
 }
 
 .btn-principal,
@@ -347,7 +445,7 @@ a.primary-button:hover {
     font-weight: 600;
 }
 
-/* ===== CARDS HISTORIAL ===== */
+/* ===== HISTORIAL ===== */
 
 .card-registro {
     border: 1px solid var(--borde-suave);
@@ -375,6 +473,16 @@ a.primary-button:hover {
     padding: 18px;
     text-align: center;
     color: var(--gris-suave);
+}
+
+.verificado-info {
+    display: inline-block;
+    background-color: var(--hospital-green);
+    color: var(--black);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: var(--md);
+    margin-top: 12px;
 }
 
 /* ===== PAGINACIÓN ===== */
@@ -430,111 +538,11 @@ a.primary-button:hover {
     font-size: 25px;
 }
 
-.verificado-info {
-    display: inline-block;
-    background-color: var(--hospital-green);
-    color: var(--black);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: var(--md);
-    margin-top: 12px;
-}
-
-
-.tabla-wrapper {
-    width: 100%;
-    overflow-x: auto;
-}
-
-#tablaIngredientes {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    background: #fff;
-}
-
-#tablaIngredientes th,
-#tablaIngredientes td {
-    border: 1px solid #e5e5e5;
-    padding: 10px;
-    vertical-align: middle;
-    text-align: center;
-}
-
-#tablaIngredientes th {
-    background: #d98a17;
-    color: #111;
-    font-weight: 700;
-}
-
-#tablaIngredientes td {
-    background: #fafafa;
-}
-
-#tablaIngredientes .celda-ingrediente {
-    text-align: left;
-    font-weight: 600;
-}
-
-.input-tabla {
-    width: 100%;
-    box-sizing: border-box;
-    height: 38px;
-    padding: 8px 10px;
-    border: 1px solid #bdbdbd;
-    border-radius: 6px;
-    background: #fff;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 14px;
-    color: #333;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.input-tabla:focus {
-    border-color: #c65b12;
-    box-shadow: 0 0 0 3px rgba(198, 91, 18, 0.12);
-}
-
-.textarea-tabla {
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 38px;
-    padding: 8px 10px;
-    border: 1px solid #bdbdbd;
-    border-radius: 6px;
-    background: #fff;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 14px;
-    color: #333;
-    resize: vertical;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.textarea-tabla:focus {
-    border-color: #c65b12;
-    box-shadow: 0 0 0 3px rgba(198, 91, 18, 0.12);
-}
-
-.input-readonly {
-    background: #f1f1f1;
-    color: #555;
-    font-weight: 600;
-    cursor: not-allowed;
-}
-
-.texto-centro {
-    text-align: center;
-    color: #666;
-    padding: 18px;
-}
-
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 1100px) {
     .grid-4 {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .col-span-3 {
@@ -543,6 +551,15 @@ a.primary-button:hover {
 }
 
 @media (max-width: 700px) {
+    body {
+        padding: 12px;
+    }
+
+    .contenedor {
+        width: 100%;
+        padding: 0 8px 32px 8px;
+    }
+
     .grid-4 {
         grid-template-columns: 1fr;
     }
@@ -551,24 +568,23 @@ a.primary-button:hover {
         grid-column: span 1;
     }
 
-    body {
-        padding: 12px;
-    }
-
     .bloque,
     .login-container,
     .card-registro {
-        padding: 16px;
+        padding: 14px;
     }
 
     .cabecera-app {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     .cabecera-app h1 {
         font-size: 24px;
         text-align: center;
+        word-break: break-word;
     }
 
     .acciones-cabecera,
@@ -576,6 +592,7 @@ a.primary-button:hover {
     .botones,
     .botones-resumen {
         justify-content: center;
+        width: 100%;
     }
 
     .btn-principal,
@@ -586,7 +603,31 @@ a.primary-button:hover {
         text-align: center;
     }
 
-    table {
+    .bloque-titulo {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .bloque-titulo h2 {
+        text-align: center;
+    }
+
+    .subtexto {
+        text-align: center;
+    }
+
+    .acciones-correctivas-inline {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    .logo {
+        width: min(170px, 60vw);
+    }
+
+    table,
+    #tablaIngredientes {
         min-width: 900px;
     }
 }
