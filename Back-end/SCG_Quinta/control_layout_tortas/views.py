@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
-@login_required
+#@login_required
 class RegistroCreateView(View):
     template_name = "control_layout_tortas/registro_create.html"
 
@@ -105,7 +105,7 @@ class RegistroCreateView(View):
         return render(request, self.template_name, {"form": form, "formset": None})
     
 
-@login_required
+#@login_required
 class RegistroDetalleView(View):
     template_name = "control_layout_tortas/registro_detalle.html"
 
