@@ -322,6 +322,28 @@ textarea {
   border-color: #1d4ed8;
 }
 
+.btn-secundario {
+    display: inline-block;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: var(--md);
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: 'Quicksand', sans-serif;
+}
+
+.btn-secundario {
+    background-color: var(--amarillo-quinta);
+    color: var(--black);
+}
+
+.btn-secundario:hover {
+    background-color: var(--naranjo-claro-quinta);
+    color: var(--white);
+}
+
 /* RESPONSIVE */
 @media (max-width: 1200px) {
   .form-grid {
