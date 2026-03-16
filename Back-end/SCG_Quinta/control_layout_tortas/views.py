@@ -70,8 +70,18 @@ class RegistroCreateView(View):
         if "_cargar_capas" in request.POST:
             formset = RegistroCapaFormSet(instance=registro, prefix="detalles")
             messages.info(request, "Capas cargadas. Ingresa los pesos reales y guarda.")
+
+            form_recargado = RegistroLayoutForm(
+                instance=registro,
+                initial={
+                    "cliente": registro.layout.producto.cliente,
+                    "producto_manual": registro.layout.producto.id,
+                    "codigo_auto": registro.layout.producto.codigo,
+                }
+            )
+
             return render(request, self.template_name, {
-                "form": RegistroLayoutForm(instance=registro),
+                "form": form_recargado,
                 "formset": formset,
                 "registro_id": registro.id,
             })

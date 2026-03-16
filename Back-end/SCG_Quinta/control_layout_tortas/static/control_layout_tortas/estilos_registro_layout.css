@@ -311,6 +311,17 @@ textarea {
   margin-top: 18px;
 }
 
+.btn-cargar {
+  background: #2563eb;
+  color: #fff;
+  border: 1px solid #2563eb;
+}
+
+.btn-cargar:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
 /* RESPONSIVE */
 @media (max-width: 1200px) {
   .form-grid {
