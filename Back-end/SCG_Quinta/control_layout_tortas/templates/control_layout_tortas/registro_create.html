@@ -5,163 +5,185 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nuevo registro layout</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 16px; }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    label { font-size: 12px; color: #444; display:block; margin-bottom: 4px; }
-    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
-    table { width:100%; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top; }
-    th { font-size: 12px; color:#555; }
-    .btn { padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #fff; cursor: pointer; }
-    .btn-primary { background:#111; color:#fff; border-color:#111; }
-    .muted { color:#666; font-size: 12px; }
-    .err { color:#c00; font-size: 12px; margin-top: 6px; }
-  </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'control_layout_tortas/estilos_registro_layout.css' %}">
+  <link rel="icon" href="{% static 'control_layout_tortas/images/logoquinta2.png' %}">
 </head>
 <body>
 
-  <h2>Registro de peso por capas (layout)</h2>
+  <div class="layout-wrapper">
+    <div class="layout-container">
 
-  <form method="post">
-    {% csrf_token %}
-
-    {% if registro_id %}
-      <input type="hidden" name="registro_id" value="{{ registro_id }}">
-    {% endif %}
-
-    <div class="card">
-      <h3>Cabecera</h3>
-      <div class="grid">
+      <div class="page-header">
+        <img src="{% static 'control_layout_tortas/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
         <div>
-          <label>Planta</label>
-          {{ form.planta }}
-        </div>
-        <div>
-          <label>Layout (torta)</label>
-          {{ form.layout }}
-        </div>
-        <div>
-          <label>Fecha</label>
-          {{ form.fecha }}
-        </div>
-        <div>
-          <label>Turno</label>
-          {{ form.turno }}
-        </div>
-
-        <div>
-          <label>Línea</label>
-          {{ form.linea }}
-        </div>
-        <div>
-          <label>Lote</label>
-          {{ form.lote }}
-        </div>
-        <div>
-          <label>Operador</label>
-          {{ form.operador }}
-        </div>
-        <div>
-          <label class="muted">Acción</label>
-          <button class="btn" name="_cargar_capas" value="1" type="submit">Cargar capas</button>
+          <h1>Registro de peso por capas</h1>
+          <p class="subtitle">Control de layout de tortas</p>
         </div>
       </div>
 
-      <div style="margin-top:10px;">
-        <label>Observaciones</label>
-        {{ form.observaciones }}
-      </div>
+      <form method="post" class="layout-form">
+        {% csrf_token %}
 
-      {% if form.errors %}
-        <div class="err">Revisa la cabecera: {{ form.errors }}</div>
-      {% endif %}
-    </div>
-
-    {% if formset %}
-      <div class="card">
-        <h3>Detalle por capas</h3>
-
-        {# ✅ CLAVE: management_form dentro del <form> #}
-        {{ formset.management_form }}
-
-        {# ✅ Muestra non_form_errors arriba para que se vea #}
-        {% if formset.non_form_errors %}
-          <div class="err">{{ formset.non_form_errors }}</div>
+        {% if registro_id %}
+          <input type="hidden" name="registro_id" value="{{ registro_id }}">
         {% endif %}
 
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Tipo</th>
-              <th>Etiqueta</th>
-              <th>Ingrediente</th>
-              <th>Ingrediente usado</th>
-              <th>Objetivo (g)</th>
-              <th>Peso real (g)</th>
-              <th>Comentario</th>
-              <th>Rango</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for f in formset.forms %}
-              {% with capa=f.instance.capa %}
-              <tr>
-                {# ✅ CLAVE: hidden id del formset (y otros hidden si existieran) #}
-                {{ f.id }}
+        <section class="card">
+          <div class="card-header">
+            <h2>Cabecera</h2>
+          </div>
 
-                <td>{{ capa.orden }}</td>
-                <td>{{ capa.get_tipo_display }}</td>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="{{ form.planta.id_for_label }}">Planta</label>
+              {{ form.planta }}
+            </div>
 
-                {# Etiqueta: si existe etiqueta, mostrarla; si no, fallback a "nombre" si aún existe #}
-                <td>
-                  {% if capa.etiqueta %}
-                    {{ capa.etiqueta }}
-                  {% else %}
-                    {{ capa.nombre }}
-                  {% endif %}
-                </td>
+            <div class="form-group">
+              <label for="{{ form.layout.id_for_label }}">Layout (torta)</label>
+              {{ form.layout }}
+            </div>
 
-                {# Ingrediente: si existe FK ingrediente #}
-                <td>
-                  {% if capa.ingrediente %}
-                    {{ capa.ingrediente.nombre }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </td>
-                <td>{{ f.ingrediente_usado }}</td>
-                <td>{{ capa.peso_objetivo_g }}</td>
-                <td>{{ f.peso_real_g }}</td>
-                <td>{{ f.comentario }}</td>
-                <td>
-                  {{ capa.peso_objetivo_g|floatformat:1 }} ± {{ capa.tolerancia_mas_g|floatformat:1 }}
-                </td>
-              </tr>
+            <div class="form-group">
+              <label for="{{ form.fecha.id_for_label }}">Fecha</label>
+              {{ form.fecha }}
+            </div>
 
-              {# Errores por fila #}
-              {% if f.errors %}
-              <tr>
-                <td colspan="8" class="err">Error en capa {{ capa.orden }}: {{ f.errors }}</td>
-              </tr>
-              {% endif %}
+            <div class="form-group">
+              <label for="{{ form.turno.id_for_label }}">Turno</label>
+              {{ form.turno }}
+            </div>
 
-              {% endwith %}
-            {% endfor %}
-          </tbody>
-        </table>
+            <div class="form-group">
+              <label for="{{ form.linea.id_for_label }}">Línea</label>
+              {{ form.linea }}
+            </div>
 
-        <div style="margin-top:12px;">
-          <button class="btn btn-primary" name="_guardar" value="1" type="submit">Guardar</button>
-        </div>
-      </div>
-    {% else %}
-      <p class="muted">Selecciona planta + layout y presiona “Cargar capas”.</p>
-    {% endif %}
+            <div class="form-group">
+              <label for="{{ form.lote.id_for_label }}">Lote</label>
+              {{ form.lote }}
+            </div>
 
-  </form>
+            <div class="form-group">
+              <label for="{{ form.operador.id_for_label }}">Operador</label>
+              {{ form.operador }}
+            </div>
+
+            <div class="form-group action-group">
+              <label class="label-muted">Acción</label>
+              <button class="btn btn-secondary" name="_cargar_capas" value="1" type="submit">
+                Cargar capas
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group form-group-full">
+            <label for="{{ form.observaciones.id_for_label }}">Observaciones</label>
+            {{ form.observaciones }}
+          </div>
+
+          {% if form.errors %}
+            <div class="alert alert-error">
+              <strong>Revisa la cabecera:</strong> {{ form.errors }}
+            </div>
+          {% endif %}
+        </section>
+
+        {% if formset %}
+          <section class="card">
+            <div class="card-header">
+              <h2>Detalle por capas</h2>
+            </div>
+
+            {{ formset.management_form }}
+
+            {% if formset.non_form_errors %}
+              <div class="alert alert-error">
+                {{ formset.non_form_errors }}
+              </div>
+            {% endif %}
+
+            <div class="table-responsive">
+              <table class="detail-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Tipo</th>
+                    <th>Etiqueta</th>
+                    <th>Ingrediente</th>
+                    <th>Ingrediente usado</th>
+                    <th>Objetivo (g)</th>
+                    <th>Peso real (g)</th>
+                    <th>Comentario</th>
+                    <th>Rango</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for f in formset.forms %}
+                    {% with capa=f.instance.capa %}
+                    <tr>
+                      {{ f.id }}
+
+                      <td data-label="#">{{ capa.orden }}</td>
+                      <td data-label="Tipo">{{ capa.get_tipo_display }}</td>
+
+                      <td data-label="Etiqueta">
+                        {% if capa.etiqueta %}
+                          {{ capa.etiqueta }}
+                        {% else %}
+                          {{ capa.ingrediente.nombre }}
+                        {% endif %}
+                      </td>
+
+                      <td data-label="Ingrediente">
+                        {% if capa.ingrediente %}
+                          {{ capa.ingrediente.nombre }}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </td>
+
+                      <td data-label="Ingrediente usado">{{ f.ingrediente_usado }}</td>
+                      <td data-label="Objetivo (g)">{{ capa.peso_objetivo_g }}</td>
+                      <td data-label="Peso real (g)">{{ f.peso_real_g }}</td>
+                      <td data-label="Comentario">{{ f.comentario }}</td>
+                      <td data-label="Rango">
+                        -{{ capa.tolerancia_menos_g|floatformat:1 }} / +{{ capa.tolerancia_mas_g|floatformat:1 }}
+                      </td>
+                    </tr>
+
+                    {% if f.errors %}
+                    <tr>
+                      <td colspan="9" class="row-error">
+                        Error en capa {{ capa.orden }}: {{ f.errors }}
+                      </td>
+                    </tr>
+                    {% endif %}
+                    {% endwith %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" name="_guardar" value="1" type="submit">
+                Guardar
+              </button>
+            </div>
+          </section>
+        {% else %}
+          <div class="helper-text">
+            Selecciona planta + layout y presiona <strong>“Cargar capas”</strong>.
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
 
 </body>
 </html>
