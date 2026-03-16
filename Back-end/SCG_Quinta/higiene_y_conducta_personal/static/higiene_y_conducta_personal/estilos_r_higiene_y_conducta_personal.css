@@ -26,9 +26,6 @@ html, body {
 
 body {
     background-image: url(./images/Fondo.png);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
 .login {
