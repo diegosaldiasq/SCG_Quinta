@@ -84,7 +84,12 @@ def no_hay_datos(request):
 @login_required
 def permisos(request):
     if request.user.is_staff or request.user.is_superuser:
-        usuarios = DatosFormularioCrearCuenta.objects.all()
+        lista_usuarios = DatosFormularioCrearCuenta.objects.all().order_by('nombre_completo')
+
+        paginator = Paginator(lista_usuarios, 10)  # 10 usuarios por página
+        page_number = request.GET.get('page')
+        usuarios = paginator.get_page(page_number)
+
         return render(request, 'inicio/permisos.html', {'usuarios': usuarios})
     else:
         return render(request, 'inicio/falta_permiso.html')

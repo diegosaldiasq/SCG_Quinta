@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,8 +17,10 @@
     <div class="login">
         <img src="{% static 'inicio/images/logoquinta.png' %}" alt="logo" class="logo">
         <h1 class="title">Selecciona permisos</h1>
+
         <div class="login-container">
             <p class="subtitle">Permisos Usuarios</p>
+
             <div class="header-row">
                 <span>Nombre usuario</span>
                 <span>Perfil</span>
@@ -27,6 +29,7 @@
                 <span>Jefatura</span>
                 <span></span>
             </div>
+
             {% for usuario in usuarios %}
                 <div class="usuario">
                     <li>
@@ -46,7 +49,25 @@
                         {% endif %}
                     </li>
                 </div>
+            {% empty %}
+                <p>No hay usuarios registrados.</p>
             {% endfor %}
+
+            <div class="paginacion">
+                {% if usuarios.has_previous %}
+                    <a href="?page=1" class="page-link">&laquo; Primera</a>
+                    <a href="?page={{ usuarios.previous_page_number }}" class="page-link">Anterior</a>
+                {% endif %}
+
+                <span class="page-info">
+                    Página {{ usuarios.number }} de {{ usuarios.paginator.num_pages }}
+                </span>
+
+                {% if usuarios.has_next %}
+                    <a href="?page={{ usuarios.next_page_number }}" class="page-link">Siguiente</a>
+                    <a href="?page={{ usuarios.paginator.num_pages }}" class="page-link">Última &raquo;</a>
+                {% endif %}
+            </div>
         </div>
         
         <div class="button-container">
@@ -59,9 +80,9 @@
             </form>
         </div>
     </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        // Definir el token CSRF para su uso en las solicitudes AJAX
         var csrftoken = "{{ csrf_token }}";
     </script>
     <script src="{% static 'inicio/scrips_permisos.js' %}"></script>
