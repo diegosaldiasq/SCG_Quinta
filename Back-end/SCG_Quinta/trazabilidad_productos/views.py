@@ -206,6 +206,11 @@ def redireccionar_intermedio(request):
     url_index = reverse('intermedio')
     return HttpResponseRedirect(url_index)
 
+@login_required
+def redireccionar_intermedio_2(request):
+    url_index = reverse('intermedio_2')
+    return HttpResponseRedirect(url_index)
+
 @require_POST
 @login_required
 def verificar_trazabilidad(request, registro_id):

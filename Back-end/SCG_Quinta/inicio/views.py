@@ -429,3 +429,8 @@ def redireccionar_graficos_parametros_gorreri(request):
 def redireccionar_graficos_control_parametros_bizcocho(request):
     url_graficos_control_parametros_bizcocho = reverse('graficos_control_parametros_bizcocho')
     return HttpResponseRedirect(url_graficos_control_parametros_bizcocho)
+
+@login_required
+def historial_trazabilidad(request):
+    url_historial_trazabilidad = reverse('historial_trazabilidad')
+    return HttpResponseRedirect(url_historial_trazabilidad)

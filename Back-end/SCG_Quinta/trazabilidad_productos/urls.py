@@ -9,5 +9,6 @@ urlpatterns = [
     path("ajax/ingredientes/", views.obtener_ingredientes_por_producto, name="obtener_ingredientes_por_producto"),
     path("ajax/proveedores/", views.obtener_proveedores, name="obtener_proveedores"),
     path("intermedio/", views.redireccionar_intermedio, name="redireccionar_intermedio"),
+    path("intermedio_2/", views.redireccionar_intermedio_2, name="redireccionar_intermedio_2"),
     path("verificar/<int:registro_id>/", views.verificar_trazabilidad, name="verificar_trazabilidad"),
 ]
