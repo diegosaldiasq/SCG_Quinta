@@ -36,13 +36,11 @@ class RegistroTrazabilidadForm(forms.ModelForm):
 class HistorialTrazabilidadFilterForm(forms.Form):
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.all().order_by("nombre"),
-        required=False,
-        empty_label="Todos los clientes"
+        required=False
     )
     producto = forms.ModelChoiceField(
-        queryset=Producto.objects.select_related("cliente").all().order_by("nombre"),
-        required=False,
-        empty_label="Todos los productos"
+        queryset=Producto.objects.all().order_by("nombre"),
+        required=False
     )
     desde = forms.DateField(
         required=False,
@@ -54,3 +52,12 @@ class HistorialTrazabilidadFilterForm(forms.Form):
     )
     lote_producto = forms.CharField(required=False)
     lote_ingrediente = forms.CharField(required=False)
+
+    estado_verificacion = forms.ChoiceField(
+        required=False,
+        choices=[
+            ("", "Todos"),
+            ("no_verificados", "No verificadas"),
+            ("verificados", "Verificadas"),
+        ]
+    )
