@@ -5,8 +5,11 @@ from django.views import View
 
 from .forms import RegistroLayoutForm, RegistroCapaFormSet
 from .models import LayoutTorta, RegistroLayout, RegistroCapa
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 
-
+@login_required
 class RegistroCreateView(View):
     template_name = "control_layout_tortas/registro_create.html"
 
@@ -102,6 +105,7 @@ class RegistroCreateView(View):
         return render(request, self.template_name, {"form": form, "formset": None})
     
 
+@login_required
 class RegistroDetalleView(View):
     template_name = "control_layout_tortas/registro_detalle.html"
 
@@ -117,3 +121,8 @@ class RegistroDetalleView(View):
             .all()
         )
         return render(request, self.template_name, {"registro": registro, "detalles": detalles})
+    
+@login_required
+def redireccionar_intermedio(request):
+    url_index = reverse('intermedio')
+    return HttpResponseRedirect(url_index)
