@@ -38,6 +38,8 @@
             <h2>Cabecera</h2>
           </div>
 
+          {{ form.layout }}
+
           <div class="form-grid">
             <div class="form-group">
               <label for="{{ form.planta.id_for_label }}">Planta</label>
@@ -45,8 +47,18 @@
             </div>
 
             <div class="form-group">
-              <label for="{{ form.layout.id_for_label }}">Layout (torta)</label>
-              {{ form.layout }}
+              <label for="{{ form.cliente.id_for_label }}">Cliente</label>
+              {{ form.cliente }}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.producto_manual.id_for_label }}">Producto</label>
+              {{ form.producto_manual }}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.codigo_auto.id_for_label }}">Código</label>
+              {{ form.codigo_auto }}
             </div>
 
             <div class="form-group">
@@ -64,6 +76,13 @@
               {{ form.linea }}
             </div>
 
+            <div class="form-group action-group">
+              <label class="label-muted">Acción</label>
+              <button class="btn btn-secondary" name="_cargar_capas" value="1" type="submit">
+                Cargar capas
+              </button>
+            </div>
+
             <div class="form-group">
               <label for="{{ form.lote.id_for_label }}">Lote</label>
               {{ form.lote }}
@@ -72,13 +91,6 @@
             <div class="form-group">
               <label for="{{ form.operador.id_for_label }}">Operador</label>
               {{ form.operador }}
-            </div>
-
-            <div class="form-group action-group">
-              <label class="label-muted">Acción</label>
-              <button class="btn btn-secondary" name="_cargar_capas" value="1" type="submit">
-                Cargar capas
-              </button>
             </div>
           </div>
 
@@ -115,7 +127,7 @@
                     <th>#</th>
                     <th>Tipo</th>
                     <th>Etiqueta</th>
-                    <th>Ingrediente</th>
+                    <th>Ingrediente planificado</th>
                     <th>Ingrediente usado</th>
                     <th>Objetivo (g)</th>
                     <th>Peso real (g)</th>
@@ -130,7 +142,10 @@
                       {{ f.id }}
 
                       <td data-label="#">{{ capa.orden }}</td>
-                      <td data-label="Tipo">{{ capa.get_tipo_display }}</td>
+
+                      <td data-label="Tipo">
+                        {{ capa.get_tipo_display }}
+                      </td>
 
                       <td data-label="Etiqueta">
                         {% if capa.etiqueta %}
@@ -140,7 +155,7 @@
                         {% endif %}
                       </td>
 
-                      <td data-label="Ingrediente">
+                      <td data-label="Ingrediente planificado">
                         {% if capa.ingrediente %}
                           {{ capa.ingrediente.nombre }}
                         {% else %}
@@ -148,10 +163,22 @@
                         {% endif %}
                       </td>
 
-                      <td data-label="Ingrediente usado">{{ f.ingrediente_usado }}</td>
-                      <td data-label="Objetivo (g)">{{ capa.peso_objetivo_g }}</td>
-                      <td data-label="Peso real (g)">{{ f.peso_real_g }}</td>
-                      <td data-label="Comentario">{{ f.comentario }}</td>
+                      <td data-label="Ingrediente usado">
+                        {{ f.ingrediente_usado }}
+                      </td>
+
+                      <td data-label="Objetivo (g)">
+                        {{ capa.peso_objetivo_g }}
+                      </td>
+
+                      <td data-label="Peso real (g)">
+                        {{ f.peso_real_g }}
+                      </td>
+
+                      <td data-label="Comentario">
+                        {{ f.comentario }}
+                      </td>
+
                       <td data-label="Rango">
                         -{{ capa.tolerancia_menos_g|floatformat:1 }} / +{{ capa.tolerancia_mas_g|floatformat:1 }}
                       </td>
@@ -178,12 +205,143 @@
           </section>
         {% else %}
           <div class="helper-text">
-            Selecciona planta + layout y presiona <strong>“Cargar capas”</strong>.
+            Selecciona planta, cliente y producto, luego presiona <strong>“Cargar capas”</strong>.
           </div>
         {% endif %}
       </form>
     </div>
   </div>
+
+  <script>
+    const layoutsData = [
+      {% for item in form.fields.layout.queryset %}
+        {
+          layout_id: "{{ item.id }}",
+          planta: "{{ item.planta|escapejs }}",
+          cliente: "{{ item.producto.cliente|default:''|escapejs }}",
+          producto_id: "{{ item.producto.id }}",
+          producto: "{{ item.producto.nombre|escapejs }}",
+          codigo: "{{ item.producto.codigo|default:''|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+
+    const plantaSelect = document.getElementById("id_planta");
+    const clienteSelect = document.getElementById("id_cliente");
+    const productoSelect = document.getElementById("id_producto_manual");
+    const codigoInput = document.getElementById("id_codigo_auto");
+    const layoutInput = document.getElementById("id_layout");
+
+    function uniqueBy(arr, key) {
+      const seen = new Set();
+      return arr.filter(item => {
+        const val = item[key] || "";
+        if (seen.has(val)) return false;
+        seen.add(val);
+        return true;
+      });
+    }
+
+    function resetProductosYCodigo() {
+      productoSelect.innerHTML = '<option value="">Selecciona producto</option>';
+      codigoInput.value = "";
+      layoutInput.value = "";
+    }
+
+    function cargarClientes() {
+      const planta = plantaSelect.value;
+
+      clienteSelect.innerHTML = '<option value="">Selecciona cliente</option>';
+      resetProductosYCodigo();
+
+      if (!planta) return;
+
+      const clientes = uniqueBy(
+        layoutsData.filter(item => item.planta === planta && item.cliente),
+        "cliente"
+      );
+
+      clientes.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.cliente;
+        option.textContent = item.cliente;
+        clienteSelect.appendChild(option);
+      });
+    }
+
+    function cargarProductos() {
+      const planta = plantaSelect.value;
+      const cliente = clienteSelect.value;
+
+      resetProductosYCodigo();
+
+      if (!planta || !cliente) return;
+
+      const productos = uniqueBy(
+        layoutsData.filter(item => item.planta === planta && item.cliente === cliente),
+        "producto_id"
+      );
+
+      productos.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.producto_id;
+        option.textContent = item.producto;
+        option.dataset.codigo = item.codigo || "";
+        option.dataset.layoutId = item.layout_id || "";
+        productoSelect.appendChild(option);
+      });
+    }
+
+    function actualizarCodigoYLayout() {
+      const selected = productoSelect.options[productoSelect.selectedIndex];
+
+      if (!selected || !selected.value) {
+        codigoInput.value = "";
+        layoutInput.value = "";
+        return;
+      }
+
+      codigoInput.value = selected.dataset.codigo || "";
+      layoutInput.value = selected.dataset.layoutId || "";
+    }
+
+    function preseleccionarDesdeServidor() {
+      const plantaActual = "{{ form.planta.value|default:''|escapejs }}";
+      const clienteActual = "{{ form.cliente.value|default:''|escapejs }}";
+      const productoActual = "{{ form.producto_manual.value|default:''|escapejs }}";
+
+      if (plantaActual) {
+        plantaSelect.value = plantaActual;
+        cargarClientes();
+      }
+
+      if (clienteActual) {
+        clienteSelect.value = clienteActual;
+        cargarProductos();
+      }
+
+      if (productoActual) {
+        productoSelect.value = productoActual;
+        actualizarCodigoYLayout();
+      }
+    }
+
+    plantaSelect.addEventListener("change", function() {
+      cargarClientes();
+    });
+
+    clienteSelect.addEventListener("change", function() {
+      cargarProductos();
+    });
+
+    productoSelect.addEventListener("change", function() {
+      actualizarCodigoYLayout();
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      preseleccionarDesdeServidor();
+    });
+  </script>
 
 </body>
 </html>

@@ -5,6 +5,22 @@ from .models import RegistroLayout, RegistroCapa, LayoutTorta, Ingrediente
 
 
 class RegistroLayoutForm(forms.ModelForm):
+    cliente = forms.ChoiceField(
+        required=False,
+        choices=[],
+        label="Cliente"
+    )
+    producto_manual = forms.ChoiceField(
+        required=False,
+        choices=[],
+        label="Producto"
+    )
+    codigo_auto = forms.CharField(
+        required=False,
+        label="Código",
+        widget=forms.TextInput(attrs={"readonly": "readonly"})
+    )
+
     class Meta:
         model = RegistroLayout
         fields = [
@@ -20,6 +36,7 @@ class RegistroLayoutForm(forms.ModelForm):
         widgets = {
             "fecha": forms.DateInput(attrs={"type": "date"}),
             "observaciones": forms.Textarea(attrs={"rows": 2}),
+            "layout": forms.HiddenInput(),  # ocultamos el layout real
         }
 
     def __init__(self, *args, **kwargs):
@@ -27,21 +44,55 @@ class RegistroLayoutForm(forms.ModelForm):
 
         self.fields["layout"].required = False
 
-        # ✅ por defecto: mostrar todos los activos
-        self.fields["layout"].queryset = (
+        layouts_qs = (
             LayoutTorta.objects
             .filter(activo=True)
             .select_related("producto")
+            .order_by("planta", "producto__cliente", "producto__nombre", "producto__codigo", "-version")
         )
 
+        self.fields["layout"].queryset = layouts_qs
+
         planta = None
+        cliente = None
+
         if self.data.get("planta"):
             planta = self.data.get("planta")
-        elif self.instance and self.instance.planta:
+        elif self.instance and self.instance.pk:
             planta = self.instance.planta
 
+        if self.data.get("cliente"):
+            cliente = self.data.get("cliente")
+
+        clientes = layouts_qs
         if planta:
-            self.fields["layout"].queryset = self.fields["layout"].queryset.filter(planta=planta)
+            clientes = clientes.filter(planta=planta)
+
+        clientes_unicos = []
+        vistos = set()
+        for item in clientes:
+            c = (item.producto.cliente or "").strip()
+            if c and c not in vistos:
+                vistos.add(c)
+                clientes_unicos.append((c, c))
+
+        self.fields["cliente"].choices = [("", "Selecciona cliente")] + clientes_unicos
+
+        productos = layouts_qs
+        if planta:
+            productos = productos.filter(planta=planta)
+        if cliente:
+            productos = productos.filter(producto__cliente=cliente)
+
+        productos_unicos = []
+        vistos_prod = set()
+        for item in productos:
+            key = (item.producto.id, item.producto.nombre)
+            if key not in vistos_prod:
+                vistos_prod.add(key)
+                productos_unicos.append((item.producto.id, item.producto.nombre))
+
+        self.fields["producto_manual"].choices = [("", "Selecciona producto")] + productos_unicos
 
 class RegistroCapaForm(forms.ModelForm):
     class Meta:
