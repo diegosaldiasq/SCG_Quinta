@@ -12,88 +12,213 @@
     --md: 16px;
     --lg: 18px;
 }
-body {
-    margin: 0;
-    font-family: 'Quicksand', sans-serif;
-    background-image: url(./images/Fondo.png);
+
+* {
+    box-sizing: border-box;
 }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: 'Quicksand', sans-serif;
+}
+
+body {
+    background-image: url(./images/Fondo.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .login {
     width: 100%;
-    height: 100vh;
-    display: grid;
-    place-items: center;
-    margin-top:24px;
-    margin-bottom: 30px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px 30px;
 }
+
 .logo {
-    width: 200px;
-    margin-bottom: 30px;
-    justify-self: center;
-    margin-top: 24px;
+    width: 180px;
+    max-width: 70%;
+    margin: 0 0 20px 0;
 }
+
 .login-container {
+    width: 100%;
+    max-width: 600px;
     display: grid;
-    grid-template-rows: auto 1fr
-    auto;
-    width: 600px;
+    grid-template-rows: auto 1fr;
     justify-items: center;
     background-color: var(--naranjo-claro-quinta);
-    border-radius: 32px;
+    border-radius: 24px;
+    padding: 24px 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
+
 .title {
-    font-size: var(--lg);
-    margin-bottom: 12px;
+    font-size: clamp(18px, 2.5vw, 26px);
+    margin: 0 0 20px 0;
     text-align: center;
+    line-height: 1.3;
+    color: var(--black);
 }
+
 .ingreso {
-    display:  grid;
+    display: flex;
     flex-direction: column;
+    width: 100%;
 }
+
 .label {
     font-size: var(--md);
-    font-weight: bold;
-    margin-bottom: 4px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--black);
 }
+
 .input {
+    width: 100%;
     background-color: var(--text-input-field);
     border: none;
     border-radius: 12px;
-    height: 30px;
+    min-height: 42px;
     font-size: var(--md);
-    padding: 6px;
-    margin-bottom: 20px;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    font-family: 'Quicksand', sans-serif;
+    outline: none;
 }
+
+.input:focus {
+    border: 2px solid var(--rojo-quinta);
+    background-color: #fff;
+}
+
 .botones {
-    display:  flex;
-    flex-direction: row;
-    justify-self: center;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
     gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
 }
+
+.form {
+    margin: 0;
+}
+
 .secundary-button {
     background-color: var(--rojo-quinta);
-    border-radius: 8px;
+    border-radius: 10px;
     border: none;
     color: var(--white);
-    width: 180px;
+    min-width: 180px;
+    padding: 12px 18px;
     cursor: pointer;
     font-size: var(--md);
     font-weight: bold;
-    height: 40px;
+    min-height: 44px;
+    font-family: 'Quicksand', sans-serif;
+    transition: all 0.2s ease;
 }
+
+.secundary-button:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
 .login-button2 {
-    margin-top: 14px;
-    margin-bottom: 30px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
-@media (max-width: 650px) {
+
+/* Tablets */
+@media (max-width: 768px) {
+    .login {
+        padding: 18px 14px 24px;
+        justify-content: flex-start;
+    }
+
+    .logo {
+        width: 150px;
+        margin-bottom: 16px;
+    }
+
     .login-container {
+        border-radius: 20px;
+        padding: 22px 16px;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .input {
+        font-size: 15px;
+        min-height: 40px;
+        margin-bottom: 16px;
+    }
+
+    .label {
+        font-size: 15px;
+    }
+}
+
+/* Celulares */
+@media (max-width: 480px) {
+    .login {
+        padding: 12px 10px 20px;
+    }
+
+    .logo {
+        width: 125px;
+        max-width: 60%;
+        margin-bottom: 14px;
+    }
+
+    .login-container {
+        padding: 18px 12px;
+        border-radius: 16px;
+    }
+
+    .title {
+        font-size: 17px;
+        margin-bottom: 16px;
+    }
+
+    .label {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .input {
+        font-size: 14px;
+        min-height: 38px;
+        padding: 9px 10px;
+        margin-bottom: 14px;
+        border-radius: 10px;
+    }
+
+    .botones {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        max-width: 600px;
+    }
+
+    .form {
         width: 100%;
     }
-    .botones {
-        gap: 8px;
-    }
+
     .secundary-button {
-        width: 120px;
-        font-size: 10px;
-        height: 40px;
+        width: 100%;
+        min-width: unset;
+        font-size: 14px;
+        min-height: 42px;
     }
 }

@@ -129,10 +129,10 @@
         <div class="botones">
             <form class="form">
                 {% csrf_token %}
-                <button class="secundary-button login-button2" id="miBoton">Grabar y continuar</button>
+                <button type="button" class="secundary-button login-button2" id="miBoton">Grabar y continuar</button>
             </form>
             <form class="form" action="{% url 'redireccionar_selecciones' %}">
-                <button class="secundary-button login-button2">Salir</button>
+                <button type="submit" class="secundary-button login-button2">Salir</button>
             </form>
         </div>
     </div>
