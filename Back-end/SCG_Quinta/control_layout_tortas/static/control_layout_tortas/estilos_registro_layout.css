@@ -21,6 +21,12 @@
   --radius-lg: 18px;
   --radius-md: 12px;
   --radius-sm: 10px;
+  --rojo-quinta: #B43C2C;
+  --amarillo-quinta: #f3ba14;
+  --naranjo-quinta: #d07020;
+  --naranjo-claro-quinta: #d4841c;
+  --black: #1f2937;
+  --white: #ffffff;
 }
 
 * {
@@ -330,11 +336,12 @@ textarea {
   align-items: center;
 }
 
-/* BOTON VOLVER */
+/* BOTON SECUNDARIO QUINTA */
 .btn-secundario{
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   min-height: 44px;
   padding: 11px 22px;
 
@@ -345,17 +352,16 @@ textarea {
 
   text-decoration: none;
 
-  background: var(--secondary);
-  color: var(--text-main);
-  border: 1px solid var(--border-strong);
+  background-color: var(--amarillo-quinta);
+  color: var(--black);
+  border: 1px solid transparent;
 
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .btn-secundario:hover{
-  background: var(--secondary-hover);
-  border-color: #94a3b8;
-  color: #111827;
+  background-color: var(--naranjo-claro-quinta);
+  color: var(--white);
 }
 
 /* RESPONSIVE */
