@@ -322,32 +322,38 @@ textarea {
   border-color: #1d4ed8;
 }
 
-/* BOTÓN VOLVER INICIO */
+/* CONTENEDOR BOTON VOLVER */
 .acciones-form{
-  margin-top: 16px;
+  margin-top: 22px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
 }
 
+/* BOTON VOLVER */
 .btn-secundario{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
-  padding: 10px 18px;
+  min-height: 44px;
+  padding: 11px 22px;
+
   border-radius: 12px;
   font-family: 'Quicksand', sans-serif;
-  font-size: 0.94rem;
+  font-size: 0.95rem;
   font-weight: 700;
+
   text-decoration: none;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  color: #1f2937;
+
+  background: var(--secondary);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+
   transition: all 0.2s ease;
 }
 
 .btn-secundario:hover{
-  background: #f1f5f9;
+  background: var(--secondary-hover);
   border-color: #94a3b8;
   color: #111827;
 }
