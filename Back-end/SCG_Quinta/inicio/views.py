@@ -20,6 +20,8 @@ from django.forms.models import model_to_dict
 from django.views.decorators.http import require_POST
 from django.db import transaction
 import json, unicodedata
+from django.shortcuts import redirect, get_object_or_404
+from control_layout_tortas.models import RegistroLayout
 
 
 # Create your views here.
@@ -439,3 +441,8 @@ def redireccionar_graficos_control_parametros_bizcocho(request):
 def historial_trazabilidad(request):
     url_historial_trazabilidad = reverse('historial_trazabilidad')
     return HttpResponseRedirect(url_historial_trazabilidad)
+
+@login_required
+def abrir_registro_layout(request, pk):
+    registro = get_object_or_404(RegistroLayout, pk=pk)
+    return redirect('control_layout_tortas:registro_detalle', pk=registro.pk)
