@@ -442,7 +442,7 @@ def historial_trazabilidad(request):
     url_historial_trazabilidad = reverse('historial_trazabilidad')
     return HttpResponseRedirect(url_historial_trazabilidad)
 
-@login_required
-def abrir_registro_layout(request, pk):
-    registro = get_object_or_404(RegistroLayout, pk=pk)
-    return redirect('control_layout_tortas:registro_detalle', pk=registro.pk)
+#@login_required
+#def abrir_registro_layout(request, pk):
+#    registro = get_object_or_404(RegistroLayout, pk=pk)
+#    return redirect('control_layout_tortas:registro_detalle', pk=registro.pk)

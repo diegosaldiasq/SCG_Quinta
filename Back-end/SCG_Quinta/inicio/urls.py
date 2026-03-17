@@ -44,5 +44,5 @@ urlpatterns = [
     path("graficos_parametros_gorreri/", views.redireccionar_graficos_parametros_gorreri, name="redireccionar_graficos_parametros_gorreri"),
     path("graficos_control_parametros_bizcocho/", views.redireccionar_graficos_control_parametros_bizcocho, name="redireccionar_graficos_control_parametros_bizcocho"),
     path("historial_trazabilidad/", views.historial_trazabilidad, name="historial_trazabilidad"),
-    path("abrir-registro-layout/<int:pk>/", views.abrir_registro_layout, name="abrir_registro_layout"),
+    #path("abrir-registro-layout/<int:pk>/", views.abrir_registro_layout, name="abrir_registro_layout"),
 ]
