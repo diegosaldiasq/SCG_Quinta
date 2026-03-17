@@ -1,0 +1,368 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de registros</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Quicksand', sans-serif;
+            background: #f4f7fb;
+            color: #233044;
+        }
+
+        .contenedor {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.08);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .titulo {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .acciones-top {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: .2s ease;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .btn-primary { background: #1e88e5; color: #fff; }
+        .btn-success { background: #22a06b; color: #fff; }
+        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-secondary { background: #64748b; color: #fff; }
+        .btn-outline {
+            background: #fff;
+            color: #1e88e5;
+            border: 1px solid #1e88e5;
+        }
+
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .campo label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .campo input,
+        .campo select {
+            width: 100%;
+            border: 1px solid #d7dee8;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-family: inherit;
+            background: #fff;
+        }
+
+        .acciones-filtros {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tabla-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #edf1f5;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8fafc;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .estado-ok {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .estado-pendiente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .acciones-tabla {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mini-form {
+            display: inline;
+            margin: 0;
+        }
+
+        .texto-suave {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .paginacion {
+            margin-top: 18px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .paginacion a,
+        .paginacion span {
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            background: #fff;
+            border: 1px solid #d7dee8;
+            color: #233044;
+        }
+
+        .mensaje-vacio {
+            text-align: center;
+            padding: 30px 10px;
+            color: #64748b;
+        }
+
+        @media (max-width: 1200px) {
+            .filtros-grid {
+                grid-template-columns: repeat(3, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filtros-grid {
+                grid-template-columns: repeat(1, minmax(120px, 1fr));
+            }
+
+            .titulo {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+
+        <div class="card">
+            <div class="topbar">
+                <h1 class="titulo">Historial de registros de layout</h1>
+                <div class="acciones-top">
+                    <a href="{% url 'control_layout_tortas:registro_nuevo' %}" class="btn btn-primary">+ Nuevo registro</a>
+                    <a href="{% url 'control_layout_tortas:redireccionar_intermedio' %}" class="btn btn-secondary">Volver</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <form method="get">
+                <div class="filtros-grid">
+                    <div class="campo">
+                        <label>{{ filter_form.planta.label }}</label>
+                        {{ filter_form.planta }}
+                    </div>
+                    <div class="campo">
+                        <label>{{ filter_form.cliente.label }}</label>
+                        {{ filter_form.cliente }}
+                    </div>
+                    <div class="campo">
+                        <label>{{ filter_form.producto.label }}</label>
+                        {{ filter_form.producto }}
+                    </div>
+                    <div class="campo">
+                        <label>{{ filter_form.lote.label }}</label>
+                        {{ filter_form.lote }}
+                    </div>
+                    <div class="campo">
+                        <label>{{ filter_form.fecha_desde.label }}</label>
+                        {{ filter_form.fecha_desde }}
+                    </div>
+                    <div class="campo">
+                        <label>{{ filter_form.fecha_hasta.label }}</label>
+                        {{ filter_form.fecha_hasta }}
+                    </div>
+                    <div class="campo">
+                        <label>{{ filter_form.estado_verificacion.label }}</label>
+                        {{ filter_form.estado_verificacion }}
+                    </div>
+                </div>
+
+                <div class="acciones-filtros">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="{% url 'control_layout_tortas:historial_registros' %}" class="btn btn-outline">Limpiar filtros</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="tabla-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Planta</th>
+                            <th>Cliente</th>
+                            <th>Producto</th>
+                            <th>Código</th>
+                            <th>Lote</th>
+                            <th>Turno</th>
+                            <th>Operador</th>
+                            <th>Capas</th>
+                            <th>Completado</th>
+                            <th>Resultado</th>
+                            <th>Verificación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registro in registros %}
+                        <tr>
+                            <td>{{ registro.fecha|date:"d-m-Y" }}</td>
+                            <td>{{ registro.planta }}</td>
+                            <td>{{ registro.layout.producto.cliente|default:"-" }}</td>
+                            <td>{{ registro.layout.producto.nombre }}</td>
+                            <td>{{ registro.layout.producto.codigo|default:"-" }}</td>
+                            <td>{{ registro.lote|default:"-" }}</td>
+                            <td>{{ registro.turno|default:"-" }}</td>
+                            <td>{{ registro.operador|default:"-" }}</td>
+                            <td>
+                                {{ registro.capas_con_peso }}/{{ registro.total_capas }}
+                            </td>
+                            <td>
+                                {{ registro.porcentaje_completado }}%
+                            </td>
+                            <td>
+                                <strong>OK:</strong> {{ registro.total_ok }}<br>
+                                <strong>NO:</strong> {{ registro.total_no_ok }}
+                            </td>
+                            <td>
+                                {% if registro.verificado %}
+                                    <span class="estado estado-ok">Verificado</span>
+                                    <div class="texto-suave" style="margin-top:6px;">
+                                        {% if registro.verificado_por %}{{ registro.verificado_por }}{% endif %}
+                                        {% if registro.fecha_verificacion %}<br>{{ registro.fecha_verificacion|date:"d-m-Y H:i" }}{% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="estado estado-pendiente">Pendiente</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="acciones-tabla">
+                                    <a href="{% url 'control_layout_tortas:registro_detalle' registro.pk %}" class="btn btn-outline">
+                                        Ver detalle
+                                    </a>
+
+                                    {% if not registro.verificado %}
+                                    <form method="post" action="{% url 'control_layout_tortas:verificar_registro' registro.pk %}" class="mini-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" class="btn btn-success">Verificar</button>
+                                    </form>
+                                    {% else %}
+                                    <form method="post" action="{% url 'control_layout_tortas:desverificar_registro' registro.pk %}" class="mini-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" class="btn btn-warning">Quitar verificación</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="13">
+                                <div class="mensaje-vacio">
+                                    No se encontraron registros con los filtros aplicados.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <div class="paginacion">
+                {% if page_obj.has_previous %}
+                    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page=1">Primera</a>
+                    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                {% endif %}
+
+                <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+                {% if page_obj.has_next %}
+                    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

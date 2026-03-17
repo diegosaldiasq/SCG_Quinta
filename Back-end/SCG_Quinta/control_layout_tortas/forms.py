@@ -1,20 +1,18 @@
 from django import forms
-from django.forms import modelform_factory
 from django.forms.models import inlineformset_factory
-from .models import RegistroLayout, RegistroCapa, LayoutTorta, Ingrediente
+
+from .models import (
+    RegistroLayout,
+    RegistroCapa,
+    LayoutTorta,
+    Ingrediente,
+    Planta,
+)
 
 
 class RegistroLayoutForm(forms.ModelForm):
-    cliente = forms.ChoiceField(
-        required=False,
-        choices=[],
-        label="Cliente"
-    )
-    producto_manual = forms.ChoiceField(
-        required=False,
-        choices=[],
-        label="Producto"
-    )
+    cliente = forms.ChoiceField(required=False, choices=[], label="Cliente")
+    producto_manual = forms.ChoiceField(required=False, choices=[], label="Producto")
     codigo_auto = forms.CharField(
         required=False,
         label="Código",
@@ -36,7 +34,7 @@ class RegistroLayoutForm(forms.ModelForm):
         widgets = {
             "fecha": forms.DateInput(attrs={"type": "date"}),
             "observaciones": forms.Textarea(attrs={"rows": 2}),
-            "layout": forms.HiddenInput(),  # ocultamos el layout real
+            "layout": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -94,6 +92,7 @@ class RegistroLayoutForm(forms.ModelForm):
 
         self.fields["producto_manual"].choices = [("", "Selecciona producto")] + productos_unicos
 
+
 class RegistroCapaForm(forms.ModelForm):
     class Meta:
         model = RegistroCapa
@@ -105,12 +104,11 @@ class RegistroCapaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Ingrediente usado es opcional (si no seleccionas, se asume el planificado)
         self.fields["ingrediente_usado"].required = False
         self.fields["ingrediente_usado"].queryset = (
             Ingrediente.objects.filter(activo=True).order_by("categoria", "nombre")
         )
+
 
 RegistroCapaFormSet = inlineformset_factory(
     RegistroLayout,
@@ -119,3 +117,33 @@ RegistroCapaFormSet = inlineformset_factory(
     extra=0,
     can_delete=False,
 )
+
+
+class HistorialRegistroFilterForm(forms.Form):
+    planta = forms.ChoiceField(
+        required=False,
+        label="Planta",
+        choices=[("", "Todas")] + list(Planta.choices),
+    )
+    cliente = forms.CharField(required=False, label="Cliente")
+    producto = forms.CharField(required=False, label="Producto")
+    lote = forms.CharField(required=False, label="Lote")
+    fecha_desde = forms.DateField(
+        required=False,
+        label="Desde",
+        widget=forms.DateInput(attrs={"type": "date"})
+    )
+    fecha_hasta = forms.DateField(
+        required=False,
+        label="Hasta",
+        widget=forms.DateInput(attrs={"type": "date"})
+    )
+    estado_verificacion = forms.ChoiceField(
+        required=False,
+        label="Verificación",
+        choices=[
+            ("", "Todos"),
+            ("verificados", "Verificados"),
+            ("pendientes", "Pendientes"),
+        ],
+    )
