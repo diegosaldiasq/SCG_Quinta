@@ -33,6 +33,21 @@
       Línea: {{ registro.linea }}
     </p>
 
+    <p>
+        <strong>Estado:</strong>
+        {% if registro.verificado %}
+            Verificado
+            {% if registro.verificado_por %} por {{ registro.verificado_por }}{% endif %}
+            {% if registro.fecha_verificacion %} el {{ registro.fecha_verificacion|date:"d-m-Y H:i" }}{% endif %}
+        {% else %}
+            Pendiente de verificación
+        {% endif %}
+    </p>
+
+    <p>
+        <a href="{% url 'control_layout_tortas:historial_registros' %}">← Volver al historial</a>
+    </p>
+
     <div class="table-responsive">
       <table class="detail-table">
 
