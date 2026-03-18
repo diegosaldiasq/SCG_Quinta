@@ -84,6 +84,12 @@ Para ejecutar las pruebas se debe tener instalado python 3.12.0, pip 23.2.1, dja
 
 Para conectar con docker, con el comando `docker login -u diegosaldiasquijada -p <contraseña>`, luego correr el comando `docker-compose up -d --build` para construir las imagenes e iniciar los contenedores. Luego correr el comando `docker-compose exec web python manage.py makemigrations` para crear las migraciones de la base de datos. Luego correr el comando `docker-compose exec web python manage.py migrate` para aplicar las migraciones a la base de datos. Luego correr el comando `docker-compose exec web python manage.py collectstatic` para recolectar los archivos static y hacerlos efectivos en el servidor. Crear el superusuario con `docker-compose exec web python manage.py createsuperuser` y seguir las instrucciones de creacion de superusuario.
 
+## Para mantenimiento del seervidor en AWS
+
+Para mantenimiento del servidor en AWS, se debe conectar a la instancia de AWS, una vez abierto el terminal, se debe ejecutar el comando `sudo du -h /var/lib/docker --max-depth=1 | sort -hr` para ver el espacio ocupado por los contenedores de docker. Para eliminar los contenedores que no se estan usando, se debe ejecutar el comando `docker system prune -a` para eliminar los contenedores, imagenes y volumenes que no se estan usando. Para una limpieza mas profunda, se debe ejecutar el comando `docker builder prune -a` para eliminar las imagenes que no se estan usando. `docker system prune -a -f` para eliminar los contenedores, imagenes y volumenes que no se estan usando sin pedir confirmacion.
+
+Para actualizaciones de ubuntu se debe ejecutar el comando `sudo apt update` para actualizar la lista de paquetes disponibles, luego ejecutar el comando `sudo apt upgrade -y` para actualizar los paquetes instalados, `sudo apt autoremove -y` para eliminar paquetes que ya no son necesarios. Para reiniciar el servidor se debe ejecutar el comando `sudo reboot` para reiniciar la instancia de AWS.
+
 ## Como contribuir
 
 Para contribuir se debe tener instalado git, clonar el repositorio de https://github.com/diegosaldiasq/SCG_Quinta, hacer tus modificaciones y luego debes hacer un pull request en github al proyecto https://github.com/diegosaldiasq/SCG_Quinta y esperar a que sea aprobado por el administrador del proyecto.
