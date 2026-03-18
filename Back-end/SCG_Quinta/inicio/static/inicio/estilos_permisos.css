@@ -116,7 +116,7 @@ body {
     color: var(--white);
     width: 150px;
     cursor: pointer;
-    font-size: var(--md);
+    font-size: var(--sm);
     font-weight: bold;
     height: 36px;
     display: flex;
