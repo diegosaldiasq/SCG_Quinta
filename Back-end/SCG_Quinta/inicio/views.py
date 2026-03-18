@@ -22,7 +22,7 @@ from django.db import transaction
 import json, unicodedata
 from django.shortcuts import redirect, get_object_or_404
 from control_layout_tortas.models import RegistroLayout
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model  
 from datetime import timedelta
 
 
@@ -451,22 +451,21 @@ def historial_trazabilidad(request):
 
 @login_required
 def usuarios_conectados(request):
+    User = get_user_model()
     ahora = timezone.now()
-
-    # puedes ajustar esto
     limite = ahora - timedelta(minutes=30)
 
-    usuarios = User.objects.all()
+    usuarios = User.objects.all().order_by('nombre_completo')
 
     usuarios_lista = []
     activos = 0
     activos_hoy = 0
 
     for u in usuarios:
-        last = u.last_login
+        last = getattr(u, 'last_login', None)
 
-        is_active_now = last and last >= limite
-        is_today = last and last.date() == ahora.date()
+        is_active_now = bool(last and last >= limite)
+        is_today = bool(last and last.date() == ahora.date())
 
         if is_active_now:
             activos += 1
@@ -474,10 +473,10 @@ def usuarios_conectados(request):
             activos_hoy += 1
 
         usuarios_lista.append({
-            "username": u.username,
-            "nombre": u.get_full_name(),
+            "nombre_completo": getattr(u, "nombre_completo", f"ID {u.pk}"),
+            "email": getattr(u, "email", ""),
             "last_login": last,
-            "is_active_now": is_active_now
+            "is_active_now": is_active_now,
         })
 
     context = {
