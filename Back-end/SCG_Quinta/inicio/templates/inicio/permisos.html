@@ -75,6 +75,9 @@
                 {% csrf_token %}
                 <button class="primary-button button">Guardar cambios</button>  
             </form>
+            <form class="form" action="{% url 'usuarios_conectados' %}">
+                <button class="primary-button button">Usuarios Conectados</button>
+            </form>
             <form class="form" action="{% url 'redireccionar_inicio' %}">
                 <button class="primary-button button">Volver inicio</button>
             </form>

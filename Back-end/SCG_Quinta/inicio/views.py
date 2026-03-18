@@ -22,6 +22,8 @@ from django.db import transaction
 import json, unicodedata
 from django.shortcuts import redirect, get_object_or_404
 from control_layout_tortas.models import RegistroLayout
+from django.contrib.auth.models import User
+from datetime import timedelta
 
 
 # Create your views here.
@@ -446,3 +448,43 @@ def historial_trazabilidad(request):
 #def abrir_registro_layout(request, pk):
 #    registro = get_object_or_404(RegistroLayout, pk=pk)
 #    return redirect('control_layout_tortas:registro_detalle', pk=registro.pk)
+
+@login_required
+def usuarios_conectados(request):
+    ahora = timezone.now()
+
+    # puedes ajustar esto
+    limite = ahora - timedelta(minutes=30)
+
+    usuarios = User.objects.all()
+
+    usuarios_lista = []
+    activos = 0
+    activos_hoy = 0
+
+    for u in usuarios:
+        last = u.last_login
+
+        is_active_now = last and last >= limite
+        is_today = last and last.date() == ahora.date()
+
+        if is_active_now:
+            activos += 1
+        if is_today:
+            activos_hoy += 1
+
+        usuarios_lista.append({
+            "username": u.username,
+            "nombre": u.get_full_name(),
+            "last_login": last,
+            "is_active_now": is_active_now
+        })
+
+    context = {
+        "usuarios": usuarios_lista,
+        "total_usuarios": usuarios.count(),
+        "usuarios_activos": activos,
+        "usuarios_hoy": activos_hoy,
+    }
+
+    return render(request, "usuarios_conectados.html", context)
