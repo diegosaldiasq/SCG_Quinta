@@ -486,4 +486,4 @@ def usuarios_conectados(request):
         "usuarios_hoy": activos_hoy,
     }
 
-    return render(request, "usuarios_conectados.html", context)
+    return render(request, "inicio/usuarios_conectados.html", context)
