@@ -5,31 +5,25 @@
     <meta charset="UTF-8">
     <title>Cargar ventas georreferenciadas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 30px; background: #f7f7f7; }
-        .box { max-width: 700px; margin: auto; background: white; padding: 24px; border-radius: 12px; }
-        h1 { margin-top: 0; }
-        form p { margin-bottom: 14px; }
-        button {
-            background: #1d4ed8;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .messages { margin-bottom: 16px; }
-        .msg { padding: 10px; border-radius: 8px; margin-bottom: 8px; }
-        .success { background: #dcfce7; }
-        .error { background: #fee2e2; }
-    </style>
+
+    <!-- Fuente -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'ventas_geo/cargar_ventas.css' %}">
+    <link rel="icon" href="{% static 'ventas_geo/images/logoquinta2.png' %}" />
 </head>
 <body>
+
+<div class="contenedor">
     <div class="box">
+
         <h1>Cargar archivo de ventas</h1>
 
-        <p><strong>Formato esperado:</strong></p>
-        <p>producto | local | direccion | comuna | ciudad | cantidad | fecha</p>
+        <div class="info">
+            <strong>Formato esperado:</strong><br>
+            producto | local | direccion | comuna | ciudad | cantidad | fecha
+        </div>
 
         {% if messages %}
             <div class="messages">
@@ -44,8 +38,20 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Procesar archivo</button>
+
+            <div class="botones">
+                <button type="submit" class="btn-procesar">
+                    Procesar archivo
+                </button>
+
+                <a href="{% url 'index' %}" class="btn-volver">
+                    Volver al inicio
+                </a>
+            </div>
         </form>
+
     </div>
+</div>
+
 </body>
 </html>
