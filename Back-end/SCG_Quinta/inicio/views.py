@@ -32,7 +32,7 @@ from datetime import timedelta
 def index(request):
     user_id = request.user.id
 
-    ids_permitidos = [1, 43]
+    ids_permitidos = [2, 43]
 
     mostrar_ventas_geo = user_id in ids_permitidos
 
