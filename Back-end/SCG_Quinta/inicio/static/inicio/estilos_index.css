@@ -1,4 +1,4 @@
-:root{
+:root {
     --very-light-pink: #C7C7C7;
     --text-input-field: #F7F7F7;
     --hospital-green: #ACD9B2;
@@ -10,80 +10,191 @@
     --black: #000000;
     --sm: 14px;
     --md: 16px;
-    --lg: 18px;
+    --lg: 20px;
+    --xl: 24px;
 }
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: 'Quicksand', sans-serif;
-    background-image: url(./images/Fondo.png);
+    background-image: url("./images/Fondo.png");
 }
-.header-img {
-    display: grid;
-    justify-items: center;
-    border: 0;
+
+.header {
     width: 100%;
 }
+
+.header-img {
+    display: block;
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    border: 0;
+}
+
 .login {
     width: 100%;
-    height: 120vh;
-    display: grid;
+    min-height: calc(100vh - 120px);
+    display: flex;
     justify-content: center;
+    align-items: flex-start;
+    padding: 30px 16px 40px;
 }
+
 .card {
-    width: 500px;
-    height: 650px;
+    width: 100%;
+    max-width: 520px;
     background: var(--amarillo-quinta);
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    padding-bottom: 24px;
 }
+
 .logo {
-    width: 500px;
-    margin-bottom: 16px;
-    justify-self: center;
+    display: block;
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    margin: 0;
 }
+
 .title {
     font-size: var(--lg);
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin: 28px 20px 10px;
     text-align: center;
+    color: var(--black);
+    line-height: 1.4;
 }
+
 .subtitle {
     color: var(--rojo-quinta);
     font-size: var(--md);
-    font-weight: 300;
-    margin-top: 0;
-    font-weight: bold;
-    margin-bottom: 32px;
+    font-weight: 700;
+    margin: 0 20px 28px;
     text-align: center;
+    line-height: 1.4;
 }
-.form {
-    display:  grid;
+
+.botones {
+    display: flex;
     flex-direction: column;
-    justify-items: center;
+    gap: 12px;
+    padding: 0 28px;
 }
+
+.form {
+    margin: 0;
+    width: 100%;
+}
+
 .primary-button {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 18px;
     background-color: var(--rojo-quinta);
-    border-radius: 8px;
+    border-radius: 12px;
     border: none;
     color: var(--white);
-    width: 80%;
     cursor: pointer;
     font-size: var(--md);
-    font-weight: bold;
-    height: 20px;
+    font-weight: 700;
+    font-family: 'Quicksand', sans-serif;
+    text-align: center;
+    transition: all 0.25s ease;
 }
+
+.primary-button:hover {
+    background-color: #992f21;
+    transform: translateY(-1px);
+}
+
+.primary-button:active {
+    transform: translateY(0);
+}
+
 .login-button {
-    margin-top: 14px;
-    margin-bottom: 4px;
+    margin: 0;
 }
-@media (max-width: 650px) {
+
+#salir {
+    background-color: #8c2d21;
+}
+
+#salir:hover {
+    background-color: #722319;
+}
+
+@media (max-width: 768px) {
+    .header-img {
+        max-height: 140px;
+    }
+
     .login {
-        width: 100%;
+        padding: 20px 12px 30px;
+        align-items: flex-start;
     }
+
     .card {
-        width: 100%;
-        height: 90%;
+        max-width: 100%;
+        border-radius: 18px;
     }
+
     .logo {
-        width: 100%;
+        height: 190px;
+    }
+
+    .title {
+        font-size: 18px;
+        margin: 22px 16px 10px;
+    }
+
+    .subtitle {
+        font-size: 15px;
+        margin: 0 16px 22px;
+    }
+
+    .botones {
+        padding: 0 18px;
+        gap: 10px;
+    }
+
+    .primary-button {
+        min-height: 46px;
+        font-size: 15px;
+        padding: 10px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-img {
+        max-height: 110px;
+    }
+
+    .logo {
+        height: 160px;
+    }
+
+    .title {
+        font-size: 17px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .botones {
+        padding: 0 14px;
+    }
+
+    .primary-button {
+        min-height: 44px;
+        font-size: 14px;
     }
 }
