@@ -33,7 +33,7 @@
 
         <p>
             <a class="btn" href="{% url 'ventas_geo:cargar_ventas' %}">Nueva carga</a>
-            <a class="btn" href="{% url 'ventas_geo:dashboard' %}">Ir al dashboard</a>
+            <a class="btn" href="{% url 'ventas_geo:dashboard_ventas_geo' carga.id %}">Ir al dashboard</a>
         </p>
 
         <h2>Errores</h2>
