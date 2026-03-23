@@ -36,6 +36,7 @@ def resultado_carga(request, carga_id):
     return render(request, 'ventas_geo/resultado_carga.html', {
         'carga': carga,
         'errores': errores,
+        'carga_id': carga_id
     })
 
 

@@ -201,7 +201,27 @@ button[type="submit"]:active {
     color: var(--rojo-quinta);
     font-weight: bold;
 }
+.acciones {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
+.btn-volver {
+    background: #6b7280;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-volver:hover {
+    background: #4b5563;
+}
 @media (max-width: 900px) {
     body {
         padding: 16px;

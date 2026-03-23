@@ -66,11 +66,20 @@
     <div class="box">
         <div class="mapa-header">
             <h2>Mapa de ventas</h2>
-            <button type="button" id="btnFullscreen">Pantalla completa</button>
+
+            <div class="acciones">
+                <a href="{% url 'ventas_geo:resultado_carga' carga_id %}" class="btn-volver">
+                    ← Resultados
+                </a>
+
+                <button type="button" id="btnFullscreen">
+                    Pantalla completa
+                </button>
+            </div>
         </div>
+
         <div id="mapa"></div>
     </div>
-
     <script>
         const heatData = JSON.parse(document.getElementById('heat-data').textContent);
         const marcadores = JSON.parse(document.getElementById('marcadores-data').textContent);
