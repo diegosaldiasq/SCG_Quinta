@@ -37,6 +37,7 @@ services:
     depends_on:
       - db
     environment:
+      GOOGLE_GEOCODING_API_KEY: 'AIzaSyBg630iaSuc4wR6eN71LEEN-pf1hx_wHBA'
       DATABASE_HOST: db
       POSTGRES_DB: SCG_Quinta
       POSTGRES_USER: postgres
