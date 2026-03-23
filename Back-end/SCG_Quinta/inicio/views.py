@@ -30,8 +30,15 @@ from datetime import timedelta
 
 @login_required
 def index(request):
-    #return HttpResponse("Hello World!!")
-    return render(request, 'inicio/index.html')
+    user_id = request.user.id
+
+    ids_permitidos = [1, 43]
+
+    mostrar_ventas_geo = user_id in ids_permitidos
+
+    return render(request, 'inicio/index.html', {
+        'mostrar_ventas_geo': mostrar_ventas_geo
+    })
 
 @login_required
 def redireccionar_selecciones(request):
