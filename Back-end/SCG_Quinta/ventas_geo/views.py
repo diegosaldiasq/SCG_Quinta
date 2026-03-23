@@ -40,12 +40,12 @@ def resultado_carga(request, carga_id):
     })
 
 
-def dashboard_ventas_geo(request):
+def dashboard_ventas_geo(request, carga_id):
     producto_id = request.GET.get('producto')
     fecha_desde = request.GET.get('fecha_desde')
     fecha_hasta = request.GET.get('fecha_hasta')
 
-    ventas = Venta.objects.select_related('producto', 'local')
+    ventas = Venta.objects.select_related('producto', 'local').filter(carga_id=carga_id)
 
     if producto_id:
         ventas = ventas.filter(producto_id=producto_id)
@@ -119,6 +119,5 @@ def dashboard_ventas_geo(request):
         'marcadores': marcadores,
         'total_general': total_general,
         'cantidad_puntos': len(marcadores),
-        'max_total': max_total,
-        'min_total': min_total,
+        'carga_id': carga_id,
     })
