@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CargaVentasForm
 from .models import CargaVentas, Venta, Producto
 from .services import procesar_carga_ventas
+import math
 
 
 def cargar_ventas(request):
@@ -68,23 +69,28 @@ def dashboard_ventas_geo(request):
     )
 
     puntos_list = list(puntos)
-    max_total = max((p['total_vendido'] or 0 for p in puntos_list), default=1)
+
+    valores = [float(p['total_vendido'] or 0) for p in puntos_list if p['total_vendido'] is not None]
+    max_total = max(valores, default=1)
+    min_total = min(valores, default=0)
 
     heat_data = []
     marcadores = []
 
+    rango = max_total - min_total if max_total != min_total else 1
+
     for p in puntos_list:
         lat = p['local__latitud']
         lon = p['local__longitud']
-        total = p['total_vendido'] or 0
+        total = float(p['total_vendido'] or 0)
 
         if lat is not None and lon is not None:
-            intensidad = total / max_total if max_total > 0 else 0
+            # Intensidad lineal real entre 0.05 y 1.0
+            intensidad = ((total - min_total) / rango)
+            intensidad = max(0.05, min(1.0, intensidad))
 
-            # para que los puntos bajos no desaparezcan completamente
-            intensidad = max(0.2, intensidad)
-
-            heat_data.append([float(lat), float(lon), float(intensidad)])
+            # radio proporcional usando raíz cuadrada para que la diferencia se note más
+            radio = 8 + (math.sqrt(total) / math.sqrt(max_total)) * 18 if max_total > 0 else 8
 
             marcadores.append({
                 'local': p['local__nombre'],
@@ -93,8 +99,12 @@ def dashboard_ventas_geo(request):
                 'ciudad': p['local__ciudad'],
                 'latitud': float(lat),
                 'longitud': float(lon),
-                'total_vendido': float(total),
+                'total_vendido': total,
+                'intensidad': round(intensidad, 4),
+                'radio': round(radio, 2),
             })
+
+            heat_data.append([float(lat), float(lon), round(intensidad, 4)])
 
     productos = Producto.objects.all()
     total_general = ventas.aggregate(total=Sum('cantidad'))['total'] or 0
@@ -109,4 +119,5 @@ def dashboard_ventas_geo(request):
         'total_general': total_general,
         'cantidad_puntos': len(marcadores),
         'max_total': max_total,
+        'min_total': min_total,
     })

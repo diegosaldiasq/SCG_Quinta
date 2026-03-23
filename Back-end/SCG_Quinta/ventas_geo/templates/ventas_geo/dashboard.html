@@ -82,18 +82,26 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(mapa);
 
+        function obtenerColorPorIntensidad(intensidad) {
+            if (intensidad >= 0.85) return '#b91c1c';   // rojo fuerte
+            if (intensidad >= 0.65) return '#ea580c';   // naranjo
+            if (intensidad >= 0.45) return '#eab308';   // amarillo
+            if (intensidad >= 0.25) return '#22c55e';   // verde
+            return '#2563eb';                           // azul
+        }
+
         if (heatData.length > 0) {
             L.heatLayer(heatData, {
-                radius: 30,
-                blur: 22,
+                radius: 18,
+                blur: 12,
                 maxZoom: 17,
-                minOpacity: 0.35,
+                minOpacity: 0.28,
                 gradient: {
-                    0.2: 'blue',
-                    0.4: 'lime',
-                    0.6: 'yellow',
-                    0.8: 'orange',
-                    1.0: 'red'
+                    0.10: '#2563eb',
+                    0.30: '#22c55e',
+                    0.50: '#eab308',
+                    0.70: '#f97316',
+                    1.00: '#dc2626'
                 }
             }).addTo(mapa);
 
@@ -102,6 +110,7 @@
             marcadores.forEach(item => {
                 bounds.push([item.latitud, item.longitud]);
 
+                // marcador clásico
                 L.marker([item.latitud, item.longitud])
                     .addTo(mapa)
                     .bindPopup(`
@@ -111,6 +120,23 @@
                         Ciudad: ${item.ciudad || ''}<br>
                         Total vendido: ${item.total_vendido}
                     `);
+
+                // círculo proporcional para mostrar diferencias reales de venta
+                L.circleMarker([item.latitud, item.longitud], {
+                    radius: item.radio,
+                    color: obtenerColorPorIntensidad(item.intensidad),
+                    weight: 2,
+                    fillColor: obtenerColorPorIntensidad(item.intensidad),
+                    fillOpacity: 0.35
+                })
+                .addTo(mapa)
+                .bindPopup(`
+                    <strong>${item.local}</strong><br>
+                    Dirección: ${item.direccion}<br>
+                    Comuna: ${item.comuna || ''}<br>
+                    Ciudad: ${item.ciudad || ''}<br>
+                    Total vendido: ${item.total_vendido}
+                `);
             });
 
             if (bounds.length > 0) {
@@ -121,19 +147,21 @@
         const btnFullscreen = document.getElementById('btnFullscreen');
         const mapaDiv = document.getElementById('mapa');
 
-        btnFullscreen.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                mapaDiv.requestFullscreen().then(() => {
-                    setTimeout(() => mapa.invalidateSize(), 300);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        });
+        if (btnFullscreen) {
+            btnFullscreen.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    mapaDiv.requestFullscreen().then(() => {
+                        setTimeout(() => mapa.invalidateSize(), 300);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            });
 
-        document.addEventListener('fullscreenchange', () => {
-            setTimeout(() => mapa.invalidateSize(), 300);
-        });
+            document.addEventListener('fullscreenchange', () => {
+                setTimeout(() => mapa.invalidateSize(), 300);
+            });
+        }
     </script>
 </body>
 </html>
