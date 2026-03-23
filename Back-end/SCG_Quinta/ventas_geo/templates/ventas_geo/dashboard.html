@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard ventas geográficas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+    {{ heat_data|json_script:"heat-data" }}
+    {{ marcadores|json_script:"marcadores-data" }}
+
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8fafc; }
+        .box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .filtros form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+        label { display: block; margin-bottom: 4px; font-size: 14px; }
+        input, select {
+            padding: 8px;
+            min-width: 180px;
+        }
+        button {
+            background: #1d4ed8;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #mapa {
+            height: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .kpis {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .kpi {
+            background: #eff6ff;
+            padding: 14px;
+            border-radius: 10px;
+            min-width: 180px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="box filtros">
+        <h1>Dashboard geográfico de ventas</h1>
+
+        <form method="get">
+            <div>
+                <label for="producto">Producto</label>
+                <select name="producto" id="producto">
+                    <option value="">Todos</option>
+                    {% for p in productos %}
+                        <option value="{{ p.id }}" {% if producto_id == p.id|stringformat:"s" %}selected{% endif %}>
+                            {{ p.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="fecha_desde">Fecha desde</label>
+                <input type="date" name="fecha_desde" id="fecha_desde" value="{{ fecha_desde }}">
+            </div>
+
+            <div>
+                <label for="fecha_hasta">Fecha hasta</label>
+                <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ fecha_hasta }}">
+            </div>
+
+            <div>
+                <button type="submit">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="box">
+        <div class="kpis">
+            <div class="kpi">
+                <strong>Total vendido</strong>
+                <div>{{ total_general }}</div>
+            </div>
+            <div class="kpi">
+                <strong>Puntos geográficos</strong>
+                <div>{{ cantidad_puntos }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div id="mapa"></div>
+    </div>
+
+    <script>
+        const heatData = JSON.parse(document.getElementById('heat-data').textContent);
+        const marcadores = JSON.parse(document.getElementById('marcadores-data').textContent);
+
+        const mapa = L.map('mapa').setView([-33.45, -70.66], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(mapa);
+
+        if (heatData.length > 0) {
+            L.heatLayer(heatData, {
+                radius: 25,
+                blur: 20,
+                maxZoom: 17
+            }).addTo(mapa);
+
+            const bounds = [];
+            marcadores.forEach(item => {
+                bounds.push([item.latitud, item.longitud]);
+
+                L.marker([item.latitud, item.longitud])
+                    .addTo(mapa)
+                    .bindPopup(`
+                        <strong>${item.local}</strong><br>
+                        Dirección: ${item.direccion}<br>
+                        Comuna: ${item.comuna || ''}<br>
+                        Ciudad: ${item.ciudad || ''}<br>
+                        Total vendido: ${item.total_vendido}
+                    `);
+            });
+
+            if (bounds.length > 0) {
+                mapa.fitBounds(bounds, {padding: [30, 30]});
+            }
+        }
+    </script>
+</body>
+</html>

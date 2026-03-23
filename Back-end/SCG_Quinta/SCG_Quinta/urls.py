@@ -46,6 +46,7 @@ urlpatterns = [
     path("control_parametros_bizcocho/", include("control_parametros_bizcocho.urls")),
     path("control_layout_tortas/", include("control_layout_tortas.urls")),
     path("trazabilidad_productos/", include("trazabilidad_productos.urls")),
+    path("ventas_geo/", include("ventas_geo.urls")),
 ]
 
 if settings.DEBUG:

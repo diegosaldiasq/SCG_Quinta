@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado carga</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f8fafc; }
+        .box { max-width: 1100px; margin: auto; background: white; padding: 24px; border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+        th, td { border-bottom: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f1f5f9; }
+        a.btn {
+            display: inline-block;
+            padding: 10px 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Resultado de la carga</h1>
+
+        <p><strong>ID carga:</strong> {{ carga.id }}</p>
+        <p><strong>Archivo:</strong> {{ carga.archivo.name }}</p>
+        <p><strong>Filas leídas:</strong> {{ carga.filas_leidas }}</p>
+        <p><strong>Filas correctas:</strong> {{ carga.filas_ok }}</p>
+        <p><strong>Filas con error:</strong> {{ carga.filas_error }}</p>
+
+        <p>
+            <a class="btn" href="{% url 'ventas_geo:cargar_ventas' %}">Nueva carga</a>
+            <a class="btn" href="{% url 'ventas_geo:dashboard' %}">Ir al dashboard</a>
+        </p>
+
+        <h2>Errores</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fila Excel</th>
+                    <th>Mensaje</th>
+                    <th>Datos fila</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for error in errores %}
+                <tr>
+                    <td>{{ error.fila_excel }}</td>
+                    <td>{{ error.mensaje }}</td>
+                    <td><pre style="white-space: pre-wrap;">{{ error.datos_fila }}</pre></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No hubo errores en la carga.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

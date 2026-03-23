@@ -66,6 +66,7 @@ LOCAL_APPS = [
     "control_parametros_bizcocho.apps.ControlParametrosBizcochoConfig",
     "control_layout_tortas.apps.ControlLayoutTortasConfig",
     "trazabilidad_productos.apps.TrazabilidadProductosConfig",
+    "ventas_geo.apps.VentasGeoConfig",
 ]
 
 DJANGO_APPS = [
@@ -209,3 +210,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10 MB
+
+GOOGLE_GEOCODING_API_KEY = os.getenv('GOOGLE_GEOCODING_API_KEY', '')

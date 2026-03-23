@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cargar ventas georreferenciadas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f7f7f7; }
+        .box { max-width: 700px; margin: auto; background: white; padding: 24px; border-radius: 12px; }
+        h1 { margin-top: 0; }
+        form p { margin-bottom: 14px; }
+        button {
+            background: #1d4ed8;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .messages { margin-bottom: 16px; }
+        .msg { padding: 10px; border-radius: 8px; margin-bottom: 8px; }
+        .success { background: #dcfce7; }
+        .error { background: #fee2e2; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Cargar archivo de ventas</h1>
+
+        <p><strong>Formato esperado:</strong></p>
+        <p>producto | local | direccion | comuna | ciudad | cantidad | fecha</p>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="msg {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Procesar archivo</button>
+        </form>
+    </div>
+</body>
+</html>
