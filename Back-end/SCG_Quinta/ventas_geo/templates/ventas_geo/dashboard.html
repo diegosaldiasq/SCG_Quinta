@@ -11,46 +11,9 @@
 
     {{ heat_data|json_script:"heat-data" }}
     {{ marcadores|json_script:"marcadores-data" }}
-
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f8fafc; }
-        .box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .filtros form {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: end;
-        }
-        label { display: block; margin-bottom: 4px; font-size: 14px; }
-        input, select {
-            padding: 8px;
-            min-width: 180px;
-        }
-        button {
-            background: #1d4ed8;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        #mapa {
-            height: 600px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .kpis {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-        .kpi {
-            background: #eff6ff;
-            padding: 14px;
-            border-radius: 10px;
-            min-width: 180px;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'ventas_geo/dashboard.css' %}">
+    <link rel="icon" href="{% static 'ventas_geo/images/logoquinta2.png' %}" />
+    
 </head>
 <body>
 
@@ -100,6 +63,10 @@
     </div>
 
     <div class="box">
+        <div class="mapa-header">
+            <h2>Mapa de ventas</h2>
+            <button type="button" id="btnFullscreen">Pantalla completa</button>
+        </div>
         <div id="mapa"></div>
     </div>
 
@@ -116,12 +83,21 @@
 
         if (heatData.length > 0) {
             L.heatLayer(heatData, {
-                radius: 25,
-                blur: 20,
-                maxZoom: 17
+                radius: 30,
+                blur: 22,
+                maxZoom: 17,
+                minOpacity: 0.35,
+                gradient: {
+                    0.2: 'blue',
+                    0.4: 'lime',
+                    0.6: 'yellow',
+                    0.8: 'orange',
+                    1.0: 'red'
+                }
             }).addTo(mapa);
 
             const bounds = [];
+
             marcadores.forEach(item => {
                 bounds.push([item.latitud, item.longitud]);
 
@@ -137,9 +113,26 @@
             });
 
             if (bounds.length > 0) {
-                mapa.fitBounds(bounds, {padding: [30, 30]});
+                mapa.fitBounds(bounds, { padding: [30, 30] });
             }
         }
+
+        const btnFullscreen = document.getElementById('btnFullscreen');
+        const mapaDiv = document.getElementById('mapa');
+
+        btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                mapaDiv.requestFullscreen().then(() => {
+                    setTimeout(() => mapa.invalidateSize(), 300);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            setTimeout(() => mapa.invalidateSize(), 300);
+        });
     </script>
 </body>
 </html>

@@ -67,16 +67,25 @@ def dashboard_ventas_geo(request):
         .order_by('-total_vendido')
     )
 
+    puntos_list = list(puntos)
+    max_total = max((p['total_vendido'] or 0 for p in puntos_list), default=1)
+
     heat_data = []
     marcadores = []
 
-    for p in puntos:
+    for p in puntos_list:
         lat = p['local__latitud']
         lon = p['local__longitud']
         total = p['total_vendido'] or 0
 
         if lat is not None and lon is not None:
-            heat_data.append([float(lat), float(lon), float(total)])
+            intensidad = total / max_total if max_total > 0 else 0
+
+            # para que los puntos bajos no desaparezcan completamente
+            intensidad = max(0.2, intensidad)
+
+            heat_data.append([float(lat), float(lon), float(intensidad)])
+
             marcadores.append({
                 'local': p['local__nombre'],
                 'direccion': p['local__direccion'],
@@ -88,7 +97,6 @@ def dashboard_ventas_geo(request):
             })
 
     productos = Producto.objects.all()
-
     total_general = ventas.aggregate(total=Sum('cantidad'))['total'] or 0
 
     return render(request, 'ventas_geo/dashboard.html', {
@@ -100,4 +108,5 @@ def dashboard_ventas_geo(request):
         'marcadores': marcadores,
         'total_general': total_general,
         'cantidad_puntos': len(marcadores),
+        'max_total': max_total,
     })
