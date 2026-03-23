@@ -1,10 +1,6 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+from .forms import CargaVentasForm
 
 def cargar_ventas(request):
-    return HttpResponse("ventas_geo funcionando")
-
-def resultado_carga(request, carga_id):
-    return HttpResponse(f"resultado carga {carga_id}")
-
-def dashboard_ventas_geo(request):
-    return HttpResponse("dashboard ventas geo")
+    form = CargaVentasForm()
+    return render(request, 'ventas_geo/cargar_ventas.html', {'form': form})
