@@ -1,0 +1,152 @@
+:root {
+    --rojo-quinta: #B43C2C;
+    --amarillo-quinta: #f3ba14;
+    --naranjo-quinta: #d07020;
+    --naranjo-claro-quinta: #d4841c;
+    --text-input-field: #F7F7F7;
+    --white: #FFFFFF;
+    --black: #000000;
+    --shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    font-family: 'Quicksand', sans-serif;
+    background-image: url("./images/Fondo.png");
+}
+
+.box {
+    max-width: 1100px;
+    margin: auto;
+    background: rgba(255,255,255,0.95);
+    padding: 28px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+h1 {
+    margin: 0 0 20px 0;
+    text-align: center;
+    color: var(--rojo-quinta);
+}
+
+h2 {
+    margin-top: 30px;
+    color: var(--rojo-quinta);
+}
+
+.resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.card-info {
+    background: #f8f8f8;
+    border-left: 5px solid var(--amarillo-quinta);
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.card-info strong {
+    display: block;
+    font-size: 14px;
+    color: var(--rojo-quinta);
+}
+
+.card-info span {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.acciones {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: var(--rojo-quinta);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #992f21;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: #f1f5f9;
+    color: var(--rojo-quinta);
+}
+
+tr:hover {
+    background: #fafafa;
+}
+
+pre {
+    margin: 0;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.sin-errores {
+    text-align: center;
+    padding: 20px;
+    color: #16a34a;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 14px;
+    }
+
+    .box {
+        padding: 18px;
+    }
+
+    table {
+        font-size: 13px;
+    }
+}
