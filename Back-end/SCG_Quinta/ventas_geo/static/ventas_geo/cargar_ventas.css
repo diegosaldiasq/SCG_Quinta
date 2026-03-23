@@ -87,6 +87,9 @@ button {
 }
 
 .btn-volver {
+    flex: 1;
+    min-height: 45px;
+    padding: 0 16px;
     background: #6b7280;
     color: white;
     text-align: center;
@@ -94,10 +97,18 @@ button {
     align-items: center;
     justify-content: center;
     text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: all 0.2s ease;
 }
 
 .btn-volver:hover {
     background: #4b5563;
+    transform: translateY(-1px);
+}
+
+.btn-volver:active {
+    transform: translateY(0);
 }
 
 .messages {
@@ -117,6 +128,47 @@ button {
 
 .error {
     background: #fee2e2;
+}
+
+.campo {
+    margin-bottom: 16px;
+}
+
+.file-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--text-input-field, #f7f7f7);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.file-input input[type="file"] {
+    display: none;
+}
+
+.file-label {
+    background: var(--rojo-quinta);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+}
+
+.file-label:hover {
+    background: #922f23;
+}
+
+#file-name {
+    font-size: 14px;
+    color: #444;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media (max-width: 600px) {

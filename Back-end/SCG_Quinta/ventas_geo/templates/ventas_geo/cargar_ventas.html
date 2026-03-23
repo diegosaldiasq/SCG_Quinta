@@ -37,7 +37,22 @@
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="campo">
+                <label>Archivo:</label>
+
+                <div class="file-input">
+                    <input type="file" name="archivo" id="id_archivo">
+                    <label for="id_archivo" class="file-label">
+                        Seleccionar archivo 📂
+                    </label>
+                    <span id="file-name">Ningún archivo seleccionado</span>
+                </div>
+            </div>
+
+            <div class="campo">
+                {{ form.observacion.label_tag }}
+                {{ form.observacion }}
+            </div>
 
             <div class="botones">
                 <button type="submit" class="btn-procesar">
@@ -52,6 +67,18 @@
 
     </div>
 </div>
+<script>
+    const fileInput = document.getElementById('id_archivo');
+    const fileName = document.getElementById('file-name');
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            fileName.textContent = this.files[0].name;
+        } else {
+            fileName.textContent = "Ningún archivo seleccionado";
+        }
+    });
+</script>
 
 </body>
 </html>
