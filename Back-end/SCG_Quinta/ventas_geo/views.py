@@ -6,8 +6,10 @@ from .forms import CargaVentasForm
 from .models import CargaVentas, Venta, Producto
 from .services import procesar_carga_ventas
 import math
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def cargar_ventas(request):
     if request.method == 'POST':
         form = CargaVentasForm(request.POST, request.FILES)
@@ -29,6 +31,7 @@ def cargar_ventas(request):
     })
 
 
+@login_required
 def resultado_carga(request, carga_id):
     carga = get_object_or_404(CargaVentas, id=carga_id)
     errores = carga.errores.all()
@@ -40,6 +43,7 @@ def resultado_carga(request, carga_id):
     })
 
 
+@login_required
 def dashboard_ventas_geo(request, carga_id):
     producto_id = request.GET.get('producto')
     fecha_desde = request.GET.get('fecha_desde')
