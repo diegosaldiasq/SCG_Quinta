@@ -43,7 +43,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Torta crema manjar mediana','392518'):  200,
     ('Torta crema piña','393011'):  200,
     ('Torta crema selva negra','393013'):  200,
-    ('Torta chocolate mediana','405523'):  80,
+    ('Torta chocolate mediana','405523'):  120,
     ('Torta merengue frambuesa','393036'):  80,
     ('Torta merengue lucuma','393212'):  80,
     ('Torta mocaccino mediana','353253'):  200,
