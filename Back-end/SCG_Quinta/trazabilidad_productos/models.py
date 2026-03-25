@@ -31,6 +31,10 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=150)
     codigo = models.CharField(max_length=50)
 
+    codigo_registro = models.CharField(max_length=100, blank=True, null=True)
+    version = models.CharField(max_length=50, blank=True, null=True)
+    fecha_modificacion = models.DateField(blank=True, null=True)
+
     class Meta:
         verbose_name = "Producto"
         verbose_name_plural = "Productos"

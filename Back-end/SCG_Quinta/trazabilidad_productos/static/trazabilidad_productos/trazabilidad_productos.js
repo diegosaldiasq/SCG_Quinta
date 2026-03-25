@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const productoSelect = document.getElementById("id_producto");
     const codigoInput = document.getElementById("id_codigo_producto");
     const tablaBody = document.querySelector("#tablaIngredientes tbody");
+    const codigoRegistroInput = document.getElementById("id_codigo_registro");
+    const versionInput = document.getElementById("id_version");
+    const fechaModificacionInput = document.getElementById("id_fecha_modificacion");
 
     function resetearTabla(mensaje) {
         tablaBody.innerHTML = `
@@ -71,6 +74,9 @@ document.addEventListener("DOMContentLoaded", function () {
     async function cargarProductosPorCliente(clienteId, productoSeleccionado = "") {
         productoSelect.innerHTML = `<option value="">Seleccione producto</option>`;
         codigoInput.value = "";
+        codigoRegistroInput.value = "";
+        versionInput.value = "";
+        fechaModificacionInput.value = "";
         resetearTabla("Seleccione un producto para cargar sus ingredientes");
 
         if (!clienteId) return;
@@ -84,6 +90,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 option.value = producto.id;
                 option.textContent = producto.nombre;
                 option.dataset.codigo = producto.codigo;
+                option.dataset.codigoRegistro = producto.codigo_registro || "";
+                option.dataset.version = producto.version || "";
+                option.dataset.fechaModificacion = producto.fecha_modificacion || "";
 
                 if (String(producto.id) === String(productoSeleccionado)) {
                     option.selected = true;

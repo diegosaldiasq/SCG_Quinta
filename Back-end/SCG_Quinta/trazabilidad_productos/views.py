@@ -37,6 +37,9 @@ def obtener_productos_por_cliente(request):
                 "id": p.id,
                 "nombre": p.nombre,
                 "codigo": p.codigo,
+                "codigo_registro": p.codigo_registro or "",
+                "version": p.version or "",
+                "fecha_modificacion": p.fecha_modificacion.strftime("%Y-%m-%d") if p.fecha_modificacion else "",
             }
             for p in qs
         ]

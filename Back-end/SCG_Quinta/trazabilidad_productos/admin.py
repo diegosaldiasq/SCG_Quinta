@@ -24,9 +24,9 @@ class ProveedorAdmin(admin.ModelAdmin):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ["nombre", "cliente", "codigo"]
+    list_display = ["nombre", "cliente", "codigo", "codigo_registro", "version", "fecha_modificacion"]
     list_filter = ["cliente"]
-    search_fields = ["nombre", "codigo"]
+    search_fields = ["nombre", "codigo", "codigo_registro", "version"]
 
 
 @admin.register(Ingrediente)
