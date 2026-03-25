@@ -148,6 +148,9 @@ document.addEventListener("DOMContentLoaded", function () {
         productoSelect.addEventListener("change", function () {
             const selectedOption = this.options[this.selectedIndex];
             codigoInput.value = selectedOption?.dataset?.codigo || "";
+            codigoRegistroInput.value = selectedOption?.dataset?.codigoRegistro || "";
+            versionInput.value = selectedOption?.dataset?.version || "";
+            fechaModificacionInput.value = selectedOption?.dataset?.fechaModificacion || "";
             cargarIngredientesPorProducto(this.value);
         });
     }
