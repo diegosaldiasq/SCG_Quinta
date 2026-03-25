@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fila.classList.add("fila-ingrediente");
 
         fila.innerHTML = `
-            <td>
+            <td class="celda-ingrediente">
                 ${ingrediente.nombre}
                 ${esDuplicada ? '<div class="subtexto">Lote adicional</div>' : ''}
                 <input type="hidden" name="ingrediente_id[]" value="${ingrediente.id}">
@@ -25,33 +25,29 @@ document.addEventListener("DOMContentLoaded", function () {
             </td>
 
             <td>
-                <input type="text" name="lote[]" required>
+                <input type="text" name="lote[]" class="input-tabla" required>
             </td>
 
             <td>
-                <input type="date" name="fecha_elaboracion[]" required>
+                <input type="date" name="fecha_elaboracion[]" class="input-tabla" required>
             </td>
 
             <td>
-                <input type="date" name="fecha_vencimiento[]" required>
+                <input type="date" name="fecha_vencimiento[]" class="input-tabla" required>
             </td>
 
             <td>
-                ${ingrediente.proveedor_nombre || "Sin proveedor"}
+                <input type="text" class="input-tabla input-readonly" value="${ingrediente.proveedor_nombre || 'Sin proveedor'}" readonly>
             </td>
 
             <td>
-                <textarea name="accion_correctiva[]" rows="2"></textarea>
+                <textarea name="accion_correctiva[]" rows="2" class="textarea-tabla"></textarea>
             </td>
 
             <td>
                 <div class="acciones-fila">
                     <button type="button" class="btn-mini btn-agregar-lote">+ Lote</button>
-                    ${
-                        esDuplicada
-                            ? '<button type="button" class="btn-mini btn-eliminar-fila">Eliminar</button>'
-                            : ''
-                    }
+                    ${esDuplicada ? '<button type="button" class="btn-mini btn-eliminar-fila">Eliminar</button>' : ''}
                 </div>
             </td>
         `;
