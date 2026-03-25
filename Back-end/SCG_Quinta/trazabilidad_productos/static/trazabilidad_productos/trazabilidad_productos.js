@@ -7,9 +7,69 @@ document.addEventListener("DOMContentLoaded", function () {
     function resetearTabla(mensaje) {
         tablaBody.innerHTML = `
             <tr>
-                <td colspan="6" class="texto-centro">${mensaje}</td>
+                <td colspan="7" class="texto-centro">${mensaje}</td>
             </tr>
         `;
+    }
+
+    function crearFilaIngrediente(ingrediente, esDuplicada = false) {
+        const fila = document.createElement("tr");
+        fila.classList.add("fila-ingrediente");
+
+        fila.innerHTML = `
+            <td>
+                ${ingrediente.nombre}
+                ${esDuplicada ? '<div class="subtexto">Lote adicional</div>' : ''}
+                <input type="hidden" name="ingrediente_id[]" value="${ingrediente.id}">
+                <input type="hidden" name="proveedor_id[]" value="${ingrediente.proveedor_id}">
+            </td>
+
+            <td>
+                <input type="text" name="lote[]" required>
+            </td>
+
+            <td>
+                <input type="date" name="fecha_elaboracion[]" required>
+            </td>
+
+            <td>
+                <input type="date" name="fecha_vencimiento[]" required>
+            </td>
+
+            <td>
+                ${ingrediente.proveedor_nombre || "Sin proveedor"}
+            </td>
+
+            <td>
+                <textarea name="accion_correctiva[]" rows="2"></textarea>
+            </td>
+
+            <td>
+                <div class="acciones-fila">
+                    <button type="button" class="btn-mini btn-agregar-lote">+ Lote</button>
+                    ${
+                        esDuplicada
+                            ? '<button type="button" class="btn-mini btn-eliminar-fila">Eliminar</button>'
+                            : ''
+                    }
+                </div>
+            </td>
+        `;
+
+        const btnAgregar = fila.querySelector(".btn-agregar-lote");
+        btnAgregar.addEventListener("click", function () {
+            const nuevaFila = crearFilaIngrediente(ingrediente, true);
+            fila.insertAdjacentElement("afterend", nuevaFila);
+        });
+
+        const btnEliminar = fila.querySelector(".btn-eliminar-fila");
+        if (btnEliminar) {
+            btnEliminar.addEventListener("click", function () {
+                fila.remove();
+            });
+        }
+
+        return fila;
     }
 
     async function cargarProductosPorCliente(clienteId, productoSeleccionado = "") {
@@ -64,34 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             ingredientes.forEach((ingrediente) => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td class="celda-ingrediente">
-                        ${ingrediente.nombre}
-                        <input type="hidden" name="ingrediente_id[]" value="${ingrediente.id}">
-                        <input type="hidden" name="proveedor_id[]" value="${ingrediente.proveedor_id || ''}">
-                    </td>
-
-                    <td>
-                        <input type="text" name="lote[]" class="input-tabla" required>
-                    </td>
-
-                    <td>
-                        <input type="date" name="fecha_elaboracion[]" class="input-tabla" required>
-                    </td>
-
-                    <td>
-                        <input type="date" name="fecha_vencimiento[]" class="input-tabla" required>
-                    </td>
-
-                    <td>
-                        <input type="text" class="input-tabla input-readonly" value="${ingrediente.proveedor_nombre || ''}" readonly>
-                    </td>
-
-                    <td>
-                        <textarea name="accion_correctiva[]" class="textarea-tabla" rows="2"></textarea>
-                    </td>
-                `;
+                const fila = crearFilaIngrediente(ingrediente, false);
                 tablaBody.appendChild(fila);
             });
         } catch (error) {

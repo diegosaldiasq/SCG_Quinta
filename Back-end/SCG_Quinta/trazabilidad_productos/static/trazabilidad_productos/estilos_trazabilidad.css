@@ -538,6 +538,43 @@ a.primary-button:hover {
     font-size: 25px;
 }
 
+.acciones-fila {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.btn-mini {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Quicksand', sans-serif;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-agregar-lote {
+    background-color: var(--amarillo-quinta);
+    color: var(--black);
+}
+
+.btn-agregar-lote:hover {
+    background-color: var(--naranjo-claro-quinta);
+    color: var(--white);
+}
+
+.btn-eliminar-fila {
+    background-color: #e5e7eb;
+    color: #111827;
+}
+
+.btn-eliminar-fila:hover {
+    background-color: #d1d5db;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 1100px) {
