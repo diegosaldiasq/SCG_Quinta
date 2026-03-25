@@ -574,6 +574,17 @@ a.primary-button:hover {
 .btn-eliminar-fila:hover {
     background-color: #d1d5db;
 }
+#tablaIngredientes td {
+    vertical-align: middle;
+}
+
+#tablaIngredientes .acciones-fila {
+    min-width: 110px;
+}
+
+#tablaIngredientes .btn-mini {
+    width: 100%;
+}
 
 /* ===== RESPONSIVE ===== */
 
