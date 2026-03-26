@@ -87,6 +87,9 @@
                                     <strong>Cliente:</strong> {{ registro.cliente.nombre }} |
                                     <strong>Código:</strong> {{ registro.codigo_producto }} |
                                     <strong>Fecha registro:</strong> {{ registro.fecha_registro|date:"d/m/Y H:i" }}
+                                    <strong>Código registro:</strong> {{ registro.producto.codigo_registro|default:"-" }} |
+                                    <strong>Versión:</strong> {{ registro.producto.version|default:"-" }} |
+                                    <strong>Fecha modificación:</strong> {{ registro.producto.fecha_modificacion|date:"d/m/Y"|default:"-" }}
                                 </p>
                             </div>
                         </div>
