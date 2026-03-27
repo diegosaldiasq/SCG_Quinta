@@ -275,7 +275,6 @@ def descargar_historial_trazabilidad_excel(request):
         .order_by("-fecha_registro")
     )
 
-    # filtros desde GET
     cliente_id = request.GET.get("cliente")
     producto_id = request.GET.get("producto")
     desde = request.GET.get("desde")
@@ -345,10 +344,12 @@ def descargar_historial_trazabilidad_excel(request):
         "Codigo registro",
         "Version",
         "Fecha modificacion",
+        "Verificado",
+        "Fecha verificacion",
+        "Nombre verificador",
     ]
     ws.append(encabezados)
 
-    # negrita en encabezados
     for cell in ws[1]:
         cell.font = Font(bold=True)
 
@@ -367,6 +368,10 @@ def descargar_historial_trazabilidad_excel(request):
         codigo_registro = getattr(registro.producto, "codigo_registro", "") or ""
         version = getattr(registro.producto, "version", "") or ""
         fecha_modificacion = getattr(registro.producto, "fecha_modificacion", None)
+
+        verificado = "Sí" if registro.verificado else "No"
+        fecha_verificacion = convertir_fecha_hora(registro.fecha_verificacion)
+        nombre_verificador = registro.nombre_verificador or ""
 
         if detalles.exists():
             for detalle in detalles:
@@ -390,6 +395,9 @@ def descargar_historial_trazabilidad_excel(request):
                     codigo_registro,
                     version,
                     fecha_modificacion,
+                    verificado,
+                    fecha_verificacion,
+                    nombre_verificador,
                 ])
         else:
             ws.append([
@@ -412,9 +420,11 @@ def descargar_historial_trazabilidad_excel(request):
                 codigo_registro,
                 version,
                 fecha_modificacion,
+                verificado,
+                fecha_verificacion,
+                nombre_verificador,
             ])
 
-    # ancho de columnas
     anchos = {
         "A": 18,
         "B": 28,
@@ -435,6 +445,9 @@ def descargar_historial_trazabilidad_excel(request):
         "Q": 18,
         "R": 12,
         "S": 20,
+        "T": 12,
+        "U": 22,
+        "V": 22,
     }
 
     for col, ancho in anchos.items():

@@ -57,13 +57,23 @@ class RegistroTrazabilidadAdmin(admin.ModelAdmin):
         "fecha_elaboracion_producto",
         "fecha_registro",
         "elaborado_por",
+        "verificado",
+        "fecha_verificacion",
+        "nombre_verificador",
     ]
-    list_filter = ["cliente", "producto", "fecha_registro", "fecha_elaboracion_producto"]
+    list_filter = [
+        "cliente",
+        "producto",
+        "fecha_registro",
+        "fecha_elaboracion_producto",
+        "verificado",
+    ]
     search_fields = [
         "producto__nombre",
         "codigo_producto",
         "lote_producto",
         "elaborado_por",
+        "nombre_verificador",
         "detalles__lote",
     ]
     inlines = [DetalleTrazabilidadIngredienteInline]
