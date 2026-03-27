@@ -135,8 +135,3 @@ def redireccionar_control_parametros_bizcocho(request):
 def redireccionar_RegistroCreateView(request):
     url_registro_nuevo = reverse('control_layout_tortas:registro_nuevo')
     return HttpResponseRedirect(url_registro_nuevo)
-
-@login_required
-def registrar_trazabilidad(request):
-    url_registrar_trazabilidad = reverse('registrar_trazabilidad')
-    return HttpResponseRedirect(url_registrar_trazabilidad)
