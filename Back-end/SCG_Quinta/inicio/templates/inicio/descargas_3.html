@@ -32,7 +32,7 @@
             </p>
             <p class="registro">
                 <span>2.- Trazabilidad de productos</span>
-                <a href="{% url 'trazabilidad_productos/descargar_historial_trazabilidad_excel' %}?{{ request.GET.urlencode }}">HISTORIAL TRAZABILIDAD</a>
+                <a href="{% url 'trazabilidad_productos:descargar_historial_trazabilidad_excel' %}?{{ request.GET.urlencode }}">HISTORIAL TRAZABILIDAD</a>
             </p>
         </div>
         <form class="form" action="{% url 'redireccionar_inicio' %}">
