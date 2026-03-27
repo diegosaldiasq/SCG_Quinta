@@ -147,7 +147,7 @@ def registrar_trazabilidad(request):
                         )
 
                 messages.success(request, "Registro de trazabilidad guardado correctamente.")
-                return redirect("registrar_trazabilidad")
+                return redirect("trazabilidad_productos:registrar_trazabilidad")
 
             except Exception as e:
                 messages.error(request, f"Error al guardar el registro: {str(e)}")
