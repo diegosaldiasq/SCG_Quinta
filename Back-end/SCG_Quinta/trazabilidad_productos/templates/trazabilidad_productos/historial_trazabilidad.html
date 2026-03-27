@@ -67,7 +67,7 @@
 
             <div class="acciones-form">
                 <button type="submit" class="btn-principal">Filtrar</button>
-                <a href="{% url 'historial_trazabilidad' %}" class="btn-secundario">Limpiar</a>
+                <a href="{% url 'trazabilidad_productos:historial_trazabilidad' %}" class="btn-secundario">Limpiar</a>
             </div>
         </form>
 
@@ -160,7 +160,7 @@
 
                         <div class="acciones-form">
                             {% if not registro.verificado %}
-                                <form method="post" action="{% url 'verificar_trazabilidad' registro.id %}" style="display:inline;">
+                                <form method="post" action="{% url 'trazabilidad_productos:verificar_trazabilidad' registro.id %}" style="display:inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-principal">Verificar</button>
                                 </form>
@@ -192,7 +192,7 @@
             {% endif %}
         </div>
         <div class="acciones-form">
-            <a href="{% url 'redireccionar_intermedio_2' %}" class="btn-secundario">Volver inicio</a>
+            <a href="{% url 'trazabilidad_productos:redireccionar_intermedio_2' %}" class="btn-secundario">Volver inicio</a>
         </div>
     </div>
 </body>
