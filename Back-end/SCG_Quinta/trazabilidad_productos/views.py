@@ -265,7 +265,7 @@ def verificar_trazabilidad(request, registro_id):
     registro.save(update_fields=["verificado", "fecha_verificacion", "nombre_verificador"])
 
     messages.success(request, "Registro verificado correctamente.")
-    return redirect("historial_trazabilidad")
+    return redirect("trazabilidad_productos:historial_trazabilidad")
 
 
 @login_required
