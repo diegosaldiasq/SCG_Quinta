@@ -118,31 +118,31 @@ def registrar_trazabilidad(request):
                     registro.save()
 
                     for i, ingrediente_id in enumerate(ingredientes_ids):
-                        lote = lotes[i].strip() if i < len(lotes) else ""
-                        fecha_elab = fechas_elaboracion[i] if i < len(fechas_elaboracion) else ""
-                        fecha_venc = fechas_vencimiento[i] if i < len(fechas_vencimiento) else ""
+                        lote = lotes[i].strip() if i < len(lotes) and lotes[i] else ""
+                        fecha_elab = fechas_elaboracion[i].strip() if i < len(fechas_elaboracion) and fechas_elaboracion[i] else None
+                        fecha_venc = fechas_vencimiento[i].strip() if i < len(fechas_vencimiento) and fechas_vencimiento[i] else None
                         proveedor_id = proveedores_ids[i] if i < len(proveedores_ids) else None
-                        accion = acciones_correctivas[i].strip() if i < len(acciones_correctivas) else ""
+                        accion = acciones_correctivas[i].strip() if i < len(acciones_correctivas) and acciones_correctivas[i] else ""
 
                         if not ingrediente_id:
                             continue
 
                         if not lote or not proveedor_id:
                             raise ValueError("Todos los ingredientes deben tener lote y proveedor configurado.")
-
+                        
                         if not fecha_elab and not fecha_venc:
                             raise ValueError("Cada ingrediente debe tener al menos fecha de elaboración o fecha de vencimiento.")
 
-                        if fecha_venc < fecha_elab:
+                        if fecha_elab and fecha_venc and fecha_venc < fecha_elab:
                             raise ValueError("La fecha de vencimiento no puede ser anterior a la fecha de elaboración.")
 
                         DetalleTrazabilidadIngrediente.objects.create(
                             registro=registro,
                             ingrediente_id=ingrediente_id,
+                            proveedor_id=proveedor_id,
                             lote=lote,
                             fecha_elaboracion=fecha_elab,
                             fecha_vencimiento=fecha_venc,
-                            proveedor_id=proveedor_id,
                             accion_correctiva=accion,
                         )
 
