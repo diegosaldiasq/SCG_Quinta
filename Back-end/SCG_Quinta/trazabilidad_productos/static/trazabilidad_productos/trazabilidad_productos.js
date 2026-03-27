@@ -32,11 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
             </td>
 
             <td>
-                <input type="date" name="fecha_elaboracion[]" class="input-tabla" required>
+                <input type="date" name="fecha_elaboracion[]" class="input-tabla">
             </td>
 
             <td>
-                <input type="date" name="fecha_vencimiento[]" class="input-tabla" required>
+                <input type="date" name="fecha_vencimiento[]" class="input-tabla">
             </td>
 
             <td>

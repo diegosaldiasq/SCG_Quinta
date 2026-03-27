@@ -127,8 +127,11 @@ def registrar_trazabilidad(request):
                         if not ingrediente_id:
                             continue
 
-                        if not lote or not fecha_elab or not fecha_venc or not proveedor_id:
-                            raise ValueError("Todos los ingredientes deben tener lote, fechas y proveedor.")
+                        if not lote or not proveedor_id:
+                            raise ValueError("Todos los ingredientes deben tener lote y proveedor configurado.")
+
+                        if not fecha_elab and not fecha_venc:
+                            raise ValueError("Cada ingrediente debe tener al menos fecha de elaboración o fecha de vencimiento.")
 
                         if fecha_venc < fecha_elab:
                             raise ValueError("La fecha de vencimiento no puede ser anterior a la fecha de elaboración.")
