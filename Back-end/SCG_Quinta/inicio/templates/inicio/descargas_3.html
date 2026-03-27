@@ -30,6 +30,10 @@
                 <span>1.- Cálculo OEE - Resumen turno</span>
                 <a href="{% url 'descargar_resumenturnooee' %}">RESUMEN TURNO OEE</a>
             </p>
+            <p class="registro">
+                <span>2.- Trazabilidad de productos</span>
+                <a href="{% url 'trazabilidad_productos/descargar_historial_trazabilidad_excel' %}">HISTORIAL TRAZABILIDAD</a>
+            </p>
         </div>
         <form class="form" action="{% url 'redireccionar_inicio' %}">
             <button class="primary-button login-button">Volver inicio</button>

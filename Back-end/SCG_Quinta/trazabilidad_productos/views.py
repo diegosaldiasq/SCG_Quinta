@@ -23,6 +23,10 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect
 from django.core.paginator import Paginator
+import pytz
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font
 
 
 @require_GET
@@ -259,3 +263,182 @@ def verificar_trazabilidad(request, registro_id):
 
     messages.success(request, "Registro verificado correctamente.")
     return redirect("historial_trazabilidad")
+
+
+@login_required
+def descargar_historial_trazabilidad_excel(request):
+    registros = (
+        RegistroTrazabilidad.objects
+        .select_related("cliente", "producto")
+        .prefetch_related("detalles__ingrediente", "detalles__proveedor")
+        .all()
+        .order_by("-fecha_registro")
+    )
+
+    # filtros desde GET
+    cliente_id = request.GET.get("cliente")
+    producto_id = request.GET.get("producto")
+    desde = request.GET.get("desde")
+    hasta = request.GET.get("hasta")
+    lote_producto = request.GET.get("lote_producto")
+    lote_ingrediente = request.GET.get("lote_ingrediente")
+
+    if cliente_id:
+        registros = registros.filter(cliente_id=cliente_id)
+
+    if producto_id:
+        registros = registros.filter(producto_id=producto_id)
+
+    if desde:
+        try:
+            desde_date = datetime.strptime(desde, "%Y-%m-%d").date()
+            registros = registros.filter(
+                fecha_registro__gte=datetime.combine(desde_date, time.min)
+            )
+        except ValueError:
+            pass
+
+    if hasta:
+        try:
+            hasta_date = datetime.strptime(hasta, "%Y-%m-%d").date()
+            registros = registros.filter(
+                fecha_registro__lte=datetime.combine(hasta_date, time.max)
+            )
+        except ValueError:
+            pass
+
+    if lote_producto:
+        registros = registros.filter(lote_producto__icontains=lote_producto.strip())
+
+    if lote_ingrediente:
+        registros = registros.filter(detalles__lote__icontains=lote_ingrediente.strip()).distinct()
+
+    if not registros.exists():
+        return render(request, "inicio/no_hay_datos.html")
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="historial_trazabilidad.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Trazabilidad"
+
+    encabezados = [
+        "Cliente",
+        "Producto",
+        "Código",
+        "Lote producto",
+        "Fecha elab. producto",
+        "Turno",
+        "Línea",
+        "Elaborado por",
+        "Fecha registro",
+        "Ingrediente",
+        "Proveedor",
+        "Lote ingrediente",
+        "Fecha elaboración",
+        "Fecha vencimiento",
+        "Acción correctiva",
+        "Observaciones",
+        "Codigo registro",
+        "Version",
+        "Fecha modificacion",
+    ]
+    ws.append(encabezados)
+
+    # negrita en encabezados
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
+
+    tz_santiago = pytz.timezone("America/Santiago")
+
+    def convertir_fecha_hora(fecha):
+        if not fecha:
+            return ""
+        if timezone.is_aware(fecha):
+            return fecha.astimezone(tz_santiago).replace(tzinfo=None)
+        return fecha
+
+    for registro in registros:
+        detalles = registro.detalles.all()
+
+        codigo_registro = getattr(registro.producto, "codigo_registro", "") or ""
+        version = getattr(registro.producto, "version", "") or ""
+        fecha_modificacion = getattr(registro.producto, "fecha_modificacion", None)
+
+        if detalles.exists():
+            for detalle in detalles:
+                ws.append([
+                    registro.cliente.nombre if registro.cliente else "",
+                    registro.producto.nombre if registro.producto else "",
+                    registro.codigo_producto or "",
+                    registro.lote_producto or "",
+                    registro.fecha_elaboracion_producto,
+                    registro.turno or "",
+                    registro.linea or "",
+                    registro.elaborado_por or "",
+                    convertir_fecha_hora(registro.fecha_registro),
+                    detalle.ingrediente.nombre if detalle.ingrediente else "",
+                    detalle.proveedor.nombre if detalle.proveedor else "",
+                    detalle.lote or "",
+                    detalle.fecha_elaboracion,
+                    detalle.fecha_vencimiento,
+                    detalle.accion_correctiva or "",
+                    registro.observaciones or "",
+                    codigo_registro,
+                    version,
+                    fecha_modificacion,
+                ])
+        else:
+            ws.append([
+                registro.cliente.nombre if registro.cliente else "",
+                registro.producto.nombre if registro.producto else "",
+                registro.codigo_producto or "",
+                registro.lote_producto or "",
+                registro.fecha_elaboracion_producto,
+                registro.turno or "",
+                registro.linea or "",
+                registro.elaborado_por or "",
+                convertir_fecha_hora(registro.fecha_registro),
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                registro.observaciones or "",
+                codigo_registro,
+                version,
+                fecha_modificacion,
+            ])
+
+    # ancho de columnas
+    anchos = {
+        "A": 18,
+        "B": 28,
+        "C": 14,
+        "D": 18,
+        "E": 20,
+        "F": 14,
+        "G": 14,
+        "H": 18,
+        "I": 22,
+        "J": 24,
+        "K": 18,
+        "L": 18,
+        "M": 20,
+        "N": 20,
+        "O": 28,
+        "P": 30,
+        "Q": 18,
+        "R": 12,
+        "S": 20,
+    }
+
+    for col, ancho in anchos.items():
+        ws.column_dimensions[col].width = ancho
+
+    wb.save(response)
+    return response
