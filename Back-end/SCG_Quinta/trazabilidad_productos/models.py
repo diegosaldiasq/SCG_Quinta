@@ -122,8 +122,8 @@ class DetalleTrazabilidadIngrediente(models.Model):
     ingrediente = models.ForeignKey(Ingrediente, on_delete=models.PROTECT)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     lote = models.CharField(max_length=100)
-    fecha_elaboracion = models.DateField()
-    fecha_vencimiento = models.DateField()
+    fecha_elaboracion = models.DateField(blank=True, null=True)
+    fecha_vencimiento = models.DateField(blank=True, null=True)
     accion_correctiva = models.TextField(blank=True, null=True)
 
     class Meta:
