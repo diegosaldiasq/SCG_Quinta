@@ -35,13 +35,13 @@
                     <li>
                         <span>{{ usuario.nombre_completo }}</span>
                         <span>{{ usuario.perfil_usuario }}</span>
-                        <span>Está Activo</span>
+                        <span>¿Está Activo?</span>
                         {% if usuario.is_active %}
                             <input type="checkbox" {% if usuario.is_active %}checked{% endif %}>
                         {% else %}
                             <input type="checkbox">
                         {% endif %}
-                        <span>Es Jefatura</span>
+                        <span>¿Es Jefatura?</span>
                         {% if usuario.is_staff %}
                             <input type="checkbox" {% if usuario.is_staff %}checked{% endif %}>
                         {% else %}
