@@ -24,24 +24,50 @@
 
       <!-- === FILTROS === -->
       <div class="filtros">
-        <label>Semanas (multi)
-          <select id="f_semanas" multiple size="4"></select>
-        </label>
-        <label>Año
+        <div class="filtro-box">
+          <label>Semanas</label>
+          <div class="multi-dropdown" id="dd_semanas">
+            <button type="button" class="multi-dropdown-btn" data-placeholder="Seleccionar semanas">
+              Seleccionar semanas
+            </button>
+            <div class="multi-dropdown-panel" id="panel_semanas"></div>
+          </div>
+        </div>
+
+        <div class="filtro-box">
+          <label>Año</label>
           <select id="f_anios"></select>
-        </label>
-        <label>Líneas (multi)
-          <select id="f_lineas" multiple size="4"></select>
-        </label>
-        <label>Turnos (multi)
-          <select id="f_turnos" multiple size="3"></select>
-        </label>
-        <label>Desde
+        </div>
+
+        <div class="filtro-box">
+          <label>Líneas</label>
+          <div class="multi-dropdown" id="dd_lineas">
+            <button type="button" class="multi-dropdown-btn" data-placeholder="Seleccionar líneas">
+              Seleccionar líneas
+            </button>
+            <div class="multi-dropdown-panel" id="panel_lineas"></div>
+          </div>
+        </div>
+
+        <div class="filtro-box">
+          <label>Turnos</label>
+          <div class="multi-dropdown" id="dd_turnos">
+            <button type="button" class="multi-dropdown-btn" data-placeholder="Seleccionar turnos">
+              Seleccionar turnos
+            </button>
+            <div class="multi-dropdown-panel" id="panel_turnos"></div>
+          </div>
+        </div>
+
+        <div class="filtro-box">
+          <label>Desde</label>
           <input type="date" id="f_desde">
-        </label>
-        <label>Hasta
+        </div>
+
+        <div class="filtro-box">
+          <label>Hasta</label>
           <input type="date" id="f_hasta">
-        </label>
+        </div>
       </div>
 
       <div style="display:flex; gap:.5rem; margin-bottom:12px; flex-wrap: wrap;">
@@ -155,12 +181,18 @@
     Chart.defaults.font.family = 'Quicksand, sans-serif';
 
     const $ = s => document.querySelector(s);
-    const sSemanas = $('#f_semanas');
+
     const sAnios   = $('#f_anios');
-    const sLineas  = $('#f_lineas');
-    const sTurnos  = $('#f_turnos');
     const fDesde   = $('#f_desde');
     const fHasta   = $('#f_hasta');
+
+    const panelSemanas = $('#panel_semanas');
+    const panelLineas  = $('#panel_lineas');
+    const panelTurnos  = $('#panel_turnos');
+
+    const ddSemanas = $('#dd_semanas');
+    const ddLineas  = $('#dd_lineas');
+    const ddTurnos  = $('#dd_turnos');
 
     const btnAplicar    = $('#btn_aplicar');
     const btnLimpiar    = $('#btn_limpiar');
@@ -174,43 +206,122 @@
 
     let chartOEE, chartDet;
 
-    // ====== MULTISELECT SIN CTRL ======
-    function habilitarMultiSelectSinCtrl(select) {
-      if (!select) return;
+    function getCheckedValues(panel) {
+      return Array.from(panel.querySelectorAll('input[type="checkbox"]:checked'))
+        .map(cb => cb.value)
+        .filter(Boolean);
+    }
 
-      select.addEventListener('mousedown', function(e) {
-        const option = e.target;
+    function updateDropdownButtonText(dropdown) {
+      const btn = dropdown.querySelector('.multi-dropdown-btn');
+      const placeholder = btn.dataset.placeholder || 'Seleccionar';
+      const checked = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+      const labels = Array.from(checked).map(cb => cb.dataset.label || cb.value);
 
-        if (option.tagName !== 'OPTION') return;
+      if (!labels.length) {
+        btn.textContent = placeholder;
+        return;
+      }
 
-        e.preventDefault();
-        option.selected = !option.selected;
+      if (labels.length <= 2) {
+        btn.textContent = labels.join(', ');
+        return;
+      }
 
-        const scrollTop = select.scrollTop;
+      btn.textContent = `${labels.length} seleccionados`;
+    }
 
-        setTimeout(() => {
-          select.scrollTop = scrollTop;
-        }, 0);
+    function renderCheckboxPanel(panel, values, dropdown) {
+      panel.innerHTML = '';
 
-        select.dispatchEvent(new Event('change', { bubbles: true }));
+      const actions = document.createElement('div');
+      actions.className = 'multi-dropdown-actions';
+
+      const btnTodos = document.createElement('button');
+      btnTodos.type = 'button';
+      btnTodos.textContent = 'Todos';
+      btnTodos.onclick = () => {
+        panel.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+        updateDropdownButtonText(dropdown);
+      };
+
+      const btnNinguno = document.createElement('button');
+      btnNinguno.type = 'button';
+      btnNinguno.textContent = 'Ninguno';
+      btnNinguno.onclick = () => {
+        panel.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        updateDropdownButtonText(dropdown);
+      };
+
+      actions.appendChild(btnTodos);
+      actions.appendChild(btnNinguno);
+      panel.appendChild(actions);
+
+      values.forEach(v => {
+        const label = document.createElement('label');
+        label.className = 'multi-option';
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = String(v);
+        cb.dataset.label = String(v);
+
+        cb.addEventListener('change', () => {
+          updateDropdownButtonText(dropdown);
+        });
+
+        const span = document.createElement('span');
+        span.textContent = v;
+
+        label.appendChild(cb);
+        label.appendChild(span);
+        panel.appendChild(label);
+      });
+
+      updateDropdownButtonText(dropdown);
+    }
+
+    function setCheckedValues(panel, values, dropdown) {
+      const set = new Set(values.map(String));
+      panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = set.has(cb.value);
+      });
+      updateDropdownButtonText(dropdown);
+    }
+
+    function setupDropdown(dropdown) {
+      const btn = dropdown.querySelector('.multi-dropdown-btn');
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        document.querySelectorAll('.multi-dropdown.open').forEach(dd => {
+          if (dd !== dropdown) dd.classList.remove('open');
+        });
+
+        dropdown.classList.toggle('open');
       });
     }
 
-    habilitarMultiSelectSinCtrl(sSemanas);
-    habilitarMultiSelectSinCtrl(sLineas);
-    habilitarMultiSelectSinCtrl(sTurnos);
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.multi-dropdown.open').forEach(dd => dd.classList.remove('open'));
+    });
 
-    // ====== FUNCIONES BASE ======
-    const getMultiValues = sel => Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
+    setupDropdown(ddSemanas);
+    setupDropdown(ddLineas);
+    setupDropdown(ddTurnos);
 
     function buildParams() {
       const p = new URLSearchParams();
-      for (const s of getMultiValues(sSemanas)) p.append('semana', s);
+
+      for (const s of getCheckedValues(panelSemanas)) p.append('semana', s);
       if (sAnios.value) p.append('anio', sAnios.value);
-      for (const l of getMultiValues(sLineas)) p.append('linea', l);
-      for (const t of getMultiValues(sTurnos)) p.append('turno', t);
+      for (const l of getCheckedValues(panelLineas)) p.append('linea', l);
+      for (const t of getCheckedValues(panelTurnos)) p.append('turno', t);
+
       if (fDesde.value) p.set('desde', fDesde.value);
       if (fHasta.value) p.set('hasta', fHasta.value);
+
       return p;
     }
 
@@ -218,36 +329,49 @@
       const urlOpt = "{% url 'resumen_turno_oee_opciones' %}";
       const r = await fetch(urlOpt, {credentials:'same-origin'});
       if (!r.ok) return;
+
       const {semanas=[], anios=[], lineas=[], turnos=[]} = await r.json();
 
-      const fill = (sel, arr, desc=false)=>{
-        sel.innerHTML='';
-        const lista=[...arr].sort((a,b)=>(desc?b:a)-(desc?a:b));
-        lista.forEach(v=>{
-          const o=document.createElement('option');
-          o.value=v; o.textContent=v; sel.appendChild(o);
+      const fillSelect = (sel, arr, desc=false) => {
+        sel.innerHTML = '';
+        const lista = [...arr].sort((a,b)=>(desc?b:a)-(desc?a:b));
+        lista.forEach(v => {
+          const o = document.createElement('option');
+          o.value = v;
+          o.textContent = v;
+          sel.appendChild(o);
         });
       };
 
-      fill(sSemanas,semanas);
-      fill(sAnios,anios,true);
-      fill(sLineas,lineas);
-      fill(sTurnos,turnos);
-      if(sAnios.options.length) sAnios.selectedIndex=0;
+      const sortedSemanas = [...semanas].sort((a,b)=>a-b);
+      const sortedLineas = [...lineas].sort();
+      const sortedTurnos = [...turnos].sort();
+
+      renderCheckboxPanel(panelSemanas, sortedSemanas, ddSemanas);
+      renderCheckboxPanel(panelLineas, sortedLineas, ddLineas);
+      renderCheckboxPanel(panelTurnos, sortedTurnos, ddTurnos);
+
+      fillSelect(sAnios, anios, true);
+
+      if (sAnios.options.length) sAnios.selectedIndex = 0;
     }
 
     function aplicarFiltrosDesdeURL(){
-      const params=new URLSearchParams(location.search);
-      const markMulti=(sel,arr)=>{
-        const S=new Set(arr);
-        Array.from(sel.options).forEach(o=>o.selected=S.has(o.value));
-      };
-      const semanas=params.getAll('semana'); if(semanas.length) markMulti(sSemanas,semanas);
-      const anio=params.get('anio'); if(anio) sAnios.value=anio;
-      const lineas=params.getAll('linea'); if(lineas.length) markMulti(sLineas,lineas);
-      const turnos=params.getAll('turno'); if(turnos.length) markMulti(sTurnos,turnos);
-      const desde=params.get('desde'); if(desde) fDesde.value=desde;
-      const hasta=params.get('hasta'); if(hasta) fHasta.value=hasta;
+      const params = new URLSearchParams(location.search);
+
+      setCheckedValues(panelSemanas, params.getAll('semana'), ddSemanas);
+
+      const anio = params.get('anio');
+      if (anio) sAnios.value = anio;
+
+      setCheckedValues(panelLineas, params.getAll('linea'), ddLineas);
+      setCheckedValues(panelTurnos, params.getAll('turno'), ddTurnos);
+
+      const desde = params.get('desde');
+      if (desde) fDesde.value = desde;
+
+      const hasta = params.get('hasta');
+      if (hasta) fHasta.value = hasta;
     }
 
     const fmtFecha=s=>{
@@ -260,7 +384,6 @@
       return ({A:0,B:1,C:2})[x] ?? 999;
     };
 
-    // ====== GRAFICO OEE ======
     async function cargarOEE(){
       const url = `{% url 'resumen_turno_oee_api' %}?${buildParams().toString()}`;
       const r = await fetch(url, {credentials:'same-origin'});
@@ -347,7 +470,6 @@
       });
     }
 
-    // ====== LEYENDA HTML DETENCIONES ======
     function renderLegendDet(chart){
       legendDetBox.innerHTML = '';
 
@@ -387,7 +509,6 @@
       });
     }
 
-    // ====== GRAFICO DETENCIONES ======
     async function cargarDetenciones(){
       const url = `{% url 'detenciones_turno_api' %}?${buildParams().toString()}`;
       const r = await fetch(url, {credentials:'same-origin'});
@@ -578,10 +699,20 @@
       });
     }
 
-    // === Botones ===
-    btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
-    btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
-    btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
+    btnSelTodoSem.onclick = () => {
+      panelSemanas.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+      updateDropdownButtonText(ddSemanas);
+    };
+
+    btnSelTodoLin.onclick = () => {
+      panelLineas.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+      updateDropdownButtonText(ddLineas);
+    };
+
+    btnSelTodoTur.onclick = () => {
+      panelTurnos.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+      updateDropdownButtonText(ddTurnos);
+    };
 
     btnAplicar.onclick=e=>{
       e.preventDefault();
@@ -592,16 +723,23 @@
     };
 
     btnLimpiar.onclick=()=>{
-      [sSemanas,sLineas,sTurnos].forEach(sel=>Array.from(sel.options).forEach(o=>o.selected=false));
-      sAnios.selectedIndex=-1;
+      panelSemanas.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      panelLineas.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      panelTurnos.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+      updateDropdownButtonText(ddSemanas);
+      updateDropdownButtonText(ddLineas);
+      updateDropdownButtonText(ddTurnos);
+
+      sAnios.selectedIndex = -1;
       fDesde.value='';
       fHasta.value='';
+
       history.replaceState(null,'',location.pathname);
       cargarOEE();
       cargarDetenciones();
     };
 
-    // Inicial
     await cargarOpciones();
     aplicarFiltrosDesdeURL();
     await cargarOEE();

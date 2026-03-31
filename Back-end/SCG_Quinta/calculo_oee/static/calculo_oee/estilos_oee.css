@@ -1,5 +1,5 @@
 :root {
-    --very-light-pink: #C7C7C7; /* color RGBA (199, 199, 199, 0.5) */
+    --very-light-pink: #C7C7C7;
     --text-input-field: #F7F7F7;
     --hospital-green: #ACD9B2;
     --rojo-quinta: #B43C2C;
@@ -14,14 +14,17 @@
 }
 
 body {
-    margin: 24;
+    margin: 24px;
     font-family: 'Quicksand', sans-serif;
     background-image: url(./images/Fondo.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 .login {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     display: grid;
     justify-content: center;
 }
@@ -83,11 +86,12 @@ select {
     background-color: var(--text-input-field);
     border: 1px solid var(--very-light-pink);
     border-radius: 8px;
-    height: 36px;
+    height: 42px;
     font-size: var(--md);
     padding: 6px 10px;
     box-sizing: border-box;
     width: 100%;
+    font-family: 'Quicksand', sans-serif;
 }
 
 button, .primary-button {
@@ -100,6 +104,7 @@ button, .primary-button {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-family: 'Quicksand', sans-serif;
 }
 
 button:hover, .primary-button:hover {
@@ -123,15 +128,15 @@ a.primary-button:hover {
     gap: 12px;
     justify-content: center;
     margin-top: 20px;
+    flex-wrap: wrap;
 }
-/* Estilos para el contenedor de paginación */
+
 .pagination {
     text-align: center;
     padding: 10px 0;
     margin-bottom: 20px;
 }
 
-/* Estilos para los enlaces de paginación */
 .pagination a {
     margin: 0 5px;
     padding: 5px 10px;
@@ -141,13 +146,11 @@ a.primary-button:hover {
     text-decoration: none;
 }
 
-/* Cambia el estilo al pasar el mouse por encima */
 .pagination a:hover {
     border-color: #428bca;
     background-color: #f0f0f0;
 }
 
-/* Estilo para el texto de la página actual */
 .pagination .current {
     margin: 0 5px;
     padding: 5px 10px;
@@ -156,28 +159,27 @@ a.primary-button:hover {
     border: 1px solid #428bca;
     border-radius: 6px;
 }
-/* Bloque contenedor del resumen */
+
 .resumen-box {
-  background-color: rgba(255, 255, 255, 1); /* fondo semitransparente blanco */
+  background-color: rgba(255, 255, 255, 1);
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   max-width: 700px;
-  margin: 24px auto; /* centrado horizontal y separacion */
+  margin: 24px auto;
 }
 
-/* Lista sin viñetas y con espacio entre líneas */
 .resumen-list {
   list-style: none;
   padding: 0;
   margin: 0 0 16px 0;
 }
+
 .resumen-list li {
   margin-bottom: 8px;
   font-size: 25px;
 }
 
-/* Estilo para la zona de verificación */
 .verificado-info {
   display: inline-block;
   background-color: var(--hospital-green);
@@ -188,103 +190,188 @@ a.primary-button:hover {
   margin-top: 12px;
 }
 
-/* Contenedor para botones bajo el resumen */
 .botones-resumen {
   display: flex;
   gap: 12px;
   justify-content: center;
   margin-top: 24px;
+  flex-wrap: wrap;
 }
 
 .login-container {
-  background-color: rgba(255, 255, 255, 1); /* fondo semitransparente blanco */
+  background-color: rgba(255, 255, 255, 1);
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   max-width: 1200px;
-  margin: 24px auto; /* centrado horizontal y separacion */
+  width: 95%;
+  margin: 24px auto;
+  box-sizing: border-box;
+  overflow: visible;
 }
-
-/*@media (max-width: 600px) {
-    table th, table td {
-        font-size: var(--sm);
-        padding: 6px;
-    }
-
-    form {
-        width: 90%;
-        padding: 15px;
-    }
-
-    button, .primary-button {
-        width: 100%;
-    }
-
-    .botones {
-        flex-direction: column;
-        gap: 8px;
-        width: 350px;
-    }
-}*/
 
 .panel-graficos {
   display: grid;
-  grid-template-columns: 1fr;   /* 1 columna: vertical */
+  grid-template-columns: 1fr;
   gap: 16px;
-}
-
-/* Opcional: si algún día quieres 2 columnas en escritorio, descomenta:
-@media (min-width: 1200px) {
-  .panel-graficos {
-    grid-template-columns: 1fr 1fr;  // 2 columnas
-  }
-}
-*/
-
-/* Asegurar alto consistente de los contenedores */
-.panel-graficos {
   width: 100%;
   background: #fff;
   border-radius: 12px;
   padding: 8px 8px 16px 8px;
 }
-/*.panel-graficos canvas {
-  width: 100% !important;
-  height: 380px !important;   /* O 420px para detenciones */
-/*}*/
+
 #graficoOEE { height: 380px !important; }
 #graficoDetenciones { height: 420px !important; }
 
-/* ===== FILTROS RESPONSIVE Y CONTENIDOS ===== */
+/* ===== FILTROS ===== */
 
 .filtros {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  align-items: end;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
   margin: 16px 0;
+  align-items: end;
   width: 100%;
   box-sizing: border-box;
+  overflow: visible;
 }
 
-.filtros label {
+.filtro-box {
   display: flex;
   flex-direction: column;
-  font-weight: 500;
+  gap: 6px;
+  min-width: 0;
+}
+
+.filtro-box label {
+  font-weight: 700;
+  color: #222;
   font-size: var(--md);
 }
 
-.filtros select,
-.filtros input {
+/* ===== DROPDOWN MULTI CHECKBOX ===== */
+
+.multi-dropdown {
+  position: relative;
   width: 100%;
 }
 
-/* Asegura que el panel blanco nunca se desborde */
-.login-container {
-  max-width: 1200px;
-  width: 95%;
-  margin: 24px auto;
+.multi-dropdown-btn {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--very-light-pink);
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+  padding: 10px 40px 10px 12px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  position: relative;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multi-dropdown-btn::after {
+  content: "▾";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #666;
+}
+
+.multi-dropdown.open .multi-dropdown-btn {
+  border-color: var(--rojo-quinta);
+  box-shadow: 0 0 0 3px rgba(180, 60, 44, 0.12);
+}
+
+.multi-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 260px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  padding: 10px;
+  z-index: 1000;
+  display: none;
   box-sizing: border-box;
+}
+
+.multi-dropdown.open .multi-dropdown-panel {
+  display: block;
+}
+
+.multi-dropdown-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+
+.multi-dropdown-actions button {
+  border: none;
+  background: var(--rojo-quinta);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+}
+
+.multi-dropdown-actions button:hover {
+  background: var(--naranjo-quinta);
+}
+
+.multi-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 2px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  border-radius: 6px;
+}
+
+.multi-option:hover {
+  background: #f7f7f7;
+}
+
+.multi-option input {
+  accent-color: var(--rojo-quinta);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+#f_anios,
+#f_desde,
+#f_hasta {
+  min-height: 42px;
+  border: 1px solid var(--very-light-pink);
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px 12px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 15px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* ===== LEYENDA OBJETIVO DETENCIONES ===== */
@@ -312,21 +399,12 @@ a.primary-button:hover {
   height: 16px;
   border-radius: 4px;
   display: inline-block;
+  border: 2px solid var(--rojo-quinta);
 }
 
-/* Colores asociados */
-.legend-objetivo-item.colacion .dot {
-  background: var(--white);
-}
-
-.legend-objetivo-item.aseo .dot {
-  background: var(--white);
-}
-
-.legend-objetivo-item.preparacion .dot {
-  background: var(--white);
-}
-
+.legend-objetivo-item.colacion .dot,
+.legend-objetivo-item.aseo .dot,
+.legend-objetivo-item.preparacion .dot,
 .legend-objetivo-item.tiempo-productivo .dot {
   background: var(--white);
 }
@@ -372,7 +450,6 @@ a.primary-button:hover {
   color: #444;
 }
 
-/* Colores alineados al gráfico */
 .oee-item.disponibilidad {
   border-color: blue;
 }
@@ -383,4 +460,53 @@ a.primary-button:hover {
 
 .oee-item.oee {
   border-color: green;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+  .login-container {
+    width: 100%;
+    padding: 18px;
+  }
+
+  .filtros {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    margin: 12px;
+  }
+
+  .logo {
+    width: 160px;
+  }
+
+  .filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .botones,
+  .botones-resumen {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button,
+  .primary-button,
+  a.primary-button {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .legend-objetivo {
+    grid-template-columns: 1fr;
+  }
+
+  .oee-explicacion {
+    grid-template-columns: 1fr;
+  }
 }
