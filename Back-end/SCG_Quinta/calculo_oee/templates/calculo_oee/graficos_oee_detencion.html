@@ -89,7 +89,6 @@
         <!-- === GRÁFICO 2: DETENCIONES === -->
         <h2 style="text-align:center; margin-top:24px;">Gráfico Detenciones</h2>
 
-        <!-- ✅ Leyenda HTML (marcar/desmarcar sin desfase) -->
         <div id="legendDet" style="
           display:grid;
           grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -128,7 +127,7 @@
             </div>
           </div>
 
-          <div class="legend-ojetivo-item tiempo-productivo">
+          <div class="legend-objetivo-item tiempo-productivo">
             <span class="dot"></span>
             <div>
               <strong>Tiempo Productivo</strong><br>
@@ -150,7 +149,6 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', async () => {
-    // ✅ Esperar fuentes
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
@@ -176,7 +174,6 @@
 
     let chartOEE, chartDet;
 
-    // ====== FUNCIONES BASE ======
     const getMultiValues = sel => Array.from(sel.selectedOptions).map(o => o.value).filter(Boolean);
 
     function buildParams() {
@@ -218,24 +215,24 @@
         const S=new Set(arr);
         Array.from(sel.options).forEach(o=>o.selected=S.has(o.value));
       };
-      const semanas=params.getAll('semana');if(semanas.length)markMulti(sSemanas,semanas);
-      const anio=params.get('anio');if(anio)sAnios.value=anio;
-      const lineas=params.getAll('linea');if(lineas.length)markMulti(sLineas,lineas);
-      const turnos=params.getAll('turno');if(turnos.length)markMulti(sTurnos,turnos);
-      const desde=params.get('desde');if(desde)fDesde.value=desde;
-      const hasta=params.get('hasta');if(hasta)fHasta.value=hasta;
+      const semanas=params.getAll('semana'); if(semanas.length) markMulti(sSemanas,semanas);
+      const anio=params.get('anio'); if(anio) sAnios.value=anio;
+      const lineas=params.getAll('linea'); if(lineas.length) markMulti(sLineas,lineas);
+      const turnos=params.getAll('turno'); if(turnos.length) markMulti(sTurnos,turnos);
+      const desde=params.get('desde'); if(desde) fDesde.value=desde;
+      const hasta=params.get('hasta'); if(hasta) fHasta.value=hasta;
     }
 
     const fmtFecha=s=>{
-      const d=new Date(s); if(isNaN(d))return s;
+      const d=new Date(s); if(isNaN(d)) return s;
       return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
     };
+
     const turnoRank=t=>{
       const x=String(t).toUpperCase().replace(/^TURNO\s*/,'').trim();
-      return ({A:0,B:1,C:2})[x]??999;
+      return ({A:0,B:1,C:2})[x] ?? 999;
     };
 
-    // ====== GRAFICO OEE ======
     async function cargarOEE(){
       const url = `{% url 'resumen_turno_oee_api' %}?${buildParams().toString()}`;
       const r = await fetch(url, {credentials:'same-origin'});
@@ -322,7 +319,6 @@
       });
     }
 
-    // ====== LEYENDA HTML DETENCIONES ======
     function renderLegendDet(chart){
       legendDetBox.innerHTML = '';
 
@@ -362,7 +358,6 @@
       });
     }
 
-    // ====== GRAFICO DETENCIONES ======
     async function cargarDetenciones(){
       const url = `{% url 'detenciones_turno_api' %}?${buildParams().toString()}`;
       const r = await fetch(url, {credentials:'same-origin'});
@@ -379,7 +374,6 @@
 
       const byLote = new Map(), motivosSet = new Set(), loteOrder = [];
 
-      // ✅ Guardamos minutos_turno por lote (Opción B)
       for (const d of data) {
         const lid = d.lote_id; 
         if (!lid) continue;
@@ -402,7 +396,6 @@
         motivosSet.add(d.motivo);
       }
 
-      // "Tiempo Productivo" al final
       const motivos = Array.from(motivosSet).sort((a,b)=>(a==='Tiempo Productivo')-(b==='Tiempo Productivo'));
       const labels  = loteOrder.map(id => byLote.get(id).label);
 
@@ -418,19 +411,67 @@
         borderColor:'rgba(0,0,0,0.1)',
       }));
 
+      const TARGETS_ESTANDAR = {
+        '1-Colacion': 6.25,
+        '7-Preparacion de insumos': 11.25,
+        '10-Aseo de linea': 12.5,
+        'Tiempo Productivo': 70
+      };
+
       const hLine = {
         id:'hLine',
         afterDraw(chart){
-          const {ctx, chartArea:{left,right}, scales:{y}} = chart;
-          const yPix = y.getPixelForValue(30);
+          const { ctx, chartArea, scales } = chart;
+          if (!chartArea || !scales?.y) return;
+
+          const visibles = chart.data.datasets
+            .map((ds, i) => ({
+              label: ds.label,
+              visible: chart.isDatasetVisible(i)
+            }))
+            .filter(x => x.visible);
+
+          if (!visibles.length) return;
+
+          let valorLinea = null;
+          let textoLinea = '';
+
+          const esVisibleEstandarUnico =
+            visibles.length === 1 &&
+            Object.prototype.hasOwnProperty.call(TARGETS_ESTANDAR, visibles[0].label);
+
+          if (esVisibleEstandarUnico) {
+            valorLinea = TARGETS_ESTANDAR[visibles[0].label];
+            textoLinea = `Objetivo ${visibles[0].label}: ${valorLinea}%`;
+          } else {
+            const hayNoEstandar = visibles.some(v =>
+              !Object.prototype.hasOwnProperty.call(TARGETS_ESTANDAR, v.label)
+            );
+
+            if (visibles.length > 1 || hayNoEstandar) {
+              valorLinea = 30;
+              textoLinea = 'Objetivo total detenciones: 30%';
+            }
+          }
+
+          if (valorLinea == null) return;
+
+          const yPix = scales.y.getPixelForValue(valorLinea);
+
           ctx.save();
           ctx.beginPath();
-          ctx.moveTo(left, yPix);
-          ctx.lineTo(right, yPix);
-          ctx.lineWidth=2;
-          ctx.strokeStyle='red';
+          ctx.moveTo(chartArea.left, yPix);
+          ctx.lineTo(chartArea.right, yPix);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#d62828';
           ctx.setLineDash([6,4]);
           ctx.stroke();
+
+          ctx.fillStyle = '#d62828';
+          ctx.font = '12px Quicksand, sans-serif';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(textoLinea, chartArea.right - 4, yPix - 4);
           ctx.restore();
         }
       };
@@ -462,7 +503,6 @@
                 const lbl = items[0].label;
                 return Array.isArray(lbl) ? lbl.join(' · ') : lbl;
               },
-              // ✅ Opción B: % + minutos calculados desde minutos_turno
               label(item){
                 const motivo = item.dataset.label;
                 const pct = item.parsed.y ?? 0;
@@ -482,12 +522,16 @@
           },
           scales:{
             x:{ stacked:true },
-            y:{ stacked:true, min:0, max:100, ticks:{ callback:v=>v+'%' } }
+            y:{ 
+              stacked:true,
+              min:0,
+              max:100,
+              ticks:{ callback:v=>v+'%' }
+            }
           }
         }
       });
 
-      // ✅ Render legend HTML (checkboxes)
       renderLegendDet(chartDet);
 
       requestAnimationFrame(() => {
@@ -496,7 +540,6 @@
       });
     }
 
-    // === Botones ===
     btnSelTodoSem.onclick = ()=>Array.from(sSemanas.options).forEach(o=>o.selected=true);
     btnSelTodoLin.onclick = ()=>Array.from(sLineas.options).forEach(o=>o.selected=true);
     btnSelTodoTur.onclick = ()=>Array.from(sTurnos.options).forEach(o=>o.selected=true);
@@ -505,7 +548,8 @@
       e.preventDefault();
       const p=buildParams();
       history.replaceState(null,'',p.toString()?`?${p}`:location.pathname);
-      cargarOEE(); cargarDetenciones();
+      cargarOEE();
+      cargarDetenciones();
     };
 
     btnLimpiar.onclick=()=>{
@@ -514,10 +558,10 @@
       fDesde.value='';
       fHasta.value='';
       history.replaceState(null,'',location.pathname);
-      cargarOEE(); cargarDetenciones();
+      cargarOEE();
+      cargarDetenciones();
     };
 
-    // Inicial
     await cargarOpciones();
     aplicarFiltrosDesdeURL();
     await cargarOEE();
