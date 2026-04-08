@@ -291,55 +291,138 @@ def verificar_registros(request):
 def descargar_registros(request):
     fecha_inicio_str = request.session.get('fechainicio')
     fecha_fin_str = request.session.get('fechafin')
-    config = request.GET['config']
+    config = request.GET.get('config')
+
+    if not config:
+        return render(request, 'inicio/no_hay_datos.html')
+
     model_name = model_mapping.get(config)
-    model = apps.get_model(config , model_name)
-    
-    objeto_filtrado = None
-    if fecha_inicio_str == None or fecha_fin_str == None:
-        objeto_filtrado = model.objects.all()
-    else:
+    if not model_name:
+        return render(request, 'inicio/no_hay_datos.html')
+
+    model = apps.get_model(config, model_name)
+
+    # Mapeo de campo de fecha por configuración
+    date_field_mapping = {
+        'monitoreo_del_agua': 'fecha_registro',
+        'higiene_y_conducta_personal': 'fecha_ingreso',
+        'monitoreo_de_plagas': 'fecha_registro',
+        'recepcion_mpme': 'fecha_registro',
+        'pcc2_detector_metales': 'fecha_registro',
+        'control_de_transporte': 'fecha_registro',
+        'temperatura_despacho_ptjumbo': 'fecha_registro',
+        'temperatura_despacho_ptsisa': 'fecha_registro',
+        'historial_termometro': 'fecha_registro',
+        'reclamo_a_proveedores': 'fecha_registro',
+        'rechazo_mp_in_me': 'fecha_registro',
+        'informe_de_incidentes': 'fecha_registro',
+        'control_material_extraño': 'fecha_registro',
+        'control_de_pesos': 'fecha_registro',
+        'control_parametros_gorreri': 'fecha_registro',
+        'control_de_pesos_prelistos': 'fecha_registro',
+        'control_de_pesos_insumos_kuchen': 'fecha_registro',
+        'control_parametros_bizcocho': 'fecha_registro',
+    }
+
+    campo_fecha = date_field_mapping.get(config)
+
+    # Si no está en el mapeo, intenta detectar automáticamente
+    if not campo_fecha:
+        posibles_campos_fecha = [
+            'fecha_registro',
+            'fecha_ingreso',
+            'fecha',
+            'created_at',
+            'creado_en',
+        ]
+        campos_modelo = [f.name for f in model._meta.fields]
+        for candidato in posibles_campos_fecha:
+            if candidato in campos_modelo:
+                campo_fecha = candidato
+                break
+
+    # Query base
+    objeto_filtrado = model.objects.all()
+
+    # Aplicar filtro por fechas solo si ambas fechas existen y se encontró un campo fecha válido
+    if fecha_inicio_str and fecha_fin_str and campo_fecha:
         fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
         fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
-        objeto_filtrado = model.objects.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
 
-    filename = str(config) + '.xlsx'
+        # Extiende fecha_fin hasta el final del día
+        fecha_fin = fecha_fin + timedelta(days=1) - timedelta(seconds=1)
+
+        filtro_fecha = {
+            f'{campo_fecha}__range': [fecha_inicio, fecha_fin]
+        }
+        objeto_filtrado = model.objects.filter(**filtro_fecha)
+
+    filename = f'{config}.xlsx'
+
     if not objeto_filtrado.exists():
         return render(request, 'inicio/no_hay_datos.html')
-    else:
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        wb = Workbook()
-        ws = wb.active
-        def get_field_names(model):
-            fields = model._meta.get_fields()
-            return [
-                field.name for field in fields 
-                if isinstance(field, Field)
-            ]
-        nombres_campos = get_field_names(model)
-        ws.append(nombres_campos)
-        def convertir_fecha(fecha):
-            return fecha.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None) if fecha else None
-        def obtener_url_archivo(objeto, campo):
-            archivo = getattr(objeto, campo, None)
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    wb = Workbook()
+    ws = wb.active
+
+    def get_field_names(model):
+        fields = model._meta.get_fields()
+        return [
+            field.name
+            for field in fields
+            if isinstance(field, Field)
+        ]
+
+    nombres_campos = get_field_names(model)
+    ws.append(nombres_campos)
+
+    def convertir_fecha(fecha):
+        return fecha.astimezone(
+            pytz.timezone('America/Santiago')
+        ).replace(tzinfo=None) if fecha else None
+
+    def obtener_url_archivo(objeto, campo):
+        archivo = getattr(objeto, campo, None)
+        try:
             return archivo.url if archivo else None
-        
-        for objeto in objeto_filtrado:
-            fila = []
-            for campo in nombres_campos:
-                valor = getattr(objeto, campo)
-                if isinstance(valor, datetime):
-                    valor = convertir_fecha(valor)
-                if campo == 'archivo_foto':
-                    valor = obtener_url_archivo(objeto, campo)
-                fila.append(valor)
-            ws.append(fila)
-        wb.save(response)
-        if fecha_inicio_str != None or fecha_fin_str != None:
-            del request.session['fechainicio']
-            del request.session['fechafin']
-        return response
+        except Exception:
+            return None
+
+    for objeto in objeto_filtrado:
+        fila = []
+        for campo in nombres_campos:
+            valor = getattr(objeto, campo, None)
+
+            if isinstance(valor, datetime):
+                valor = convertir_fecha(valor)
+
+            # Convierte archivos/imágenes a URL si aplica
+            if hasattr(valor, 'url'):
+                try:
+                    valor = valor.url
+                except Exception:
+                    valor = str(valor)
+
+            # Caso explícito por compatibilidad
+            if campo == 'archivo_foto':
+                valor = obtener_url_archivo(objeto, campo)
+
+            fila.append(valor)
+        ws.append(fila)
+
+    wb.save(response)
+
+    if 'fechainicio' in request.session:
+        del request.session['fechainicio']
+    if 'fechafin' in request.session:
+        del request.session['fechafin']
+
+    return response
     
 @login_required
 def en_desarrollo(request):
