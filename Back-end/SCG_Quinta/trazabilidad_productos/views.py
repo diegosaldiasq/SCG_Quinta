@@ -284,6 +284,7 @@ def descargar_historial_trazabilidad_excel(request):
     hasta = request.GET.get("hasta")
     lote_producto = request.GET.get("lote_producto")
     lote_ingrediente = request.GET.get("lote_ingrediente")
+    estado_verificacion = request.GET.get("estado_verificacion")
 
     if cliente_id:
         registros = registros.filter(cliente_id=cliente_id)
@@ -294,18 +295,16 @@ def descargar_historial_trazabilidad_excel(request):
     if desde:
         try:
             desde_date = datetime.strptime(desde, "%Y-%m-%d").date()
-            registros = registros.filter(
-                fecha_registro__gte=datetime.combine(desde_date, time.min)
-            )
+            fecha_desde = timezone.make_aware(datetime.combine(desde_date, time.min))
+            registros = registros.filter(fecha_registro__gte=fecha_desde)
         except ValueError:
             pass
 
     if hasta:
         try:
             hasta_date = datetime.strptime(hasta, "%Y-%m-%d").date()
-            registros = registros.filter(
-                fecha_registro__lte=datetime.combine(hasta_date, time.max)
-            )
+            fecha_hasta = timezone.make_aware(datetime.combine(hasta_date, time.max))
+            registros = registros.filter(fecha_registro__lte=fecha_hasta)
         except ValueError:
             pass
 
@@ -314,6 +313,11 @@ def descargar_historial_trazabilidad_excel(request):
 
     if lote_ingrediente:
         registros = registros.filter(detalles__lote__icontains=lote_ingrediente.strip()).distinct()
+
+    if estado_verificacion == "no_verificados":
+        registros = registros.filter(verificado=False)
+    elif estado_verificacion == "verificados":
+        registros = registros.filter(verificado=True)
 
     if not registros.exists():
         return render(request, "inicio/no_hay_datos.html")
@@ -328,28 +332,12 @@ def descargar_historial_trazabilidad_excel(request):
     ws.title = "Trazabilidad"
 
     encabezados = [
-        "Cliente",
-        "Producto",
-        "Código",
-        "Lote producto",
-        "Fecha elab. producto",
-        "Turno",
-        "Línea",
-        "Elaborado por",
-        "Fecha registro",
-        "Ingrediente",
-        "Proveedor",
-        "Lote ingrediente",
-        "Fecha elaboración",
-        "Fecha vencimiento",
-        "Acción correctiva",
-        "Observaciones",
-        "Codigo registro",
-        "Version",
-        "Fecha modificacion",
-        "Verificado",
-        "Fecha verificacion",
-        "Nombre verificador",
+        "Cliente", "Producto", "Código", "Lote producto", "Fecha elab. producto",
+        "Turno", "Línea", "Elaborado por", "Fecha registro",
+        "Ingrediente", "Proveedor", "Lote ingrediente", "Fecha elaboración",
+        "Fecha vencimiento", "Acción correctiva", "Observaciones",
+        "Codigo registro", "Version", "Fecha modificacion",
+        "Verificado", "Fecha verificacion", "Nombre verificador",
     ]
     ws.append(encabezados)
 
@@ -429,30 +417,10 @@ def descargar_historial_trazabilidad_excel(request):
             ])
 
     anchos = {
-        "A": 18,
-        "B": 28,
-        "C": 14,
-        "D": 18,
-        "E": 20,
-        "F": 14,
-        "G": 14,
-        "H": 18,
-        "I": 22,
-        "J": 24,
-        "K": 18,
-        "L": 18,
-        "M": 20,
-        "N": 20,
-        "O": 28,
-        "P": 30,
-        "Q": 18,
-        "R": 12,
-        "S": 20,
-        "T": 12,
-        "U": 22,
-        "V": 22,
+        "A": 18, "B": 28, "C": 14, "D": 18, "E": 20, "F": 14, "G": 14, "H": 18,
+        "I": 22, "J": 24, "K": 18, "L": 18, "M": 20, "N": 20, "O": 28, "P": 30,
+        "Q": 18, "R": 12, "S": 20, "T": 12, "U": 22, "V": 22,
     }
-
     for col, ancho in anchos.items():
         ws.column_dimensions[col].width = ancho
 
