@@ -162,7 +162,6 @@ def registrar_trazabilidad(request):
 @login_required
 def historial_trazabilidad(request):
     form = HistorialTrazabilidadFilterForm(request.GET or None)
-
     registros_qs = (
         RegistroTrazabilidad.objects
         .select_related("cliente", "producto")
@@ -192,19 +191,13 @@ def historial_trazabilidad(request):
             registros_qs = registros_qs.filter(producto=producto)
 
         if desde:
-            registros_qs = registros_qs.filter(
-                fecha_registro__gte=datetime.combine(desde, time.min)
-            )
+            registros_qs = registros_qs.filter(fecha_elaboracion_producto__gte=desde)
 
         if hasta:
-            registros_qs = registros_qs.filter(
-                fecha_registro__lte=datetime.combine(hasta, time.max)
-            )
+            registros_qs = registros_qs.filter(fecha_elaboracion_producto__lte=hasta)
 
         if lote_producto:
-            registros_qs = registros_qs.filter(
-                lote_producto__icontains=lote_producto.strip()
-            )
+            registros_qs = registros_qs.filter(lote_producto__icontains=lote_producto.strip())
 
         if lote_ingrediente:
             registros_qs = registros_qs.filter(
@@ -213,7 +206,6 @@ def historial_trazabilidad(request):
 
         if estado_verificacion == "no_verificados":
             registros_qs = registros_qs.filter(verificado=False)
-
         elif estado_verificacion == "verificados":
             registros_qs = registros_qs.filter(verificado=True)
 
@@ -295,16 +287,14 @@ def descargar_historial_trazabilidad_excel(request):
     if desde:
         try:
             desde_date = datetime.strptime(desde, "%Y-%m-%d").date()
-            fecha_desde = timezone.make_aware(datetime.combine(desde_date, time.min))
-            registros = registros.filter(fecha_registro__gte=fecha_desde)
+            registros = registros.filter(fecha_elaboracion_producto__gte=desde_date)
         except ValueError:
             pass
 
     if hasta:
         try:
             hasta_date = datetime.strptime(hasta, "%Y-%m-%d").date()
-            fecha_hasta = timezone.make_aware(datetime.combine(hasta_date, time.max))
-            registros = registros.filter(fecha_registro__lte=fecha_hasta)
+            registros = registros.filter(fecha_elaboracion_producto__lte=hasta_date)
         except ValueError:
             pass
 
