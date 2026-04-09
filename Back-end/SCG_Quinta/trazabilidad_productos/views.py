@@ -272,11 +272,19 @@ def descargar_historial_trazabilidad_excel(request):
 
     cliente_id = request.GET.get("cliente")
     producto_id = request.GET.get("producto")
-    desde = request.GET.get("desde")
-    hasta = request.GET.get("hasta")
     lote_producto = request.GET.get("lote_producto")
     lote_ingrediente = request.GET.get("lote_ingrediente")
     estado_verificacion = request.GET.get("estado_verificacion")
+
+    # Primero intenta tomar fechas desde GET
+    desde = request.GET.get("desde")
+    hasta = request.GET.get("hasta")
+
+    # Si no vienen por GET, toma las fechas guardadas en sesión desde /inicio
+    if not desde:
+        desde = request.session.get("fechainicio")
+    if not hasta:
+        hasta = request.session.get("fechafin")
 
     if cliente_id:
         registros = registros.filter(cliente_id=cliente_id)
@@ -284,6 +292,7 @@ def descargar_historial_trazabilidad_excel(request):
     if producto_id:
         registros = registros.filter(producto_id=producto_id)
 
+    # Filtro por FECHA ELABORACION PRODUCTO
     if desde:
         try:
             desde_date = datetime.strptime(desde, "%Y-%m-%d").date()
@@ -302,7 +311,9 @@ def descargar_historial_trazabilidad_excel(request):
         registros = registros.filter(lote_producto__icontains=lote_producto.strip())
 
     if lote_ingrediente:
-        registros = registros.filter(detalles__lote__icontains=lote_ingrediente.strip()).distinct()
+        registros = registros.filter(
+            detalles__lote__icontains=lote_ingrediente.strip()
+        ).distinct()
 
     if estado_verificacion == "no_verificados":
         registros = registros.filter(verificado=False)
@@ -406,13 +417,10 @@ def descargar_historial_trazabilidad_excel(request):
                 nombre_verificador,
             ])
 
-    anchos = {
-        "A": 18, "B": 28, "C": 14, "D": 18, "E": 20, "F": 14, "G": 14, "H": 18,
-        "I": 22, "J": 24, "K": 18, "L": 18, "M": 20, "N": 20, "O": 28, "P": 30,
-        "Q": 18, "R": 12, "S": 20, "T": 12, "U": 22, "V": 22,
-    }
-    for col, ancho in anchos.items():
-        ws.column_dimensions[col].width = ancho
-
     wb.save(response)
+
+    # Limpia sesión para que no arrastre filtros viejos
+    request.session.pop("fechainicio", None)
+    request.session.pop("fechafin", None)
+
     return response
