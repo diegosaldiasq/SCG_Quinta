@@ -14,4 +14,5 @@ urlpatterns = [
     path("intermedio_2/", views.redireccionar_intermedio_2, name="redireccionar_intermedio_2"),
     path("verificar/<int:registro_id>/", views.verificar_trazabilidad, name="verificar_trazabilidad"),
     path("historial/excel/", views.descargar_historial_trazabilidad_excel, name="descargar_historial_trazabilidad_excel"),
+    path("verificar-acciones/<int:registro_id>/", views.verificar_acciones_correctivas, name="verificar_acciones_correctivas"),
 ]

@@ -69,7 +69,7 @@ def obtener_ingredientes_por_producto(request):
                 "id": r.ingrediente.id,
                 "nombre": r.ingrediente.nombre,
                 "proveedor_id": r.proveedor.id if r.proveedor else "",
-                "proveedor_nombre": r.proveedor.nombre if r.proveedor else "",
+                "proveedor_nombre": r.proveedor.nombre if r.proveedor else "Sin proveedor",
             }
             for r in relaciones
         ]
@@ -117,6 +117,8 @@ def registrar_trazabilidad(request):
                     registro.codigo_producto = producto.codigo
                     registro.save()
 
+                    tiene_acciones_correctivas = False
+
                     for i, ingrediente_id in enumerate(ingredientes_ids):
                         lote = lotes[i].strip() if i < len(lotes) and lotes[i] else ""
                         fecha_elab = fechas_elaboracion[i].strip() if i < len(fechas_elaboracion) and fechas_elaboracion[i] else None
@@ -129,12 +131,12 @@ def registrar_trazabilidad(request):
 
                         if not lote or not proveedor_id:
                             raise ValueError("Todos los ingredientes deben tener lote y proveedor configurado.")
-                        
-                        if not fecha_elab and not fecha_venc:
-                            raise ValueError("Cada ingrediente debe tener al menos fecha de elaboración o fecha de vencimiento.")
 
                         if fecha_elab and fecha_venc and fecha_venc < fecha_elab:
                             raise ValueError("La fecha de vencimiento no puede ser anterior a la fecha de elaboración.")
+
+                        if accion:
+                            tiene_acciones_correctivas = True
 
                         DetalleTrazabilidadIngrediente.objects.create(
                             registro=registro,
@@ -145,6 +147,13 @@ def registrar_trazabilidad(request):
                             fecha_vencimiento=fecha_venc,
                             accion_correctiva=accion,
                         )
+
+                    registro.acciones_correctivas_requieren_revision = tiene_acciones_correctivas
+                    registro.acciones_correctivas_verificadas = not tiene_acciones_correctivas
+                    registro.save(update_fields=[
+                        "acciones_correctivas_requieren_revision",
+                        "acciones_correctivas_verificadas",
+                    ])
 
                 messages.success(request, "Registro de trazabilidad guardado correctamente.")
                 return redirect("trazabilidad_productos:registrar_trazabilidad")
@@ -162,7 +171,8 @@ def registrar_trazabilidad(request):
 @login_required
 def historial_trazabilidad(request):
     form = HistorialTrazabilidadFilterForm(request.GET or None)
-    registros_qs = (
+
+    registros = (
         RegistroTrazabilidad.objects
         .select_related("cliente", "producto")
         .prefetch_related(
@@ -182,36 +192,28 @@ def historial_trazabilidad(request):
         hasta = form.cleaned_data.get("hasta")
         lote_producto = form.cleaned_data.get("lote_producto")
         lote_ingrediente = form.cleaned_data.get("lote_ingrediente")
-        estado_verificacion = form.cleaned_data.get("estado_verificacion")
 
         if cliente:
-            registros_qs = registros_qs.filter(cliente=cliente)
+            registros = registros.filter(cliente=cliente)
 
         if producto:
-            registros_qs = registros_qs.filter(producto=producto)
+            registros = registros.filter(producto=producto)
 
         if desde:
-            registros_qs = registros_qs.filter(fecha_elaboracion_producto__gte=desde)
+            registros = registros.filter(
+                fecha_registro__gte=datetime.combine(desde, time.min)
+            )
 
         if hasta:
-            registros_qs = registros_qs.filter(fecha_elaboracion_producto__lte=hasta)
+            registros = registros.filter(
+                fecha_registro__lte=datetime.combine(hasta, time.max)
+            )
 
         if lote_producto:
-            registros_qs = registros_qs.filter(lote_producto__icontains=lote_producto.strip())
+            registros = registros.filter(lote_producto__icontains=lote_producto.strip())
 
         if lote_ingrediente:
-            registros_qs = registros_qs.filter(
-                detalles__lote__icontains=lote_ingrediente.strip()
-            ).distinct()
-
-        if estado_verificacion == "no_verificados":
-            registros_qs = registros_qs.filter(verificado=False)
-        elif estado_verificacion == "verificados":
-            registros_qs = registros_qs.filter(verificado=True)
-
-    paginator = Paginator(registros_qs, 10)
-    page_number = request.GET.get("page")
-    registros = paginator.get_page(page_number)
+            registros = registros.filter(detalles__lote__icontains=lote_ingrediente.strip()).distinct()
 
     contexto = {
         "form": form,
@@ -231,20 +233,19 @@ def redireccionar_intermedio_2(request):
 
 @require_POST
 @login_required
-def verificar_trazabilidad(request, registro_id):
+def verificar_acciones_correctivas(request, registro_id):
     registro = get_object_or_404(RegistroTrazabilidad, id=registro_id)
 
-    if registro.verificado:
-        messages.warning(request, "Este registro ya fue verificado.")
-        return redirect("historial_trazabilidad")
+    if not registro.acciones_correctivas_requieren_revision:
+        messages.info(request, "Este registro no requiere verificación previa de acciones correctivas.")
+        return redirect("trazabilidad_productos:historial_trazabilidad")
 
-    registro.verificado = True
-    registro.fecha_verificacion = timezone.now()
+    if registro.acciones_correctivas_verificadas:
+        messages.warning(request, "Las acciones correctivas ya fueron verificadas.")
+        return redirect("trazabilidad_productos:historial_trazabilidad")
 
-    nombre_usuario = ""
-
-    if hasattr(request.user, "nombre") and request.user.nombre:
-        nombre_usuario = request.user.nombre
+    if hasattr(request.user, "nombre_completo") and request.user.nombre_completo:
+        nombre_usuario = request.user.nombre_completo
     elif hasattr(request.user, "username") and request.user.username:
         nombre_usuario = request.user.username
     elif hasattr(request.user, "email") and request.user.email:
@@ -252,9 +253,51 @@ def verificar_trazabilidad(request, registro_id):
     else:
         nombre_usuario = str(request.user)
 
-    registro.nombre_verificador = nombre_usuario
+    registro.acciones_correctivas_verificadas = True
+    registro.fecha_verificacion_acciones = timezone.now()
+    registro.nombre_verificador_acciones = nombre_usuario
+    registro.save(update_fields=[
+        "acciones_correctivas_verificadas",
+        "fecha_verificacion_acciones",
+        "nombre_verificador_acciones",
+    ])
 
-    registro.save(update_fields=["verificado", "fecha_verificacion", "nombre_verificador"])
+    messages.success(request, "Acciones correctivas verificadas correctamente.")
+    return redirect("trazabilidad_productos:historial_trazabilidad")
+
+@require_POST
+@login_required
+def verificar_trazabilidad(request, registro_id):
+    registro = get_object_or_404(RegistroTrazabilidad, id=registro_id)
+
+    if registro.verificado:
+        messages.warning(request, "Este registro ya fue verificado.")
+        return redirect("trazabilidad_productos:historial_trazabilidad")
+
+    if registro.acciones_correctivas_requieren_revision and not registro.acciones_correctivas_verificadas:
+        messages.error(
+            request,
+            "Este registro tiene acciones correctivas y requiere verificación previa antes de la verificación final."
+        )
+        return redirect("trazabilidad_productos:historial_trazabilidad")
+
+    if hasattr(request.user, "nombre_completo") and request.user.nombre_completo:
+        nombre_usuario = request.user.nombre_completo
+    elif hasattr(request.user, "username") and request.user.username:
+        nombre_usuario = request.user.username
+    elif hasattr(request.user, "email") and request.user.email:
+        nombre_usuario = request.user.email
+    else:
+        nombre_usuario = str(request.user)
+
+    registro.verificado = True
+    registro.fecha_verificacion = timezone.now()
+    registro.nombre_verificador = nombre_usuario
+    registro.save(update_fields=[
+        "verificado",
+        "fecha_verificacion",
+        "nombre_verificador",
+    ])
 
     messages.success(request, "Registro verificado correctamente.")
     return redirect("trazabilidad_productos:historial_trazabilidad")

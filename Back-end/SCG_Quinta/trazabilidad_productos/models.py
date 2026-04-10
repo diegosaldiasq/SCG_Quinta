@@ -30,7 +30,6 @@ class Producto(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name="productos")
     nombre = models.CharField(max_length=150)
     codigo = models.CharField(max_length=50)
-
     codigo_registro = models.CharField(max_length=100, blank=True, null=True)
     version = models.CharField(max_length=50, blank=True, null=True)
     fecha_modificacion = models.DateField(blank=True, null=True)
@@ -87,6 +86,15 @@ class RegistroTrazabilidad(models.Model):
     elaborado_por = models.CharField(max_length=150, blank=True, null=True)
     observaciones = models.TextField(blank=True, null=True)
 
+    verificado = models.BooleanField(default=False)
+    fecha_verificacion = models.DateTimeField(blank=True, null=True)
+    nombre_verificador = models.CharField(max_length=150, blank=True, null=True)
+
+    acciones_correctivas_requieren_revision = models.BooleanField(default=False)
+    acciones_correctivas_verificadas = models.BooleanField(default=False)
+    fecha_verificacion_acciones = models.DateTimeField(blank=True, null=True)
+    nombre_verificador_acciones = models.CharField(max_length=150, blank=True, null=True)
+
     class Meta:
         verbose_name = "Registro de trazabilidad"
         verbose_name_plural = "Registros de trazabilidad"
@@ -95,22 +103,6 @@ class RegistroTrazabilidad(models.Model):
     def __str__(self):
         fecha = self.fecha_registro.strftime("%d-%m-%Y %H:%M")
         return f"{self.producto.nombre} - {fecha}"
-    
-    verificado = models.BooleanField(default=False, verbose_name="Verificado")
-    fecha_verificacion = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="Fecha de verificación"
-    )
-    nombre_verificador = models.CharField(
-        max_length=150,
-        null=True,
-        blank=True,
-        verbose_name="Nombre verificador"
-    )
-
-    def __str__(self):
-        return f"{self.producto} - {self.lote_producto}"
 
 
 class DetalleTrazabilidadIngrediente(models.Model):
