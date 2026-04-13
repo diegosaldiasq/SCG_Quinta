@@ -172,7 +172,7 @@ def registrar_trazabilidad(request):
 def historial_trazabilidad(request):
     form = HistorialTrazabilidadFilterForm(request.GET or None)
 
-    registros = (
+    registros_qs = (
         RegistroTrazabilidad.objects
         .select_related("cliente", "producto")
         .prefetch_related(
@@ -194,30 +194,41 @@ def historial_trazabilidad(request):
         lote_ingrediente = form.cleaned_data.get("lote_ingrediente")
 
         if cliente:
-            registros = registros.filter(cliente=cliente)
+            registros_qs = registros_qs.filter(cliente=cliente)
 
         if producto:
-            registros = registros.filter(producto=producto)
+            registros_qs = registros_qs.filter(producto=producto)
 
         if desde:
-            registros = registros.filter(
+            registros_qs = registros_qs.filter(
                 fecha_registro__gte=datetime.combine(desde, time.min)
             )
 
         if hasta:
-            registros = registros.filter(
+            registros_qs = registros_qs.filter(
                 fecha_registro__lte=datetime.combine(hasta, time.max)
             )
 
         if lote_producto:
-            registros = registros.filter(lote_producto__icontains=lote_producto.strip())
+            registros_qs = registros_qs.filter(
+                lote_producto__icontains=lote_producto.strip()
+            )
 
         if lote_ingrediente:
-            registros = registros.filter(detalles__lote__icontains=lote_ingrediente.strip()).distinct()
+            registros_qs = registros_qs.filter(
+                detalles__lote__icontains=lote_ingrediente.strip()
+            ).distinct()
+
+    paginator = Paginator(registros_qs, 10)  # 10 registros por página
+    page_number = request.GET.get("page")
+    registros = paginator.get_page(page_number)
 
     contexto = {
         "form": form,
         "registros": registros,
+        "paginator": paginator,
+        "page_obj": registros,
+        "is_paginated": registros.has_other_pages(),
     }
     return render(request, "trazabilidad_productos/historial_trazabilidad.html", contexto)
 
