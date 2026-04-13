@@ -11,6 +11,7 @@
     --gris-texto: #4b5563;
     --gris-suave: #6b7280;
     --borde-suave: #e5e7eb;
+    --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.12);
     --sm: 14px;
     --md: 16px;
     --lg: 20px;
@@ -29,7 +30,6 @@ body {
     padding: 24px;
     font-family: 'Quicksand', sans-serif;
     background-image: url("./images/Fondo.png");
-    background-repeat: repeat;
 }
 
 a {
@@ -40,6 +40,7 @@ h1, h2, h3 {
     color: var(--rojo-quinta);
     text-align: center;
     margin-top: 0;
+    margin-bottom: 0;
 }
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
@@ -71,7 +72,7 @@ h1, h2, h3 {
 .sin-resultados {
     background-color: rgba(255, 255, 255, 0.96);
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--sombra-suave);
     box-sizing: border-box;
 }
 
@@ -137,6 +138,7 @@ h1, h2, h3 {
     font-size: 13px;
     color: var(--gris-suave);
     display: block;
+    line-height: 1.4;
 }
 
 /* ===== ACCIONES CORRECTIVAS ===== */
@@ -212,14 +214,28 @@ h1, h2, h3 {
     color: var(--black);
 }
 
+.campo input,
+.campo select {
+    min-height: 42px;
+}
+
 .campo textarea {
     min-height: 80px;
     resize: vertical;
 }
 
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    outline: none;
+    border-color: var(--naranjo-quinta);
+    box-shadow: 0 0 0 3px rgba(208, 112, 32, 0.15);
+}
+
 input[readonly] {
     background-color: #ececec;
     color: #555;
+    font-weight: 600;
 }
 
 /* ===== FORMULARIOS ===== */
@@ -232,6 +248,62 @@ form {
     padding: 0;
     box-shadow: none;
     max-width: none;
+}
+
+/* ===== FILTROS HISTORIAL ===== */
+
+.filtros {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(150px, 1fr));
+    gap: 14px;
+    align-items: end;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.filtros label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 700;
+    color: var(--rojo-quinta);
+    font-size: var(--md);
+    min-width: 0;
+}
+
+.filtros input,
+.filtros select,
+.filtros textarea {
+    margin-top: 6px;
+    background-color: var(--text-input-field);
+    border: 1px solid var(--very-light-pink);
+    border-radius: 8px;
+    font-size: var(--md);
+    padding: 10px 12px;
+    width: 100%;
+    min-width: 0;
+    font-family: 'Quicksand', sans-serif;
+    color: var(--black);
+    min-height: 42px;
+}
+
+.filtros input:focus,
+.filtros select:focus,
+.filtros textarea:focus {
+    outline: none;
+    border-color: var(--naranjo-quinta);
+    box-shadow: 0 0 0 3px rgba(208, 112, 32, 0.15);
+}
+
+.filtros .acciones-form {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+    margin-bottom: 0;
+    justify-content: center;
+}
+
+.filtros .btn-principal,
+.filtros .btn-secundario {
+    min-width: 140px;
 }
 
 /* ===== TABLAS ===== */
@@ -303,6 +375,10 @@ table tr:hover {
 #tablaIngredientes .celda-ingrediente {
     text-align: left;
     font-weight: 600;
+}
+
+#tablaIngredientes td {
+    vertical-align: middle;
 }
 
 .texto-centro {
@@ -390,6 +466,7 @@ button,
     font-weight: bold;
     transition: background-color 0.3s ease, color 0.3s ease;
     font-family: 'Quicksand', sans-serif;
+    text-align: center;
 }
 
 .btn-principal,
@@ -469,6 +546,14 @@ a.primary-button:hover {
     margin-bottom: 16px;
 }
 
+.datos-resumen > div {
+    background: rgba(247, 247, 247, 0.75);
+    border: 1px solid var(--borde-suave);
+    border-radius: 8px;
+    padding: 10px 12px;
+    min-height: 48px;
+}
+
 .sin-resultados {
     padding: 18px;
     text-align: center;
@@ -545,6 +630,14 @@ a.primary-button:hover {
     align-items: stretch;
 }
 
+#tablaIngredientes .acciones-fila {
+    min-width: 110px;
+}
+
+#tablaIngredientes .btn-mini {
+    width: 100%;
+}
+
 .btn-mini {
     border: none;
     border-radius: 6px;
@@ -574,17 +667,8 @@ a.primary-button:hover {
 .btn-eliminar-fila:hover {
     background-color: #d1d5db;
 }
-#tablaIngredientes td {
-    vertical-align: middle;
-}
 
-#tablaIngredientes .acciones-fila {
-    min-width: 110px;
-}
-
-#tablaIngredientes .btn-mini {
-    width: 100%;
-}
+/* ===== ESTADOS ===== */
 
 .estado {
     display: inline-block;
@@ -611,6 +695,12 @@ a.primary-button:hover {
 
 /* ===== RESPONSIVE ===== */
 
+@media (max-width: 1200px) {
+    .filtros {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+    }
+}
+
 @media (max-width: 1100px) {
     .grid-4 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -631,7 +721,8 @@ a.primary-button:hover {
         padding: 0 8px 32px 8px;
     }
 
-    .grid-4 {
+    .grid-4,
+    .filtros {
         grid-template-columns: 1fr;
     }
 
@@ -664,6 +755,11 @@ a.primary-button:hover {
     .botones-resumen {
         justify-content: center;
         width: 100%;
+    }
+
+    .filtros .acciones-form {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .btn-principal,
