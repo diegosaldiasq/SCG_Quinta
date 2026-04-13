@@ -90,9 +90,9 @@
                             {{ registro.cliente.nombre }} |
                             Código: {{ registro.codigo_producto }} |
                             {{ registro.fecha_registro|date:"d/m/Y H:i" }} |
-                            {{ registro.codigo_registro }} |
-                            {{ registro.version }} |
-                            {{ registro.fecha_modificacion|date:"d/m/Y H:i" }}
+                            {{ registro.producto.codigo_registro }} |
+                            {{ registro.producto.version }} |
+                            {{ registro.producto.fecha_modificacion|date:"d/m/Y H:i" }}
                         </p>
                     </div>
 
