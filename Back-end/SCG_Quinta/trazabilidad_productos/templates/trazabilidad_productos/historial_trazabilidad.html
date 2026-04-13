@@ -93,7 +93,7 @@
                             Fecha de registro: {{ registro.fecha_registro|date:"d/m/Y H:i" }} |
                             Código registro: {{ registro.producto.codigo_registro }} |
                             Versión: {{ registro.producto.version }} |
-                            Fecha modificación: {{ registro.producto.fecha_modificacion|localtime|date:"d/m/Y" }}
+                            Fecha modificación: {{ registro.producto.fecha_modificacion|date:"d/m/Y" }}
                         </p>
                     </div>
 
@@ -120,12 +120,12 @@
                         </div>
 
                         <div><strong>Verificado final:</strong> {% if registro.verificado %}Sí{% else %}No{% endif %}</div>
-                        <div><strong>Fecha verificación:</strong> {{ registro.fecha_verificacion|date:"d/m/Y H:i"|default:"-" }}</div>
+                        <div><strong>Fecha verificación:</strong> {{ registro.fecha_verificacion|localtime|date:"d/m/Y H:i"|default:"-" }}</div>
                         <div><strong>Nombre verificador:</strong> {{ registro.nombre_verificador|default:"-" }}</div>
 
                         <div><strong>Requiere revisión:</strong> {% if registro.acciones_correctivas_requieren_revision %}Sí{% else %}No{% endif %}</div>
                         <div><strong>Acciones verificadas:</strong> {% if registro.acciones_correctivas_verificadas %}Sí{% else %}No{% endif %}</div>
-                        <div><strong>Fecha verificación acciones:</strong> {{ registro.fecha_verificacion_acciones|date:"d/m/Y H:i"|default:"-" }}</div>
+                        <div><strong>Fecha verificación acciones:</strong> {{ registro.fecha_verificacion_acciones|localtime|date:"d/m/Y H:i"|default:"-" }}</div>
                         <div><strong>Verificador acciones:</strong> {{ registro.nombre_verificador_acciones|default:"-" }}</div>
 
                         <div class="col-span-3">
