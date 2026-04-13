@@ -1,199 +1,206 @@
 {% load static %}
-{% load extras %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Historial de Trazabilidad</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+
+    <!-- Fuente -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{% static 'trazabilidad_productos/estilos_trazabilidad.css' %}">
-    <link rel="icon" href="{% static 'trazabilidad_productos/images/logoquinta2.png' %}" />
 </head>
+
 <body>
-    <div class="contenedor">
-        <img src="{% static 'trazabilidad_productos/images/logoquinta.png' %}" alt="logo" class="logo">
+<div class="contenedor">
 
-        <div class="cabecera-app">
-            <h1>Historial de Trazabilidad</h1>
+    <!-- CABECERA -->
+    <div class="cabecera-app">
+        <h1>Historial de Trazabilidad</h1>
+
+        <div class="acciones-cabecera">
+            <a href="{% url 'trazabilidad_productos:registrar_trazabilidad' %}" class="btn-secundario">
+                Nuevo registro
+            </a>
+
+            <a href="{% url 'trazabilidad_productos:descargar_historial_trazabilidad_excel' %}?{{ request.GET.urlencode }}" class="btn-secundario">
+                Descargar Excel
+            </a>
         </div>
+    </div>
 
-        {% if messages %}
-            <div class="mensajes">
-                {% for message in messages %}
-                    <div class="mensaje {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    <!-- MENSAJES -->
+    {% if messages %}
+        <div class="mensajes">
+            {% for message in messages %}
+                <div class="mensaje {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-        <form method="get" class="bloque">
-            <h2>Filtros de búsqueda</h2>
+    <!-- FILTROS -->
+    <div class="bloque">
+        <h2>Filtros</h2>
 
-            <div class="grid grid-4">
-                <div class="campo">
-                    <label for="{{ form.cliente.id_for_label }}">Cliente</label>
-                    {{ form.cliente }}
-                </div>
-                <div class="campo">
-                    <label for="{{ form.producto.id_for_label }}">Producto</label>
-                    {{ form.producto }}
-                </div>
-                <div class="campo">
-                    <label for="{{ form.desde.id_for_label }}">Desde</label>
-                    {{ form.desde }}
-                </div>
-                <div class="campo">
-                    <label for="{{ form.hasta.id_for_label }}">Hasta</label>
-                    {{ form.hasta }}
-                </div>
-            </div>
+        <form method="get" class="filtros">
 
-            <div class="grid grid-4">
-                <div class="campo">
-                    <label for="{{ form.lote_producto.id_for_label }}">Lote producto</label>
-                    {{ form.lote_producto }}
-                </div>
-                <div class="campo">
-                    <label for="{{ form.lote_ingrediente.id_for_label }}">Lote ingrediente</label>
-                    {{ form.lote_ingrediente }}
-                </div>
-                <div class="campo">
-                    <label for="{{ form.estado_verificacion.id_for_label }}">Estado verificación</label>
-                    {{ form.estado_verificacion }}
-                </div>
-            </div>
+            <label>
+                Cliente
+                {{ form.cliente }}
+            </label>
+
+            <label>
+                Producto
+                {{ form.producto }}
+            </label>
+
+            <label>
+                Desde
+                {{ form.desde }}
+            </label>
+
+            <label>
+                Hasta
+                {{ form.hasta }}
+            </label>
+
+            <label>
+                Lote producto
+                {{ form.lote_producto }}
+            </label>
+
+            <label>
+                Lote ingrediente
+                {{ form.lote_ingrediente }}
+            </label>
 
             <div class="acciones-form">
                 <button type="submit" class="btn-principal">Filtrar</button>
                 <a href="{% url 'trazabilidad_productos:historial_trazabilidad' %}" class="btn-secundario">Limpiar</a>
             </div>
+
         </form>
+    </div>
 
-        <div class="bloque">
-            <h2>Resultados</h2>
+    <!-- RESULTADOS -->
+    <div class="bloque">
+        <h2>Registros</h2>
 
-            {% if registros %}
-                {% for registro in registros %}
-                    <div class="card-registro">
-                        <div class="card-registro-header">
-                            <div>
-                                <h3>{{ registro.producto.nombre }}</h3>
-                                <p>
-                                    <strong>Cliente:</strong> {{ registro.cliente.nombre }} |
-                                    <strong>Código:</strong> {{ registro.codigo_producto }} |
-                                    <strong>Fecha registro:</strong> {{ registro.fecha_registro|date:"d/m/Y H:i" }} |
-                                    <strong>Código registro:</strong> {{ registro.producto.codigo_registro|default:"-" }} |
-                                    <strong>Versión:</strong> {{ registro.producto.version|default:"-" }} |
-                                    <strong>Fecha modificación:</strong> {{ registro.producto.fecha_modificacion|date:"d/m/Y"|default:"-" }}
-                                </p>
-                            </div>
-                        </div>
+        {% if registros %}
 
-                        <div class="grid grid-4 datos-resumen">
-                            <div><strong>Lote producto:</strong> {{ registro.lote_producto|default:"-" }}</div>
-                            <div><strong>Fecha elab. producto:</strong> {{ registro.fecha_elaboracion_producto|date:"d/m/Y"|default:"-" }}</div>
-                            <div><strong>Turno:</strong> {{ registro.turno|default:"-" }}</div>
-                            <div><strong>Línea:</strong> {{ registro.linea|default:"-" }}</div>
+            {% for registro in registros %}
+                <div class="card-registro">
 
-                            <div><strong>Elaborado por:</strong> {{ registro.elaborado_por|default:"-" }}</div>
+                    <div class="card-registro-header">
+                        <h3>{{ registro.producto.nombre }}</h3>
+                        <p>
+                            {{ registro.cliente.nombre }} |
+                            Código: {{ registro.codigo_producto }} |
+                            {{ registro.fecha_registro|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
 
-                            <div>
-                                <strong>Verificado:</strong>
-                                {% if registro.verificado %}
-                                    Sí
-                                {% else %}
-                                    No
-                                {% endif %}
-                            </div>
+                    <!-- DATOS RESUMEN -->
+                    <div class="grid grid-4 datos-resumen">
 
-                            <div>
-                                <strong>Fecha verificación:</strong>
-                                {% if registro.fecha_verificacion %}
-                                    {{ registro.fecha_verificacion|date:"d/m/Y H:i" }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </div>
+                        <div><strong>Lote producto:</strong> {{ registro.lote_producto|default:"-" }}</div>
+                        <div><strong>Fecha elab. producto:</strong> {{ registro.fecha_elaboracion_producto|date:"d/m/Y"|default:"-" }}</div>
+                        <div><strong>Turno:</strong> {{ registro.turno|default:"-" }}</div>
+                        <div><strong>Línea:</strong> {{ registro.linea|default:"-" }}</div>
+                        <div><strong>Elaborado por:</strong> {{ registro.elaborado_por|default:"-" }}</div>
 
-                            <div>
-                                <strong>Nombre verificador:</strong>
-                                {{ registro.nombre_verificador|default:"-" }}
-                            </div>
-
-                            <div class="col-span-3">
-                                <strong>Observaciones:</strong> {{ registro.observaciones|default:"-" }}
-                            </div>
-                        </div>
-
-                        <div class="tabla-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Ingrediente</th>
-                                        <th>Lote</th>
-                                        <th>Fecha elaboración</th>
-                                        <th>Fecha vencimiento</th>
-                                        <th>Proveedor</th>
-                                        <th>Acción correctiva</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for detalle in registro.detalles.all %}
-                                        <tr>
-                                            <td>{{ detalle.ingrediente.nombre }}</td>
-                                            <td>{{ detalle.lote }}</td>
-                                            <td>{{ detalle.fecha_elaboracion|date:"d/m/Y" }}</td>
-                                            <td>{{ detalle.fecha_vencimiento|date:"d/m/Y" }}</td>
-                                            <td>{{ detalle.proveedor.nombre }}</td>
-                                            <td>{{ detalle.accion_correctiva|default:"-" }}</td>
-                                        </tr>
-                                    {% empty %}
-                                        <tr>
-                                            <td colspan="6" class="texto-centro">Sin detalles</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="acciones-form">
-                            {% if not registro.verificado %}
-                                <form method="post" action="{% url 'trazabilidad_productos:verificar_trazabilidad' registro.id %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-principal">Verificar</button>
-                                </form>
+                        <div>
+                            <strong>Estado:</strong>
+                            {% if registro.verificado %}
+                                <span class="estado ok">Verificado final</span>
+                            {% elif registro.acciones_correctivas_requieren_revision and not registro.acciones_correctivas_verificadas %}
+                                <span class="estado alerta">Pendiente revisión acciones</span>
+                            {% elif registro.acciones_correctivas_requieren_revision and registro.acciones_correctivas_verificadas %}
+                                <span class="estado medio">Listo para verificación</span>
                             {% else %}
-                                <span class="verificado-info">Registro verificado</span>
+                                <span class="estado medio">Listo para verificación</span>
                             {% endif %}
                         </div>
+
+                        <div><strong>Verificado final:</strong> {% if registro.verificado %}Sí{% else %}No{% endif %}</div>
+                        <div><strong>Fecha verificación:</strong> {{ registro.fecha_verificacion|date:"d/m/Y H:i"|default:"-" }}</div>
+                        <div><strong>Nombre verificador:</strong> {{ registro.nombre_verificador|default:"-" }}</div>
+
+                        <div><strong>Requiere revisión:</strong> {% if registro.acciones_correctivas_requieren_revision %}Sí{% else %}No{% endif %}</div>
+                        <div><strong>Acciones verificadas:</strong> {% if registro.acciones_correctivas_verificadas %}Sí{% else %}No{% endif %}</div>
+                        <div><strong>Fecha verificación acciones:</strong> {{ registro.fecha_verificacion_acciones|date:"d/m/Y H:i"|default:"-" }}</div>
+                        <div><strong>Verificador acciones:</strong> {{ registro.nombre_verificador_acciones|default:"-" }}</div>
+
+                        <div class="col-span-3">
+                            <strong>Observaciones:</strong>
+                            {{ registro.observaciones|default:"-" }}
+                        </div>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="sin-resultados">
-                    No se encontraron registros con los filtros seleccionados.
-                </div>
-            {% endif %}
-            {% if registros.has_other_pages %}
-                <div class="pagination">
-                    {% if registros.has_previous %}
-                        <a href="?page={{ registros.previous_page_number }}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.producto %}&producto={{ request.GET.producto }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}{% if request.GET.lote_producto %}&lote_producto={{ request.GET.lote_producto }}{% endif %}{% if request.GET.lote_ingrediente %}&lote_ingrediente={{ request.GET.lote_ingrediente }}{% endif %}{% if request.GET.estado_verificacion %}&estado_verificacion={{ request.GET.estado_verificacion }}{% endif %}">Anterior</a>
-                    {% endif %}
 
-                    <span class="current">
-                        Página {{ registros.number }} de {{ registros.paginator.num_pages }}
-                    </span>
+                    <!-- TABLA INGREDIENTES -->
+                    <div class="tabla-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ingrediente</th>
+                                    <th>Lote</th>
+                                    <th>Fecha elaboración</th>
+                                    <th>Fecha vencimiento</th>
+                                    <th>Proveedor</th>
+                                    <th>Acción correctiva</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detalle in registro.detalles.all %}
+                                <tr>
+                                    <td>{{ detalle.ingrediente.nombre }}</td>
+                                    <td>{{ detalle.lote }}</td>
+                                    <td>{{ detalle.fecha_elaboracion|date:"d/m/Y"|default:"-" }}</td>
+                                    <td>{{ detalle.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</td>
+                                    <td>{{ detalle.proveedor.nombre }}</td>
+                                    <td>{{ detalle.accion_correctiva|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
 
-                    {% if registros.has_next %}
-                        <a href="?page={{ registros.next_page_number }}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.producto %}&producto={{ request.GET.producto }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}{% if request.GET.lote_producto %}&lote_producto={{ request.GET.lote_producto }}{% endif %}{% if request.GET.lote_ingrediente %}&lote_ingrediente={{ request.GET.lote_ingrediente }}{% endif %}{% if request.GET.estado_verificacion %}&estado_verificacion={{ request.GET.estado_verificacion }}{% endif %}">Siguiente</a>
-                    {% endif %}
+                    <!-- ACCIONES -->
+                    <div class="acciones-form" style="margin-top:16px;">
+                        {% if not registro.verificado %}
+
+                            {% if registro.acciones_correctivas_requieren_revision and not registro.acciones_correctivas_verificadas %}
+                                <form method="post" action="{% url 'trazabilidad_productos:verificar_acciones_correctivas' registro.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-secundario">
+                                        Verificar acciones correctivas
+                                    </button>
+                                </form>
+
+                            {% else %}
+                                <form method="post" action="{% url 'trazabilidad_productos:verificar_trazabilidad' registro.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-principal">
+                                        Verificar registro
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                        {% endif %}
+                    </div>
+
                 </div>
-            {% endif %}
-        </div>
-        <div class="acciones-form">
-            <a href="{% url 'trazabilidad_productos:redireccionar_intermedio_2' %}" class="btn-secundario">Volver inicio</a>
-        </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="sin-resultados">
+                No hay registros para los filtros seleccionados.
+            </div>
+        {% endif %}
     </div>
+
+</div>
 </body>
 </html>
