@@ -19,16 +19,6 @@
     <!-- CABECERA -->
     <div class="cabecera-app">
         <h1>Historial de Trazabilidad</h1>
-
-        <div class="acciones-cabecera">
-            <a href="{% url 'trazabilidad_productos:registrar_trazabilidad' %}" class="btn-secundario">
-                Nuevo registro
-            </a>
-
-            <a href="{% url 'trazabilidad_productos:descargar_historial_trazabilidad_excel' %}?{{ request.GET.urlencode }}" class="btn-secundario">
-                Descargar Excel
-            </a>
-        </div>
     </div>
 
     <!-- MENSAJES -->
