@@ -265,7 +265,7 @@ def verificar_acciones_correctivas(request, registro_id):
         nombre_usuario = str(request.user)
 
     registro.acciones_correctivas_verificadas = True
-    registro.fecha_verificacion_acciones = timezone.localtime(timezone.now())
+    registro.fecha_verificacion_acciones = timezone.now()
     registro.nombre_verificador_acciones = nombre_usuario
     registro.save(update_fields=[
         "acciones_correctivas_verificadas",
@@ -302,7 +302,7 @@ def verificar_trazabilidad(request, registro_id):
         nombre_usuario = str(request.user)
 
     registro.verificado = True
-    registro.fecha_verificacion = timezone.localtime(timezone.now())
+    registro.fecha_verificacion = timezone.now()
     registro.nombre_verificador = nombre_usuario
     registro.save(update_fields=[
         "verificado",
