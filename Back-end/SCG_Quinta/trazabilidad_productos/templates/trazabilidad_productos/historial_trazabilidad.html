@@ -1,4 +1,5 @@
 {% load static %}
+{% load tz %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -92,7 +93,7 @@
                             Fecha de registro: {{ registro.fecha_registro|date:"d/m/Y H:i" }} |
                             Código registro: {{ registro.producto.codigo_registro }} |
                             Versión: {{ registro.producto.version }} |
-                            Fecha modificación: {{ registro.producto.fecha_modificacion|date:"d/m/Y" }}
+                            Fecha modificación: {{ registro.producto.fecha_modificacion|localtime|date:"d/m/Y" }}
                         </p>
                     </div>
 
