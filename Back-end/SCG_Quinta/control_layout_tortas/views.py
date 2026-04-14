@@ -13,7 +13,6 @@ from django.views.generic import ListView
 from .forms import (
     RegistroLayoutForm,
     RegistroCapaFormSet,
-    HistorialRegistroFilterForm,
 )
 from .models import (
     LayoutTorta,
