@@ -9,15 +9,19 @@ class Planta(models.TextChoices):
 
 
 class TurnoChoices(models.TextChoices):
-    TURNO_1 = "TURNO 1", "Turno 1"
-    TURNO_2 = "TURNO 2", "Turno 2"
-    TURNO_3 = "TURNO 3", "Turno 3"
+    TURNO_A = "TURNO A", "Turno A"
+    TURNO_B = "TURNO B", "Turno B"
+    TURNO_C = "TURNO C", "Turno C"
 
 
 class LineaChoices(models.TextChoices):
-    LINEA_1 = "LÍNEA 1", "Línea 1"
+    Gorreri_pasteleria = "Gorreri pasteleria", "Gorreri pastelería"
+    LINEA_1A = "LÍNEA 1A", "Línea 1A"
+    LINEA_1B = "LÍNEA 1B", "Línea 1B"
     LINEA_2 = "LÍNEA 2", "Línea 2"
-    LINEA_3 = "LÍNEA 3", "Línea 3"
+    LINEA_3A = "LÍNEA 3A", "Línea 3A"
+    LINEA_3B = "LÍNEA 3B", "Línea 3B"
+    CAKEMATIC = "CAKEMATIC", "Cakematic"
 
 
 class TipoCapa(models.TextChoices):
