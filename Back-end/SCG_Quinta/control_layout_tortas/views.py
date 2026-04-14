@@ -25,8 +25,21 @@ class RegistroCreateView(LoginRequiredMixin, View):
     template_name = "control_layout_tortas/registro_create.html"
 
     def _nombre_operador(self, request):
-        full_name = request.user.get_full_name()
-        return full_name.strip() if full_name and full_name.strip() else request.user.username
+        user = request.user
+
+        nombre_completo = getattr(user, "nombre_completo", "")
+        if nombre_completo and str(nombre_completo).strip():
+            return str(nombre_completo).strip()
+
+        username = getattr(user, "username", "")
+        if username and str(username).strip():
+            return str(username).strip()
+
+        email = getattr(user, "email", "")
+        if email and str(email).strip():
+            return str(email).strip()
+
+        return str(user)
 
     def get(self, request):
         form = RegistroLayoutForm(operador_inicial=self._nombre_operador(request))
