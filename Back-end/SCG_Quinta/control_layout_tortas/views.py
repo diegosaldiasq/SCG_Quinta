@@ -13,6 +13,7 @@ from django.views.generic import ListView
 from .forms import (
     RegistroLayoutForm,
     RegistroCapaFormSet,
+    HistorialRegistroFilterForm,
 )
 from .models import (
     LayoutTorta,
@@ -148,7 +149,7 @@ class RegistroDetalleView(LoginRequiredMixin, View):
         return render(request, self.template_name, {"registro": registro, "detalles": detalles})
 
 
-class HistorialRegistroListView(LoginRequiredMixin, ListView):
+class HistorialRegistroListView(ListView):
     model = RegistroLayout
     template_name = "control_layout_tortas/historial_registros.html"
     context_object_name = "registros"
@@ -157,60 +158,57 @@ class HistorialRegistroListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         qs = (
             RegistroLayout.objects
-            .select_related(
-                "layout",
-                "layout__producto",
-                "verificado_por",
-            )
-            .prefetch_related(
-                Prefetch(
-                    "detalles",
-                    queryset=RegistroCapa.objects.select_related("capa", "ingrediente_usado")
-                )
-            )
+            .select_related("layout", "layout__producto")
             .order_by("-fecha", "-creado_en")
         )
 
-        planta = self.request.GET.get("planta")
-        cliente = self.request.GET.get("cliente")
-        producto = self.request.GET.get("producto")
-        lote = self.request.GET.get("lote")
-        fecha_desde = self.request.GET.get("fecha_desde")
-        fecha_hasta = self.request.GET.get("fecha_hasta")
-        estado = self.request.GET.get("estado_verificacion")
+        self.filter_form = HistorialRegistroFilterForm(self.request.GET or None)
 
-        if planta:
-            qs = qs.filter(planta=planta)
+        if self.filter_form.is_valid():
+            planta = self.filter_form.cleaned_data.get("planta")
+            turno = self.filter_form.cleaned_data.get("turno")
+            linea = self.filter_form.cleaned_data.get("linea")
+            layout = self.filter_form.cleaned_data.get("layout")
+            desde = self.filter_form.cleaned_data.get("desde")
+            hasta = self.filter_form.cleaned_data.get("hasta")
+            lote = self.filter_form.cleaned_data.get("lote")
+            operador = self.filter_form.cleaned_data.get("operador")
+            verificado = self.filter_form.cleaned_data.get("verificado")
 
-        if cliente:
-            qs = qs.filter(layout__producto__cliente__icontains=cliente)
+            if planta:
+                qs = qs.filter(planta=planta)
 
-        if producto:
-            qs = qs.filter(layout__producto__nombre__icontains=producto)
+            if turno:
+                qs = qs.filter(turno=turno)
 
-        if lote:
-            qs = qs.filter(lote__icontains=lote)
+            if linea:
+                qs = qs.filter(linea=linea)
 
-        if fecha_desde:
-            qs = qs.filter(fecha__gte=fecha_desde)
+            if layout:
+                qs = qs.filter(layout=layout)
 
-        if fecha_hasta:
-            qs = qs.filter(fecha__lte=fecha_hasta)
+            if desde:
+                qs = qs.filter(fecha__gte=desde)
 
-        if estado == "verificados":
-            qs = qs.filter(verificado=True)
-        elif estado == "pendientes":
-            qs = qs.filter(verificado=False)
+            if hasta:
+                qs = qs.filter(fecha__lte=hasta)
+
+            if lote:
+                qs = qs.filter(lote__icontains=lote)
+
+            if operador:
+                qs = qs.filter(operador__icontains=operador)
+
+            if verificado == "si":
+                qs = qs.filter(verificado=True)
+            elif verificado == "no":
+                qs = qs.filter(verificado=False)
 
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["filter_form"] = HistorialRegistroFilterForm(self.request.GET or None)
-        querydict = self.request.GET.copy()
-        if "page" in querydict:
-            querydict.pop("page")
-        context["querystring"] = querydict.urlencode()
+        context["filter_form"] = getattr(self, "filter_form", HistorialRegistroFilterForm())
         return context
 
 

@@ -107,3 +107,53 @@ RegistroCapaFormSet = inlineformset_factory(
     extra=0,
     can_delete=False,
 )
+
+class HistorialRegistroFilterForm(forms.Form):
+    planta = forms.ChoiceField(
+        required=False,
+        choices=[("", "Todas")] + list(RegistroLayout._meta.get_field("planta").choices),
+        label="Planta",
+    )
+    turno = forms.ChoiceField(
+        required=False,
+        choices=[("", "Todos")] + list(RegistroLayout._meta.get_field("turno").choices),
+        label="Turno",
+    )
+    linea = forms.ChoiceField(
+        required=False,
+        choices=[("", "Todas")] + list(RegistroLayout._meta.get_field("linea").choices),
+        label="Línea",
+    )
+    layout = forms.ModelChoiceField(
+        required=False,
+        queryset=LayoutTorta.objects.select_related("producto").order_by("producto__cliente", "producto__nombre"),
+        label="Layout",
+        empty_label="Todos",
+    )
+    desde = forms.DateField(
+        required=False,
+        label="Desde",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    hasta = forms.DateField(
+        required=False,
+        label="Hasta",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    lote = forms.CharField(
+        required=False,
+        label="Lote",
+    )
+    operador = forms.CharField(
+        required=False,
+        label="Operador",
+    )
+    verificado = forms.ChoiceField(
+        required=False,
+        label="Verificación",
+        choices=[
+            ("", "Todos"),
+            ("si", "Verificados"),
+            ("no", "No verificados"),
+        ],
+    )
