@@ -54,6 +54,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
         cliente = post_data.get("cliente")
         producto_id = post_data.get("producto_manual")
 
+        # Resolver layout automáticamente si no viene informado
         if not post_data.get("layout") and planta and cliente and producto_id:
             layout_obj = (
                 LayoutTorta.objects
@@ -69,33 +70,46 @@ class RegistroCreateView(LoginRequiredMixin, View):
             if layout_obj:
                 post_data["layout"] = str(layout_obj.id)
 
+        # Operador siempre desde el usuario logueado
         post_data["operador"] = self._nombre_operador(request)
 
-        form = RegistroLayoutForm(post_data, operador_inicial=self._nombre_operador(request))
-        formset = None
+        form = RegistroLayoutForm(
+            post_data,
+            operador_inicial=self._nombre_operador(request),
+        )
 
         if not form.is_valid():
-            return render(request, self.template_name, {"form": form, "formset": None})
+            return render(request, self.template_name, {
+                "form": form,
+                "formset": None,
+            })
 
         registro_id = post_data.get("registro_id")
+        auto_cargar = post_data.get("_auto_cargar_capas") == "1"
+        guardar = "_guardar" in request.POST
+
         if registro_id:
             registro = get_object_or_404(RegistroLayout, pk=registro_id)
             for campo in ["planta", "layout", "fecha", "turno", "linea", "lote", "observaciones"]:
                 setattr(registro, campo, form.cleaned_data[campo])
             registro.operador = self._nombre_operador(request)
-            registro.save()
         else:
             registro = form.save(commit=False)
             registro.operador = self._nombre_operador(request)
-            registro.save()
+            registro.verificado = False
+            registro.completado = False
+
+        registro.save()
 
         for capa in registro.layout.capas.all():
             RegistroCapa.objects.get_or_create(registro=registro, capa=capa)
 
-        if "_guardar" in request.POST:
+        if guardar:
             formset = RegistroCapaFormSet(post_data, instance=registro, prefix="detalles")
             if formset.is_valid():
                 formset.save()
+                registro.completado = True
+                registro.save(update_fields=["completado"])
                 messages.success(request, "Registro guardado correctamente.")
                 return redirect("control_layout_tortas:registro_detalle", pk=registro.id)
 
@@ -116,6 +130,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 "registro_id": registro.id,
             })
 
+        # Auto-carga o vista intermedia
         formset = RegistroCapaFormSet(instance=registro, prefix="detalles")
         form_recargado = RegistroLayoutForm(
             instance=registro,
@@ -132,7 +147,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
             "form": form_recargado,
             "formset": formset,
             "registro_id": registro.id,
-            "auto_cargado": True,
+            "auto_cargado": auto_cargar,
         })
 
 
@@ -159,6 +174,7 @@ class HistorialRegistroListView(ListView):
         qs = (
             RegistroLayout.objects
             .select_related("layout", "layout__producto")
+            .filter(completado=True)
             .order_by("-fecha", "-creado_en")
         )
 

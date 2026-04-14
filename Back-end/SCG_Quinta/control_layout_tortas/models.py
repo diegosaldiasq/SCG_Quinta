@@ -138,6 +138,7 @@ class RegistroLayout(models.Model):
     operador = models.CharField(max_length=120, blank=True, default="")
     observaciones = models.TextField(blank=True, default="")
     verificado = models.BooleanField(default=False)
+    completado = models.BooleanField(default=False)
     creado_en = models.DateTimeField(default=timezone.now)
 
     class Meta:
