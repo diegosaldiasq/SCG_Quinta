@@ -1,13 +1,6 @@
 from django import forms
 from django.forms.models import inlineformset_factory
-
-from .models import (
-    RegistroLayout,
-    RegistroCapa,
-    LayoutTorta,
-    Ingrediente,
-    Planta,
-)
+from .models import RegistroLayout, RegistroCapa, LayoutTorta, Ingrediente
 
 
 class RegistroLayoutForm(forms.ModelForm):
@@ -35,12 +28,17 @@ class RegistroLayoutForm(forms.ModelForm):
             "fecha": forms.DateInput(attrs={"type": "date"}),
             "observaciones": forms.Textarea(attrs={"rows": 2}),
             "layout": forms.HiddenInput(),
+            "operador": forms.TextInput(attrs={"readonly": "readonly"}),
         }
 
     def __init__(self, *args, **kwargs):
+        operador_inicial = kwargs.pop("operador_inicial", "")
         super().__init__(*args, **kwargs)
 
         self.fields["layout"].required = False
+
+        if operador_inicial and not self.initial.get("operador"):
+            self.initial["operador"] = operador_inicial
 
         layouts_qs = (
             LayoutTorta.objects
@@ -51,24 +49,16 @@ class RegistroLayoutForm(forms.ModelForm):
 
         self.fields["layout"].queryset = layouts_qs
 
-        planta = None
-        cliente = None
+        planta = self.data.get("planta") or getattr(self.instance, "planta", None)
+        cliente = self.data.get("cliente") or self.initial.get("cliente")
 
-        if self.data.get("planta"):
-            planta = self.data.get("planta")
-        elif self.instance and self.instance.pk:
-            planta = self.instance.planta
-
-        if self.data.get("cliente"):
-            cliente = self.data.get("cliente")
-
-        clientes = layouts_qs
+        clientes_qs = layouts_qs
         if planta:
-            clientes = clientes.filter(planta=planta)
+            clientes_qs = clientes_qs.filter(planta=planta)
 
         clientes_unicos = []
         vistos = set()
-        for item in clientes:
+        for item in clientes_qs:
             c = (item.producto.cliente or "").strip()
             if c and c not in vistos:
                 vistos.add(c)
@@ -76,15 +66,15 @@ class RegistroLayoutForm(forms.ModelForm):
 
         self.fields["cliente"].choices = [("", "Selecciona cliente")] + clientes_unicos
 
-        productos = layouts_qs
+        productos_qs = layouts_qs
         if planta:
-            productos = productos.filter(planta=planta)
+            productos_qs = productos_qs.filter(planta=planta)
         if cliente:
-            productos = productos.filter(producto__cliente=cliente)
+            productos_qs = productos_qs.filter(producto__cliente=cliente)
 
         productos_unicos = []
         vistos_prod = set()
-        for item in productos:
+        for item in productos_qs:
             key = (item.producto.id, item.producto.nombre)
             if key not in vistos_prod:
                 vistos_prod.add(key)
@@ -117,33 +107,3 @@ RegistroCapaFormSet = inlineformset_factory(
     extra=0,
     can_delete=False,
 )
-
-
-class HistorialRegistroFilterForm(forms.Form):
-    planta = forms.ChoiceField(
-        required=False,
-        label="Planta",
-        choices=[("", "Todas")] + list(Planta.choices),
-    )
-    cliente = forms.CharField(required=False, label="Cliente")
-    producto = forms.CharField(required=False, label="Producto")
-    lote = forms.CharField(required=False, label="Lote")
-    fecha_desde = forms.DateField(
-        required=False,
-        label="Desde",
-        widget=forms.DateInput(attrs={"type": "date"})
-    )
-    fecha_hasta = forms.DateField(
-        required=False,
-        label="Hasta",
-        widget=forms.DateInput(attrs={"type": "date"})
-    )
-    estado_verificacion = forms.ChoiceField(
-        required=False,
-        label="Verificación",
-        choices=[
-            ("", "Todos"),
-            ("verificados", "Verificados"),
-            ("pendientes", "Pendientes"),
-        ],
-    )

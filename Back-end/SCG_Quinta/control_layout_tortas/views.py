@@ -25,13 +25,18 @@ from .models import (
 class RegistroCreateView(LoginRequiredMixin, View):
     template_name = "control_layout_tortas/registro_create.html"
 
+    def _nombre_operador(self, request):
+        full_name = request.user.get_full_name()
+        return full_name.strip() if full_name and full_name.strip() else request.user.username
+
     def get(self, request):
-        form = RegistroLayoutForm()
+        form = RegistroLayoutForm(operador_inicial=self._nombre_operador(request))
         return render(request, self.template_name, {"form": form, "formset": None})
 
     @transaction.atomic
     def post(self, request):
         post_data = request.POST.copy()
+
         planta = post_data.get("planta")
         cliente = post_data.get("cliente")
         producto_id = post_data.get("producto_manual")
@@ -51,116 +56,84 @@ class RegistroCreateView(LoginRequiredMixin, View):
             if layout_obj:
                 post_data["layout"] = str(layout_obj.id)
 
-        form = RegistroLayoutForm(post_data)
+        post_data["operador"] = self._nombre_operador(request)
+
+        form = RegistroLayoutForm(post_data, operador_inicial=self._nombre_operador(request))
         formset = None
 
-        if "_cargar_capas" in request.POST:
-            if not planta:
-                messages.error(request, "Selecciona una planta.")
-                return render(request, self.template_name, {"form": form, "formset": None})
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form, "formset": None})
 
-            if not cliente:
-                messages.error(request, "Selecciona un cliente.")
-                return render(request, self.template_name, {"form": form, "formset": None})
+        registro_id = post_data.get("registro_id")
+        if registro_id:
+            registro = get_object_or_404(RegistroLayout, pk=registro_id)
+            for campo in ["planta", "layout", "fecha", "turno", "linea", "lote", "observaciones"]:
+                setattr(registro, campo, form.cleaned_data[campo])
+            registro.operador = self._nombre_operador(request)
+            registro.save()
+        else:
+            registro = form.save(commit=False)
+            registro.operador = self._nombre_operador(request)
+            registro.save()
 
-            if not producto_id:
-                messages.error(request, "Selecciona un producto.")
-                return render(request, self.template_name, {"form": form, "formset": None})
-
-            if not form.is_valid():
-                return render(request, self.template_name, {"form": form, "formset": None})
-
-            registro_id = post_data.get("registro_id")
-            if registro_id:
-                registro = get_object_or_404(RegistroLayout, pk=registro_id)
-            else:
-                registro = form.save(commit=False)
-                registro.save()
-
-            for capa in registro.layout.capas.all():
-                RegistroCapa.objects.get_or_create(registro=registro, capa=capa)
-
-            formset = RegistroCapaFormSet(instance=registro, prefix="detalles")
-            messages.info(request, "Capas cargadas. Ingresa los pesos reales y guarda.")
-
-            form_recargado = RegistroLayoutForm(
-                instance=registro,
-                initial={
-                    "cliente": registro.layout.producto.cliente,
-                    "producto_manual": registro.layout.producto.id,
-                    "codigo_auto": registro.layout.producto.codigo,
-                }
-            )
-
-            return render(
-                request,
-                self.template_name,
-                {
-                    "form": form_recargado,
-                    "formset": formset,
-                    "registro_id": registro.id,
-                }
-            )
+        for capa in registro.layout.capas.all():
+            RegistroCapa.objects.get_or_create(registro=registro, capa=capa)
 
         if "_guardar" in request.POST:
-            registro_id = post_data.get("registro_id")
-            if not registro_id:
-                messages.error(request, "Primero debes cargar las capas.")
-                return render(request, self.template_name, {"form": form, "formset": None})
-
-            registro = get_object_or_404(RegistroLayout, pk=registro_id)
-
             formset = RegistroCapaFormSet(post_data, instance=registro, prefix="detalles")
             if formset.is_valid():
                 formset.save()
                 messages.success(request, "Registro guardado correctamente.")
                 return redirect("control_layout_tortas:registro_detalle", pk=registro.id)
 
-            return render(
-                request,
-                self.template_name,
-                {
-                    "form": RegistroLayoutForm(
-                        instance=registro,
-                        initial={
-                            "cliente": registro.layout.producto.cliente,
-                            "producto_manual": registro.layout.producto.id,
-                            "codigo_auto": registro.layout.producto.codigo,
-                        }
-                    ),
-                    "formset": formset,
-                    "registro_id": registro.id,
+            form_recargado = RegistroLayoutForm(
+                instance=registro,
+                operador_inicial=self._nombre_operador(request),
+                initial={
+                    "cliente": registro.layout.producto.cliente,
+                    "producto_manual": registro.layout.producto.id,
+                    "codigo_auto": registro.layout.producto.codigo,
+                    "operador": self._nombre_operador(request),
                 }
             )
 
-        return render(request, self.template_name, {"form": form, "formset": None})
+            return render(request, self.template_name, {
+                "form": form_recargado,
+                "formset": formset,
+                "registro_id": registro.id,
+            })
+
+        formset = RegistroCapaFormSet(instance=registro, prefix="detalles")
+        form_recargado = RegistroLayoutForm(
+            instance=registro,
+            operador_inicial=self._nombre_operador(request),
+            initial={
+                "cliente": registro.layout.producto.cliente,
+                "producto_manual": registro.layout.producto.id,
+                "codigo_auto": registro.layout.producto.codigo,
+                "operador": self._nombre_operador(request),
+            }
+        )
+
+        return render(request, self.template_name, {
+            "form": form_recargado,
+            "formset": formset,
+            "registro_id": registro.id,
+            "auto_cargado": True,
+        })
 
 
 class RegistroDetalleView(LoginRequiredMixin, View):
     template_name = "control_layout_tortas/registro_detalle.html"
 
     def get(self, request, pk):
-        registro = get_object_or_404(
-            RegistroLayout.objects.select_related(
-                "layout",
-                "layout__producto",
-                "verificado_por",
-            ),
-            pk=pk
-        )
+        registro = get_object_or_404(RegistroLayout, pk=pk)
         detalles = (
             registro.detalles
             .select_related("capa", "capa__ingrediente", "ingrediente_usado")
             .all()
         )
-        return render(
-            request,
-            self.template_name,
-            {
-                "registro": registro,
-                "detalles": detalles,
-            }
-        )
+        return render(request, self.template_name, {"registro": registro, "detalles": detalles})
 
 
 class HistorialRegistroListView(LoginRequiredMixin, ListView):

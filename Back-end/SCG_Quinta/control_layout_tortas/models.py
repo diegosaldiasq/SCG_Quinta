@@ -1,15 +1,23 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-
-User = get_user_model()
 
 
 class Planta(models.TextChoices):
     PV = "PV", "PV"
     ENEA = "ENEA", "ENEA"
     CURICO = "CURICO", "Curicó"
+
+
+class TurnoChoices(models.TextChoices):
+    TURNO_1 = "TURNO 1", "Turno 1"
+    TURNO_2 = "TURNO 2", "Turno 2"
+    TURNO_3 = "TURNO 3", "Turno 3"
+
+
+class LineaChoices(models.TextChoices):
+    LINEA_1 = "LÍNEA 1", "Línea 1"
+    LINEA_2 = "LÍNEA 2", "Línea 2"
+    LINEA_3 = "LÍNEA 3", "Línea 3"
 
 
 class TipoCapa(models.TextChoices):
@@ -42,11 +50,7 @@ class CategoriaIngrediente(models.TextChoices):
 
 class Ingrediente(models.Model):
     nombre = models.CharField(max_length=120)
-    categoria = models.CharField(
-        max_length=20,
-        choices=CategoriaIngrediente.choices,
-        default=CategoriaIngrediente.OTRO
-    )
+    categoria = models.CharField(max_length=20, choices=CategoriaIngrediente.choices, default=CategoriaIngrediente.OTRO)
     activo = models.BooleanField(default=True)
     descripcion = models.CharField(max_length=200, blank=True, default="")
     codigo_interno = models.CharField(max_length=40, blank=True, default="")
@@ -104,7 +108,7 @@ class LayoutCapa(models.Model):
         max_length=120,
         blank=True,
         default="",
-        help_text="Texto libre opcional (ej: 'Relleno 1', 'Mermelada guinda'). Si está vacío se usa el ingrediente."
+        help_text="Texto libre opcional."
     )
     peso_objetivo_g = models.DecimalField(max_digits=8, decimal_places=1)
     tolerancia_menos_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
@@ -124,22 +128,11 @@ class RegistroLayout(models.Model):
     planta = models.CharField(max_length=10, choices=Planta.choices)
     layout = models.ForeignKey(LayoutTorta, on_delete=models.PROTECT)
     fecha = models.DateField(default=timezone.localdate)
-    turno = models.CharField(max_length=20, blank=True, default="")
-    linea = models.CharField(max_length=30, blank=True, default="")
+    turno = models.CharField(max_length=20, choices=TurnoChoices.choices, blank=True, default="")
+    linea = models.CharField(max_length=30, choices=LineaChoices.choices, blank=True, default="")
     lote = models.CharField(max_length=40, blank=True, default="")
     operador = models.CharField(max_length=120, blank=True, default="")
     observaciones = models.TextField(blank=True, default="")
-
-    verificado = models.BooleanField(default=False)
-    verificado_por = models.ForeignKey(
-        User,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="registros_layout_verificados"
-    )
-    fecha_verificacion = models.DateTimeField(null=True, blank=True)
-
     creado_en = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -147,36 +140,6 @@ class RegistroLayout(models.Model):
 
     def __str__(self):
         return f"{self.fecha} {self.planta} - {self.layout}"
-
-    def clean(self):
-        super().clean()
-        if self.layout_id and self.planta and self.layout.planta != self.planta:
-            raise ValidationError({
-                "planta": "La planta seleccionada no coincide con la planta del layout."
-            })
-
-    @property
-    def total_capas(self):
-        return self.detalles.count()
-
-    @property
-    def capas_con_peso(self):
-        return self.detalles.exclude(peso_real_g__isnull=True).count()
-
-    @property
-    def porcentaje_completado(self):
-        total = self.total_capas
-        if total == 0:
-            return 0
-        return round((self.capas_con_peso / total) * 100, 1)
-
-    @property
-    def total_ok(self):
-        return sum(1 for d in self.detalles.all() if d.cumple is True)
-
-    @property
-    def total_no_ok(self):
-        return sum(1 for d in self.detalles.all() if d.cumple is False)
 
 
 class RegistroCapa(models.Model):

@@ -26,19 +26,20 @@
         </div>
       </div>
 
-      <form method="post" class="layout-form">
+      <form method="post" class="layout-form" id="registroLayoutForm">
         {% csrf_token %}
 
         {% if registro_id %}
           <input type="hidden" name="registro_id" value="{{ registro_id }}">
         {% endif %}
 
+        <input type="hidden" name="_auto_cargar_capas" id="autoCargarCapas" value="">
+        {{ form.layout }}
+
         <section class="card">
           <div class="card-header">
             <h2>Cabecera</h2>
           </div>
-
-          {{ form.layout }}
 
           <div class="form-grid">
             <div class="form-group">
@@ -76,21 +77,14 @@
               {{ form.linea }}
             </div>
 
-            <div class="form-group action-group">
-              <label class="label-muted">Acción</label>
-              <button class="btn btn-cargar" name="_cargar_capas" value="1" type="submit">
-                Cargar capas
-              </button>
+            <div class="form-group">
+              <label for="{{ form.operador.id_for_label }}">Operador</label>
+              {{ form.operador }}
             </div>
 
             <div class="form-group">
               <label for="{{ form.lote.id_for_label }}">Lote</label>
               {{ form.lote }}
-            </div>
-
-            <div class="form-group">
-              <label for="{{ form.operador.id_for_label }}">Operador</label>
-              {{ form.operador }}
             </div>
           </div>
 
@@ -142,11 +136,7 @@
                       {{ f.id }}
 
                       <td data-label="#">{{ capa.orden }}</td>
-
-                      <td data-label="Tipo">
-                        {{ capa.get_tipo_display }}
-                      </td>
-
+                      <td data-label="Tipo">{{ capa.get_tipo_display }}</td>
                       <td data-label="Etiqueta">
                         {% if capa.etiqueta %}
                           {{ capa.etiqueta }}
@@ -154,7 +144,6 @@
                           {{ capa.ingrediente.nombre }}
                         {% endif %}
                       </td>
-
                       <td data-label="Ingrediente planificado">
                         {% if capa.ingrediente %}
                           {{ capa.ingrediente.nombre }}
@@ -162,23 +151,10 @@
                           -
                         {% endif %}
                       </td>
-
-                      <td data-label="Ingrediente usado">
-                        {{ f.ingrediente_usado }}
-                      </td>
-
-                      <td data-label="Objetivo (g)">
-                        {{ capa.peso_objetivo_g }}
-                      </td>
-
-                      <td data-label="Peso real (g)">
-                        {{ f.peso_real_g }}
-                      </td>
-
-                      <td data-label="Comentario">
-                        {{ f.comentario }}
-                      </td>
-
+                      <td data-label="Ingrediente usado">{{ f.ingrediente_usado }}</td>
+                      <td data-label="Objetivo (g)">{{ capa.peso_objetivo_g }}</td>
+                      <td data-label="Peso real (g)">{{ f.peso_real_g }}</td>
+                      <td data-label="Comentario">{{ f.comentario }}</td>
                       <td data-label="Rango">
                         -{{ capa.tolerancia_menos_g|floatformat:1 }} / +{{ capa.tolerancia_mas_g|floatformat:1 }}
                       </td>
@@ -205,12 +181,9 @@
           </section>
         {% else %}
           <div class="helper-text">
-            Selecciona planta, cliente y producto, luego presiona <strong>“Cargar capas”</strong>.
+            Selecciona planta, cliente y producto. Las capas se cargarán automáticamente.
           </div>
         {% endif %}
-        <div class="acciones-form">
-            <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">Volver inicio</a>
-        </div>
       </form>
     </div>
   </div>
@@ -229,11 +202,13 @@
       {% endfor %}
     ];
 
+    const form = document.getElementById("registroLayoutForm");
     const plantaSelect = document.getElementById("id_planta");
     const clienteSelect = document.getElementById("id_cliente");
     const productoSelect = document.getElementById("id_producto_manual");
     const codigoInput = document.getElementById("id_codigo_auto");
     const layoutInput = document.getElementById("id_layout");
+    const autoCargarCapasInput = document.getElementById("autoCargarCapas");
 
     function uniqueBy(arr, key) {
       const seen = new Set();
@@ -253,7 +228,6 @@
 
     function cargarClientes() {
       const planta = plantaSelect.value;
-
       clienteSelect.innerHTML = '<option value="">Selecciona cliente</option>';
       resetProductosYCodigo();
 
@@ -275,7 +249,6 @@
     function cargarProductos() {
       const planta = plantaSelect.value;
       const cliente = clienteSelect.value;
-
       resetProductosYCodigo();
 
       if (!planta || !cliente) return;
@@ -339,6 +312,11 @@
 
     productoSelect.addEventListener("change", function() {
       actualizarCodigoYLayout();
+
+      if (plantaSelect.value && clienteSelect.value && productoSelect.value) {
+        autoCargarCapasInput.value = "1";
+        form.submit();
+      }
     });
 
     document.addEventListener("DOMContentLoaded", function() {
