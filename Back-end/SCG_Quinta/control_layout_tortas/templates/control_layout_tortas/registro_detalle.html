@@ -75,7 +75,9 @@
             </td>
 
             <td data-label="Nombre">
-              {% if d.capa.etiqueta %}
+              {% if d.ingrediente_final %}
+                {{ d.ingrediente_final.nombre }}
+              {% elif d.capa.etiqueta %}
                 {{ d.capa.etiqueta }}
               {% else %}
                 {{ d.capa.ingrediente.nombre }}
