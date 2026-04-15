@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 
 class Planta(models.TextChoices):
@@ -137,7 +138,17 @@ class RegistroLayout(models.Model):
     lote = models.CharField(max_length=40, blank=True, default="")
     operador = models.CharField(max_length=120, blank=True, default="")
     observaciones = models.TextField(blank=True, default="")
+
     verificado = models.BooleanField(default=False)
+    fecha_verificacion = models.DateTimeField(null=True, blank=True)
+    verificado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="registros_layout_verificados",
+    )
+
     completado = models.BooleanField(default=False)
     creado_en = models.DateTimeField(default=timezone.now)
 

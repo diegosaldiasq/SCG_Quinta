@@ -236,9 +236,9 @@ def verificar_registro(request, pk):
 
     registro = get_object_or_404(RegistroLayout, pk=pk)
     registro.verificado = True
-    #registro.verificado_por = request.user
-    #registro.fecha_verificacion = timezone.now()
-    registro.save(update_fields=["verificado"])
+    registro.verificado_por = request.user
+    registro.fecha_verificacion = timezone.now()
+    registro.save(update_fields=["verificado", "verificado_por", "fecha_verificacion"])
 
     messages.success(request, "Registro verificado correctamente.")
     return redirect(request.POST.get("next") or reverse("control_layout_tortas:historial_registros"))
