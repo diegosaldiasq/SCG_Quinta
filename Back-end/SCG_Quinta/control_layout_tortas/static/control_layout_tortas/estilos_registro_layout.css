@@ -400,6 +400,25 @@ textarea {
   font-weight: 600;
 }
 
+.btn-volver {
+  display: inline-block;
+  margin: 10px 0 16px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #c7d2fe;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background: #e0e7ff;
+  color: #1e40af;
+  border-color: #a5b4fc;
+}
+
 /* RESPONSIVE */
 @media (max-width: 1200px) {
   .form-grid {
