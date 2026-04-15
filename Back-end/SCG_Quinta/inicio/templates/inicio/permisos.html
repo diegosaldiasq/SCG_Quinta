@@ -22,6 +22,7 @@
             <p class="subtitle">Permisos Usuarios</p>
 
             <div class="header-row">
+                <span>#ID</span>
                 <span>Nombre usuario</span>
                 <span>Perfil</span>
                 <span>Usuario Activo</span>
@@ -33,6 +34,7 @@
             {% for usuario in usuarios %}
                 <div class="usuario">
                     <li>
+                        <span>{{ usuario.id }}</span>
                         <span>{{ usuario.nombre_completo }}</span>
                         <span>{{ usuario.perfil_usuario }}</span>
                         <span>¿Está Activo?</span>
