@@ -213,10 +213,6 @@
         <div class="card">
             <div class="topbar">
                 <h1 class="titulo">Historial de registros de layout</h1>
-                <div class="acciones-top">
-                    <a href="{% url 'control_layout_tortas:registro_nuevo' %}" class="btn btn-primary">+ Nuevo registro</a>
-                    <a href="{% url 'control_layout_tortas:redireccionar_intermedio' %}" class="btn btn-secondary">Volver</a>
-                </div>
             </div>
         </div>
 
@@ -356,6 +352,9 @@
                 {% endif %}
             </div>
             {% endif %}
+        </div>
+        <div class="acciones-top">
+            <a href="{% url 'control_layout_tortas:redireccionar_intermedio' %}" class="btn btn-secondary">Volver</a>
         </div>
     </div>
 </body>
