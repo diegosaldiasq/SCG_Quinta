@@ -324,12 +324,6 @@
                                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                         <button type="submit" class="btn btn-success">Verificar</button>
                                     </form>
-                                    {% else %}
-                                    <form method="post" action="{% url 'control_layout_tortas:desverificar_registro' registro.pk %}" class="mini-form">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                        <button type="submit" class="btn btn-warning">Quitar verificación</button>
-                                    </form>
                                     {% endif %}
                                 </div>
                             </td>
