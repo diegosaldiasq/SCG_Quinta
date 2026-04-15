@@ -95,8 +95,10 @@
             <td data-label="Desv (g)">
               {% if d.desviacion_g is None %}
                 -
+              {% elif d.cumple %}
+                <span class="desv-ok">{{ d.desviacion_g }}</span>
               {% else %}
-                {{ d.desviacion_g }}
+                <span class="desv-no">{{ d.desviacion_g }}</span>
               {% endif %}
             </td>
 
@@ -107,14 +109,11 @@
             <td data-label="Cumple">
 
               {% if d.cumple is None %}
-                -
-
+                <span class="estado estado-neutral">-</span>
               {% elif d.cumple %}
-                <span class="ok">OK</span>
-
+                <span class="estado estado-ok">OK</span>
               {% else %}
-                <span class="bad">NO</span>
-
+                <span class="estado estado-no">NO</span>
               {% endif %}
 
             </td>

@@ -364,6 +364,42 @@ textarea {
   color: var(--white);
 }
 
+.estado {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* OK (verde) */
+.estado-ok {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* NO (rojo) */
+.estado-no {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* sin dato */
+.estado-neutral {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.desv-ok {
+  color: #047857;
+  font-weight: 600;
+}
+
+.desv-no {
+  color: #dc2626;
+  font-weight: 600;
+}
+
 /* RESPONSIVE */
 @media (max-width: 1200px) {
   .form-grid {
