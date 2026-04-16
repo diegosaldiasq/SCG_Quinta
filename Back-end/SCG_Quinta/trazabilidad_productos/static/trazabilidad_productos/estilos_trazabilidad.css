@@ -134,7 +134,7 @@ h1, h2, h3 {
 }
 
 .header-logo img {
-    width: 52px;
+    width: 156px;
     height: auto;
     display: block;
     margin: 0 auto;
@@ -889,7 +889,7 @@ a.primary-button:hover {
     }
 
     .header-logo img {
-        width: 42px;
+        width: 90px;
     }
 
     .card-logo img {
