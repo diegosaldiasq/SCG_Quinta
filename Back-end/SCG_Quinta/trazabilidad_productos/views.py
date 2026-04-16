@@ -88,6 +88,13 @@ def obtener_proveedores(request):
 def registrar_trazabilidad(request):
     form = RegistroTrazabilidadForm()
 
+    if hasattr(request.user, "nombre_completo") and request.user.nombre_completo:
+        nombre_usuario = request.user.nombre_completo
+    elif hasattr(request.user, "email") and request.user.email:
+        nombre_usuario = request.user.email
+    else:
+        nombre_usuario = str(request.user)
+
     if request.method == "POST":
         form = RegistroTrazabilidadForm(request.POST)
 
@@ -107,6 +114,7 @@ def registrar_trazabilidad(request):
                     {
                         "form": form,
                         "clientes": Cliente.objects.all().order_by("nombre"),
+                        "nombre_usuario": nombre_usuario,
                     },
                 )
 
@@ -115,12 +123,7 @@ def registrar_trazabilidad(request):
                     registro = form.save(commit=False)
                     producto = registro.producto
                     registro.codigo_producto = producto.codigo
-                    if hasattr(request.user, "nombre_completo") and request.user.nombre_completo:
-                        registro.elaborado_por = request.user.nombre_completo
-                    elif hasattr(request.user, "email") and request.user.email:
-                        registro.elaborado_por = request.user.email
-                    else:
-                        registro.elaborado_por = str(request.user)
+                    registro.elaborado_por = nombre_usuario
                     registro.save()
 
                     tiene_acciones_correctivas = False
@@ -170,6 +173,7 @@ def registrar_trazabilidad(request):
     contexto = {
         "form": form,
         "clientes": Cliente.objects.all().order_by("nombre"),
+        "nombre_usuario": nombre_usuario,
     }
     return render(request, "trazabilidad_productos/registrar_trazabilidad.html", contexto)
 
