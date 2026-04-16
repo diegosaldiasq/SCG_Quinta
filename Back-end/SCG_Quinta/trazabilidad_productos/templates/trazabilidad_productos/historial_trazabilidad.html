@@ -119,11 +119,11 @@
                             {% endif %}
                         </div>
 
-                        <div><strong>Requiere revisión:</strong>{% if not registro.verificado %}Sí{% else %}No{% endif %}</div>
+                        <div><strong>Requiere revisión final:</strong>{% if not registro.verificado %}Sí{% else %}No{% endif %}</div>
                         <div><strong>Fecha verificación:</strong> {{ registro.fecha_verificacion|localtime|date:"d/m/Y H:i"|default:"-" }}</div>
                         <div><strong>Nombre verificador:</strong> {{ registro.nombre_verificador|default:"-" }}</div>
 
-                        <div><strong>Requiere revisión:</strong> {% if not registro.acciones_correctivas_requieren_revision %}Sí{% else %}No{% endif %}</div>
+                        <div><strong>Requiere revisión VAC:</strong> {% if not registro.acciones_correctivas_requieren_revision %}No{% else %}Sí{% endif %}</div>
                         <div><strong>Acciones verificadas:</strong> {% if registro.acciones_correctivas_verificadas %}Sí{% else %}No{% endif %}</div>
                         <div><strong>Fecha verificación acciones:</strong> {{ registro.fecha_verificacion_acciones|localtime|date:"d/m/Y H:i"|default:"-" }}</div>
                         <div><strong>Verificador acciones:</strong> {{ registro.nombre_verificador_acciones|default:"-" }}</div>
