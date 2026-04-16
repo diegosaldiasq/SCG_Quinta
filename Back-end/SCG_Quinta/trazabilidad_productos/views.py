@@ -184,7 +184,7 @@ def historial_trazabilidad(request):
     user_id = request.user.id
 
     ids_vac = [1, 51, 52, 53, 54, 55, 56] #ID autorizados para verificacion acciones correctivas
-    ids_vf = [49] #ID autorizados para verificacion final de trazabilidad
+    ids_vf = [1, 49] #ID autorizados para verificacion final de trazabilidad
 
     mostrar_vac = user_id in ids_vac
     mostrar_vf = user_id in ids_vf
