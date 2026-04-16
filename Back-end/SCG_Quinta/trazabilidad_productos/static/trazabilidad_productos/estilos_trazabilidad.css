@@ -1,3 +1,4 @@
+
 :root {
     --very-light-pink: #C7C7C7;
     --text-input-field: #F7F7F7;
@@ -122,24 +123,26 @@ h1, h2, h3 {
 
 .header-logo {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    gap: 8px;
     margin-bottom: 10px;
-    flex-wrap: wrap;
     text-align: center;
+    width: 100%;
 }
 
 .header-logo img {
-    width: 50px;
+    width: 52px;
     height: auto;
     display: block;
+    margin: 0 auto;
 }
 
 .header-logo h1 {
     margin: 0;
-    font-size: 30px;
     line-height: 1.1;
+    text-align: center;
 }
 
 /* ===== BLOQUE TÍTULO ===== */
@@ -556,9 +559,29 @@ a.primary-button:hover {
     overflow: hidden;
 }
 
-.card-registro-header {
+.card-registro::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 48px;
+    height: 48px;
+    background: url("./images/logoquinta.png") no-repeat center;
+    background-size: contain;
+    opacity: 0.16;
+    pointer-events: none;
+}
+
+.card-registro-header,
+.datos-resumen,
+.tabla-wrapper,
+.card-registro .acciones-form {
     position: relative;
     z-index: 1;
+}
+
+.card-registro-header {
+    padding-left: 64px;
 }
 
 .card-registro-header h3 {
@@ -576,8 +599,6 @@ a.primary-button:hover {
 .datos-resumen {
     font-size: 14px;
     margin-bottom: 16px;
-    position: relative;
-    z-index: 1;
 }
 
 .datos-resumen > div {
@@ -727,46 +748,6 @@ a.primary-button:hover {
     color: #92400e;
 }
 
-/* ===== LOGOS HISTORIAL SIN ROMPER LAYOUT ===== */
-
-.card-registro::before {
-    content: "";
-    position: absolute;
-    top: 12px;
-    left: 14px;
-    width: 56px;
-    height: 56px;
-    background: url("./images/logoquinta.png") no-repeat center;
-    background-size: contain;
-    opacity: 0.18;
-    pointer-events: none;
-}
-
-.card-registro-header {
-    padding-left: 78px;
-}
-
-.header-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-    text-align: center;
-}
-
-.header-logo img {
-    width: 48px;
-    height: auto;
-    display: block;
-}
-
-.header-logo h1 {
-    margin: 0;
-    line-height: 1.1;
-}
-
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 1200px) {
@@ -872,24 +853,19 @@ a.primary-button:hover {
         min-width: 900px;
     }
 
-    .card-registro::before {
+    .header-logo img {
         width: 42px;
-        height: 42px;
+    }
+
+    .card-registro::before {
+        width: 38px;
+        height: 38px;
         top: 10px;
         left: 10px;
         opacity: 0.14;
     }
 
     .card-registro-header {
-        padding-left: 56px;
-    }
-
-    .header-logo {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .header-logo img {
-        width: 42px;
+        padding-left: 50px;
     }
 }
