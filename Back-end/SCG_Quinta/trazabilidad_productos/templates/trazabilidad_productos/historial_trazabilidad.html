@@ -121,7 +121,7 @@
 
                         <div>
                             <strong>Requiere revisión:</strong>
-                            {% if not registro.verificado %}
+                            {% if registro.verificado %}
                                 Sí
                             {% elif not registro.acciones_correctivas_requieren_revision %}
                                 Sí
