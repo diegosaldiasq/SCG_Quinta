@@ -115,6 +115,14 @@ def registrar_trazabilidad(request):
                     registro = form.save(commit=False)
                     producto = registro.producto
                     registro.codigo_producto = producto.codigo
+                    if hasattr(request.user, "nombre_completo") and request.user.nombre_completo:
+                        registro.elaborado_por = request.user.nombre_completo
+                    elif hasattr(request.user, "username") and request.user.username:
+                        registro.elaborado_por = request.user.username
+                    elif hasattr(request.user, "email") and request.user.email:
+                        registro.elaborado_por = request.user.email
+                    else:
+                        registro.elaborado_por = str(request.user)
                     registro.save()
 
                     tiene_acciones_correctivas = False
