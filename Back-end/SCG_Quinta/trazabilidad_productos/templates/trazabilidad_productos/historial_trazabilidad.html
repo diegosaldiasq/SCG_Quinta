@@ -123,10 +123,8 @@
                             <strong>Requiere revisión:</strong>
                             {% if registro.verificado %}
                                 No
-                            {% elif not registro.acciones_correctivas_requieren_revision %}
-                                Sí
                             {% else %}
-                                No
+                                Sí
                             {% endif %}
                         </div>
                         <div><strong>Fecha verificación:</strong> {{ registro.fecha_verificacion|localtime|date:"d/m/Y H:i"|default:"-" }}</div>
