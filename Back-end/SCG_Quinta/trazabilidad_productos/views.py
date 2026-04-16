@@ -181,6 +181,13 @@ def registrar_trazabilidad(request):
 @login_required
 def historial_trazabilidad(request):
     form = HistorialTrazabilidadFilterForm(request.GET or None)
+    user_id = request.user.id
+
+    ids_vac = [51, 52, 53, 54, 55, 56]
+    ids_vf = [49]
+
+    mostrar_vac = user_id in ids_vac
+    mostrar_vf = user_id in ids_vf
 
     registros_qs = (
         RegistroTrazabilidad.objects
@@ -239,6 +246,8 @@ def historial_trazabilidad(request):
         "paginator": paginator,
         "page_obj": registros,
         "is_paginated": registros.has_other_pages(),
+        "mostrar_vac": mostrar_vac,
+        "mostrar_vf": mostrar_vf,
     }
     return render(request, "trazabilidad_productos/historial_trazabilidad.html", contexto)
 

@@ -166,7 +166,7 @@
                     <div class="acciones-form" style="margin-top:16px;">
                         {% if not registro.verificado %}
 
-                            {% if registro.acciones_correctivas_requieren_revision and not registro.acciones_correctivas_verificadas %}
+                            {% if registro.acciones_correctivas_requieren_revision and not registro.acciones_correctivas_verificadas and mostrar_vac %}
                                 <form method="post" action="{% url 'trazabilidad_productos:verificar_acciones_correctivas' registro.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-secundario">
@@ -175,14 +175,15 @@
                                 </form>
 
                             {% else %}
-                                <form method="post" action="{% url 'trazabilidad_productos:verificar_trazabilidad' registro.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-principal">
-                                        Verificar registro
-                                    </button>
-                                </form>
+                                {% if mostrar_vf %}
+                                    <form method="post" action="{% url 'trazabilidad_productos:verificar_trazabilidad' registro.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-principal">
+                                            Verificar registro
+                                        </button>
+                                    </form>
+                                {% endif %} 
                             {% endif %}
-
                         {% endif %}
                     </div>
 
