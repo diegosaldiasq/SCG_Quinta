@@ -119,7 +119,16 @@
                             {% endif %}
                         </div>
 
-                        <div><strong>Verificado final:</strong> {% if registro.verificado %}Sí{% else %}No{% endif %}</div>
+                        <div>
+                            <strong>Requiere revisión:</strong>
+                            {% if not registro.verificado %}
+                                No
+                            {% elif registro.acciones_correctivas_requieren_revision %}
+                                Sí
+                            {% else %}
+                                No
+                            {% endif %}
+                        </div>
                         <div><strong>Fecha verificación:</strong> {{ registro.fecha_verificacion|localtime|date:"d/m/Y H:i"|default:"-" }}</div>
                         <div><strong>Nombre verificador:</strong> {{ registro.nombre_verificador|default:"-" }}</div>
 
