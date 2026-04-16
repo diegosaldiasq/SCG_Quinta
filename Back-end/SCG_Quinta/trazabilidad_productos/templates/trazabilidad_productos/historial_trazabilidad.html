@@ -20,7 +20,10 @@
 
     <!-- CABECERA -->
     <div class="cabecera-app">
-        <h1>Historial de Trazabilidad</h1>
+        <div class="header-logo">
+            <img src="{% static 'trazabilidad_productos/images/logoquinta.png' %}" alt="Logo Quinta">
+            <h1>Historial de Trazabilidad</h1>
+        </div>
     </div>
 
     <!-- MENSAJES -->
@@ -83,9 +86,12 @@
         {% if registros %}
 
             {% for registro in registros %}
-                <div class="card-registro">
+                <div class="card-registro with-logo">
+                    <div class="card-logo">
+                        <img src="{% static 'trazabilidad_productos/images/logoquinta.png' %}" alt="Logo Quinta">
+                    </div>
 
-                    <div class="card-registro-header">
+                    <div class="card-contenido">
                         <h3>{{ registro.producto.nombre }}</h3>
                         <p>
                             {{ registro.cliente.nombre }} |

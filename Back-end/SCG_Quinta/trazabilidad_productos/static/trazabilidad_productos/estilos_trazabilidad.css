@@ -693,6 +693,59 @@ a.primary-button:hover {
     color: #92400e;
 }
 
+.header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.header-logo img {
+    width: 60px;
+    height: auto;
+}
+
+.header-logo h1 {
+    margin: 0;
+}
+
+.card-registro.with-logo {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.card-logo {
+    flex-shrink: 0;
+}
+
+.card-logo img {
+    width: 50px;
+    opacity: 0.9;
+}
+
+.card-contenido {
+    width: 100%;
+}
+
+.card-registro {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-registro::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 80px;
+    height: 80px;
+    background: url("../images/logoquinta.png") no-repeat center;
+    background-size: contain;
+    opacity: 0.06;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 1200px) {
