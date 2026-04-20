@@ -107,10 +107,6 @@
 
             <!-- BOTONES -->
             <div class="acciones-form">
-                <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">
-                    Volver inicio
-                </a>
-
                 <button type="submit" name="_guardar" class="btn-principal">
                     Guardar
                 </button>
@@ -189,7 +185,9 @@
                 </div>
             </div>
             {% endif %}
-
+            <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">
+                Volver inicio
+            </a>
         </form>
     </div>
 </div>
