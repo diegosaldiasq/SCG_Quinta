@@ -103,9 +103,16 @@
             </div>
 
             <div class="form-group">
-              <label for="{{ form.peso_real_obtenido_g.id_for_label }}">Peso real obtenido (g)</label>
-              {{ form.peso_real_obtenido_g }}
+              <label for="peso_real_obtenido_visual">Peso real obtenido (g)</label>
+              <input
+                type="text"
+                id="peso_real_obtenido_visual"
+                value="{{ peso_real_obtenido_actual|default:0 }}"
+                readonly
+              >
             </div>
+
+            {{ form.peso_real_obtenido_g.as_hidden }}
 
             <div class="form-group">
               <label for="{{ form.lote.id_for_label }}">Lote</label>
@@ -217,6 +224,47 @@
   </div>
 
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const pesoRealVisual = document.getElementById("peso_real_obtenido_visual");
+        const pesoRealHidden = document.getElementById("id_peso_real_obtenido_g");
+
+        function parseNumero(valor) {
+            if (!valor) return 0;
+            const limpio = String(valor).replace(",", ".").trim();
+            const numero = parseFloat(limpio);
+            return isNaN(numero) ? 0 : numero;
+        }
+
+        function recalcularPesoReal() {
+            let total = 0;
+
+            const inputsPeso = document.querySelectorAll(
+                'input[name$="-peso_real_g"]'
+            );
+
+            inputsPeso.forEach(function (input) {
+                total += parseNumero(input.value);
+            });
+
+            total = Math.round(total * 10) / 10;
+
+            if (pesoRealVisual) {
+                pesoRealVisual.value = total.toFixed(1);
+            }
+
+            if (pesoRealHidden) {
+                pesoRealHidden.value = total.toFixed(1);
+            }
+        }
+
+        document.addEventListener("input", function (event) {
+            if (event.target.matches('input[name$="-peso_real_g"]')) {
+                recalcularPesoReal();
+            }
+        });
+
+        recalcularPesoReal();
+    });
     const layoutsData = [
       {% for item in form.fields.layout.queryset %}
         {

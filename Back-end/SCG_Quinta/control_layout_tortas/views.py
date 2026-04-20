@@ -93,6 +93,25 @@ class RegistroCreateView(LoginRequiredMixin, View):
 
         return resumen
 
+    def _calcular_peso_real_desde_formset(self, formset):
+        total = Decimal("0.0")
+
+        for form in formset.forms:
+            if not hasattr(form, "cleaned_data"):
+                continue
+
+            if not form.cleaned_data:
+                continue
+
+            if form.cleaned_data.get("DELETE"):
+                continue
+
+            peso = form.cleaned_data.get("peso_real_g")
+            if peso is not None:
+                total += Decimal(str(peso))
+
+        return round(total, 1)
+
     def _contexto_desde_registro(self, registro, form, formset=None, auto_cargado=False):
         return {
             "form": form,
@@ -103,6 +122,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
             "peso_objetivo_total": registro.peso_objetivo_total_g or 0,
             "porcentaje_perdida": registro.porcentaje_perdida or 0,
             "peso_final_con_perdida": registro.peso_final_con_perdida_g or 0,
+            "peso_real_obtenido_actual": registro.peso_real_obtenido_g or 0,
         }
 
     def get(self, request):
@@ -117,6 +137,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
             "peso_objetivo_total": 0,
             "porcentaje_perdida": 0,
             "peso_final_con_perdida": 0,
+            "peso_real_obtenido_actual": 0,
         }
         return render(request, self.template_name, context)
 
@@ -159,6 +180,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 "peso_objetivo_total": 0,
                 "porcentaje_perdida": 0,
                 "peso_final_con_perdida": 0,
+                "peso_real_obtenido_actual": 0,
             })
 
         registro_id = post_data.get("registro_id")
@@ -179,7 +201,6 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 "linea",
                 "lote",
                 "observaciones",
-                "peso_real_obtenido_g",
             ]:
                 setattr(registro, campo, form.cleaned_data[campo])
 
@@ -213,10 +234,16 @@ class RegistroCreateView(LoginRequiredMixin, View):
 
             if formset.is_valid():
                 formset.save()
+
+                peso_real_total = self._calcular_peso_real_desde_formset(formset)
+                registro.peso_real_obtenido_g = peso_real_total
                 registro.completado = True
-                registro.save(update_fields=["completado"])
+                registro.save(update_fields=["peso_real_obtenido_g", "completado"])
+
                 messages.success(request, "Registro guardado correctamente.")
                 return redirect("control_layout_tortas:registro_detalle", pk=registro.id)
+
+            peso_real_total = self._calcular_peso_real_desde_formset(formset)
 
             form_recargado = RegistroLayoutForm(
                 instance=registro,
@@ -229,15 +256,14 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 }
             )
 
-            return render(
-                request,
-                self.template_name,
-                self._contexto_desde_registro(
-                    registro=registro,
-                    form=form_recargado,
-                    formset=formset,
-                )
+            contexto = self._contexto_desde_registro(
+                registro=registro,
+                form=form_recargado,
+                formset=formset,
             )
+            contexto["peso_real_obtenido_actual"] = peso_real_total
+
+            return render(request, self.template_name, contexto)
 
         formset = RegistroCapaFormSet(instance=registro, prefix="detalles")
 
