@@ -306,7 +306,7 @@ textarea {
 .acciones-form {
   display: flex;
   gap: 12px;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   margin-top: 22px;
   flex-wrap: wrap;
