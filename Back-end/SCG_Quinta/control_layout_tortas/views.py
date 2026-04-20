@@ -307,16 +307,16 @@ class HistorialRegistroListView(ListView):
             .filter(completado=True)
             .annotate(
                 capas_con_peso=Count(
-                    "registrocapa",
-                    filter=Q(registrocapa__peso_real_g__isnull=False)
+                    "detalles",
+                    filter=Q(detalles__peso_real_g__isnull=False)
                 ),
                 ok_count=Count(
-                    "registrocapa",
-                    filter=Q(registrocapa__cumple=True)
+                    "detalles",
+                    filter=Q(detalles__cumple=True)
                 ),
                 no_count=Count(
-                    "registrocapa",
-                    filter=Q(registrocapa__cumple=False)
+                    "detalles",
+                    filter=Q(detalles__cumple=False)
                 ),
             )
             .order_by("-fecha", "-creado_en")
