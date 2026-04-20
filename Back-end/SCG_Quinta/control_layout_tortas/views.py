@@ -299,16 +299,20 @@ class RegistroDetalleView(LoginRequiredMixin, View):
                 "layout",
                 "layout__producto",
                 "verificado_por",
-            ).prefetch_related(
-                "registrocapa_set",
-                "registrocapa_set__capa",
-                "registrocapa_set__capa__ingrediente",
-                "registrocapa_set__ingrediente_usado",
             ),
             pk=pk
         )
 
-        detalles = registro.registrocapa_set.all().order_by("capa__orden")
+        detalles = (
+            RegistroCapa.objects
+            .filter(registro=registro)
+            .select_related(
+                "capa",
+                "capa__ingrediente",
+                "ingrediente_usado",
+            )
+            .order_by("capa__orden")
+        )
 
         return render(request, self.template_name, {
             "registro": registro,
