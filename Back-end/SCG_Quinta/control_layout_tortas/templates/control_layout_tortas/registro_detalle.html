@@ -50,6 +50,34 @@
         </a>
     </p>
 
+    <!-- AQUI VA EL BLOQUE NUEVO -->
+    <div class="resumen-registro">
+        <div class="resumen-item">
+            <label>Total de capas</label>
+            <input type="text" value="{{ registro.total_capas|default:0 }}" readonly>
+        </div>
+
+        <div class="resumen-item">
+            <label>Peso objetivo total (g)</label>
+            <input type="text" value="{{ registro.peso_objetivo_total_g|default:0 }}" readonly>
+        </div>
+
+        <div class="resumen-item">
+            <label>% pérdida producto</label>
+            <input type="text" value="{{ registro.porcentaje_perdida|default:0 }}%" readonly>
+        </div>
+
+        <div class="resumen-item">
+            <label>Peso final con pérdida (g)</label>
+            <input type="text" value="{{ registro.peso_final_con_perdida_g|default:0 }}" readonly>
+        </div>
+
+        <div class="resumen-item">
+            <label>Peso real obtenido (g)</label>
+            <input type="text" value="{{ registro.peso_real_obtenido_g|default:0 }}" readonly>
+        </div>
+    </div>
+
     <div class="table-responsive">
       <table class="detail-table">
 
