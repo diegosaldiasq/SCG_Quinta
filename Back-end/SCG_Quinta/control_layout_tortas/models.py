@@ -144,6 +144,23 @@ class RegistroLayout(models.Model):
     lote = models.CharField(max_length=40, blank=True, default="")
     operador = models.CharField(max_length=120, blank=True, default="")
     observaciones = models.TextField(blank=True, default="")
+
+    total_capas = models.PositiveIntegerField(default=0)
+    peso_objetivo_total_g = models.DecimalField(
+        max_digits=8,
+        decimal_places=1,
+        default=0
+    )
+    porcentaje_perdida = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0
+    )
+    peso_final_con_perdida_g = models.DecimalField(
+        max_digits=8,
+        decimal_places=1,
+        default=0
+    )
     peso_real_obtenido_g = models.DecimalField(
         max_digits=8,
         decimal_places=1,
