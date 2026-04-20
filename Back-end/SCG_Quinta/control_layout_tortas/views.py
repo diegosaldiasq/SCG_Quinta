@@ -304,19 +304,17 @@ class HistorialRegistroListView(ListView):
         qs = (
             RegistroLayout.objects
             .select_related("layout", "layout__producto")
+            .prefetch_related(
+                Prefetch(
+                    "detalles",
+                    queryset=RegistroCapa.objects.select_related("capa", "ingrediente_usado")
+                )
+            )
             .filter(completado=True)
             .annotate(
                 capas_con_peso=Count(
                     "detalles",
                     filter=Q(detalles__peso_real_g__isnull=False)
-                ),
-                ok_count=Count(
-                    "detalles",
-                    filter=Q(detalles__cumple=True)
-                ),
-                no_count=Count(
-                    "detalles",
-                    filter=Q(detalles__cumple=False)
                 ),
             )
             .order_by("-fecha", "-creado_en")
@@ -369,6 +367,13 @@ class HistorialRegistroListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["filter_form"] = getattr(self, "filter_form", HistorialRegistroFilterForm())
+
+        for registro in context["registros"]:
+            detalles = list(registro.detalles.all())
+
+            registro.ok_count = sum(1 for d in detalles if d.cumple is True)
+            registro.no_count = sum(1 for d in detalles if d.cumple is False)
+
         return context
 
 
