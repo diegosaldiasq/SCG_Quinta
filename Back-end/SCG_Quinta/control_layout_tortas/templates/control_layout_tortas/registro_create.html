@@ -113,10 +113,6 @@
             </div>
 
             <div class="acciones-form">
-                <button type="submit" name="_auto_cargar_capas" value="1" class="btn-secundario">
-                    Cargar capas
-                </button>
-
                 <button type="submit" name="_guardar" class="btn-principal">
                     Guardar
                 </button>
@@ -188,11 +184,46 @@
                     </div>
                 </div>
             {% endif %}
+            <div class="acciones-form">
+                <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">Volver inicio</a>
+            </div>
         </form>
     </div>
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.querySelector("form");
+
+    const planta = document.getElementById("id_planta");
+    const cliente = document.getElementById("id_cliente");
+    const producto = document.getElementById("id_producto_manual");
+
+    function submitAuto() {
+        if (!form) return;
+
+        // flag para que la vista sepa que es recarga automática
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "_auto_cargar_capas";
+        input.value = "1";
+
+        form.appendChild(input);
+        form.submit();
+    }
+
+    function validarYEnviar() {
+        if (planta.value && cliente.value && producto.value) {
+            submitAuto();
+        }
+    }
+
+    if (planta) planta.addEventListener("change", validarYEnviar);
+    if (cliente) cliente.addEventListener("change", validarYEnviar);
+    if (producto) producto.addEventListener("change", validarYEnviar);
+
+});
 document.addEventListener("DOMContentLoaded", function () {
     const pesoRealVisual = document.getElementById("peso_real_obtenido_visual");
     const pesoRealHidden = document.getElementById("id_peso_real_obtenido_g");
