@@ -82,6 +82,31 @@
               {{ form.operador }}
             </div>
 
+            <div class="form-group resumen-card">
+              <label>Total de capas</label>
+              <input type="text" value="{{ total_capas }}" readonly>
+            </div>
+
+            <div class="form-group resumen-card">
+              <label>Peso objetivo total (g)</label>
+              <input type="text" value="{{ peso_objetivo_total }}" readonly>
+            </div>
+
+            <div class="form-group resumen-card">
+              <label>% pérdida producto</label>
+              <input type="text" value="{{ porcentaje_perdida }}%" readonly>
+            </div>
+
+            <div class="form-group resumen-card">
+              <label>Peso final con pérdida (g)</label>
+              <input type="text" value="{{ peso_final_con_perdida }}" readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.peso_real_obtenido_g.id_for_label }}">Peso real obtenido (g)</label>
+              {{ form.peso_real_obtenido_g }}
+            </div>
+
             <div class="form-group">
               <label for="{{ form.lote.id_for_label }}">Lote</label>
               {{ form.lote }}

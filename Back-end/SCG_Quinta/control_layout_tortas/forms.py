@@ -22,6 +22,7 @@ class RegistroLayoutForm(forms.ModelForm):
             "linea",
             "lote",
             "operador",
+            "peso_real_obtenido_g",
             "observaciones",
         ]
         widgets = {
@@ -29,6 +30,7 @@ class RegistroLayoutForm(forms.ModelForm):
             "observaciones": forms.Textarea(attrs={"rows": 2}),
             "layout": forms.HiddenInput(),
             "operador": forms.TextInput(attrs={"readonly": "readonly"}),
+            "peso_real_obtenido_g": forms.NumberInput(attrs={"step": "0.1", "min": "0"}),
         }
 
     def __init__(self, *args, **kwargs):

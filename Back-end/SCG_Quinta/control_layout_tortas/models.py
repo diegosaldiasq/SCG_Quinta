@@ -74,6 +74,12 @@ class ProductoTorta(models.Model):
     cliente = models.CharField(max_length=80, blank=True, default="")
     nombre = models.CharField(max_length=160)
     codigo = models.CharField(max_length=30, blank=True, default="")
+    porcentaje_perdida = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        verbose_name="% pérdida"
+    )
 
     class Meta:
         unique_together = [("codigo", "nombre")]
@@ -138,6 +144,13 @@ class RegistroLayout(models.Model):
     lote = models.CharField(max_length=40, blank=True, default="")
     operador = models.CharField(max_length=120, blank=True, default="")
     observaciones = models.TextField(blank=True, default="")
+    peso_real_obtenido_g = models.DecimalField(
+        max_digits=8,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        verbose_name="Peso real obtenido (g)"
+    )
 
     verificado = models.BooleanField(default=False)
     fecha_verificacion = models.DateTimeField(null=True, blank=True)
