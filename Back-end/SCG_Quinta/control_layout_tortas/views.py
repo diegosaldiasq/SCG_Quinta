@@ -9,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 from django.views.generic import ListView
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django.db.models import Sum
 
 from .forms import (
@@ -21,6 +21,7 @@ from .models import (
     LayoutTorta,
     RegistroLayout,
     RegistroCapa,
+    Ingrediente,
 )
 
 
