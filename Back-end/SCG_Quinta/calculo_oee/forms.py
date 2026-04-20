@@ -53,6 +53,7 @@ CATALOGO = {
     { 'producto': 'Torta mocaccino mediana',          'codigo': '353253' },
     { 'producto': 'Torta panqueque naranja',          'codigo': '393018' },
     { 'producto': 'Torta tres leches',                'codigo': '393015' },
+    { 'producto': 'Torta crema manjar',               'codigo': '405692' },
     { 'producto': 'Torta yogurt',                     'codigo': '393017' },
     { 'producto': 'Torta viena',                      'codigo': '393019' },
     #{ 'producto': 'Torta guinda chocolate',           'codigo': '393362' }, Descontinuado 30-10-25

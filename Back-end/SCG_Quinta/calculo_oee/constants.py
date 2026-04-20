@@ -49,6 +49,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Torta mocaccino mediana','353253'):  200,
     ('Torta panqueque naranja','393018'):  100,
     ('Torta tres leches','393015'):  100,
+    ('Torta crema manjar','405692'):  200,
     ('Torta yogurt','393017'):  100,
     ('Torta viena','393019'):  100,
     ('Torta guinda chocolate','393362'):  200,
