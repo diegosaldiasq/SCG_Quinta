@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{% static 'control_layout_tortas/estilos_registro_layout.css' %}">
+    <link rel="stylesheet" href="{% static 'control_layout_tortas/estilos_layout_tortas.css' %}">
     <link rel="icon" href="{% static 'control_layout_tortas/images/logoquinta2.png' %}">
 </head>
 <body>
@@ -44,7 +44,8 @@
 
                 <div class="form-group">
                     <label>Código</label>
-                    {{ form.codigo_auto }}
+                    <input type="text" value="{{ codigo_producto_actual }}" readonly>
+                    {{ form.codigo_auto.as_hidden }}
                 </div>
 
                 <div class="form-group">
@@ -105,7 +106,6 @@
                 {{ form.observaciones }}
             </div>
 
-            <!-- DETALLE -->
             {% if detalle_rows %}
             <div class="card card-detalle">
                 <h2>Detalle por capas</h2>
@@ -178,12 +178,9 @@
                 </div>
             </div>
             {% endif %}
-            
-            <!-- BOTONES -->
             <div class="acciones-form">
-                <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">
-                    Volver inicio
-                </a>
+                <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">Volver inicio</a>
+
                 <button type="submit" name="_guardar" class="btn-principal">
                     Guardar
                 </button>
@@ -193,10 +190,8 @@
     </div>
 </div>
 
-<!-- JS -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     const form = document.querySelector("form");
     const pesoVisual = document.getElementById("peso_real_obtenido_visual");
     const pesoHidden = document.getElementById("id_peso_real_obtenido_g");
@@ -207,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function parseNumero(valor) {
         if (!valor) return 0;
-        return parseFloat(valor.replace(",", ".")) || 0;
+        return parseFloat(String(valor).replace(",", ".")) || 0;
     }
 
     function recalcularPeso() {
@@ -229,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    function autoSubmit(){
+    function autoSubmit() {
         const input = document.createElement("input");
         input.type = "hidden";
         input.name = "_auto_cargar_capas";
@@ -238,8 +233,8 @@ document.addEventListener("DOMContentLoaded", function () {
         form.submit();
     }
 
-    function validarCambio(){
-        if (planta.value && cliente.value && producto.value){
+    function validarCambio() {
+        if (planta && cliente && producto && planta.value && cliente.value && producto.value) {
             autoSubmit();
         }
     }

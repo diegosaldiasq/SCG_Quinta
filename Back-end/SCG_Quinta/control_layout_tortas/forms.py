@@ -4,12 +4,20 @@ from .models import RegistroLayout, RegistroCapa, LayoutTorta, Ingrediente
 
 
 class RegistroLayoutForm(forms.ModelForm):
-    cliente = forms.ChoiceField(required=False, choices=[], label="Cliente")
-    producto_manual = forms.ChoiceField(required=False, choices=[], label="Producto")
+    cliente = forms.ChoiceField(
+        required=False,
+        choices=[],
+        label="Cliente"
+    )
+    producto_manual = forms.ChoiceField(
+        required=False,
+        choices=[],
+        label="Producto"
+    )
     codigo_auto = forms.CharField(
         required=False,
         label="Código",
-        widget=forms.TextInput(attrs={"readonly": "readonly"})
+        widget=forms.HiddenInput()
     )
 
     class Meta:
@@ -30,7 +38,7 @@ class RegistroLayoutForm(forms.ModelForm):
             "observaciones": forms.Textarea(attrs={"rows": 2}),
             "layout": forms.HiddenInput(),
             "operador": forms.TextInput(attrs={"readonly": "readonly"}),
-            "peso_real_obtenido_g": forms.NumberInput(attrs={"step": "0.1", "min": "0"}),
+            "peso_real_obtenido_g": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -38,6 +46,8 @@ class RegistroLayoutForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["layout"].required = False
+        self.fields["codigo_auto"].required = False
+        self.fields["peso_real_obtenido_g"].required = False
 
         if operador_inicial and not self.initial.get("operador"):
             self.initial["operador"] = operador_inicial
@@ -46,7 +56,13 @@ class RegistroLayoutForm(forms.ModelForm):
             LayoutTorta.objects
             .filter(activo=True)
             .select_related("producto")
-            .order_by("planta", "producto__cliente", "producto__nombre", "producto__codigo", "-version")
+            .order_by(
+                "planta",
+                "producto__cliente",
+                "producto__nombre",
+                "producto__codigo",
+                "-version"
+            )
         )
 
         self.fields["layout"].queryset = layouts_qs
@@ -110,6 +126,7 @@ RegistroCapaFormSet = inlineformset_factory(
     can_delete=False,
 )
 
+
 class HistorialRegistroFilterForm(forms.Form):
     planta = forms.ChoiceField(
         required=False,
@@ -128,7 +145,10 @@ class HistorialRegistroFilterForm(forms.Form):
     )
     layout = forms.ModelChoiceField(
         required=False,
-        queryset=LayoutTorta.objects.select_related("producto").order_by("producto__cliente", "producto__nombre"),
+        queryset=LayoutTorta.objects.select_related("producto").order_by(
+            "producto__cliente",
+            "producto__nombre"
+        ),
         label="Layout",
         empty_label="Todos",
     )

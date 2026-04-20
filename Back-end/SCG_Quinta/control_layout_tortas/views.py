@@ -153,8 +153,34 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 total += peso
         return round(total, 1)
 
+    def _set_campos_visualizacion_form(self, form, layout):
+        if not layout:
+            return
+
+        producto = layout.producto
+        codigo = producto.codigo or ""
+
+        if "cliente" in form.fields:
+            form.fields["cliente"].initial = producto.cliente
+
+        if "producto_manual" in form.fields:
+            form.fields["producto_manual"].initial = producto.id
+
+        if "codigo_auto" in form.fields:
+            form.fields["codigo_auto"].initial = codigo
+            form.initial["codigo_auto"] = codigo
+            form.fields["codigo_auto"].widget.attrs["value"] = codigo
+
+        if "layout" in form.fields:
+            form.fields["layout"].initial = layout.id
+            form.initial["layout"] = layout.id
+
     def _contexto_base(self, form, layout=None, detalle_rows=None, peso_real_obtenido_actual=0):
         resumen = self._calcular_resumen(layout)
+
+        codigo_producto = ""
+        if layout and layout.producto:
+            codigo_producto = layout.producto.codigo or ""
 
         return {
             "form": form,
@@ -165,6 +191,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
             "porcentaje_perdida": resumen["porcentaje_perdida"],
             "peso_final_con_perdida": resumen["peso_final_con_perdida"],
             "peso_real_obtenido_actual": peso_real_obtenido_actual,
+            "codigo_producto_actual": codigo_producto,
         }
 
     def get(self, request):
@@ -205,12 +232,14 @@ class RegistroCreateView(LoginRequiredMixin, View):
             )
 
         layout = form.cleaned_data.get("layout")
+        self._set_campos_visualizacion_form(form, layout)
+
         detalle_rows = self._build_detalle_rows(layout, request.POST)
         peso_real_preview = self._calcular_peso_real_desde_rows(detalle_rows)
 
         guardar = "_guardar" in request.POST
 
-        # Si no está guardando aún, solo mostrar preview. NO guardar nada en BD.
+        # Solo preview, sin guardar en BD
         if not guardar:
             return render(
                 request,
