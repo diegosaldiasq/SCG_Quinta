@@ -83,7 +83,6 @@ class RegistroCreateView(LoginRequiredMixin, View):
         registro.peso_objetivo_total_g = resumen["peso_objetivo_total"]
         registro.porcentaje_perdida = resumen["porcentaje_perdida"]
         registro.peso_final_con_perdida_g = resumen["peso_final_con_perdida"]
-
         registro.save(update_fields=[
             "total_capas",
             "peso_objetivo_total_g",
@@ -92,6 +91,28 @@ class RegistroCreateView(LoginRequiredMixin, View):
         ])
 
         return resumen
+
+    def _sincronizar_capas_con_layout(self, registro):
+        """
+        Elimina las capas actuales del registro y crea las que correspondan
+        exactamente al layout actual.
+        """
+        RegistroCapa.objects.filter(registro=registro).delete()
+
+        nuevas = []
+        for capa in registro.layout.capas.all().order_by("orden"):
+            nuevas.append(
+                RegistroCapa(
+                    registro=registro,
+                    capa=capa,
+                    ingrediente_usado=None,
+                    peso_real_g=None,
+                    comentario="",
+                )
+            )
+
+        if nuevas:
+            RegistroCapa.objects.bulk_create(nuevas)
 
     def _calcular_peso_real_desde_formset(self, formset):
         total = Decimal("0.0")
@@ -149,6 +170,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
         cliente = post_data.get("cliente")
         producto_id = post_data.get("producto_manual")
 
+        # Resolver layout automáticamente según selección actual
         if not post_data.get("layout") and planta and cliente and producto_id:
             layout_obj = (
                 LayoutTorta.objects
@@ -187,11 +209,16 @@ class RegistroCreateView(LoginRequiredMixin, View):
         auto_cargar = post_data.get("_auto_cargar_capas") == "1"
         guardar = "_guardar" in request.POST
 
+        layout_cambio = False
+
         if registro_id:
             registro = get_object_or_404(
                 RegistroLayout.objects.select_related("layout", "layout__producto"),
                 pk=registro_id
             )
+
+            layout_anterior_id = registro.layout_id
+            nuevo_layout = form.cleaned_data["layout"]
 
             for campo in [
                 "planta",
@@ -205,26 +232,30 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 setattr(registro, campo, form.cleaned_data[campo])
 
             registro.operador = self._nombre_operador(request)
+
+            if layout_anterior_id != nuevo_layout.id:
+                layout_cambio = True
+                registro.peso_real_obtenido_g = None
+                registro.completado = False
+
             registro.save()
         else:
             registro = form.save(commit=False)
             registro.operador = self._nombre_operador(request)
             registro.verificado = False
             registro.completado = False
+            registro.peso_real_obtenido_g = None
             registro.save()
+            layout_cambio = True
 
-            for capa in registro.layout.capas.all():
-                RegistroCapa.objects.get_or_create(
-                    registro=registro,
-                    capa=capa
-                )
+        # Si cambió el layout, rehacer detalle completo
+        if layout_cambio:
+            self._sincronizar_capas_con_layout(registro)
 
-            registro = RegistroLayout.objects.select_related(
-                "layout", "layout__producto"
-            ).get(pk=registro.pk)
-
+        # Asegurar resumen actualizado según layout actual
         self._guardar_resumen_en_registro(registro)
 
+        # Si el usuario apretó Guardar definitivo
         if guardar:
             formset = RegistroCapaFormSet(
                 post_data,
@@ -262,9 +293,9 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 formset=formset,
             )
             contexto["peso_real_obtenido_actual"] = peso_real_total
-
             return render(request, self.template_name, contexto)
 
+        # Si solo está auto-cargando capas o refrescando cabecera
         formset = RegistroCapaFormSet(instance=registro, prefix="detalles")
 
         form_recargado = RegistroLayoutForm(
