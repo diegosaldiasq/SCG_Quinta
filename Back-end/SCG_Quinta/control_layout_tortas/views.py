@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -305,6 +305,20 @@ class HistorialRegistroListView(ListView):
             RegistroLayout.objects
             .select_related("layout", "layout__producto")
             .filter(completado=True)
+            .annotate(
+                capas_con_peso=Count(
+                    "registrocapa",
+                    filter=Q(registrocapa__peso_real_g__isnull=False)
+                ),
+                ok_count=Count(
+                    "registrocapa",
+                    filter=Q(registrocapa__cumple=True)
+                ),
+                no_count=Count(
+                    "registrocapa",
+                    filter=Q(registrocapa__cumple=False)
+                ),
+            )
             .order_by("-fecha", "-creado_en")
         )
 

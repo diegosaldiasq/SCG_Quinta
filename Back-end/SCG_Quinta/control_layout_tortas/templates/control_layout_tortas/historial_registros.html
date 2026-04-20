@@ -270,7 +270,6 @@
                             <th>Turno</th>
                             <th>Operador</th>
                             <th>Capas</th>
-                            <th>Completado</th>
                             <th>Resultado</th>
                             <th>Verificación</th>
                             <th>Acciones</th>
@@ -287,15 +286,10 @@
                             <td>{{ registro.lote|default:"-" }}</td>
                             <td>{{ registro.turno|default:"-" }}</td>
                             <td>{{ registro.operador|default:"-" }}</td>
+                            <td>{{ registro.capas_con_peso|default:0 }} / {{ registro.total_capas|default:0 }}</td>
                             <td>
-                                {{ registro.capas_con_peso }}/{{ registro.total_capas }}
-                            </td>
-                            <td>
-                                {{ registro.porcentaje_completado }}%
-                            </td>
-                            <td>
-                                <strong>OK:</strong> {{ registro.total_ok }}<br>
-                                <strong>NO:</strong> {{ registro.total_no_ok }}
+                            OK: {{ registro.ok_count|default:0 }}<br>
+                            NO: {{ registro.no_count|default:0 }}
                             </td>
                             <td>
                                 {% if registro.verificado %}
