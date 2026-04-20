@@ -27,35 +27,41 @@ from .models import (
 class RegistroCreateView(LoginRequiredMixin, View):
     template_name = "control_layout_tortas/registro_create.html"
 
-    # ===============================
-    # NOMBRE OPERADOR
-    # ===============================
     def _nombre_operador(self, request):
         user = request.user
 
-        if hasattr(user, "nombre_completo") and user.nombre_completo:
-            return user.nombre_completo
+        nombre_completo = getattr(user, "nombre_completo", "")
+        if nombre_completo and str(nombre_completo).strip():
+            return str(nombre_completo).strip()
 
-        if user.username:
-            return user.username
+        username = getattr(user, "username", "")
+        if username and str(username).strip():
+            return str(username).strip()
+
+        email = getattr(user, "email", "")
+        if email and str(email).strip():
+            return str(email).strip()
 
         return str(user)
 
-    # ===============================
-    # CALCULAR Y GUARDAR RESUMEN
-    # ===============================
-    def _calcular_y_guardar_resumen(self, registro):
-        capas_qs = registro.layout.capas.all()
+    def _calcular_resumen(self, layout):
+        if not layout:
+            return {
+                "total_capas": 0,
+                "peso_objetivo_total": Decimal("0.0"),
+                "porcentaje_perdida": Decimal("0.0"),
+                "peso_final_con_perdida": Decimal("0.0"),
+            }
+
+        capas_qs = layout.capas.all()
 
         total_capas = capas_qs.count()
-
         peso_objetivo_total = capas_qs.aggregate(
             total=Sum("peso_objetivo_g")
         )["total"] or Decimal("0.0")
 
-        # ⚠️ seguro por si la columna aún no existe
         try:
-            porcentaje_perdida = registro.layout.producto.porcentaje_perdida or Decimal("0.0")
+            porcentaje_perdida = layout.producto.porcentaje_perdida or Decimal("0.0")
         except Exception:
             porcentaje_perdida = Decimal("0.0")
 
@@ -63,11 +69,20 @@ class RegistroCreateView(LoginRequiredMixin, View):
             Decimal("1") - (porcentaje_perdida / Decimal("100"))
         )
 
-        # guardar en el registro
-        registro.total_capas = total_capas
-        registro.peso_objetivo_total_g = round(peso_objetivo_total, 1)
-        registro.porcentaje_perdida = round(porcentaje_perdida, 2)
-        registro.peso_final_con_perdida_g = round(peso_final_con_perdida, 1)
+        return {
+            "total_capas": total_capas,
+            "peso_objetivo_total": round(peso_objetivo_total, 1),
+            "porcentaje_perdida": round(porcentaje_perdida, 2),
+            "peso_final_con_perdida": round(peso_final_con_perdida, 1),
+        }
+
+    def _guardar_resumen_en_registro(self, registro):
+        resumen = self._calcular_resumen(registro.layout)
+
+        registro.total_capas = resumen["total_capas"]
+        registro.peso_objetivo_total_g = resumen["peso_objetivo_total"]
+        registro.porcentaje_perdida = resumen["porcentaje_perdida"]
+        registro.peso_final_con_perdida_g = resumen["peso_final_con_perdida"]
 
         registro.save(update_fields=[
             "total_capas",
@@ -76,16 +91,20 @@ class RegistroCreateView(LoginRequiredMixin, View):
             "peso_final_con_perdida_g",
         ])
 
+        return resumen
+
+    def _contexto_desde_registro(self, registro, form, formset=None, auto_cargado=False):
         return {
-            "total_capas": registro.total_capas,
-            "peso_objetivo_total": registro.peso_objetivo_total_g,
-            "porcentaje_perdida": registro.porcentaje_perdida,
-            "peso_final_con_perdida": registro.peso_final_con_perdida_g,
+            "form": form,
+            "formset": formset,
+            "registro_id": registro.id,
+            "auto_cargado": auto_cargado,
+            "total_capas": registro.total_capas or 0,
+            "peso_objetivo_total": registro.peso_objetivo_total_g or 0,
+            "porcentaje_perdida": registro.porcentaje_perdida or 0,
+            "peso_final_con_perdida": registro.peso_final_con_perdida_g or 0,
         }
 
-    # ===============================
-    # GET
-    # ===============================
     def get(self, request):
         form = RegistroLayoutForm(
             operador_inicial=self._nombre_operador(request)
@@ -99,12 +118,8 @@ class RegistroCreateView(LoginRequiredMixin, View):
             "porcentaje_perdida": 0,
             "peso_final_con_perdida": 0,
         }
-
         return render(request, self.template_name, context)
 
-    # ===============================
-    # POST
-    # ===============================
     @transaction.atomic
     def post(self, request):
         post_data = request.POST.copy()
@@ -113,9 +128,6 @@ class RegistroCreateView(LoginRequiredMixin, View):
         cliente = post_data.get("cliente")
         producto_id = post_data.get("producto_manual")
 
-        # ===============================
-        # AUTO RESOLVER LAYOUT
-        # ===============================
         if not post_data.get("layout") and planta and cliente and producto_id:
             layout_obj = (
                 LayoutTorta.objects
@@ -125,13 +137,13 @@ class RegistroCreateView(LoginRequiredMixin, View):
                     producto_id=producto_id,
                     producto__cliente=cliente,
                 )
+                .select_related("producto")
                 .order_by("-version")
                 .first()
             )
             if layout_obj:
                 post_data["layout"] = str(layout_obj.id)
 
-        # operador automático
         post_data["operador"] = self._nombre_operador(request)
 
         form = RegistroLayoutForm(
@@ -153,11 +165,11 @@ class RegistroCreateView(LoginRequiredMixin, View):
         auto_cargar = post_data.get("_auto_cargar_capas") == "1"
         guardar = "_guardar" in request.POST
 
-        # ===============================
-        # ACTUALIZAR REGISTRO
-        # ===============================
         if registro_id:
-            registro = get_object_or_404(RegistroLayout, pk=registro_id)
+            registro = get_object_or_404(
+                RegistroLayout.objects.select_related("layout", "layout__producto"),
+                pk=registro_id
+            )
 
             for campo in [
                 "planta",
@@ -173,10 +185,6 @@ class RegistroCreateView(LoginRequiredMixin, View):
 
             registro.operador = self._nombre_operador(request)
             registro.save()
-
-        # ===============================
-        # CREAR REGISTRO NUEVO
-        # ===============================
         else:
             registro = form.save(commit=False)
             registro.operador = self._nombre_operador(request)
@@ -184,21 +192,18 @@ class RegistroCreateView(LoginRequiredMixin, View):
             registro.completado = False
             registro.save()
 
-            # crear capas automáticamente
             for capa in registro.layout.capas.all():
                 RegistroCapa.objects.get_or_create(
                     registro=registro,
                     capa=capa
                 )
 
-        # ===============================
-        # CALCULAR Y GUARDAR RESUMEN
-        # ===============================
-        resumen = self._calcular_y_guardar_resumen(registro)
+            registro = RegistroLayout.objects.select_related(
+                "layout", "layout__producto"
+            ).get(pk=registro.pk)
 
-        # ===============================
-        # GUARDAR DETALLE
-        # ===============================
+        self._guardar_resumen_en_registro(registro)
+
         if guardar:
             formset = RegistroCapaFormSet(
                 post_data,
@@ -210,11 +215,9 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 formset.save()
                 registro.completado = True
                 registro.save(update_fields=["completado"])
-
                 messages.success(request, "Registro guardado correctamente.")
                 return redirect("control_layout_tortas:registro_detalle", pk=registro.id)
 
-            # error en detalle
             form_recargado = RegistroLayoutForm(
                 instance=registro,
                 operador_inicial=self._nombre_operador(request),
@@ -223,20 +226,19 @@ class RegistroCreateView(LoginRequiredMixin, View):
                     "producto_manual": registro.layout.producto.id,
                     "codigo_auto": registro.layout.producto.codigo,
                     "operador": self._nombre_operador(request),
-                    "peso_real_obtenido_g": registro.peso_real_obtenido_g,
                 }
             )
 
-            return render(request, self.template_name, {
-                "form": form_recargado,
-                "formset": formset,
-                "registro_id": registro.id,
-                **resumen,
-            })
+            return render(
+                request,
+                self.template_name,
+                self._contexto_desde_registro(
+                    registro=registro,
+                    form=form_recargado,
+                    formset=formset,
+                )
+            )
 
-        # ===============================
-        # AUTO CARGA / CONTINUAR
-        # ===============================
         formset = RegistroCapaFormSet(instance=registro, prefix="detalles")
 
         form_recargado = RegistroLayoutForm(
@@ -247,17 +249,19 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 "producto_manual": registro.layout.producto.id,
                 "codigo_auto": registro.layout.producto.codigo,
                 "operador": self._nombre_operador(request),
-                "peso_real_obtenido_g": registro.peso_real_obtenido_g,
             }
         )
 
-        return render(request, self.template_name, {
-            "form": form_recargado,
-            "formset": formset,
-            "registro_id": registro.id,
-            "auto_cargado": auto_cargar,
-            **resumen,
-        })
+        return render(
+            request,
+            self.template_name,
+            self._contexto_desde_registro(
+                registro=registro,
+                form=form_recargado,
+                formset=formset,
+                auto_cargado=auto_cargar,
+            )
+        )
 
 
 class RegistroDetalleView(LoginRequiredMixin, View):
