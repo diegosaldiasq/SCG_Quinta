@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{% static 'control_layout_tortas/estilos_registro_layout.css' %}">
+    <link rel="stylesheet" href="{% static 'control_layout_tortas/estilos_layout_tortas.css' %}">
     <link rel="icon" href="{% static 'control_layout_tortas/images/logoquinta2.png' %}">
 </head>
 <body>
@@ -23,50 +23,47 @@
         <form method="post">
             {% csrf_token %}
 
-            {% if registro_id %}
-              <input type="hidden" name="registro_id" value="{{ registro_id }}">
-            {% endif %}
-
             {{ form.layout }}
 
             <div class="form-grid">
+
                 <div class="form-group">
-                    <label for="{{ form.planta.id_for_label }}">Planta</label>
+                    <label>Planta</label>
                     {{ form.planta }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.cliente.id_for_label }}">Cliente</label>
+                    <label>Cliente</label>
                     {{ form.cliente }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.producto_manual.id_for_label }}">Producto</label>
+                    <label>Producto</label>
                     {{ form.producto_manual }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.codigo_auto.id_for_label }}">Código</label>
+                    <label>Código</label>
                     {{ form.codigo_auto }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.fecha.id_for_label }}">Fecha</label>
+                    <label>Fecha</label>
                     {{ form.fecha }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.turno.id_for_label }}">Turno</label>
+                    <label>Turno</label>
                     {{ form.turno }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.linea.id_for_label }}">Línea</label>
+                    <label>Línea</label>
                     {{ form.linea }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.operador.id_for_label }}">Operador</label>
+                    <label>Operador</label>
                     {{ form.operador }}
                 </div>
 
@@ -91,142 +88,119 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="peso_real_obtenido_visual">Peso real obtenido (g)</label>
-                    <input
-                        type="text"
-                        id="peso_real_obtenido_visual"
-                        value="{{ peso_real_obtenido_actual|default:0 }}"
-                        readonly
-                    >
+                    <label>Peso real obtenido (g)</label>
+                    <input id="peso_real_obtenido_visual" type="text" value="{{ peso_real_obtenido_actual|default:0 }}" readonly>
                     {{ form.peso_real_obtenido_g.as_hidden }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.lote.id_for_label }}">Lote</label>
+                    <label>Lote</label>
                     {{ form.lote }}
                 </div>
+
             </div>
 
             <div class="form-group form-group-full">
-                <label for="{{ form.observaciones.id_for_label }}">Observaciones</label>
+                <label>Observaciones</label>
                 {{ form.observaciones }}
             </div>
 
+            <!-- BOTONES -->
             <div class="acciones-form">
+                <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">
+                    Volver inicio
+                </a>
+
                 <button type="submit" name="_guardar" class="btn-principal">
                     Guardar
                 </button>
             </div>
 
-            {% if formset %}
-                <div class="card card-detalle">
-                    <h2>Detalle por capas</h2>
+            <!-- DETALLE -->
+            {% if detalle_rows %}
+            <div class="card card-detalle">
+                <h2>Detalle por capas</h2>
 
-                    {{ formset.management_form }}
+                <div class="tabla-wrapper">
+                    <table class="tabla-registro">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tipo</th>
+                                <th>Nombre</th>
+                                <th>Objetivo (g)</th>
+                                <th>Ingrediente usado</th>
+                                <th>Real (g)</th>
+                                <th>Comentario</th>
+                            </tr>
+                        </thead>
 
-                    <div class="tabla-wrapper">
-                        <table class="tabla-registro">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Tipo</th>
-                                    <th>Nombre</th>
-                                    <th>Objetivo (g)</th>
-                                    <th>Ingrediente usado</th>
-                                    <th>Real (g)</th>
-                                    <th>Comentario</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for f in formset %}
-                                    <tr>
-                                        {{ f.id }}
-                                        {% if f.non_field_errors %}
-                                            <td colspan="7">
-                                                {{ f.non_field_errors }}
-                                            </td>
-                                        {% else %}
-                                            <td>
-                                                {{ f.instance.capa.orden }}
-                                            </td>
-                                            <td>
-                                                {{ f.instance.capa.get_tipo_display }}
-                                            </td>
-                                            <td>
-                                                {% if f.instance.capa.ingrediente %}
-                                                    {{ f.instance.capa.ingrediente.nombre }}
-                                                {% else %}
-                                                    {{ f.instance.capa.etiqueta }}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {{ f.instance.capa.peso_objetivo_g }}
-                                            </td>
-                                            <td>
-                                                {{ f.ingrediente_usado }}
-                                            </td>
-                                            <td>
-                                                {{ f.peso_real_g }}
-                                                {% if f.peso_real_g.errors %}
-                                                    <div class="error-campo">
-                                                        {{ f.peso_real_g.errors }}
-                                                    </div>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {{ f.comentario }}
-                                            </td>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        <tbody>
+                            {% for row in detalle_rows %}
+                            <tr>
+                                <td data-label="#">{{ row.capa.orden }}</td>
+
+                                <td data-label="Tipo">
+                                    {{ row.capa.get_tipo_display }}
+                                </td>
+
+                                <td data-label="Nombre">
+                                    {% if row.capa.ingrediente %}
+                                        {{ row.capa.ingrediente.nombre }}
+                                    {% else %}
+                                        {{ row.capa.etiqueta }}
+                                    {% endif %}
+                                </td>
+
+                                <td data-label="Objetivo (g)">
+                                    {{ row.capa.peso_objetivo_g }}
+                                </td>
+
+                                <td data-label="Ingrediente usado">
+                                    <input type="hidden" name="capa_id" value="{{ row.capa.id }}">
+                                    <select name="ingrediente_usado">
+                                        <option value="">---------</option>
+                                        {% for ingrediente in row.ingredientes %}
+                                            <option value="{{ ingrediente.id }}"
+                                                {% if row.ingrediente_usado_id == ingrediente.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ ingrediente.nombre }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+
+                                <td data-label="Real (g)">
+                                    <input
+                                        type="number"
+                                        name="peso_real_g"
+                                        step="0.1"
+                                        min="0"
+                                        value="{{ row.peso_real_g }}"
+                                    >
+                                </td>
+
+                                <td data-label="Comentario">
+                                    <textarea name="comentario">{{ row.comentario }}</textarea>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            {% endif %}
-            <div class="acciones-form">
-                <a href="{% url 'redireccionar_intermedio' %}" class="btn-secundario">Volver inicio</a>
             </div>
+            {% endif %}
+
         </form>
     </div>
 </div>
 
+<!-- JS -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
     const form = document.querySelector("form");
-
-    const planta = document.getElementById("id_planta");
-    const cliente = document.getElementById("id_cliente");
-    const producto = document.getElementById("id_producto_manual");
-
-    function submitAuto() {
-        if (!form) return;
-
-        // flag para que la vista sepa que es recarga automática
-        let input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "_auto_cargar_capas";
-        input.value = "1";
-
-        form.appendChild(input);
-        form.submit();
-    }
-
-    function validarYEnviar() {
-        if (planta.value && cliente.value && producto.value) {
-            submitAuto();
-        }
-    }
-
-    if (planta) planta.addEventListener("change", validarYEnviar);
-    if (cliente) cliente.addEventListener("change", validarYEnviar);
-    if (producto) producto.addEventListener("change", validarYEnviar);
-
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const pesoRealVisual = document.getElementById("peso_real_obtenido_visual");
-    const pesoRealHidden = document.getElementById("id_peso_real_obtenido_g");
+    const pesoVisual = document.getElementById("peso_real_obtenido_visual");
+    const pesoHidden = document.getElementById("id_peso_real_obtenido_g");
 
     const planta = document.getElementById("id_planta");
     const cliente = document.getElementById("id_cliente");
@@ -234,54 +208,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function parseNumero(valor) {
         if (!valor) return 0;
-        const limpio = String(valor).replace(",", ".").trim();
-        const numero = parseFloat(limpio);
-        return isNaN(numero) ? 0 : numero;
+        return parseFloat(valor.replace(",", ".")) || 0;
     }
 
-    function recalcularPesoReal() {
+    function recalcularPeso() {
         let total = 0;
 
-        const inputsPeso = document.querySelectorAll('input[name$="-peso_real_g"]');
-
-        inputsPeso.forEach(function (input) {
-            total += parseNumero(input.value);
+        document.querySelectorAll('input[name="peso_real_g"]').forEach(el => {
+            total += parseNumero(el.value);
         });
 
         total = Math.round(total * 10) / 10;
 
-        if (pesoRealVisual) {
-            pesoRealVisual.value = total.toFixed(1);
-        }
-
-        if (pesoRealHidden) {
-            pesoRealHidden.value = total.toFixed(1);
-        }
+        if (pesoVisual) pesoVisual.value = total.toFixed(1);
+        if (pesoHidden) pesoHidden.value = total.toFixed(1);
     }
 
-    document.addEventListener("input", function (event) {
-        if (event.target.matches('input[name$="-peso_real_g"]')) {
-            recalcularPesoReal();
+    document.addEventListener("input", function(e){
+        if (e.target.name === "peso_real_g") {
+            recalcularPeso();
         }
     });
 
-    function limpiarCabeceraResumen() {
-        const codigo = document.getElementById("id_codigo_auto");
-        if (codigo) codigo.value = "";
-
-        if (pesoRealVisual) pesoRealVisual.value = "0.0";
-        if (pesoRealHidden) pesoRealHidden.value = "0.0";
+    function autoSubmit(){
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "_auto_cargar_capas";
+        input.value = "1";
+        form.appendChild(input);
+        form.submit();
     }
 
-    function alCambiarSeleccionBase() {
-        limpiarCabeceraResumen();
+    function validarCambio(){
+        if (planta.value && cliente.value && producto.value){
+            autoSubmit();
+        }
     }
 
-    if (planta) planta.addEventListener("change", alCambiarSeleccionBase);
-    if (cliente) cliente.addEventListener("change", alCambiarSeleccionBase);
-    if (producto) producto.addEventListener("change", alCambiarSeleccionBase);
+    planta?.addEventListener("change", validarCambio);
+    cliente?.addEventListener("change", validarCambio);
+    producto?.addEventListener("change", validarCambio);
 
-    recalcularPesoReal();
+    recalcularPeso();
 });
 </script>
 
