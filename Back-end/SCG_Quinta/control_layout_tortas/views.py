@@ -294,13 +294,26 @@ class RegistroDetalleView(LoginRequiredMixin, View):
     template_name = "control_layout_tortas/registro_detalle.html"
 
     def get(self, request, pk):
-        registro = get_object_or_404(RegistroLayout, pk=pk)
-        detalles = (
-            registro.detalles
-            .select_related("capa", "capa__ingrediente", "ingrediente_usado")
-            .all()
+        registro = get_object_or_404(
+            RegistroLayout.objects.select_related(
+                "layout",
+                "layout__producto",
+                "verificado_por",
+            ).prefetch_related(
+                "registrocapa_set",
+                "registrocapa_set__capa",
+                "registrocapa_set__capa__ingrediente",
+                "registrocapa_set__ingrediente_usado",
+            ),
+            pk=pk
         )
-        return render(request, self.template_name, {"registro": registro, "detalles": detalles})
+
+        detalles = registro.registrocapa_set.all().order_by("capa__orden")
+
+        return render(request, self.template_name, {
+            "registro": registro,
+            "detalles": detalles,
+        })
 
 
 class HistorialRegistroListView(ListView):
