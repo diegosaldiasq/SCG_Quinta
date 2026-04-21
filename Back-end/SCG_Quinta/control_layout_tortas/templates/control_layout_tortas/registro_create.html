@@ -134,7 +134,7 @@
                                 </td>
 
                                 <td data-label="Nombre">
-                                    {% if row.capa.ingrediente %}
+                                    {% if not row.capa.ingrediente %}
                                         {{ row.capa.ingrediente.nombre }}
                                     {% else %}
                                         {{ row.capa.etiqueta }}
