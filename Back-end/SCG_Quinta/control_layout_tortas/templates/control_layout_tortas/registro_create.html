@@ -118,8 +118,8 @@
                                 <th>Tipo</th>
                                 <th>Nombre</th>
                                 <th>Etiqueta</th>
-                                <th>Objetivo (g)</th>
                                 <th>Ingrediente usado</th>
+                                <th>Objetivo (g)</th>
                                 <th>Real (g)</th>
                                 <th>Comentario</th>
                             </tr>
@@ -142,10 +142,6 @@
                                     {{ row.capa.etiqueta }}
                                 </td>
 
-                                <td data-label="Objetivo (g)">
-                                    {{ row.capa.peso_objetivo_g }}
-                                </td>
-
                                 <td data-label="Ingrediente usado">
                                     <input type="hidden" name="capa_id" value="{{ row.capa.id }}">
                                     <select name="ingrediente_usado">
@@ -157,6 +153,10 @@
                                             </option>
                                         {% endfor %}
                                     </select>
+                                </td>
+
+                                <td data-label="Objetivo (g)">
+                                    {{ row.capa.peso_objetivo_g }}
                                 </td>
 
                                 <td data-label="Real (g)">
