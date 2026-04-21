@@ -64,6 +64,7 @@ body {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  justify-content: center;
 }
 
 .contenedor {
@@ -71,6 +72,7 @@ body {
   max-width: 1400px;
   margin: 0 auto;
   padding: 28px 16px 40px;
+  justify-content: center;
 }
 
 /* ===============================
