@@ -60,6 +60,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Torta caramel macchiato','405294'):  80,
     ('Torta piña colada','405292'):  80,
     ('Torta panqueque chocolate manjar','405460'):  25,
+    ('Tarta cóctel de frutas','405631'):  100,
     ('Tartaleta fruta mixta mediana','393270'):  80,
     ('Pie de limon familiar','393000'):  100,
     ('Pie de limon mediano','405396'):  100,

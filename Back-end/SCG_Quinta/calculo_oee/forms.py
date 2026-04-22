@@ -64,6 +64,7 @@ CATALOGO = {
     #{ 'producto': 'Torta caramel macchiato',          'codigo': '405294' }, Descontinuado 30-10-25
     #{ 'producto': 'Torta piña colada',                'codigo': '405292' }, Descontinuado 30-10-25
     { 'producto': 'Torta panqueque chocolate manjar', 'codigo': '405460' },
+    { 'producto': 'Tarta cóctel de frutas',           'codigo': '405631' },
     { 'producto': 'Tartaleta fruta mixta mediana',    'codigo': '393270' },
     { 'producto': 'Pie de limon familiar',            'codigo': '393000' },
     { 'producto': 'Pastel de yogurt',                 'codigo': '392488' },
