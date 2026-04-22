@@ -434,12 +434,6 @@
                 return tr;
             }
 
-            btnAgregarFila.addEventListener("click", function () {
-                const nuevaFila = crearFila();
-                tbodyMuestras.appendChild(nuevaFila);
-                renumerarFilas();
-            });
-
             tbodyMuestras.addEventListener("click", function (e) {
                 if (e.target.classList.contains("btn-eliminar-fila")) {
                     const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
