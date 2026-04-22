@@ -1,4 +1,4 @@
-// Configuración global de jQuery para incluir CSRF en todas las peticiones POST/AJAX
+// Configuración global de jQuery para incluir CSRF en solicitudes AJAX
 $.ajaxSetup({
     beforeSend: function (xhr, settings) {
         if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -8,148 +8,211 @@ $.ajaxSetup({
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    const loteInput = document.getElementById('lote');
-    const turnoInput = document.getElementById('turno');
-    const tbodyMuestras = document.getElementById('tbody-muestras');
-    const btnAgregarFila = document.getElementById('btn-agregar-fila');
+    const loteInput = document.getElementById("lote");
+    const turnoInput = document.getElementById("turno");
+    const clienteInput = document.getElementById("cliente");
+    const productoInput = document.getElementById("producto");
+    const codigoInput = document.getElementById("codigo");
+    const pesoRecetaInput = document.getElementById("peso");
+
+    const tbodyMuestras = document.getElementById("tbody-muestras");
+    const btnAgregarFila = document.getElementById("btn-agregar-fila");
     const btnGuardar = document.getElementById("miBoton");
 
+    // =========================
     // Restaurar lote y turno
-    const loteGuardado = sessionStorage.getItem('lote');
-    const turnoGuardado = sessionStorage.getItem('turno');
+    // =========================
+    const loteGuardado = sessionStorage.getItem("lote");
+    const turnoGuardado = sessionStorage.getItem("turno");
 
     if (loteGuardado !== null && loteInput) {
         loteInput.value = loteGuardado;
-        sessionStorage.removeItem('lote');
+        sessionStorage.removeItem("lote");
     }
 
     if (turnoGuardado !== null && turnoInput) {
         turnoInput.value = turnoGuardado;
-        sessionStorage.removeItem('turno');
+        sessionStorage.removeItem("turno");
+    }
+
+    // =========================
+    // Funciones filas dinámicas
+    // =========================
+    function crearFilaMuestra(numero) {
+        const tr = document.createElement("tr");
+        tr.className = "fila-muestra";
+
+        tr.innerHTML = `
+            <td class="num-muestra">${numero}</td>
+            <td>
+                <input
+                    type="number"
+                    class="input input-peso-real"
+                    min="0"
+                    step="1"
+                    placeholder="-"
+                    required
+                >
+            </td>
+            <td>
+                <input
+                    type="number"
+                    class="input input-altura"
+                    min="0"
+                    step="1"
+                    placeholder="-"
+                >
+            </td>
+            <td>
+                <button type="button" class="btn-eliminar-fila">Eliminar</button>
+            </td>
+        `;
+
+        return tr;
     }
 
     function renumerarFilas() {
-        const filas = tbodyMuestras.querySelectorAll('.fila-muestra');
+        const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+
         filas.forEach((fila, index) => {
-            const celdaNumero = fila.querySelector('.num-muestra');
+            const celdaNumero = fila.querySelector(".num-muestra");
+            const btnEliminar = fila.querySelector(".btn-eliminar-fila");
+
             if (celdaNumero) {
                 celdaNumero.textContent = index + 1;
             }
 
-            const btnEliminar = fila.querySelector('.btn-eliminar-fila');
             if (btnEliminar) {
                 btnEliminar.disabled = filas.length === 1;
             }
         });
     }
 
-    function crearFila() {
-        const tr = document.createElement('tr');
-        tr.className = 'fila-muestra';
-        tr.innerHTML = `
-            <td class="num-muestra"></td>
-            <td>
-                <input type="number" class="input-peso-real" step="1" min="0" required>
-            </td>
-            <td>
-                <input type="number" class="input-altura" step="0.1" min="0">
-            </td>
-            <td>
-                <button type="button" class="btn-eliminar-fila">Eliminar</button>
-            </td>
-        `;
-        return tr;
+    if (btnAgregarFila && tbodyMuestras) {
+        btnAgregarFila.addEventListener("click", function () {
+            const numero = tbodyMuestras.querySelectorAll(".fila-muestra").length + 1;
+            const nuevaFila = crearFilaMuestra(numero);
+            tbodyMuestras.appendChild(nuevaFila);
+            renumerarFilas();
+        });
+
+        tbodyMuestras.addEventListener("click", function (e) {
+            if (e.target.classList.contains("btn-eliminar-fila")) {
+                const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+
+                if (filas.length > 1) {
+                    const fila = e.target.closest(".fila-muestra");
+                    if (fila) {
+                        fila.remove();
+                        renumerarFilas();
+                    }
+                }
+            }
+        });
+
+        renumerarFilas();
     }
 
-    btnAgregarFila.addEventListener('click', function () {
-        const nuevaFila = crearFila();
-        tbodyMuestras.appendChild(nuevaFila);
-        renumerarFilas();
-    });
+    // =========================
+    // Guardar múltiples muestras
+    // =========================
+    if (btnGuardar) {
+        btnGuardar.addEventListener("click", async function (event) {
+            event.preventDefault();
 
-    tbodyMuestras.addEventListener('click', function (e) {
-        if (e.target.classList.contains('btn-eliminar-fila')) {
-            const filas = tbodyMuestras.querySelectorAll('.fila-muestra');
-            if (filas.length > 1) {
-                e.target.closest('.fila-muestra').remove();
-                renumerarFilas();
-            }
-        }
-    });
+            try {
+                const cliente = clienteInput ? clienteInput.value : "";
+                const codigoProducto = codigoInput ? codigoInput.value : "";
+                const producto = productoInput ? productoInput.value : "";
+                const pesoReceta = pesoRecetaInput ? pesoRecetaInput.value : "";
+                const lote = loteInput ? loteInput.value : "";
+                const turno = turnoInput ? turnoInput.value : "";
 
-    renumerarFilas();
-
-    btnGuardar.addEventListener("click", async function (event) {
-        event.preventDefault();
-
-        try {
-            const cliente = $("#cliente").val();
-            const codigoProducto = $("#codigo").val();
-            const producto = $("#producto").val();
-            const pesoReceta = $("#peso").val();
-            const lote = $("#lote").val();
-            const turno = $("#turno").val();
-
-            const filas = tbodyMuestras.querySelectorAll('.fila-muestra');
-            const muestras = [];
-
-            filas.forEach((fila) => {
-                const pesoReal = fila.querySelector('.input-peso-real')?.value;
-                const altura = fila.querySelector('.input-altura')?.value;
-
-                if (pesoReal !== "") {
-                    muestras.push({
-                        peso_real: pesoReal,
-                        altura: altura
-                    });
+                if (!cliente) {
+                    alert("Debes seleccionar un cliente.");
+                    return;
                 }
-            });
 
-            if (!cliente || !producto || !pesoReceta || !lote || !turno) {
-                alert("Debes completar cliente, producto, peso receta, lote y turno.");
-                return;
+                if (!producto) {
+                    alert("Debes seleccionar un producto.");
+                    return;
+                }
+
+                if (!pesoReceta) {
+                    alert("No se encontró el peso receta.");
+                    return;
+                }
+
+                if (!lote) {
+                    alert("Debes ingresar un lote.");
+                    return;
+                }
+
+                if (!turno) {
+                    alert("Debes seleccionar un turno.");
+                    return;
+                }
+
+                const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+                const muestras = [];
+
+                for (const fila of filas) {
+                    const pesoRealInput = fila.querySelector(".input-peso-real");
+                    const alturaInput = fila.querySelector(".input-altura");
+
+                    const pesoReal = pesoRealInput ? pesoRealInput.value.trim() : "";
+                    const altura = alturaInput ? alturaInput.value.trim() : "";
+
+                    if (pesoReal !== "") {
+                        muestras.push({
+                            peso_real: pesoReal,
+                            altura: altura
+                        });
+                    }
+                }
+
+                if (muestras.length === 0) {
+                    alert("Debes ingresar al menos una muestra de peso.");
+                    return;
+                }
+
+                const datos = {
+                    cliente: cliente,
+                    producto: producto,
+                    codigo_producto: codigoProducto,
+                    peso_receta: pesoReceta,
+                    lote: lote,
+                    turno: turno,
+                    muestras: muestras
+                };
+
+                const csrfTokenInput = document.querySelector("[name=csrfmiddlewaretoken]");
+                const csrfToken = csrfTokenInput ? csrfTokenInput.value : csrftoken;
+
+                const response = await fetch("/control_de_pesos/vista_control_de_pesos/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({ dato: datos })
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    sessionStorage.setItem("lote", lote);
+                    sessionStorage.setItem("turno", turno);
+                    alert(data.mensaje || "Datos guardados exitosamente.");
+                    location.reload();
+                } else {
+                    alert(data.mensaje || "No se pudo guardar la información.");
+                }
+
+            } catch (error) {
+                console.error("Hubo un error:", error);
+                alert("Hubo un problema al guardar los datos.");
             }
-
-            if (muestras.length === 0) {
-                alert("Debes ingresar al menos una muestra.");
-                return;
-            }
-
-            const datos = {
-                cliente: cliente,
-                producto: producto,
-                codigo_producto: codigoProducto,
-                peso_receta: pesoReceta,
-                lote: lote,
-                turno: turno,
-                muestras: muestras
-            };
-
-            const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-
-            const response = await fetch('/control_de_pesos/vista_control_de_pesos/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ dato: datos })
-            });
-
-            const data = await response.json();
-
-            if (data.ok) {
-                sessionStorage.setItem('lote', lote);
-                sessionStorage.setItem('turno', turno);
-                alert(data.mensaje || "Datos guardados exitosamente.");
-                location.reload();
-            } else {
-                alert(data.mensaje || "No se pudo guardar la información.");
-            }
-
-        } catch (error) {
-            console.error("Hubo un error:", error);
-            alert("Hubo un problema al guardar los datos.");
-        }
-    });
+        });
+    }
 });
