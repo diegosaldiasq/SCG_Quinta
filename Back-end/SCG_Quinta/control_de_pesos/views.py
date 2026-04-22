@@ -20,41 +20,81 @@ def control_de_pesos(request):
 @csrf_exempt
 @login_required
 def vista_control_de_pesos(request):
-    if request.method == 'POST':
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'mensaje': 'Método no permitido'}, status=405)
+
+    try:
         data = json.loads(request.body.decode('utf-8'))
-        dato = data.get('dato', None)
+    except json.JSONDecodeError:
+        return JsonResponse({'ok': False, 'mensaje': 'JSON inválido'}, status=400)
 
-        if dato:
-            nombre_tecnologo = request.user.nombre_completo
-            fecha_registro = timezone.now()
-            cliente = dato.get('cliente')
-            codigo_producto = dato.get('codigo_producto')
-            producto = dato.get('producto')
-            peso_receta = dato.get('peso_receta')
-            peso_real = dato.get('peso_real')
-            altura = dato.get('altura')
-            lote = dato.get('lote')
-            turno = dato.get('turno')
+    dato = data.get('dato', None)
+    if not dato:
+        return JsonResponse({'ok': False, 'mensaje': 'No se recibió información'}, status=400)
 
-            datos = DatosFormularioControlDePesos(
-                nombre_tecnologo=nombre_tecnologo,
-                fecha_registro=fecha_registro,
-                cliente=cliente,
-                codigo_producto=codigo_producto,
-                producto=producto,
-                peso_receta=peso_receta,
-                peso_real=peso_real,
-                altura=altura if altura not in (None, '') else None,
-                lote=lote,
-                turno=turno
-            )
-            datos.save()
+    cliente = dato.get('cliente')
+    codigo_producto = dato.get('codigo_producto')
+    producto = dato.get('producto')
+    peso_receta = dato.get('peso_receta')
+    lote = dato.get('lote')
+    turno = dato.get('turno')
 
-            return JsonResponse({'existe': True})
+    muestras = dato.get('muestras', [])
 
-        return JsonResponse({'existe': False})
+    # Compatibilidad por si viene el formato antiguo
+    if not muestras and dato.get('peso_real') not in [None, ""]:
+        muestras = [{
+            'peso_real': dato.get('peso_real'),
+            'altura': dato.get('altura')
+        }]
 
-    return JsonResponse({'existe': False})
+    if not cliente or not producto or not peso_receta or not lote or not turno:
+        return JsonResponse({
+            'ok': False,
+            'mensaje': 'Faltan datos obligatorios del encabezado'
+        }, status=400)
+
+    if not muestras:
+        return JsonResponse({
+            'ok': False,
+            'mensaje': 'Debes ingresar al menos una muestra'
+        }, status=400)
+
+    nombre_tecnologo = getattr(request.user, 'nombre_completo', None) or request.user.username
+    guardados = 0
+
+    for muestra in muestras:
+        peso_real = muestra.get('peso_real')
+        altura = muestra.get('altura')
+
+        if peso_real in [None, ""]:
+            continue
+
+        DatosFormularioControlDePesos.objects.create(
+            nombre_tecnologo=nombre_tecnologo,
+            fecha_registro=timezone.now(),
+            cliente=cliente,
+            codigo_producto=codigo_producto,
+            producto=producto,
+            peso_receta=int(peso_receta),
+            peso_real=int(float(peso_real)),
+            altura=float(altura) if altura not in [None, ""] else None,
+            lote=lote,
+            turno=turno
+        )
+        guardados += 1
+
+    if guardados == 0:
+        return JsonResponse({
+            'ok': False,
+            'mensaje': 'No se guardó ninguna muestra válida'
+        }, status=400)
+
+    return JsonResponse({
+        'ok': True,
+        'existe': True,
+        'mensaje': f'Se guardaron {guardados} muestra(s) correctamente'
+    })
 
 
 @login_required

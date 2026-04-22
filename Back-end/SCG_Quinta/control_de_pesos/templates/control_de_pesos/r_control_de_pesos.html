@@ -1,6 +1,5 @@
 {% load static %}
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,13 +12,128 @@
     <link rel="stylesheet" type="text/css" href="{% static 'control_de_pesos/estilos_r_control_de_pesos.css' %}">
     <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
     <title>Registro control Pesos Tortas R-POE-Q-04-XX</title>
+
+    <style>
+        .muestras-box {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.75);
+            border: 1px solid #e5e7eb;
+        }
+
+        .muestras-titulo {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #B43C2C;
+            text-align: center;
+        }
+
+        .tabla-muestras-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .tabla-muestras {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .tabla-muestras th,
+        .tabla-muestras td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .tabla-muestras th {
+            background: #f8f8f8;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .tabla-muestras input {
+            width: 100%;
+            min-width: 110px;
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        .num-muestra {
+            font-weight: 700;
+            color: #B43C2C;
+            width: 48px;
+        }
+
+        .acciones-muestras {
+            margin-top: 14px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-secundario {
+            background-color: #d07020;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            min-width: 180px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            min-height: 42px;
+            padding: 8px 16px;
+        }
+
+        .btn-secundario:hover {
+            opacity: 0.95;
+        }
+
+        .btn-eliminar-fila {
+            background-color: #B43C2C;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            min-height: 36px;
+            padding: 8px 12px;
+        }
+
+        .btn-eliminar-fila:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+            .muestras-box {
+                padding: 12px;
+            }
+
+            .tabla-muestras th,
+            .tabla-muestras td {
+                padding: 8px;
+            }
+
+            .btn-secundario {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="login">
         <img src="{% static 'control_de_pesos/images/logoquinta.png' %}" alt="logo" class="logo">
+
         <div class="login-container">
             <h1 class="title">Registro control de pesos Tortas R-POE-Q-04-XX</h1>
         </div>
+
         <div class="login-container">
             <!-- Selección de Cliente -->
             <label for="cliente">Cliente</label>
@@ -59,18 +173,17 @@
                     { codigo: '393145', value: 'Torta selva negra', text: 'Torta selva negra', peso: '1550' },
                     { codigo: '393167', value: 'Torta truffa', text: 'Torta truffa', peso: '1672' },
                     { codigo: '393153', value: 'Torta viena', text: 'Torta viena', peso: '1490' },
-                    { codigo: '393396', value: 'Torta San Jorge lucuma', text: 'Torta San Jorge lucuma', peso: '2050' }, // Actualizado 27-11-25
+                    { codigo: '393396', value: 'Torta San Jorge lucuma', text: 'Torta San Jorge lucuma', peso: '2050' },
                     { codigo: '393397', value: 'Torta San Jorge guinda', text: 'Torta San Jorge guinda', peso: '1872' },
                     { codigo: '393398', value: 'Torta San Jorge chocolate', text: 'Torta San Jorge chocolate', peso: '1700' },
-                    { codigo: '405220', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '1140' }, // Actualizado 27-11-25
-                    { codigo: '405217', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '1470' }, // Actualizado 05-11-25
+                    { codigo: '405220', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '1140' },
+                    { codigo: '405217', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '1470' },
                     { codigo: '393443', value: 'Torta merengue nugat', text: 'Torta merengue nugat', peso: '1310' },
-                    { codigo: '405458', value: 'Torta merengue manzana frambuesa', text: 'Torta merengue manzana frambuesa', peso: '1450' }, // Actualizado 17-11-25
+                    { codigo: '405458', value: 'Torta merengue manzana frambuesa', text: 'Torta merengue manzana frambuesa', peso: '1450' },
                     { codigo: '405254', value: 'Torta chocolate real', text: 'Torta chocolate real', peso: '860' },
                     { codigo: '393414', value: 'Torta caluga frambuesa', text: 'Torta caluga frambuesa', peso: '1120' },
                     { codigo: '405548', value: 'Torta caluga nuez', text: 'Torta caluga nuez', peso: '1005' },
                     { codigo: '405258', value: 'Torta selva negra vegana', text: 'Torta selva negra vegana', peso: '1010' },
-                    //{ codigo: '405260', value: 'Torta piña vegana', text: 'Torta piña vegana', peso: '1470' }, Descontinuado 30-10-25
                     { codigo: '402261', value: 'Torta panqueque guinda chocolate', text: 'Torta panqueque guinda chocolate', peso: '1814' },
                     { codigo: '405598', value: 'Torta tentacion de chocolate', text: 'Torta tentacion de chocolate', peso: '1120' },
                     { codigo: '405599', value: 'Torta lemon cake', text: 'Torta lemon cake', peso: '1175' },
@@ -87,32 +200,26 @@
                 ],
                 SISA: [
                     { codigo: '393266', value: 'Torta amor', text: 'Torta amor', peso: '1373' },
-                    //{ codigo: '392518', value: 'Torta crema manjar mediana', text: 'Torta crema manjar mediana', peso: '904' }, Descontinuado 30-10-25
                     { codigo: '393011', value: 'Torta crema piña', text: 'Torta crema piña', peso: '1180' },
-                    { codigo: '393013', value: 'Torta crema selva negra', text: 'Torta crema selva negra', peso: '1200' }, // Actualizado 27-11-25
+                    { codigo: '393013', value: 'Torta crema selva negra', text: 'Torta crema selva negra', peso: '1200' },
                     { codigo: '405523', value: 'Torta chocolate mediana', text: 'Torta chocolate mediana', peso: '810' },
-                    { codigo: '393213', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '860' }, // Actualizado 13-10-25
+                    { codigo: '393213', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '860' },
                     { codigo: '393212', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '970' },
                     { codigo: '405605', value: 'Torta merengue cookies', text: 'Torta merengue cookies', peso: '1000' },
-                    { codigo: '405604', value: 'Torta merengue lemon pie', text: 'Torta merengue lemon pie', peso: '815' }, // Actualizado 17-11-25
+                    { codigo: '405604', value: 'Torta merengue lemon pie', text: 'Torta merengue lemon pie', peso: '815' },
                     { codigo: '353253', value: 'Torta mocaccino mediana', text: 'Torta mocaccino mediana', peso: '700' },
                     { codigo: '393018', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1380' },
                     { codigo: '393015', value: 'Torta tres leches', text: 'Torta tres leches', peso: '1300' },
                     { codigo: '393017', value: 'Torta yogurt', text: 'Torta yogurt', peso: '1610' },
                     { codigo: '393019', value: 'Torta viena', text: 'Torta viena', peso: '1470' },
-                    //{ codigo: '393362', value: 'Torta guinda chocolate', text: 'Torta guinda chocolate', peso: '1180' }, Descontinuado 30-10-25
                     { codigo: '393356', value: 'Torta sabor lucuma', text: 'Torta sabor lucuma', peso: '1180' },
                     { codigo: '393354', value: 'Torta sacher', text: 'Torta sacher', peso: '1110' },
                     { codigo: '405256', value: 'Torta doña Isabel', text: 'Torta doña Isabel', peso: '1350' },
                     { codigo: '405295', value: 'Torta cookies & cream', text: 'Torta cookies & cream', peso: '735' },
                     { codigo: '405460', value: 'Torta panqueque chocolate manjar', text: 'Torta panqueque chocolate manjar', peso: '1814' },
-                    //{ codigo: '405294', value: 'Torta caramel macchiato', text: 'Torta caramel macchiato', peso: '780' }, Descontinuado 30-10-25
-                    //{ codigo: '405292', value: 'Torta piña colada', text: 'Torta piña colada', peso: '790' }, Descontinuado 30-10-25
                     { codigo: '405631', value: 'Tarta cóctel de frutas', text: 'Tarta cóctel de frutas', peso: '670' },
                     { codigo: '393270', value: 'Tartaleta fruta mixta mediana', text: 'Tartaleta fruta mixta mediana', peso: '826' },
-                    { codigo: '393000', value: 'Pie de limon familiar', text: 'Pie de limon familiar', peso: '870' },
-                    //{ codigo: '405396', value: 'Pie de limon mediano', text: 'Pie de limon mediano', peso: '560' }, Descontinuado 30-10-25
-                    //{ codigo: '405397', value: 'Pie de maracuya mediano', text: 'Pie de maracuya mediano', peso: '560' } Descontinuado 30-10-25
+                    { codigo: '393000', value: 'Pie de limon familiar', text: 'Pie de limon familiar', peso: '870' }
                 ],
                 Walmart: [
                     { codigo: '393058', value: 'Torta chocoguinda', text: 'Torta chocoguinda', peso: '1180' },
@@ -121,14 +228,13 @@
                     { codigo: '393402', value: 'Torta crema frambuesa', text: 'Torta crema frambuesa', peso: '1045' },
                     { codigo: '392500', value: 'Torta crema moka 15pp', text: 'Torta crema moka 15pp', peso: '1090' },
                     { codigo: '393033', value: 'Torta crema piña 15pp', text: 'Torta crema piña 15pp', peso: '1230' },
-                    //{ codigo: '392498', value: 'Torta holandesa 15pp', text: 'Torta holandesa 15pp', peso: '1180' }, Descontinuada 
                     { codigo: '405726', value: 'Torta amor 15pp', text: 'Torta amor 15pp', peso: '1275' },
                     { codigo: '405641', value: 'Torta viena 15pp', text: 'Torta viena 15pp', peso: '1340' },
                     { codigo: '392495', value: 'Torta mousse manjar 15pp', text: 'Torta mousse manjar 15pp', peso: '1130' },
                     { codigo: '393295', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1410' },
-                    { codigo: '405727', value: 'Torta san jorge lactea', text: 'Torta san jorge lactea', peso: '1610' }, // Actualizado 19-11-25
+                    { codigo: '405727', value: 'Torta san jorge lactea', text: 'Torta san jorge lactea', peso: '1610' },
                     { codigo: '393020', value: 'Torta selva negra 15pp', text: 'Torta selva negra 15pp', peso: '1180' },
-                    { codigo: '392494', value: 'Torta tres leches 15pp', text: 'Torta tres leches 15pp', peso: '1185' }, // Actualizado 19-11-25
+                    { codigo: '392494', value: 'Torta tres leches 15pp', text: 'Torta tres leches 15pp', peso: '1185' },
                     { codigo: '405262', value: 'Torta hoja manjar chocolate artesanal', text: 'Torta hoja manjar chocolate artesanal', peso: '1510' },
                     { codigo: '405315', value: 'Torta frutos del bosque', text: 'Torta frutos del bosque', peso: '740' },
                     { codigo: '393445', value: 'Torta chocolate avellana', text: 'Torta chocolate avellana', peso: '850' },
@@ -162,45 +268,93 @@
 
                 // Cuando cambia el cliente, recargamos productos y deshabilitamos peso
                 selectCliente.addEventListener('change', () => {
-                const cliente = selectCliente.value;
-                const lista   = productosPorCliente[cliente] || [];
+                    const cliente = selectCliente.value;
+                    const lista   = productosPorCliente[cliente] || [];
 
-                // Reiniciamos select producto
-                selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
-                selectProducto.disabled  = lista.length === 0;
-                inputPeso.value          = '';
-                inputCodigo.value = '';
+                    // Reiniciamos select producto
+                    selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
+                    selectProducto.disabled  = lista.length === 0;
+                    inputPeso.value          = '';
+                    inputCodigo.value        = '';
 
-                // Creamos opciones
-                lista.forEach(prod => {
-                    const opt = document.createElement('option');
-                    opt.value       = prod.value;
-                    opt.textContent = prod.text;
-                    // guardamos el peso en un atributo data-peso
-                    opt.setAttribute('data-peso', prod.peso);
-                    opt.setAttribute('data-codigo', prod.codigo);
-                    selectProducto.appendChild(opt);
-                });
+                    // Creamos opciones
+                    lista.forEach(prod => {
+                        const opt = document.createElement('option');
+                        opt.value       = prod.value;
+                        opt.textContent = prod.text;
+                        opt.setAttribute('data-peso', prod.peso);
+                        opt.setAttribute('data-codigo', prod.codigo);
+                        selectProducto.appendChild(opt);
+                    });
                 });
 
                 selectProducto.addEventListener('change', () => {
-                const opt = selectProducto.selectedOptions[0];
-                if (opt) {
-                inputPeso.value   = opt.getAttribute('data-peso')   || '';
-                inputCodigo.value = opt.getAttribute('data-codigo') || '';
-                } else {
-                inputPeso.value   = '';
-                inputCodigo.value = '';
-                }
-            });
+                    const opt = selectProducto.selectedOptions[0];
+                    if (opt) {
+                        inputPeso.value   = opt.getAttribute('data-peso') || '';
+                        inputCodigo.value = opt.getAttribute('data-codigo') || '';
+                    } else {
+                        inputPeso.value   = '';
+                        inputCodigo.value = '';
+                    }
+                });
             </script>
 
-            <!-- Campo que mostrará el peso real -->
-            <label for="peso-real">Peso real (gr)</label>  
-            <input type="text" id="peso-real" class="input" placeholder="-" required>
+            <div class="muestras-box">
+                <h3 class="muestras-titulo">Muestras de peso y altura</h3>
 
-            <label for="altura">Altura (mm)</label>
-            <input type="number" id="altura" name="altura" min="0" step="1" class="input input-altura">
+                <div class="tabla-muestras-wrap">
+                    <table class="tabla-muestras">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Peso real (gr)</th>
+                                <th>Altura (mm)</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-muestras">
+                            <tr class="fila-muestra">
+                                <td class="num-muestra">1</td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        class="input input-peso-real"
+                                        min="0"
+                                        step="1"
+                                        placeholder="-"
+                                        required
+                                    >
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        class="input input-altura"
+                                        min="0"
+                                        step="1"
+                                        placeholder="-"
+                                    >
+                                </td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="btn-eliminar-fila"
+                                        disabled
+                                    >
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="acciones-muestras">
+                    <button type="button" id="btn-agregar-fila" class="btn-secundario">
+                        + Agregar muestra
+                    </button>
+                </div>
+            </div>
 
             <!-- Campo que mostrará el lote -->
             <label for="lote">Lote</label>
@@ -215,19 +369,93 @@
                 <option value="C">C</option>
             </select>
         </div>
+
         <div class="botones">
             <form class="form">
                 {% csrf_token %}
                 <button class="primary-button login-button" id="miBoton">Grabar y continuar</button>
             </form>
+
             <form class="form" action="{% url 'redireccionar_selecciones_2' %}">
                 <button class="primary-button login-button">Salir</button>
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tbodyMuestras = document.getElementById("tbody-muestras");
+            const btnAgregarFila = document.getElementById("btn-agregar-fila");
+
+            function renumerarFilas() {
+                const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+                filas.forEach((fila, index) => {
+                    const celdaNumero = fila.querySelector(".num-muestra");
+                    const btnEliminar = fila.querySelector(".btn-eliminar-fila");
+
+                    if (celdaNumero) {
+                        celdaNumero.textContent = index + 1;
+                    }
+
+                    if (btnEliminar) {
+                        btnEliminar.disabled = filas.length === 1;
+                    }
+                });
+            }
+
+            function crearFila() {
+                const tr = document.createElement("tr");
+                tr.className = "fila-muestra";
+                tr.innerHTML = `
+                    <td class="num-muestra"></td>
+                    <td>
+                        <input
+                            type="number"
+                            class="input input-peso-real"
+                            min="0"
+                            step="1"
+                            placeholder="-"
+                            required
+                        >
+                    </td>
+                    <td>
+                        <input
+                            type="number"
+                            class="input input-altura"
+                            min="0"
+                            step="1"
+                            placeholder="-"
+                        >
+                    </td>
+                    <td>
+                        <button type="button" class="btn-eliminar-fila">Eliminar</button>
+                    </td>
+                `;
+                return tr;
+            }
+
+            btnAgregarFila.addEventListener("click", function () {
+                const nuevaFila = crearFila();
+                tbodyMuestras.appendChild(nuevaFila);
+                renumerarFilas();
+            });
+
+            tbodyMuestras.addEventListener("click", function (e) {
+                if (e.target.classList.contains("btn-eliminar-fila")) {
+                    const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+                    if (filas.length > 1) {
+                        e.target.closest(".fila-muestra").remove();
+                        renumerarFilas();
+                    }
+                }
+            });
+
+            renumerarFilas();
+        });
+    </script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        // Definir el token CSRF para su uso en las solicitudes AJAX
         var csrftoken = "{{ csrf_token }}";
     </script>
     <script src="{% static 'control_de_pesos/scrip_r_control_de_pesos.js' %}"></script>
