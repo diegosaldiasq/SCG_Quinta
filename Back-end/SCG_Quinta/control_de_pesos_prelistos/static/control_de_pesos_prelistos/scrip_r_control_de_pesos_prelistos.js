@@ -1,77 +1,195 @@
-// Configuración global de jQuery para incluir CSRF en todas las peticiones POST/AJAX
 $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
+    beforeSend: function (xhr, settings) {
         if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
         }
     }
 });
 
-document.addEventListener("DOMContentLoaded", function() {
-     // 1) Restaurar lote y turno guardados en sessionStorage
-    const loteGuardado  = sessionStorage.getItem('lote');
-    const turnoGuardado = sessionStorage.getItem('turno');
+document.addEventListener("DOMContentLoaded", function () {
+    const loteInput = document.getElementById("lote");
+    const turnoInput = document.getElementById("turno");
+    const clienteInput = document.getElementById("cliente");
+    const productoInput = document.getElementById("producto");
+    const codigoInput = document.getElementById("codigo");
+    const pesoRecetaInput = document.getElementById("peso");
 
-    if (loteGuardado !== null) {
-        document.getElementById('lote').value = loteGuardado;
-        sessionStorage.removeItem('lote');
+    const tbodyMuestras = document.getElementById("tbody-muestras");
+    const btnAgregarFila = document.getElementById("btn-agregar-fila");
+    const btnGuardar = document.getElementById("miBoton");
+
+    const loteGuardado = sessionStorage.getItem("lote");
+    const turnoGuardado = sessionStorage.getItem("turno");
+
+    if (loteGuardado !== null && loteInput) {
+        loteInput.value = loteGuardado;
+        sessionStorage.removeItem("lote");
     }
-    if (turnoGuardado !== null) {
-        document.getElementById('turno').value = turnoGuardado;
-        sessionStorage.removeItem('turno');
+
+    if (turnoGuardado !== null && turnoInput) {
+        turnoInput.value = turnoGuardado;
+        sessionStorage.removeItem("turno");
     }
 
-    // 2) Listener para el botón
-    document.getElementById("miBoton").addEventListener("click", async function() {
-        try {
-            event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
-            var cliente = $("#cliente").val();
-            var codigoProducto = $("#codigo").val();
-            var producto = $("#producto").val();
-            var pesoReceta = $("#peso").val();
-            var pesoReal = $("#peso-real").val();
-            var lote = $("#lote").val();
-            var turno = $("#turno").val();
+    function crearFilaMuestra(numero) {
+        const tr = document.createElement("tr");
+        tr.className = "fila-muestra";
 
-            // agregar valores a datos
+        tr.innerHTML = `
+            <td class="num-muestra">${numero}</td>
+            <td>
+                <input
+                    type="number"
+                    class="input input-peso-real"
+                    min="0"
+                    step="1"
+                    placeholder="-"
+                    required
+                >
+            </td>
+            <td>
+                <button type="button" class="btn-eliminar-fila">Eliminar</button>
+            </td>
+        `;
 
-            var datos = {
-                cliente: cliente,
-                producto: producto,
-                codigo_producto: codigoProducto,
-                peso_receta: pesoReceta,
-                peso_real: pesoReal,
-                lote: lote,
-                turno: turno
+        return tr;
+    }
+
+    function renumerarFilas() {
+        const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+
+        filas.forEach((fila, index) => {
+            const celdaNumero = fila.querySelector(".num-muestra");
+            const btnEliminar = fila.querySelector(".btn-eliminar-fila");
+
+            if (celdaNumero) {
+                celdaNumero.textContent = index + 1;
             }
-            
-            // Obtener el CSRF token
-            var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
-            var response = await fetch('/control_de_pesos_prelistos/vista_control_de_pesos_prelistos/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken // Aquí deberías agregar el csrf token para Django si es necesario
-                },
-                body: JSON.stringify({ dato: datos })
-            });
-            var data = await response.json();
-            debugger; // <-- Agrega esta línea
-            if (data.existe) {
-                 // guardamos lote y turno en sessionStorage
-                sessionStorage.setItem('lote', lote);
-                sessionStorage.setItem('turno', turno);
-
-                alert("Datos guardados exitosamente!!");
-                location.reload();
-            } else {
-                alert("No se pudo guardar... revisa nuevamente!!");
-                return false;
+            if (btnEliminar) {
+                btnEliminar.disabled = filas.length === 1;
             }
-        } catch (error) {
-            console.error("Hubo un error:", error);
-            alert("Hubo un problema al cargar los datos, formatos no coinciden!!");
-        }
-    });
+        });
+    }
+
+    if (btnAgregarFila && tbodyMuestras) {
+        btnAgregarFila.addEventListener("click", function () {
+            const numero = tbodyMuestras.querySelectorAll(".fila-muestra").length + 1;
+            const nuevaFila = crearFilaMuestra(numero);
+            tbodyMuestras.appendChild(nuevaFila);
+            renumerarFilas();
+        });
+
+        tbodyMuestras.addEventListener("click", function (e) {
+            if (e.target.classList.contains("btn-eliminar-fila")) {
+                const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+
+                if (filas.length > 1) {
+                    const fila = e.target.closest(".fila-muestra");
+                    if (fila) {
+                        fila.remove();
+                        renumerarFilas();
+                    }
+                }
+            }
+        });
+
+        renumerarFilas();
+    }
+
+    if (btnGuardar) {
+        btnGuardar.addEventListener("click", async function (event) {
+            event.preventDefault();
+
+            try {
+                const cliente = clienteInput ? clienteInput.value : "";
+                const codigoProducto = codigoInput ? codigoInput.value : "";
+                const producto = productoInput ? productoInput.value : "";
+                const pesoReceta = pesoRecetaInput ? pesoRecetaInput.value : "";
+                const lote = loteInput ? loteInput.value : "";
+                const turno = turnoInput ? turnoInput.value : "";
+
+                if (!cliente) {
+                    alert("Debes seleccionar un cliente.");
+                    return;
+                }
+
+                if (!producto) {
+                    alert("Debes seleccionar un producto.");
+                    return;
+                }
+
+                if (!pesoReceta) {
+                    alert("No se encontró el peso receta.");
+                    return;
+                }
+
+                if (!lote) {
+                    alert("Debes ingresar un lote.");
+                    return;
+                }
+
+                if (!turno) {
+                    alert("Debes seleccionar un turno.");
+                    return;
+                }
+
+                const filas = tbodyMuestras.querySelectorAll(".fila-muestra");
+                const muestras = [];
+
+                for (const fila of filas) {
+                    const pesoRealInput = fila.querySelector(".input-peso-real");
+                    const pesoReal = pesoRealInput ? pesoRealInput.value.trim() : "";
+
+                    if (pesoReal !== "") {
+                        muestras.push({
+                            peso_real: pesoReal
+                        });
+                    }
+                }
+
+                if (muestras.length === 0) {
+                    alert("Debes ingresar al menos una muestra de peso real.");
+                    return;
+                }
+
+                const datos = {
+                    cliente: cliente,
+                    producto: producto,
+                    codigo_producto: codigoProducto,
+                    peso_receta: pesoReceta,
+                    lote: lote,
+                    turno: turno,
+                    muestras: muestras
+                };
+
+                const csrfTokenInput = document.querySelector("[name=csrfmiddlewaretoken]");
+                const csrfToken = csrfTokenInput ? csrfTokenInput.value : csrftoken;
+
+                const response = await fetch("/control_de_pesos_prelistos/vista_control_de_pesos_prelistos/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({ dato: datos })
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    sessionStorage.setItem("lote", lote);
+                    sessionStorage.setItem("turno", turno);
+                    alert(data.mensaje || "Datos guardados exitosamente.");
+                    location.reload();
+                } else {
+                    alert(data.mensaje || "No se pudo guardar la información.");
+                }
+
+            } catch (error) {
+                console.error("Hubo un error:", error);
+                alert("Hubo un problema al guardar los datos.");
+            }
+        });
+    }
 });
