@@ -87,6 +87,7 @@
             <th>#</th>
             <th>Tipo</th>
             <th>Nombre</th>
+            <th>Etiqueta</th>
             <th>Objetivo (g)</th>
             <th>Real (g)</th>
             <th>Desv (g)</th>
@@ -113,6 +114,10 @@
               {% else %}
                 {{ d.capa.ingrediente.nombre }}
               {% endif %}
+            </td>
+
+            <td data-label="Etiqueta">
+              {{ d.capa.etiqueta }}
             </td>
 
             <td data-label="Objetivo (g)">
