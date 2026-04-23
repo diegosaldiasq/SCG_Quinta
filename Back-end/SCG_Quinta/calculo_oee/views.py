@@ -26,6 +26,7 @@ from django.db.models import Value, FloatField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.functions import ExtractWeek, ExtractYear
 from django.db.models import Sum
+from openpyxl.styles import Font, PatternFill
 
 
 
@@ -363,51 +364,252 @@ def redireccionar_intermedio_4(request):
 @csrf_exempt
 @login_required
 def descargar_resumenturnooee(request):
-    fecha_inicio_str = request.session.get('fechainicio')
-    fecha_fin_str = request.session.get('fechafin')
-    registros = None
-    if fecha_inicio_str == None or fecha_fin_str == None:
-        registros = ResumenTurnoOee.objects.all()
-    else:
-        fecha_inicio = timezone.make_aware(datetime.strptime(fecha_inicio_str, '%Y-%m-%d'))
-        fecha_fin = timezone.make_aware(datetime.strptime(fecha_fin_str, '%Y-%m-%d'))
-        registros = ResumenTurnoOee.objects.filter(fecha__range=[fecha_inicio, fecha_fin])
-    if not registros:
-        return render(request, 'inicio/no_hay_datos.html')
+    # =========================
+    # FILTROS DESDE GET
+    # =========================
+    semana = request.GET.getlist("semana")
+    anio = request.GET.get("anio")
+    linea = request.GET.getlist("linea")
+    turno = request.GET.getlist("turno")
+    desde = request.GET.get("desde")
+    hasta = request.GET.get("hasta")
 
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    response['Content-Disposition'] = 'attachment; filename="resumen_turno_oee.xlsx"'
+    # =========================
+    # QUERY BASE RESUMEN
+    # =========================
+    queryset = ResumenTurnoOee.objects.select_related("lote").all()
 
+    if semana:
+        queryset = queryset.filter(fecha__week__in=semana)
+
+    if anio:
+        queryset = queryset.filter(fecha__year=anio)
+
+    if linea:
+        queryset = queryset.filter(linea__in=linea)
+
+    if turno:
+        queryset = queryset.filter(turno__in=turno)
+
+    if desde:
+        queryset = queryset.filter(fecha__gte=desde)
+
+    if hasta:
+        queryset = queryset.filter(fecha__lte=hasta)
+
+    queryset = queryset.order_by("fecha", "linea", "turno")
+
+    # =========================
+    # CREAR EXCEL
+    # =========================
     wb = Workbook()
-    ws = wb.active
 
-    fields = [f.name for f in ResumenTurnoOee._meta.fields]
-    ws.append(fields)
+    encabezado_fill = PatternFill(start_color="B43C2C", end_color="B43C2C", fill_type="solid")
+    encabezado_font = Font(color="FFFFFF", bold=True)
 
-    def convertir_fecha(fecha):
-        return fecha.astimezone(pytz.timezone('America/Santiago')).replace(tzinfo=None) if fecha else None
+    # ==========================================================
+    # HOJA 1: RESUMEN OEE
+    # ==========================================================
+    ws1 = wb.active
+    ws1.title = "Resumen OEE"
 
-    for obj in registros:
-        data = model_to_dict(obj, fields=fields)
-        # si tienes DateTimeField y quieres formatear:
-        if 'fecha' in data:
-            data['fecha'] = convertir_fecha(data['fecha'])
-        if 'fecha_de_verificacion' in data:
-            data['fecha_de_verificacion'] = convertir_fecha(data['fecha_de_verificacion'])
-        fila = []
-        for field in fields:
-            val = data[field]
-            if hasattr(val, 'isoformat'):  # p.ej. datetime / date
-                val = val.isoformat(sep=' ')
-            fila.append(val)
-        ws.append(fila)
+    headers_resumen = [
+        "Fecha",
+        "Semana",
+        "Año",
+        "Línea",
+        "Turno",
+        "Lote ID",
+        "Tiempo planeado (min)",
+        "Tiempo parada (min)",
+        "Tiempo operativo (min)",
+        "Producción real",
+        "Producción teórica",
+        "Productos buenos",
+        "Productos reproceso",
+        "Disponibilidad (%)",
+        "Eficiencia (%)",
+        "Calidad (%)",
+        "OEE (%)",
+        "Unidades por persona",
+        "Unidades pp/hora",
+        "Comentarios",
+    ]
+
+    ws1.append(headers_resumen)
+
+    for cell in ws1[1]:
+        cell.fill = encabezado_fill
+        cell.font = encabezado_font
+
+    for r in queryset:
+        lote = getattr(r, "lote", None)
+
+        ws1.append([
+            r.fecha.strftime("%d-%m-%Y") if r.fecha else "",
+            r.fecha.isocalendar()[1] if r.fecha else "",
+            r.fecha.year if r.fecha else "",
+            r.linea if hasattr(r, "linea") else (getattr(lote, "linea", "") if lote else ""),
+            r.turno if hasattr(r, "turno") else (getattr(lote, "turno", "") if lote else ""),
+            lote.id if lote else "",
+            float(r.tiempo_planeado) if r.tiempo_planeado is not None else 0,
+            float(r.tiempo_parada) if r.tiempo_parada is not None else 0,
+            float(r.tiempo_operativo) if r.tiempo_operativo is not None else 0,
+            float(r.produccion_real) if r.produccion_real is not None else 0,
+            float(r.produccion_teorica) if r.produccion_teorica is not None else 0,
+            float(r.productos_buenos) if r.productos_buenos is not None else 0,
+            float(r.productos_reproceso) if r.productos_reproceso is not None else 0,
+            float(r.disponibilidad) if r.disponibilidad is not None else 0,
+            float(r.eficiencia) if r.eficiencia is not None else 0,
+            float(r.calidad) if r.calidad is not None else 0,
+            float(r.oee) if r.oee is not None else 0,
+            float(r.unidades_por_persona) if hasattr(r, "unidades_por_persona") and r.unidades_por_persona is not None else "",
+            float(r.unidades_pp_hora) if hasattr(r, "unidades_pp_hora") and r.unidades_pp_hora is not None else "",
+            getattr(r, "comentarios", "") or getattr(lote, "comentarios", "") if lote else "",
+        ])
+
+    # ==========================================================
+    # HOJA 2: DETENCIONES
+    # ==========================================================
+    ws2 = wb.create_sheet(title="Detenciones")
+
+    headers_detenciones = [
+        "Fecha",
+        "Semana",
+        "Año",
+        "Línea",
+        "Turno",
+        "Lote ID",
+        "Motivo detención",
+        "Hora inicio",
+        "Hora fin",
+        "Duración (min)",
+        "Comentario detención",
+        "Tiempo planeado turno (min)",
+        "Tiempo parada turno (min)",
+        "Tiempo operativo turno (min)",
+        "Disponibilidad turno (%)",
+        "Eficiencia turno (%)",
+        "Calidad turno (%)",
+        "OEE turno (%)",
+    ]
+
+    ws2.append(headers_detenciones)
+
+    for cell in ws2[1]:
+        cell.fill = encabezado_fill
+        cell.font = encabezado_font
+
+    resumenes = list(queryset)
+    resumen_por_lote_id = {
+        r.lote_id: r for r in resumenes if getattr(r, "lote_id", None)
+    }
+    lotes_ids = list(resumen_por_lote_id.keys())
+
+    detenciones = Detencion.objects.filter(lote_id__in=lotes_ids).order_by(
+        "lote_id", "hora_inicio", "hora_fin"
+    )
+
+    for d in detenciones:
+        resumen = resumen_por_lote_id.get(d.lote_id)
+        lote = getattr(resumen, "lote", None) if resumen else None
+        fecha = resumen.fecha if resumen else None
+
+        ws2.append([
+            fecha.strftime("%d-%m-%Y") if fecha else "",
+            fecha.isocalendar()[1] if fecha else "",
+            fecha.year if fecha else "",
+            resumen.linea if resumen and hasattr(resumen, "linea") else (getattr(lote, "linea", "") if lote else ""),
+            resumen.turno if resumen and hasattr(resumen, "turno") else (getattr(lote, "turno", "") if lote else ""),
+            d.lote_id,
+            d.motivo if hasattr(d, "motivo") else getattr(d, "motivo_detencion", ""),
+            d.hora_inicio.strftime("%H:%M") if getattr(d, "hora_inicio", None) else "",
+            d.hora_fin.strftime("%H:%M") if getattr(d, "hora_fin", None) else "",
+            float(d.duracion) if getattr(d, "duracion", None) is not None else 0,
+            getattr(d, "comentario", "") or getattr(d, "comentarios", ""),
+            float(resumen.tiempo_planeado) if resumen and resumen.tiempo_planeado is not None else 0,
+            float(resumen.tiempo_parada) if resumen and resumen.tiempo_parada is not None else 0,
+            float(resumen.tiempo_operativo) if resumen and resumen.tiempo_operativo is not None else 0,
+            float(resumen.disponibilidad) if resumen and resumen.disponibilidad is not None else 0,
+            float(resumen.eficiencia) if resumen and resumen.eficiencia is not None else 0,
+            float(resumen.calidad) if resumen and resumen.calidad is not None else 0,
+            float(resumen.oee) if resumen and resumen.oee is not None else 0,
+        ])
+
+    # ==========================================================
+    # HOJA 3: REPROCESOS
+    # ==========================================================
+    ws3 = wb.create_sheet(title="Reprocesos")
+
+    headers_reprocesos = [
+        "Fecha",
+        "Semana",
+        "Año",
+        "Línea",
+        "Turno",
+        "Lote ID",
+        "Cantidad reproceso",
+        "Comentario reproceso",
+        "Producción real turno",
+        "Productos buenos turno",
+        "Productos reproceso turno",
+        "Calidad turno (%)",
+        "OEE turno (%)",
+    ]
+
+    ws3.append(headers_reprocesos)
+
+    for cell in ws3[1]:
+        cell.fill = encabezado_fill
+        cell.font = encabezado_font
+
+    reprocesos = Reproceso.objects.filter(lote_id__in=lotes_ids).order_by("lote_id", "id")
+
+    for rp in reprocesos:
+        resumen = resumen_por_lote_id.get(rp.lote_id)
+        lote = getattr(resumen, "lote", None) if resumen else None
+        fecha = resumen.fecha if resumen else None
+
+        ws3.append([
+            fecha.strftime("%d-%m-%Y") if fecha else "",
+            fecha.isocalendar()[1] if fecha else "",
+            fecha.year if fecha else "",
+            resumen.linea if resumen and hasattr(resumen, "linea") else (getattr(lote, "linea", "") if lote else ""),
+            resumen.turno if resumen and hasattr(resumen, "turno") else (getattr(lote, "turno", "") if lote else ""),
+            rp.lote_id,
+            float(rp.cantidad) if getattr(rp, "cantidad", None) is not None else 0,
+            getattr(rp, "comentario", "") or getattr(rp, "comentarios", ""),
+            float(resumen.produccion_real) if resumen and resumen.produccion_real is not None else 0,
+            float(resumen.productos_buenos) if resumen and resumen.productos_buenos is not None else 0,
+            float(resumen.productos_reproceso) if resumen and resumen.productos_reproceso is not None else 0,
+            float(resumen.calidad) if resumen and resumen.calidad is not None else 0,
+            float(resumen.oee) if resumen and resumen.oee is not None else 0,
+        ])
+
+    # =========================
+    # AJUSTAR ANCHO COLUMNAS
+    # =========================
+    for ws in [ws1, ws2, ws3]:
+        for col in ws.columns:
+            max_length = 0
+            col_letter = col[0].column_letter
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except Exception:
+                    pass
+            ws.column_dimensions[col_letter].width = max_length + 2
+
+    # =========================
+    # RESPUESTA
+    # =========================
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="resumen_oee_detenciones_reprocesos.xlsx"'
 
     wb.save(response)
-    if fecha_inicio_str != None or fecha_fin_str != None:
-        del request.session['fechainicio']
-        del request.session['fechafin']
     return response
 
 @require_GET
