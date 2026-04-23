@@ -364,9 +364,6 @@ def redireccionar_intermedio_4(request):
 @csrf_exempt
 @login_required
 def descargar_resumenturnooee(request):
-    # =========================
-    # FILTROS DESDE GET
-    # =========================
     semana = request.GET.getlist("semana")
     anio = request.GET.get("anio")
     linea = request.GET.getlist("linea")
@@ -374,9 +371,6 @@ def descargar_resumenturnooee(request):
     desde = request.GET.get("desde")
     hasta = request.GET.get("hasta")
 
-    # =========================
-    # QUERY BASE RESUMEN
-    # =========================
     queryset = ResumenTurnoOee.objects.select_related("lote").all()
 
     if semana:
@@ -392,24 +386,21 @@ def descargar_resumenturnooee(request):
         queryset = queryset.filter(turno__in=turno)
 
     if desde:
-        queryset = queryset.filter(fecha__gte=desde)
+        queryset = queryset.filter(fecha__date__gte=desde)
 
     if hasta:
-        queryset = queryset.filter(fecha__lte=hasta)
+        queryset = queryset.filter(fecha__date__lte=hasta)
 
     queryset = queryset.order_by("fecha", "linea", "turno")
 
-    # =========================
-    # CREAR EXCEL
-    # =========================
     wb = Workbook()
 
     encabezado_fill = PatternFill(start_color="B43C2C", end_color="B43C2C", fill_type="solid")
     encabezado_font = Font(color="FFFFFF", bold=True)
 
-    # ==========================================================
+    # =========================
     # HOJA 1: RESUMEN OEE
-    # ==========================================================
+    # =========================
     ws1 = wb.active
     ws1.title = "Resumen OEE"
 
@@ -417,23 +408,31 @@ def descargar_resumenturnooee(request):
         "Fecha",
         "Semana",
         "Año",
+        "Cliente",
+        "Código",
+        "Producto",
         "Línea",
         "Turno",
+        "Supervisor",
         "Lote ID",
+        "Lote",
         "Tiempo planeado (min)",
-        "Tiempo parada (min)",
-        "Tiempo operativo (min)",
-        "Producción real",
+        "Tiempo paro (min)",
         "Producción teórica",
+        "Producción planificada",
+        "Producción real",
+        "Productos malos",
         "Productos buenos",
-        "Productos reproceso",
+        "Número personas",
+        "Unidades por persona",
+        "Unidades pp/hora",
         "Disponibilidad (%)",
         "Eficiencia (%)",
         "Calidad (%)",
         "OEE (%)",
-        "Unidades por persona",
-        "Unidades pp/hora",
-        "Comentarios",
+        "Verificado",
+        "Verificado por",
+        "Fecha verificación",
     ]
 
     ws1.append(headers_resumen)
@@ -442,52 +441,66 @@ def descargar_resumenturnooee(request):
         cell.fill = encabezado_fill
         cell.font = encabezado_font
 
-    for r in queryset:
-        lote = getattr(r, "lote", None)
+    resumenes = list(queryset)
+
+    for r in resumenes:
+        lote_obj = r.lote
 
         ws1.append([
             r.fecha.strftime("%d-%m-%Y") if r.fecha else "",
             r.fecha.isocalendar()[1] if r.fecha else "",
             r.fecha.year if r.fecha else "",
-            r.linea if hasattr(r, "linea") else (getattr(lote, "linea", "") if lote else ""),
-            r.turno if hasattr(r, "turno") else (getattr(lote, "turno", "") if lote else ""),
-            lote.id if lote else "",
+            r.cliente or "",
+            r.codigo or "",
+            r.producto or "",
+            r.linea or "",
+            r.turno or "",
+            r.supervisor or "",
+            lote_obj.id if lote_obj else "",
+            lote_obj.lote if lote_obj else "",
             float(r.tiempo_planeado) if r.tiempo_planeado is not None else 0,
-            float(r.tiempo_parada) if r.tiempo_parada is not None else 0,
-            float(r.tiempo_operativo) if r.tiempo_operativo is not None else 0,
-            float(r.produccion_real) if r.produccion_real is not None else 0,
+            float(r.tiempo_paro) if r.tiempo_paro is not None else 0,
             float(r.produccion_teorica) if r.produccion_teorica is not None else 0,
+            float(r.produccion_planificada) if r.produccion_planificada is not None else 0,
+            float(r.produccion_real) if r.produccion_real is not None else 0,
+            float(r.productos_malos) if r.productos_malos is not None else 0,
             float(r.productos_buenos) if r.productos_buenos is not None else 0,
-            float(r.productos_reproceso) if r.productos_reproceso is not None else 0,
+            float(r.numero_personas) if r.numero_personas is not None else 0,
+            float(r.unidades_por_persona) if r.unidades_por_persona is not None else 0,
+            float(r.unidades_pp_hora) if r.unidades_pp_hora is not None else 0,
             float(r.disponibilidad) if r.disponibilidad is not None else 0,
             float(r.eficiencia) if r.eficiencia is not None else 0,
             float(r.calidad) if r.calidad is not None else 0,
             float(r.oee) if r.oee is not None else 0,
-            float(r.unidades_por_persona) if hasattr(r, "unidades_por_persona") and r.unidades_por_persona is not None else "",
-            float(r.unidades_pp_hora) if hasattr(r, "unidades_pp_hora") and r.unidades_pp_hora is not None else "",
-            getattr(r, "comentarios", "") or getattr(lote, "comentarios", "") if lote else "",
+            "Sí" if r.verificado else "No",
+            r.verificado_por or "",
+            r.fecha_de_verificacion.strftime("%d-%m-%Y %H:%M") if r.fecha_de_verificacion else "",
         ])
 
-    # ==========================================================
+    # =========================
     # HOJA 2: DETENCIONES
-    # ==========================================================
+    # =========================
     ws2 = wb.create_sheet(title="Detenciones")
 
     headers_detenciones = [
         "Fecha",
         "Semana",
         "Año",
+        "Cliente",
+        "Código",
+        "Producto",
         "Línea",
         "Turno",
+        "Supervisor",
         "Lote ID",
+        "Lote",
         "Motivo detención",
         "Hora inicio",
         "Hora fin",
         "Duración (min)",
-        "Comentario detención",
+        "Comentarios detención",
         "Tiempo planeado turno (min)",
-        "Tiempo parada turno (min)",
-        "Tiempo operativo turno (min)",
+        "Tiempo paro turno (min)",
         "Disponibilidad turno (%)",
         "Eficiencia turno (%)",
         "Calidad turno (%)",
@@ -500,9 +513,8 @@ def descargar_resumenturnooee(request):
         cell.fill = encabezado_fill
         cell.font = encabezado_font
 
-    resumenes = list(queryset)
     resumen_por_lote_id = {
-        r.lote_id: r for r in resumenes if getattr(r, "lote_id", None)
+        r.lote_id: r for r in resumenes if r.lote_id
     }
     lotes_ids = list(resumen_por_lote_id.keys())
 
@@ -512,47 +524,57 @@ def descargar_resumenturnooee(request):
 
     for d in detenciones:
         resumen = resumen_por_lote_id.get(d.lote_id)
-        lote = getattr(resumen, "lote", None) if resumen else None
+        lote_obj = resumen.lote if resumen else None
         fecha = resumen.fecha if resumen else None
 
         ws2.append([
             fecha.strftime("%d-%m-%Y") if fecha else "",
             fecha.isocalendar()[1] if fecha else "",
             fecha.year if fecha else "",
-            resumen.linea if resumen and hasattr(resumen, "linea") else (getattr(lote, "linea", "") if lote else ""),
-            resumen.turno if resumen and hasattr(resumen, "turno") else (getattr(lote, "turno", "") if lote else ""),
+            resumen.cliente if resumen else "",
+            resumen.codigo if resumen else "",
+            resumen.producto if resumen else "",
+            resumen.linea if resumen else "",
+            resumen.turno if resumen else "",
+            resumen.supervisor if resumen else "",
             d.lote_id,
-            d.motivo if hasattr(d, "motivo") else getattr(d, "motivo_detencion", ""),
-            d.hora_inicio.strftime("%H:%M") if getattr(d, "hora_inicio", None) else "",
-            d.hora_fin.strftime("%H:%M") if getattr(d, "hora_fin", None) else "",
-            float(d.duracion) if getattr(d, "duracion", None) is not None else 0,
-            getattr(d, "comentario", "") or getattr(d, "comentarios", ""),
+            lote_obj.lote if lote_obj else "",
+            d.motivo or "",
+            d.hora_inicio.strftime("%H:%M") if d.hora_inicio else "",
+            d.hora_fin.strftime("%H:%M") if d.hora_fin else "",
+            float(d.duracion) if d.duracion is not None else 0,
+            d.comentarios or "",
             float(resumen.tiempo_planeado) if resumen and resumen.tiempo_planeado is not None else 0,
-            float(resumen.tiempo_parada) if resumen and resumen.tiempo_parada is not None else 0,
-            float(resumen.tiempo_operativo) if resumen and resumen.tiempo_operativo is not None else 0,
+            float(resumen.tiempo_paro) if resumen and resumen.tiempo_paro is not None else 0,
             float(resumen.disponibilidad) if resumen and resumen.disponibilidad is not None else 0,
             float(resumen.eficiencia) if resumen and resumen.eficiencia is not None else 0,
             float(resumen.calidad) if resumen and resumen.calidad is not None else 0,
             float(resumen.oee) if resumen and resumen.oee is not None else 0,
         ])
 
-    # ==========================================================
+    # =========================
     # HOJA 3: REPROCESOS
-    # ==========================================================
+    # =========================
     ws3 = wb.create_sheet(title="Reprocesos")
 
     headers_reprocesos = [
         "Fecha",
         "Semana",
         "Año",
+        "Cliente",
+        "Código",
+        "Producto",
         "Línea",
         "Turno",
+        "Supervisor",
         "Lote ID",
-        "Cantidad reproceso",
-        "Comentario reproceso",
+        "Lote",
+        "Motivo reproceso",
+        "Cantidad",
+        "Comentarios reproceso",
         "Producción real turno",
+        "Productos malos turno",
         "Productos buenos turno",
-        "Productos reproceso turno",
         "Calidad turno (%)",
         "OEE turno (%)",
     ]
@@ -567,21 +589,27 @@ def descargar_resumenturnooee(request):
 
     for rp in reprocesos:
         resumen = resumen_por_lote_id.get(rp.lote_id)
-        lote = getattr(resumen, "lote", None) if resumen else None
+        lote_obj = resumen.lote if resumen else None
         fecha = resumen.fecha if resumen else None
 
         ws3.append([
             fecha.strftime("%d-%m-%Y") if fecha else "",
             fecha.isocalendar()[1] if fecha else "",
             fecha.year if fecha else "",
-            resumen.linea if resumen and hasattr(resumen, "linea") else (getattr(lote, "linea", "") if lote else ""),
-            resumen.turno if resumen and hasattr(resumen, "turno") else (getattr(lote, "turno", "") if lote else ""),
+            resumen.cliente if resumen else "",
+            resumen.codigo if resumen else "",
+            resumen.producto if resumen else "",
+            resumen.linea if resumen else "",
+            resumen.turno if resumen else "",
+            resumen.supervisor if resumen else "",
             rp.lote_id,
-            float(rp.cantidad) if getattr(rp, "cantidad", None) is not None else 0,
-            getattr(rp, "comentario", "") or getattr(rp, "comentarios", ""),
+            lote_obj.lote if lote_obj else "",
+            rp.motivo or "",
+            float(rp.cantidad) if rp.cantidad is not None else 0,
+            rp.comentarios or "",
             float(resumen.produccion_real) if resumen and resumen.produccion_real is not None else 0,
+            float(resumen.productos_malos) if resumen and resumen.productos_malos is not None else 0,
             float(resumen.productos_buenos) if resumen and resumen.productos_buenos is not None else 0,
-            float(resumen.productos_reproceso) if resumen and resumen.productos_reproceso is not None else 0,
             float(resumen.calidad) if resumen and resumen.calidad is not None else 0,
             float(resumen.oee) if resumen and resumen.oee is not None else 0,
         ])
@@ -595,7 +623,7 @@ def descargar_resumenturnooee(request):
             col_letter = col[0].column_letter
             for cell in col:
                 try:
-                    if cell.value:
+                    if cell.value is not None:
                         max_length = max(max_length, len(str(cell.value)))
                 except Exception:
                     pass
