@@ -162,8 +162,8 @@
         const selectProducto = byId('producto');
         const inputPeso = byId('peso');
         const inputCodigo = byId('codigo');
-        const inputAltura = byId('altura');
-        const labelAltura = byId('label-altura');
+        //const inputAltura = byId('altura');
+        //const labelAltura = byId('label-altura');
 
         function resetProducto() {
           selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
@@ -176,16 +176,19 @@
         }
 
         function setAlturaVisible(show) {
-          if (show) {
-            labelAltura.style.display = 'block';
-            inputAltura.style.display = 'block';
-            inputAltura.required = true;
-          } else {
-            labelAltura.style.display = 'none';
-            inputAltura.style.display = 'none';
-            inputAltura.required = false;
-            inputAltura.value = '';
-          }
+            // ocultar/mostrar header
+            const thAltura = document.querySelectorAll(".tabla-muestras th:nth-child(3)");
+
+            // ocultar/mostrar celdas
+            const tdAltura = document.querySelectorAll(".tabla-muestras td:nth-child(3)");
+
+            thAltura.forEach(el => {
+                el.style.display = show ? "" : "none";
+            });
+
+            tdAltura.forEach(el => {
+                el.style.display = show ? "" : "none";
+            });
         }
 
         function poblarProductos(cliente) {

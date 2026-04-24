@@ -87,6 +87,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const nuevaFila = crearFilaMuestra(numero);
             tbodyMuestras.appendChild(nuevaFila);
             renumerarFilas();
+             // 🔥 mantener lógica altura
+            const cliente = document.getElementById("cliente").value;
+            setAlturaVisible(cliente === 'Pasteles' || cliente === 'Insumo');
         });
 
         tbodyMuestras.addEventListener("click", function (e) {
