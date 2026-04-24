@@ -16,43 +16,88 @@ def control_de_pesos_insumos_kuchen(request):
     return render(request, 'control_de_pesos_insumos_kuchen/r_control_de_pesos_insumos_kuchen.html')
 
 @csrf_exempt
-@login_required 
+@login_required
 def vista_control_de_pesos_insumos_kuchen(request):
-     if request.method == 'POST':
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'mensaje': 'Método no permitido'}, status=405)
+
+    try:
         data = json.loads(request.body.decode('utf-8'))
-        dato = data.get('dato', None)
-        if dato:
-            nombre_tecnologo = request.user.nombre_completo
-            fecha_registro = timezone.now()
-            cliente = dato.get('cliente')
-            codigo_producto = dato.get('codigo_producto')
-            producto = dato.get('producto')
-            peso_receta = dato.get('peso_receta')
-            peso_real = dato.get('peso_real')
-            altura = dato.get('altura')
-            lote = dato.get('lote')
-            turno = dato.get('turno')
+    except json.JSONDecodeError:
+        return JsonResponse({'ok': False, 'mensaje': 'JSON inválido'}, status=400)
 
-            if altura == '':
-                altura = None
+    dato = data.get('dato', None)
 
-            datos = DatosFormularioControlDePesosInsumosKuchen(
-                nombre_tecnologo=nombre_tecnologo,
-                fecha_registro=fecha_registro,
-                cliente=cliente,
-                codigo_producto=codigo_producto,
-                producto=producto,
-                peso_receta=peso_receta,
-                peso_real=peso_real,
-                altura=altura,
-                lote=lote,
-                turno=turno
-                )
-            datos.save()
+    if not dato:
+        return JsonResponse({'ok': False, 'existe': False, 'mensaje': 'No se recibió información'}, status=400)
 
-            return JsonResponse({'existe': True})
-        else:
-            return JsonResponse({'existe': False})
+    nombre_tecnologo = request.user.nombre_completo
+
+    cliente = dato.get('cliente')
+    codigo_producto = dato.get('codigo_producto')
+    producto = dato.get('producto')
+    peso_receta = dato.get('peso_receta')
+    lote = dato.get('lote')
+    turno = dato.get('turno')
+    muestras = dato.get('muestras', [])
+
+    # Compatibilidad con formato antiguo
+    if not muestras and dato.get('peso_real') not in [None, ""]:
+        muestras = [{
+            'peso_real': dato.get('peso_real'),
+            'altura': dato.get('altura')
+        }]
+
+    if not cliente or not producto or not peso_receta or not lote or not turno:
+        return JsonResponse({
+            'ok': False,
+            'existe': False,
+            'mensaje': 'Faltan datos obligatorios'
+        }, status=400)
+
+    if not muestras:
+        return JsonResponse({
+            'ok': False,
+            'existe': False,
+            'mensaje': 'Debes ingresar al menos una muestra'
+        }, status=400)
+
+    guardados = 0
+
+    for muestra in muestras:
+        peso_real = muestra.get('peso_real')
+        altura = muestra.get('altura')
+
+        if peso_real in [None, ""]:
+            continue
+
+        DatosFormularioControlDePesosInsumosKuchen.objects.create(
+            nombre_tecnologo=nombre_tecnologo,
+            fecha_registro=timezone.now(),
+            cliente=cliente,
+            codigo_producto=codigo_producto,
+            producto=producto,
+            peso_receta=int(float(peso_receta)),
+            peso_real=int(float(peso_real)),
+            altura=int(float(altura)) if altura not in [None, ""] else None,
+            lote=lote,
+            turno=turno
+        )
+
+        guardados += 1
+
+    if guardados == 0:
+        return JsonResponse({
+            'ok': False,
+            'existe': False,
+            'mensaje': 'No se guardó ninguna muestra válida'
+        }, status=400)
+
+    return JsonResponse({
+        'ok': True,
+        'existe': True,
+        'mensaje': f'Se guardaron {guardados} muestra(s) correctamente'
+    })
 
 @login_required
 def redireccionar_selecciones_2(request):
