@@ -56,6 +56,7 @@ CATALOGO = {
     { 'producto': 'Torta crema manjar',               'codigo': '405692' },
     { 'producto': 'Torta yogurt',                     'codigo': '393017' },
     { 'producto': 'Torta viena',                      'codigo': '393019' },
+    { 'producto': 'Torta viena vainilla',             'codigo': '405760' },
     #{ 'producto': 'Torta guinda chocolate',           'codigo': '393362' }, Descontinuado 30-10-25
     { 'producto': 'Torta sabor lucuma',               'codigo': '393356' },
     { 'producto': 'Torta sacher',                     'codigo': '393354' },

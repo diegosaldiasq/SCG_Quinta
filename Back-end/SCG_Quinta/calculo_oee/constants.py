@@ -52,6 +52,7 @@ TASA_NOMINAL_POR_PRODUCTO = {
     ('Torta crema manjar','405692'):  200,
     ('Torta yogurt','393017'):  100,
     ('Torta viena','393019'):  100,
+    ('Torta viena vainilla','405760'):  100,
     ('Torta guinda chocolate','393362'):  200,
     ('Torta sabor lucuma','393356'):  200,
     ('Torta sacher','393354'):  200,
