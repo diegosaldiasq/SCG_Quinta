@@ -74,7 +74,7 @@ Iniciar sesion de docker (se debebe tener Docker instalado) con el comando `dock
 
 ## PGAdmin de postgres
 
-Para el acceso local se debe ingreaar a http://localhost:5050 e ingresar con usuario y contraseña.
+Para el acceso local se debe ingreaar a http://localhost:5050 e ingresar con usuario y contraseña. Para ingreso desde la web se debe ingresar por https://pgadmin.controldeprocesosquinta.com e ingresar con usuario y contraseña.
 
 ## Como ejecutar las pruebas
 
@@ -90,9 +90,9 @@ Para mantenimiento del servidor en AWS, se debe conectar a la instancia de AWS, 
 
 Para actualizaciones de ubuntu se debe ejecutar el comando `sudo apt update` para actualizar la lista de paquetes disponibles, luego ejecutar el comando `sudo apt upgrade -y` para actualizar los paquetes instalados, `sudo apt autoremove -y` para eliminar paquetes que ya no son necesarios. Para reiniciar el servidor se debe ejecutar el comando `sudo reboot` para reiniciar la instancia de AWS.
 
-#### Funcionamiento de la aplicaciones web
+## Funcionamiento de la aplicaciones web
 
-## Control de layout tortas
+#### Control de layout tortas
 
 Desde https://www.controldeprocesosquinta.con/admin se ingresa al administrados de Django, donde se encuentra entre varias aplicaciones, la de control de layout tortas. Para crear un nuevo producto se debe hacer desde 'Producto tortas', se crea el producto con su codigo, nombre y perdida operacional, luego se debe poblar las capas de ese producto desde 'Layout tortas', se debe ingresar capa por capa, los ingredientes que se usaran en las capas de crean en 'Ingredientes'. Solo con esas base se puede crear un producto en la aplicacion web.
 
