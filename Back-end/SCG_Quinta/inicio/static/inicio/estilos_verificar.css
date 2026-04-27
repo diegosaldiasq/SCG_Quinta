@@ -941,3 +941,29 @@ body {
 .usuario_control_de_pesos_insumos_kuchen input[type="checkbox"]:hover {
     cursor: pointer;
 }
+
+.seleccionar-todos-box {
+    width: 100%;
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: #ffffff;
+    border: 1px solid var(--very-light-pink);
+    border-radius: 10px;
+    box-shadow: var(--sombra-suave);
+    font-size: var(--md);
+    color: var(--gris-texto);
+}
+
+.seleccionar-todos-box label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.seleccionar-todos-box input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
