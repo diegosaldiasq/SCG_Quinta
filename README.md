@@ -90,6 +90,12 @@ Para mantenimiento del servidor en AWS, se debe conectar a la instancia de AWS, 
 
 Para actualizaciones de ubuntu se debe ejecutar el comando `sudo apt update` para actualizar la lista de paquetes disponibles, luego ejecutar el comando `sudo apt upgrade -y` para actualizar los paquetes instalados, `sudo apt autoremove -y` para eliminar paquetes que ya no son necesarios. Para reiniciar el servidor se debe ejecutar el comando `sudo reboot` para reiniciar la instancia de AWS.
 
+#### Funcionamiento de la aplicaciones web
+
+## Control de layout tortas
+
+Desde https://www.controldeprocesosquinta.con/admin se ingresa al administrados de Django, donde se encuentra entre varias aplicaciones, la de control de layout tortas. Para crear un nuevo producto se debe hacer desde 'Producto tortas', se crea el producto con su codigo, nombre y perdida operacional, luego se debe poblar las capas de ese producto desde 'Layout tortas', se debe ingresar capa por capa, los ingredientes que se usaran en las capas de crean en 'Ingredientes'. Solo con esas base se puede crear un producto en la aplicacion web.
+
 ## Como contribuir
 
 Para contribuir se debe tener instalado git, clonar el repositorio de https://github.com/diegosaldiasq/SCG_Quinta, hacer tus modificaciones y luego debes hacer un pull request en github al proyecto https://github.com/diegosaldiasq/SCG_Quinta y esperar a que sea aprobado por el administrador del proyecto.
