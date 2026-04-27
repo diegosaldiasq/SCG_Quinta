@@ -941,29 +941,62 @@ body {
 .usuario_control_de_pesos_insumos_kuchen input[type="checkbox"]:hover {
     cursor: pointer;
 }
+/* ===== Seleccionar todos ===== */
 
 .seleccionar-todos-box {
     width: 100%;
-    margin: 16px 0;
-    padding: 12px 16px;
-    background: #ffffff;
+    margin: 18px auto 24px auto;
+    padding: 14px 18px;
+    background: var(--white);
     border: 1px solid var(--very-light-pink);
-    border-radius: 10px;
-    box-shadow: var(--sombra-suave);
-    font-size: var(--md);
-    color: var(--gris-texto);
+    border-radius: 8px;
+    box-sizing: border-box;
 }
 
 .seleccionar-todos-box label {
     display: flex;
     align-items: center;
     gap: 10px;
-    cursor: pointer;
     font-weight: 700;
+    color: var(--black);
+    cursor: pointer;
 }
 
-.seleccionar-todos-box input[type="checkbox"] {
+.seleccionar-todos-box input[type="checkbox"],
+.check-verificar {
     width: 18px;
     height: 18px;
+    accent-color: var(--rojo-quinta);
     cursor: pointer;
+}
+
+
+/* ===== Botón volver ===== */
+
+.secondary-button {
+    width: 200px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    background: var(--naranjo-quinta);
+    color: var(--white);
+    font-weight: 700;
+    font-family: 'Quicksand', sans-serif;
+    cursor: pointer;
+}
+
+.secondary-button:hover {
+    background: var(--naranjo-claro-quinta);
+}
+
+.button-container a {
+    text-decoration: none;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
