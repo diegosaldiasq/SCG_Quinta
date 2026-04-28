@@ -29,14 +29,6 @@
 
         <h2 class="subtitle">Registros no verificados {{ config }}</h2>
 
-        <!-- 🔥 NUEVO: Seleccionar todos -->
-        <div class="seleccionar-todos-box">
-            <label>
-                <input type="checkbox" id="seleccionar-todos">
-                Seleccionar todos los registros de esta página
-            </label>
-        </div>
-
         <!-- ENCABEZADOS -->
         <div class="{{ config }}">
             {% for nombres in nombres_campos %}
@@ -75,6 +67,14 @@
         {% empty %}
             <p>No hay registros pendientes por verificar.</p>
         {% endfor %}
+
+         <!-- 🔥 NUEVO: Seleccionar todos -->
+        <div class="seleccionar-todos-box">
+            <label>
+                <input type="checkbox" id="seleccionar-todos">
+                Seleccionar todos los registros de esta página
+            </label>
+        </div>
 
         <!-- PAGINACIÓN -->
         <div class="pagination">
