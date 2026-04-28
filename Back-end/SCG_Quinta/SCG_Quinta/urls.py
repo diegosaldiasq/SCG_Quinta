@@ -47,6 +47,7 @@ urlpatterns = [
     path("control_layout_tortas/", include("control_layout_tortas.urls")),
     path("trazabilidad_productos/", include("trazabilidad_productos.urls")),
     path("ventas_geo/", include("ventas_geo.urls")),
+    path('control_sala_cremas/', include('control_sala_cremas.urls')),
 ]
 
 if settings.DEBUG:

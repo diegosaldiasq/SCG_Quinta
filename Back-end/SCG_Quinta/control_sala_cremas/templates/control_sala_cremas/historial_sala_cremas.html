@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial Sala de Cremas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'control_sala_cremas/estilos_sala_cremas.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}">
+</head>
+<body>
+
+<div class="page page-wide">
+
+    <div class="card">
+
+        <div class="header">
+            <img src="{% static 'inicio/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+            <h1>Historial Sala de Cremas</h1>
+            <p>Consulta, filtra y descarga los registros ingresados</p>
+        </div>
+
+        <form method="GET" class="filtros">
+            <div class="grid">
+                <div class="field">
+                    <label>Desde</label>
+                    <input type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}">
+                </div>
+
+                <div class="field">
+                    <label>Hasta</label>
+                    <input type="date" name="fecha_hasta" value="{{ filtros.fecha_hasta }}">
+                </div>
+
+                <div class="field">
+                    <label>Turno</label>
+                    <select name="turno">
+                        <option value="">Todos</option>
+                        <option value="Día" {% if filtros.turno == "Día" %}selected{% endif %}>Día</option>
+                        <option value="Noche" {% if filtros.turno == "Noche" %}selected{% endif %}>Noche</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Cliente</label>
+                    <input type="text" name="cliente" value="{{ filtros.cliente }}" placeholder="Cliente">
+                </div>
+
+                <div class="field">
+                    <label>Producto</label>
+                    <input type="text" name="producto" value="{{ filtros.producto }}" placeholder="Producto">
+                </div>
+
+                <div class="field">
+                    <label>Lote</label>
+                    <input type="text" name="lote" value="{{ filtros.lote }}" placeholder="Lote">
+                </div>
+
+                <div class="field">
+                    <label>N° Batidora</label>
+                    <input type="text" name="batidora" value="{{ filtros.batidora }}" placeholder="Batidora">
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'control_sala_cremas:registro_sala_cremas' %}" class="btn btn-secondary">
+                    Nuevo registro
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Filtrar
+                </button>
+
+                <a href="{% url 'control_sala_cremas:historial_sala_cremas' %}" class="btn btn-light">
+                    Limpiar
+                </a>
+
+                <a href="{% url 'control_sala_cremas:descargar_sala_cremas_excel' %}?{{ request.GET.urlencode }}" class="btn btn-excel">
+                    Descargar Excel
+                </a>
+            </div>
+        </form>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Turno</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Código</th>
+                        <th>Lote</th>
+                        <th>Densidad</th>
+                        <th>Temperatura</th>
+                        <th>Batidora</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for r in registros %}
+                        <tr>
+                            <td>{{ r.fecha_hora|date:"d-m-Y H:i" }}</td>
+                            <td>{{ r.usuario }}</td>
+                            <td>{{ r.turno }}</td>
+                            <td>{{ r.cliente }}</td>
+                            <td>{{ r.producto }}</td>
+                            <td>{{ r.codigo }}</td>
+                            <td>{{ r.lote }}</td>
+                            <td>{{ r.densidad }}</td>
+                            <td>{{ r.temperatura }} °C</td>
+                            <td>{{ r.numero_batidora }}</td>
+                            <td>{{ r.observaciones|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="11" class="empty">
+                                No existen registros para los filtros seleccionados.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

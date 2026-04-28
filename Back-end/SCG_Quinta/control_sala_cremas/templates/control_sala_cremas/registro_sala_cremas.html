@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Sala de Cremas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'control_sala_cremas/estilos_sala_cremas.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}">
+</head>
+<body>
+
+<div class="page">
+
+    <div class="card">
+
+        <div class="header">
+            <img src="{% static 'inicio/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+            <h1>Registro Sala de Cremas</h1>
+            <p>Control de densidad, temperatura y batidora</p>
+        </div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" class="formulario">
+            {% csrf_token %}
+
+            <div class="section-title">Datos del proceso</div>
+
+            <div class="grid">
+                <div class="field">
+                    <label>Turno</label>
+                    {{ form.turno }}
+                </div>
+
+                <div class="field">
+                    <label>Cliente</label>
+                    {{ form.cliente }}
+                </div>
+
+                <div class="field">
+                    <label>Producto</label>
+                    {{ form.producto }}
+                </div>
+
+                <div class="field">
+                    <label>Código</label>
+                    {{ form.codigo }}
+                </div>
+
+                <div class="field">
+                    <label>Lote</label>
+                    {{ form.lote }}
+                </div>
+
+                <div class="field">
+                    <label>N° Batidora</label>
+                    {{ form.numero_batidora }}
+                </div>
+            </div>
+
+            <div class="section-title">Controles medidos</div>
+
+            <div class="grid grid-2">
+                <div class="field">
+                    <label>Densidad</label>
+                    {{ form.densidad }}
+                </div>
+
+                <div class="field">
+                    <label>Temperatura °C</label>
+                    {{ form.temperatura }}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Observaciones</label>
+                {{ form.observaciones }}
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'control_sala_cremas:historial_sala_cremas' %}" class="btn btn-secondary">
+                    Ver historial
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Guardar registro
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

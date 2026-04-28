@@ -67,6 +67,7 @@ LOCAL_APPS = [
     "control_layout_tortas.apps.ControlLayoutTortasConfig",
     "trazabilidad_productos.apps.TrazabilidadProductosConfig",
     "ventas_geo.apps.VentasGeoConfig",
+    "control_sala_cremas.apps.ControlSalaCremasConfig",
 ]
 
 DJANGO_APPS = [

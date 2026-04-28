@@ -32,16 +32,20 @@
                 <a href="{% url 'redireccionar_control_de_pesos_insumos_kuchen' %}">SUB, INSUMOS, KUCHEN y PASTELES</a>
             </p>
             <p class="registro">
-                <span>4.- Registro control parametros Gorrei: </span>
-                <a href="{% url 'redireccionar_control_parametros_gorreri' %}">CREMAS</a>
+                <span>4.- Registro control parametros sala de cremas: </span>
+                <a href="{% url 'control_sala_cremas:registro_sala_cremas' %}">SALA DE CREMAS</a>
             </p>
             <p class="registro">
-                <span>5.- Registro control parametros: </span>
+                <span>5.- Registro control parametros Gorrei: </span>
+                <a href="{% url 'redireccionar_control_parametros_gorreri' %}">CREMAS TURBOMIXER</a>
+            </p>
+            <p class="registro">
+                <span>6.- Registro control parametros: </span>
                 <a href="{% url 'redireccionar_control_parametros_bizcocho' %}">BIZCOCHOS</a>
             </p>
             <p class="registro">
-                <span>6.- Registro layout tortas: </span>
-                <a href="{% url 'registro_nuevo' %}">LAYOUT TORTAS (en construcción)</a>
+                <span>7.- Registro layout tortas: </span>
+                <a href="{% url 'registro_nuevo' %}">LAYOUT TORTAS</a>
             </p>
         </div>
         <form class="form" action="{% url 'redireccionar_index' %}">
