@@ -685,7 +685,7 @@ def resumen_turno_oee_api(request):
         hasta   = request.GET.get('hasta')
 
         qs = (ResumenTurnoOee.objects
-              .annotate(target=Value(70.0, output_field=FloatField()))  # ajusta tu target si es otro
+              .annotate(target=Value(65.83, output_field=FloatField()))  # ajusta tu target si es otro
               .values('id', 'fecha', 'turno', 'linea',
                       'disponibilidad', 'eficiencia', 'oee',
                       'target', 'lote_id'))
