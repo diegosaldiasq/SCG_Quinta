@@ -7,9 +7,9 @@ from control_sala_cremas.models import ProductoSalaCremas
 class RegistroTemperaturaPostSpiral(models.Model):
 
     TURNO_CHOICES = [
-        ('Mañana', 'Mañana'),
-        ('Tarde', 'Tarde'),
-        ('Noche', 'Noche'),
+        ('Turno A', 'Turno A'),
+        ('Turno B', 'Turno B'),
+        ('Turno C', 'Turno C'),
     ]
 
     producto_sala_cremas = models.ForeignKey(
