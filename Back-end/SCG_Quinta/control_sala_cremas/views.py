@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.http import JsonResponse
 from django.utils.timezone import localtime
+from django.urls import reverse
+
 
 from openpyxl import Workbook
 
@@ -199,3 +201,8 @@ def verificar_registro_sala_cremas(request, pk):
 
     messages.success(request, "Registro verificado correctamente.")
     return redirect(request.POST.get("next") or "control_sala_cremas:historial_sala_cremas")
+
+@login_required
+def redireccionar_selecciones_2(request):
+    url_selecciones = reverse('vista_selecciones_2')
+    return HttpResponseRedirect(url_selecciones)
