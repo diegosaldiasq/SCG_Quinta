@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Temperatura Post Spiral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'temperatura_post_spiral/estilos_temperatura_post_spiral.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}">
+</head>
+<body>
+
+<div class="page">
+
+    <header class="header-card">
+        <img src="{% static 'inicio/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+        <div>
+            <h1>Detalle Registro Post Spiral</h1>
+            <p>Revisión de información y verificación del registro.</p>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="card">
+        <div class="card-header">
+            <h2>Información del registro</h2>
+            <span class="badge {{ registro.clase_estado }}">{{ registro.estado_verificacion }}</span>
+        </div>
+
+        <div class="detail-grid">
+            <div><strong>Usuario:</strong><span>{{ registro.usuario }}</span></div>
+            <div><strong>Fecha y hora:</strong><span>{{ registro.fecha_hora|date:"d-m-Y H:i" }}</span></div>
+            <div><strong>Turno:</strong><span>{{ registro.turno }}</span></div>
+            <div><strong>Cliente:</strong><span>{{ registro.cliente }}</span></div>
+            <div><strong>Producto:</strong><span>{{ registro.producto }}</span></div>
+            <div><strong>Código:</strong><span>{{ registro.codigo }}</span></div>
+            <div><strong>Lote:</strong><span>{{ registro.lote }}</span></div>
+            <div><strong>Tiempo permanencia:</strong><span>{{ registro.tiempo_permanencia_producto }}</span></div>
+            <div><strong>Temperatura:</strong><span>{{ registro.temperatura }} °C</span></div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Acción correctiva y observaciones</h2>
+
+        <div class="text-block">
+            <strong>Acción correctiva:</strong>
+            <p>{{ registro.accion_correctiva|default:"Sin acción correctiva." }}</p>
+        </div>
+
+        <div class="text-block">
+            <strong>Observaciones:</strong>
+            <p>{{ registro.observaciones|default:"Sin observaciones." }}</p>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Verificaciones</h2>
+
+        <div class="detail-grid">
+            <div>
+                <strong>Requiere revisión acción correctiva:</strong>
+                <span>{% if registro.acciones_correctivas_requieren_revision %}Sí{% else %}No{% endif %}</span>
+            </div>
+
+            <div>
+                <strong>Acción correctiva verificada:</strong>
+                <span>{% if registro.acciones_correctivas_verificadas %}Sí{% else %}No{% endif %}</span>
+            </div>
+
+            <div>
+                <strong>Revisor acción correctiva:</strong>
+                <span>{{ registro.nombre_revisor_accion_correctiva|default:"Pendiente" }}</span>
+            </div>
+
+            <div>
+                <strong>Fecha revisión acción correctiva:</strong>
+                <span>
+                    {% if registro.fecha_revision_accion_correctiva %}
+                        {{ registro.fecha_revision_accion_correctiva|date:"d-m-Y H:i" }}
+                    {% else %}
+                        Pendiente
+                    {% endif %}
+                </span>
+            </div>
+
+            <div>
+                <strong>Verificado final:</strong>
+                <span>{% if registro.verificado %}Sí{% else %}No{% endif %}</span>
+            </div>
+
+            <div>
+                <strong>Verificador final:</strong>
+                <span>{{ registro.nombre_verificador|default:"Pendiente" }}</span>
+            </div>
+
+            <div>
+                <strong>Fecha verificación final:</strong>
+                <span>
+                    {% if registro.fecha_verificacion %}
+                        {{ registro.fecha_verificacion|date:"d-m-Y H:i" }}
+                    {% else %}
+                        Pendiente
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="actions verification-actions">
+
+            {% if registro.acciones_correctivas_requieren_revision and not registro.acciones_correctivas_verificadas and not registro.verificado %}
+                <form method="post" action="{% url 'temperatura_post_spiral:verificar_accion' registro.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">Verificar acción correctiva</button>
+                </form>
+            {% endif %}
+
+            {% if not registro.verificado %}
+                {% if not registro.acciones_correctivas_requieren_revision or registro.acciones_correctivas_verificadas %}
+                    <form method="post" action="{% url 'temperatura_post_spiral:verificar_final' registro.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Verificar final</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            <a href="{% url 'temperatura_post_spiral:historial' %}" class="btn btn-secondary">← Volver al historial</a>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Temperatura Post Spiral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'temperatura_post_spiral/estilos_temperatura_post_spiral.css' %}">
+    <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}">
+</head>
+<body>
+
+<div class="page">
+
+    <header class="header-card">
+        <img src="{% static 'inicio/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
+        <div>
+            <h1>Registro Temperatura Post Spiral</h1>
+            <p>Control de temperatura, permanencia y verificación posterior al spiral.</p>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="card">
+        <div class="card-header">
+            <h2>Nuevo registro</h2>
+            <a href="{% url 'temperatura_post_spiral:historial' %}" class="btn btn-secondary">Ver historial</a>
+        </div>
+
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.cliente_selector.id_for_label }}">Cliente</label>
+                {{ form.cliente_selector }}
+                {{ form.cliente_selector.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.producto_sala_cremas.id_for_label }}">Producto</label>
+                {{ form.producto_sala_cremas }}
+                {{ form.producto_sala_cremas.errors }}
+            </div>
+
+            <div class="form-group">
+                <label>Código</label>
+                <input type="text" id="codigo_producto_preview" class="form-control readonly" readonly placeholder="Código automático">
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.turno.id_for_label }}">Turno</label>
+                {{ form.turno }}
+                {{ form.turno.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.lote.id_for_label }}">Lote</label>
+                {{ form.lote }}
+                {{ form.lote.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.tiempo_permanencia_producto.id_for_label }}">Tiempo permanencia producto</label>
+                {{ form.tiempo_permanencia_producto }}
+                {{ form.tiempo_permanencia_producto.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.temperatura.id_for_label }}">Temperatura °C</label>
+                {{ form.temperatura }}
+                {{ form.temperatura.errors }}
+            </div>
+
+            <div class="form-group full">
+                <label for="{{ form.accion_correctiva.id_for_label }}">Acción correctiva</label>
+                {{ form.accion_correctiva }}
+                {{ form.accion_correctiva.errors }}
+                <small>Si se ingresa acción correctiva, el registro requerirá una primera revisión antes de la verificación final.</small>
+            </div>
+
+            <div class="form-group full">
+                <label for="{{ form.observaciones.id_for_label }}">Observaciones</label>
+                {{ form.observaciones }}
+                {{ form.observaciones.errors }}
+            </div>
+
+            <div class="actions full">
+                <button type="submit" class="btn btn-primary">Guardar registro</button>
+                <a href="{% url 'temperatura_post_spiral:historial' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<script>
+    window.URL_PRODUCTOS_POR_CLIENTE = "{% url 'temperatura_post_spiral:api_productos_por_cliente' %}";
+</script>
+<script src="{% static 'temperatura_post_spiral/temperatura_post_spiral.js' %}"></script>
+
+</body>
+</html>
