@@ -146,9 +146,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button type="submit" class="btn btn-primary">
                     Guardar registro
                 </button>
-                <form class="form" action="{% url 'redireccionar_selecciones_2' %}">
-                    <button class="primary-button login-button">Salir</button>
-                </form>  
+                <a href="{% url 'control_sala_cremas:redireccionar_selecciones_2' %}" class="btn btn-light">
+                    Volver a selecciones
+                </a>
             </div>
         </form>
 
