@@ -24,10 +24,7 @@ body {
     font-family: 'Quicksand', sans-serif;
     color: var(--gris-texto);
     background-color: #f6f7fb;
-    background-image: url("../images/Fondo.png");
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center;
+    background-image: url("./images/Fondo.png");
 }
 
 .page {
