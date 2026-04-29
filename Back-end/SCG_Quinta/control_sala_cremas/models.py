@@ -23,6 +23,19 @@ class RegistroSalaCremas(models.Model):
         ("Turno B", "Turno B"),
         ("Turno C", "Turno C"),
     ]
+    TIPOS_CREMA = [
+        ("Crema batida", "Crema batida"),
+        ("Crema pastelera", "Crema pastelera"),
+        ("Merengue", "Merengue"),
+        ("Manjar", "Manjar"),
+        ("Mousse", "Mousse"),
+    ]
+
+    APLICACIONES = [
+        ("Pegado", "Pegado"),
+        ("Rebosado", "Rebosado"),
+        ("Ambas", "Ambas"),
+    ]
 
     usuario = models.CharField(max_length=150)
     fecha_hora = models.DateTimeField(default=timezone.now)
@@ -32,6 +45,9 @@ class RegistroSalaCremas(models.Model):
     producto = models.CharField(max_length=150)
     codigo = models.CharField(max_length=80)
     lote = models.CharField(max_length=100)
+
+    tipo_crema = models.CharField(max_length=50, choices=TIPOS_CREMA)
+    aplicacion = models.CharField(max_length=20, choices=APLICACIONES)
 
     densidad = models.DecimalField(max_digits=8, decimal_places=3)
     temperatura = models.DecimalField(max_digits=8, decimal_places=2)

@@ -11,6 +11,8 @@ class RegistroSalaCremasForm(forms.ModelForm):
             "producto",
             "codigo",
             "lote",
+            "tipo_crema",   # 👈 nuevo
+            "aplicacion",   # 👈 nuevo
             "densidad",
             "temperatura",
             "numero_batidora",
@@ -27,6 +29,8 @@ class RegistroSalaCremasForm(forms.ModelForm):
                 "readonly": "readonly",
             }),
             "lote": forms.TextInput(attrs={"class": "form-control", "placeholder": "Lote"}),
+            "tipo_crema": forms.Select(attrs={"class": "form-control"}),
+            "aplicacion": forms.Select(attrs={"class": "form-control"}),
             "densidad": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.001",
