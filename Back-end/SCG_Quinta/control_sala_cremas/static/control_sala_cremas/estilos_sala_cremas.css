@@ -248,6 +248,31 @@ tbody tr:hover {
     color: var(--gris-suave);
     font-weight: 700;
 }
+.badge-ok {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.badge-pendiente {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.btn-sm {
+    min-height: 34px;
+    padding: 7px 12px;
+    font-size: 13px;
+}
 
 @media (max-width: 768px) {
     .page {

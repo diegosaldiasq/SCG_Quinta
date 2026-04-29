@@ -19,9 +19,13 @@ class RegistroSalaCremasForm(forms.ModelForm):
 
         widgets = {
             "turno": forms.Select(attrs={"class": "form-control"}),
-            "cliente": forms.TextInput(attrs={"class": "form-control", "placeholder": "Cliente"}),
-            "producto": forms.TextInput(attrs={"class": "form-control", "placeholder": "Producto"}),
-            "codigo": forms.TextInput(attrs={"class": "form-control", "placeholder": "Código"}),
+            "cliente": forms.Select(attrs={"class": "form-control", "id": "id_cliente"}),
+            "producto": forms.Select(attrs={"class": "form-control", "id": "id_producto"}),
+            "codigo": forms.TextInput(attrs={
+                "class": "form-control",
+                "id": "id_codigo",
+                "readonly": "readonly",
+            }),
             "lote": forms.TextInput(attrs={"class": "form-control", "placeholder": "Lote"}),
             "densidad": forms.NumberInput(attrs={
                 "class": "form-control",
@@ -43,3 +47,8 @@ class RegistroSalaCremasForm(forms.ModelForm):
                 "placeholder": "Observaciones del proceso",
             }),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["cliente"].choices = [("", "Seleccione cliente")]
+        self.fields["producto"].choices = [("", "Seleccione producto")]

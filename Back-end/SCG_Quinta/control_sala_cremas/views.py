@@ -1,13 +1,15 @@
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.http import JsonResponse
 
 from openpyxl import Workbook
 
 from .forms import RegistroSalaCremasForm
-from .models import RegistroSalaCremas
+from .models import RegistroSalaCremas, ProductoSalaCremas
 
 
 @login_required
@@ -150,3 +152,49 @@ def descargar_sala_cremas_excel(request):
 
     wb.save(response)
     return response
+
+@login_required
+def api_clientes_sala_cremas(request):
+    clientes = (
+        ProductoSalaCremas.objects
+        .filter(activo=True)
+        .values_list("cliente", flat=True)
+        .distinct()
+        .order_by("cliente")
+    )
+    return JsonResponse({"clientes": list(clientes)})
+
+
+@login_required
+def api_productos_por_cliente_sala_cremas(request):
+    cliente = request.GET.get("cliente", "")
+
+    productos = (
+        ProductoSalaCremas.objects
+        .filter(cliente=cliente, activo=True)
+        .values("producto", "codigo")
+        .order_by("producto")
+    )
+
+    return JsonResponse({"productos": list(productos)})
+
+
+@login_required
+def verificar_registro_sala_cremas(request, pk):
+    if request.method != "POST":
+        return redirect("control_sala_cremas:historial_sala_cremas")
+
+    registro = get_object_or_404(RegistroSalaCremas, pk=pk)
+
+    if hasattr(request.user, "nombre_completo"):
+        verificador = request.user.nombre_completo
+    else:
+        verificador = request.user.get_full_name() or request.user.username
+
+    registro.verificado = True
+    registro.fecha_verificacion = timezone.now()
+    registro.verificado_por = verificador
+    registro.save(update_fields=["verificado", "fecha_verificacion", "verificado_por"])
+
+    messages.success(request, "Registro verificado correctamente.")
+    return redirect(request.POST.get("next") or "control_sala_cremas:historial_sala_cremas")

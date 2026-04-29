@@ -13,6 +13,55 @@
     <link rel="stylesheet" href="{% static 'control_sala_cremas/estilos_sala_cremas.css' %}">
     <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}">
 </head>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const clienteSelect = document.getElementById("id_cliente");
+    const productoSelect = document.getElementById("id_producto");
+    const codigoInput = document.getElementById("id_codigo");
+
+    const urlClientes = "{% url 'control_sala_cremas:api_clientes_sala_cremas' %}";
+    const urlProductos = "{% url 'control_sala_cremas:api_productos_por_cliente_sala_cremas' %}";
+
+    fetch(urlClientes)
+        .then(response => response.json())
+        .then(data => {
+            clienteSelect.innerHTML = '<option value="">Seleccione cliente</option>';
+
+            data.clientes.forEach(cliente => {
+                const option = document.createElement("option");
+                option.value = cliente;
+                option.textContent = cliente;
+                clienteSelect.appendChild(option);
+            });
+        });
+
+    clienteSelect.addEventListener("change", function () {
+        const cliente = this.value;
+
+        productoSelect.innerHTML = '<option value="">Seleccione producto</option>';
+        codigoInput.value = "";
+
+        if (!cliente) return;
+
+        fetch(`${urlProductos}?cliente=${encodeURIComponent(cliente)}`)
+            .then(response => response.json())
+            .then(data => {
+                data.productos.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.producto;
+                    option.textContent = item.producto;
+                    option.dataset.codigo = item.codigo;
+                    productoSelect.appendChild(option);
+                });
+            });
+    });
+
+    productoSelect.addEventListener("change", function () {
+        const selected = this.options[this.selectedIndex];
+        codigoInput.value = selected.dataset.codigo || "";
+    });
+});
+</script>
 <body>
 
 <div class="page">

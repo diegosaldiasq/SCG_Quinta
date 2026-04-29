@@ -2,6 +2,21 @@ from django.db import models
 from django.utils import timezone
 
 
+class ProductoSalaCremas(models.Model):
+    cliente = models.CharField(max_length=150)
+    producto = models.CharField(max_length=150)
+    codigo = models.CharField(max_length=80)
+
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["cliente", "producto"]
+        unique_together = ("cliente", "producto", "codigo")
+
+    def __str__(self):
+        return f"{self.cliente} - {self.producto} - {self.codigo}"
+
+
 class RegistroSalaCremas(models.Model):
     TURNOS = [
         ("Turno A", "Turno A"),
@@ -24,10 +39,12 @@ class RegistroSalaCremas(models.Model):
 
     observaciones = models.TextField(blank=True, null=True)
 
+    verificado = models.BooleanField(default=False)
+    fecha_verificacion = models.DateTimeField(blank=True, null=True)
+    verificado_por = models.CharField(max_length=150, blank=True, null=True)
+
     class Meta:
         ordering = ["-fecha_hora"]
-        verbose_name = "Registro sala de cremas"
-        verbose_name_plural = "Registros sala de cremas"
 
     def __str__(self):
-        return f"{self.producto} - Lote {self.lote} - {self.fecha_hora:%d-%m-%Y %H:%M}"
+        return f"{self.producto} - Lote {self.lote}"

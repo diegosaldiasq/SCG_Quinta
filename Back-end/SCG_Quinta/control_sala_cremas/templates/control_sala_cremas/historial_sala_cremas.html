@@ -98,6 +98,10 @@
                         <th>Temperatura</th>
                         <th>Batidora</th>
                         <th>Observaciones</th>
+                        <th>Estado</th>
+                        <th>Verificado por</th>
+                        <th>Fecha verificación</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
 
@@ -115,6 +119,37 @@
                             <td>{{ r.temperatura }} °C</td>
                             <td>{{ r.numero_batidora }}</td>
                             <td>{{ r.observaciones|default:"-" }}</td>
+                            <td>
+                                {% if r.verificado %}
+                                    <span class="badge-ok">Verificado</span>
+                                {% else %}
+                                    <span class="badge-pendiente">Pendiente</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ r.verificado_por|default:"-" }}</td>
+
+                            <td>
+                                {% if r.fecha_verificacion %}
+                                    {{ r.fecha_verificacion|date:"d-m-Y H:i" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if not r.verificado %}
+                                    <form method="POST" action="{% url 'control_sala_cremas:verificar_registro_sala_cremas' r.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            Verificar
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
                         </tr>
                     {% empty %}
                         <tr>
