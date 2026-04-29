@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.http import JsonResponse
+from django.utils.timezone import localtime
 
 from openpyxl import Workbook
 
@@ -133,7 +134,7 @@ def descargar_sala_cremas_excel(request):
     for r in registros:
         ws.append([
             r.usuario,
-            r.fecha_hora.strftime("%d-%m-%Y %H:%M"),
+            localtime(r.fecha_hora).strftime("%d-%m-%Y %H:%M"),
             r.turno,
             r.cliente,
             r.producto,
