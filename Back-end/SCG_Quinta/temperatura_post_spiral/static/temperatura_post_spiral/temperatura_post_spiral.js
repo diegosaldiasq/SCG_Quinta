@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 data.forEach(producto => {
                     const option = document.createElement("option");
                     option.value = producto.id;
-                    option.textContent = `${producto.producto} (${producto.codigo})`;
+                    option.textContent = producto.producto;
                     option.dataset.codigo = producto.codigo;
                     selectProducto.appendChild(option);
                 });
