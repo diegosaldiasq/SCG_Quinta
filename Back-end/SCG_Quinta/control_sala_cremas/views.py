@@ -129,6 +129,9 @@ def descargar_sala_cremas_excel(request):
         "Temperatura",
         "N° Batidora",
         "Observaciones",
+        "Verificado",
+        "Fecha de verificación",
+        "Verificado por",   
     ]
 
     ws.append(headers)
@@ -146,6 +149,9 @@ def descargar_sala_cremas_excel(request):
             float(r.temperatura),
             r.numero_batidora,
             r.observaciones or "",
+            r.verificado,
+            localtime(r.fecha_verificacion).strftime("%d-%m-%Y %H:%M") if r.fecha_verificacion else "",
+            r.verificado_por or "",
         ])
 
     response = HttpResponse(
