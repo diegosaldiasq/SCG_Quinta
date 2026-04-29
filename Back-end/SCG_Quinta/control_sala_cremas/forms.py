@@ -44,7 +44,7 @@ class RegistroSalaCremasForm(forms.ModelForm):
             "observaciones": forms.Textarea(attrs={
                 "class": "form-control",
                 "rows": 3,
-                "placeholder": "Observaciones del proceso",
+                "placeholder": "Observaciones del proceso/Tipo de crema",
             }),
         }
     def __init__(self, *args, **kwargs):
