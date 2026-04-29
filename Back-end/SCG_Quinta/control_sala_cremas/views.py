@@ -216,3 +216,8 @@ def verificar_registro_sala_cremas(request, pk):
 def redireccionar_selecciones_2(request):
     url_selecciones = reverse('vista_selecciones_2')
     return HttpResponseRedirect(url_selecciones)
+
+@login_required
+def redireccionar_seleccion_verifica_2(request):
+    url_seleccion_verifica = reverse('seleccion_verifica_2')
+    return HttpResponseRedirect(url_seleccion_verifica)
