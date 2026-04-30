@@ -335,6 +335,38 @@ tbody tr:hover {
 .verification-actions {
     margin-top: 18px;
 }
+.info-acciones-correctivas {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-left: 6px solid var(--naranjo-quinta);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin: 18px 0 14px;
+}
+
+.info-acciones-correctivas h3 {
+    margin: 0 0 10px;
+    color: var(--rojo-quinta);
+    font-size: 17px;
+}
+
+.info-acciones-correctivas ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.info-acciones-correctivas li {
+    margin-bottom: 6px;
+    color: var(--gris-texto);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.field small {
+    margin-top: 4px;
+    color: var(--gris-suave);
+    font-size: 13px;
+}
 
 @media (max-width: 900px) {
     .header-card {
