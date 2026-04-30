@@ -84,6 +84,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Fecha</th>
                         <th>Usuario</th>
                         <th>Turno</th>
@@ -107,6 +108,7 @@
                 <tbody>
                     {% for r in registros %}
                         <tr>
+                            <td>{{ r.id }}</td>
                             <td>{{ r.fecha_hora|date:"d-m-Y H:i" }}</td>
                             <td>{{ r.usuario }}</td>
                             <td>{{ r.turno }}</td>
