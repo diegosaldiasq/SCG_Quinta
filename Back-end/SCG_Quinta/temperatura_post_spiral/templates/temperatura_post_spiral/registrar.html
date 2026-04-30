@@ -34,10 +34,6 @@
     {% endif %}
 
     <section class="card">
-        <div class="card-header">
-            <h2>Nuevo registro</h2>
-            <a href="{% url 'temperatura_post_spiral:historial' %}" class="btn btn-secondary">Ver historial</a>
-        </div>
 
         <form method="post" class="form-grid">
             {% csrf_token %}
@@ -98,7 +94,9 @@
 
             <div class="actions full">
                 <button type="submit" class="btn btn-primary">Guardar registro</button>
-                <a href="{% url 'temperatura_post_spiral:historial' %}" class="btn btn-secondary">Cancelar</a>
+                <a href="{% url 'control_sala_cremas:redireccionar_selecciones_2' %}" class="btn btn-light">
+                    Volver
+                </a>
             </div>
         </form>
     </section>

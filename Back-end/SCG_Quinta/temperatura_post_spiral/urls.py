@@ -14,4 +14,6 @@ urlpatterns = [
     path('api/productos-por-cliente/', views.api_productos_por_cliente, name='api_productos_por_cliente'),
 
     path('descargar/', views.descargar_excel, name='descargar_excel'),
+    path("selecciones/", views.redireccionar_selecciones_2, name="redireccionar_selecciones_2"),
+    path("seleccion-verifica/", views.redireccionar_seleccion_verifica_2, name="redireccionar_seleccion_verifica_2"),
 ]

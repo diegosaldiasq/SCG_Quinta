@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 
 from openpyxl import Workbook
@@ -291,3 +292,13 @@ def descargar_excel(request):
 
     wb.save(response)
     return response
+
+@login_required
+def redireccionar_selecciones_2(request):
+    url_selecciones = reverse('vista_selecciones_2')
+    return HttpResponseRedirect(url_selecciones)
+
+@login_required
+def redireccionar_seleccion_verifica_2(request):
+    url_seleccion_verifica = reverse('seleccion_verifica_2')
+    return HttpResponseRedirect(url_seleccion_verifica)

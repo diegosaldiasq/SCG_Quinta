@@ -34,10 +34,6 @@
     {% endif %}
 
     <section class="card">
-        <div class="card-header">
-            <h2>Filtros</h2>
-            <a href="{% url 'temperatura_post_spiral:registrar' %}" class="btn btn-primary">Nuevo registro</a>
-        </div>
 
         <form method="get" class="filter-grid">
             <div class="form-group">
@@ -145,6 +141,10 @@
                     {% endfor %}
                 </tbody>
             </table>
+             <!--Boton volver -->
+            <a href="{% url 'control_sala_cremas:redireccionar_seleccion_verifica_2' %}" class="btn btn-light">
+                Volver
+            </a>
         </div>
     </section>
 
