@@ -118,7 +118,7 @@
                             <td>{{ r.lote }}</td>
                             <td>{{ r.tipo_crema }}</td>
                             <td>{{ r.aplicacion }}</td>
-                            <td>{{ r.densidad }}</td>
+                            <td>{{ r.densidad|floatformat:2 }}</td> <!-- 2 decimales -->
                             <td>{{ r.temperatura }} °C</td>
                             <td>{{ r.numero_batidora }}</td>
                             <td>{{ r.observaciones|default:"-" }}</td>
