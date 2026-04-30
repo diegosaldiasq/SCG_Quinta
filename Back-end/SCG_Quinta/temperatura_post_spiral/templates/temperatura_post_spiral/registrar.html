@@ -79,15 +79,14 @@
                 {{ form.temperatura.errors }}
             </div>
 
-            <div class="info-acciones-correctivas">
-                <h3>Acciones correctivas sugeridas</h3>
-                <ul>
-                    <li>1. Si durante el monitoreo la temperatura del producto no cumple con la especificación (-12°C), se deberá dar un golpe de frío en tunel irinox y verificar nuevamente la temperatura para dejar el registro en VAC (verificación de acción correctiva).</li>
-                    <li>2. Si el tiempo de permanencia es menor a 177 min, se debe dar aviso a personal de mantenimiento para su corrección. Verificar la temperatura de productos, si no cumplen con la temperatura especificada (-12°C), se debe realizar la acción correctiva (1).</li>
-                </ul>
-            </div>
-
             <div class="form-group full">
+                <div class="info-acciones-correctivas">
+                    <h3>Acciones correctivas sugeridas</h3>
+                    <ul>
+                        <li>1. Si durante el monitoreo la temperatura del producto no cumple con la especificación (-12°C), se deberá dar un golpe de frío en tunel irinox y verificar nuevamente la temperatura para dejar el registro en VAC (verificación de acción correctiva).</li>
+                        <li>2. Si el tiempo de permanencia es menor a 177 min, se debe dar aviso a personal de mantenimiento para su corrección. Verificar la temperatura de productos, si no cumplen con la temperatura especificada (-12°C), se debe realizar la acción correctiva (1).</li>
+                    </ul>
+                </div>
                 <label for="{{ form.accion_correctiva.id_for_label }}">Acción correctiva</label>
                 {{ form.accion_correctiva }}
                 {{ form.accion_correctiva.errors }}
