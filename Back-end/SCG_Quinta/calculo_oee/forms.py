@@ -196,8 +196,8 @@ class TurnoOEEForm(forms.ModelForm):
         fields = ['fecha', 'linea', 'turno', 'numero_personas','lote', 'supervisor', 'tiempo_planeado', 'cliente', 'producto', 'codigo', 'produccion_planeada']
         widgets = {
             'tiempo_planeado': forms.NumberInput(attrs={
-                # Valor fijo de 480 minutos (8 horas)
-                'value': 480,
+                # Valor fijo de 450 minutos (7.5 horas) (por aplicacion 42 horas semanales / 5 dias = 8 horas diarias - 30 minutos de colacion = 7.5 horas = 450 minutos)
+                'value': 450,
                 'id': 'id_tiempo_planeado',
                 'placeholder': 'Tiempo planeado (en minutos)',
                 'readonly': 'readonly'
