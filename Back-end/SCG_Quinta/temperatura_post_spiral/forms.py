@@ -105,7 +105,7 @@ DetalleTemperaturaPostSpiralFormSet = inlineformset_factory(
     RegistroTemperaturaPostSpiral,
     DetalleTemperaturaPostSpiral,
     form=DetalleTemperaturaPostSpiralForm,
-    #extra=10,
+    extra=10,
     max_num=100,
     min_num=10,
     validate_min=True,
