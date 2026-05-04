@@ -12,7 +12,7 @@ from openpyxl.utils import get_column_letter
 
 from control_sala_cremas.models import ProductoSalaCremas
 from .forms import RegistroTemperaturaPostSpiralForm, DetalleTemperaturaPostSpiralFormSet
-from .models import RegistroTemperaturaPostSpiral
+from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiral
 from django.db import transaction
 
 
@@ -75,7 +75,10 @@ def aplicar_filtros_registros(request, queryset):
 def registrar_temperatura(request):
     if request.method == 'POST':
         form = RegistroTemperaturaPostSpiralForm(request.POST)
-        formset = DetalleTemperaturaPostSpiralFormSet(request.POST)
+        formset = DetalleTemperaturaPostSpiralFormSet(
+            request.POST,
+            queryset=DetalleTemperaturaPostSpiral.objects.none()
+        )
 
         if form.is_valid() and formset.is_valid():
             registro = form.save(commit=False)
@@ -85,15 +88,25 @@ def registrar_temperatura(request):
             detalles = formset.save(commit=False)
 
             requiere_revision = False
+            numero = 1
 
-            for index, detalle in enumerate(detalles, start=1):
+            # Eliminar objetos marcados, si existieran
+            for obj in formset.deleted_objects:
+                obj.delete()
+
+            for detalle in detalles:
+                # Evita guardar filas completamente vacías
+                if detalle.temperatura is None and not detalle.accion_correctiva:
+                    continue
+
                 detalle.registro = registro
-                detalle.numero = index
+                detalle.numero = numero
 
                 if detalle.accion_correctiva and detalle.accion_correctiva.strip():
                     requiere_revision = True
 
                 detalle.save()
+                numero += 1
 
             registro.acciones_correctivas_requieren_revision = requiere_revision
             registro.save(update_fields=[
@@ -103,9 +116,14 @@ def registrar_temperatura(request):
 
             messages.success(request, 'Registro guardado correctamente.')
             return redirect('temperatura_post_spiral:historial')
+
+        messages.error(request, 'Revise los datos ingresados. Hay campos obligatorios o registros incompletos.')
+
     else:
         form = RegistroTemperaturaPostSpiralForm()
-        formset = DetalleTemperaturaPostSpiralFormSet()
+        formset = DetalleTemperaturaPostSpiralFormSet(
+            queryset=DetalleTemperaturaPostSpiral.objects.none()
+        )
 
     return render(request, 'temperatura_post_spiral/registrar.html', {
         'form': form,

@@ -96,3 +96,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+document.addEventListener("change", function (e) {
+    if (e.target && e.target.name && e.target.name.includes("-DELETE")) {
+        const fila = e.target.closest("tr");
+        if (fila) {
+            fila.style.display = e.target.checked ? "none" : "";
+        }
+    }
+});
