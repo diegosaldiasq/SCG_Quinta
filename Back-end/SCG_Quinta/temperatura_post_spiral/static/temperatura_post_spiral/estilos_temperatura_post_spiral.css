@@ -39,6 +39,8 @@ body {
     box-shadow: var(--sombra-suave);
     padding: 24px;
     display: flex;
+    max-width: 100%;
+    overflow: hidden;
     align-items: center;
     gap: 22px;
     margin-bottom: 22px;
@@ -567,5 +569,64 @@ tbody tr:hover {
     .counter {
         width: 100%;
         text-align: center;
+    }
+}
+
+/* Ajuste extra para celular pequeño */
+@media (max-width: 480px) {
+    .page {
+        width: 100%;
+        padding: 6px;
+    }
+
+    .header-card {
+        padding: 14px 10px;
+        margin-bottom: 12px;
+        gap: 8px;
+        overflow: hidden;
+    }
+
+    .logo {
+        width: 92px;
+        max-width: 92px;
+    }
+
+    .header-card h1 {
+        font-size: 18px;
+        line-height: 1.15;
+        max-width: 100%;
+        word-break: normal;
+    }
+
+    .header-card p {
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    .card {
+        padding: 14px 10px;
+        border-radius: 14px;
+    }
+
+    .form-grid,
+    .filter-grid,
+    .detail-grid {
+        gap: 12px;
+    }
+
+    .form-control {
+        font-size: 13px;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .card h2,
+    .sub-card-header h2 {
+        font-size: 17px;
     }
 }
