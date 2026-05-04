@@ -2,8 +2,15 @@ from django.contrib import admin
 from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiral
 
 
+class DetalleTemperaturaPostSpiralInline(admin.TabularInline):
+    model = DetalleTemperaturaPostSpiral
+    extra = 0
+
+
 @admin.register(RegistroTemperaturaPostSpiral)
 class RegistroTemperaturaPostSpiralAdmin(admin.ModelAdmin):
+    inlines = [DetalleTemperaturaPostSpiralInline]
+
     list_display = [
         'fecha_hora',
         'usuario',
@@ -44,6 +51,12 @@ class RegistroTemperaturaPostSpiralAdmin(admin.ModelAdmin):
         'fecha_revision_accion_correctiva',
         'nombre_revisor_accion_correctiva',
     ]
+
+    def cantidad_temperaturas(self, obj):
+        return obj.detalles.count()
+
+    cantidad_temperaturas.short_description = 'Registros temp.'
+
 
 @admin.register(DetalleTemperaturaPostSpiral)
 class DetalleTemperaturaPostSpiralAdmin(admin.ModelAdmin):
