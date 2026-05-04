@@ -436,25 +436,50 @@ tbody tr:hover {
     width: 90px;
 }
 
+/* ===============================
+   RESPONSIVE TEMPERATURA POST SPIRAL
+================================== */
+
 @media (max-width: 900px) {
+    .page {
+        width: 96%;
+        padding: 14px 0 32px;
+    }
+
     .header-card {
         flex-direction: column;
         text-align: center;
+        padding: 18px;
     }
 
     .logo {
         width: 150px;
     }
 
+    .header-card h1 {
+        font-size: 24px;
+    }
+
+    .header-card p {
+        font-size: 14px;
+    }
+
+    .card {
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    .card-header,
+    .sub-card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
     .form-grid,
     .filter-grid,
     .detail-grid {
         grid-template-columns: 1fr;
-    }
-
-    .card-header {
-        flex-direction: column;
-        align-items: flex-start;
     }
 
     .actions {
@@ -464,5 +489,83 @@ tbody tr:hover {
 
     .btn {
         width: 100%;
+    }
+
+    .table-wrapper,
+    .tabla-detalles-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table,
+    .tabla-detalles {
+        min-width: 780px;
+    }
+
+    .input-accion {
+        min-width: 320px;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        background-attachment: scroll;
+    }
+
+    .page {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .header-card {
+        margin-bottom: 14px;
+    }
+
+    .logo {
+        width: 130px;
+    }
+
+    .header-card h1 {
+        font-size: 21px;
+        line-height: 1.2;
+    }
+
+    .card h2,
+    .sub-card-header h2 {
+        font-size: 19px;
+    }
+
+    .form-control {
+        font-size: 14px;
+        padding: 11px 12px;
+    }
+
+    .tabla-detalles {
+        min-width: 720px;
+    }
+
+    .tabla-detalles th,
+    .tabla-detalles td,
+    th,
+    td {
+        padding: 9px 8px;
+        font-size: 13px;
+    }
+
+    .btn {
+        padding: 11px 14px;
+        font-size: 14px;
+    }
+
+    .badge {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .counter {
+        width: 100%;
+        text-align: center;
     }
 }
