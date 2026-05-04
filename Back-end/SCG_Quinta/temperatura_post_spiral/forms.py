@@ -1,7 +1,8 @@
 from django import forms
 
 from control_sala_cremas.models import ProductoSalaCremas
-from .models import RegistroTemperaturaPostSpiral
+from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiral
+from django.forms import inlineformset_factory
 
 
 class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
@@ -23,8 +24,6 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
             'turno',
             'lote',
             'tiempo_permanencia_producto',
-            'temperatura',
-            'accion_correctiva',
             'observaciones',
         ]
 
@@ -41,16 +40,6 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
             'tiempo_permanencia_producto': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej: 45 min'
-            }),
-            'temperatura': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01',
-                'placeholder': 'Ej: 4.5'
-            }),
-            'accion_correctiva': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'Completar solo si aplica'
             }),
             'observaciones': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -89,3 +78,35 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
                 cliente=self.instance.cliente
             ).order_by('producto')
             self.fields['cliente_selector'].initial = self.instance.cliente
+
+class DetalleTemperaturaPostSpiralForm(forms.ModelForm):
+    class Meta:
+        model = DetalleTemperaturaPostSpiral
+        fields = [
+            'temperatura',
+            'accion_correctiva',
+        ]
+
+        widgets = {
+            'temperatura': forms.NumberInput(attrs={
+                'class': 'form-control input-temperatura',
+                'step': '0.01',
+                'placeholder': 'Ej: -12.0'
+            }),
+            'accion_correctiva': forms.Textarea(attrs={
+                'class': 'form-control input-accion',
+                'rows': 2,
+                'placeholder': 'Completar solo si aplica'
+            }),
+        }
+
+
+DetalleTemperaturaPostSpiralFormSet = inlineformset_factory(
+    RegistroTemperaturaPostSpiral,
+    DetalleTemperaturaPostSpiral,
+    form=DetalleTemperaturaPostSpiralForm,
+    extra=10,
+    min_num=10,
+    validate_min=True,
+    can_delete=True
+)

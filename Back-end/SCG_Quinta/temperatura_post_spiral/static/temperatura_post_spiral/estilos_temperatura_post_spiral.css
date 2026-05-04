@@ -368,6 +368,74 @@ tbody tr:hover {
     font-size: 13px;
 }
 
+.bloque-detalles-temperatura {
+    margin-top: 22px;
+}
+
+.sub-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.sub-card-header h2 {
+    margin: 0;
+    color: var(--rojo-quinta);
+    font-size: 20px;
+}
+
+.sub-card-header p {
+    margin: 4px 0 0;
+    color: var(--gris-suave);
+}
+
+.tabla-detalles-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-detalles {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+
+.tabla-detalles th {
+    background: var(--rojo-quinta);
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.tabla-detalles td {
+    padding: 10px;
+    border-bottom: 1px solid var(--borde-suave);
+    vertical-align: top;
+}
+
+.tabla-detalles .numero-linea {
+    font-weight: 700;
+    color: var(--rojo-quinta);
+    text-align: center;
+    width: 60px;
+}
+
+.input-temperatura {
+    min-width: 140px;
+}
+
+.input-accion {
+    min-width: 420px;
+    resize: vertical;
+}
+
+.td-eliminar {
+    text-align: center;
+    width: 90px;
+}
+
 @media (max-width: 900px) {
     .header-card {
         flex-direction: column;

@@ -35,13 +35,6 @@ class RegistroTemperaturaPostSpiral(models.Model):
         verbose_name='Tiempo permanencia producto'
     )
 
-    temperatura = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        verbose_name='Temperatura °C'
-    )
-
-    accion_correctiva = models.TextField(blank=True, null=True)
     observaciones = models.TextField(blank=True, null=True)
 
     acciones_correctivas_requieren_revision = models.BooleanField(default=False)
@@ -68,10 +61,6 @@ class RegistroTemperaturaPostSpiral(models.Model):
             self.producto = getattr(self.producto_sala_cremas, 'producto', '') or getattr(self.producto_sala_cremas, 'nombre', '') or ''
             self.codigo = getattr(self.producto_sala_cremas, 'codigo', '') or ''
 
-        self.acciones_correctivas_requieren_revision = bool(
-            self.accion_correctiva and self.accion_correctiva.strip()
-        )
-
         super().save(*args, **kwargs)
 
     @property
@@ -96,3 +85,28 @@ class RegistroTemperaturaPostSpiral(models.Model):
 
     def __str__(self):
         return f'{self.fecha_hora:%d-%m-%Y %H:%M} | {self.cliente} | {self.producto} | {self.lote}'
+    
+class DetalleTemperaturaPostSpiral(models.Model):
+    registro = models.ForeignKey(
+        RegistroTemperaturaPostSpiral,
+        on_delete=models.CASCADE,
+        related_name='detalles'
+    )
+
+    numero = models.PositiveIntegerField(default=1)
+
+    temperatura = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        verbose_name='Temperatura °C'
+    )
+
+    accion_correctiva = models.TextField(blank=True, null=True)
+
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['numero']
+
+    def __str__(self):
+        return f'Línea {self.numero} | {self.temperatura} °C'

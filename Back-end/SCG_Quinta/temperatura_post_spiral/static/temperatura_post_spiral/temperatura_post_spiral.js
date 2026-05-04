@@ -45,3 +45,54 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const btnAgregar = document.getElementById("btn-agregar-linea");
+    const tbody = document.getElementById("tbody-detalles");
+    const totalForms = document.getElementById("id_detalles-TOTAL_FORMS");
+
+    if (!btnAgregar || !tbody || !totalForms) return;
+
+    function actualizarNumeros() {
+        const filas = tbody.querySelectorAll(".fila-detalle");
+        filas.forEach((fila, index) => {
+            const numero = fila.querySelector(".numero-linea");
+            if (numero) numero.textContent = index + 1;
+        });
+    }
+
+    btnAgregar.addEventListener("click", function () {
+        const formIndex = parseInt(totalForms.value);
+        const primeraFila = tbody.querySelector(".fila-detalle");
+        const nuevaFila = primeraFila.cloneNode(true);
+
+        nuevaFila.querySelectorAll("input, textarea, select").forEach((input) => {
+            if (input.name) {
+                input.name = input.name.replace(/detalles-\d+-/g, `detalles-${formIndex}-`);
+            }
+
+            if (input.id) {
+                input.id = input.id.replace(/id_detalles-\d+-/g, `id_detalles-${formIndex}-`);
+            }
+
+            if (input.type === "checkbox") {
+                input.checked = false;
+            } else if (input.type !== "hidden") {
+                input.value = "";
+            } else {
+                input.value = "";
+            }
+        });
+
+        tbody.appendChild(nuevaFila);
+        totalForms.value = formIndex + 1;
+
+        actualizarNumeros();
+    });
+
+    tbody.addEventListener("change", function (e) {
+        if (e.target && e.target.name && e.target.name.includes("-DELETE")) {
+            actualizarNumeros();
+        }
+    });
+});

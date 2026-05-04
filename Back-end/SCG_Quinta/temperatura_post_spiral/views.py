@@ -12,7 +12,8 @@ from openpyxl.utils import get_column_letter
 
 from control_sala_cremas.models import ProductoSalaCremas
 from .forms import RegistroTemperaturaPostSpiralForm
-from .models import RegistroTemperaturaPostSpiral
+from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiralFormSet
+from django.db import transaction
 
 
 def obtener_nombre_usuario(user):
@@ -70,22 +71,45 @@ def aplicar_filtros_registros(request, queryset):
 
 
 @login_required
+@transaction.atomic
 def registrar_temperatura(request):
     if request.method == 'POST':
         form = RegistroTemperaturaPostSpiralForm(request.POST)
+        formset = DetalleTemperaturaPostSpiralFormSet(request.POST)
 
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             registro = form.save(commit=False)
             registro.usuario = obtener_nombre_usuario(request.user)
             registro.save()
+
+            detalles = formset.save(commit=False)
+
+            requiere_revision = False
+
+            for index, detalle in enumerate(detalles, start=1):
+                detalle.registro = registro
+                detalle.numero = index
+
+                if detalle.accion_correctiva and detalle.accion_correctiva.strip():
+                    requiere_revision = True
+
+                detalle.save()
+
+            registro.acciones_correctivas_requieren_revision = requiere_revision
+            registro.save(update_fields=[
+                'acciones_correctivas_requieren_revision',
+                'actualizado_en'
+            ])
 
             messages.success(request, 'Registro guardado correctamente.')
             return redirect('temperatura_post_spiral:historial')
     else:
         form = RegistroTemperaturaPostSpiralForm()
+        formset = DetalleTemperaturaPostSpiralFormSet()
 
     return render(request, 'temperatura_post_spiral/registrar.html', {
-        'form': form
+        'form': form,
+        'formset': formset,
     })
 
 
