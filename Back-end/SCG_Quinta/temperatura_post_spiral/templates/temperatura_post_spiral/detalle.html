@@ -48,24 +48,44 @@
             <div><strong>Código:</strong><span>{{ registro.codigo }}</span></div>
             <div><strong>Lote:</strong><span>{{ registro.lote }}</span></div>
             <div><strong>Tiempo permanencia:</strong><span>{{ registro.tiempo_permanencia_producto }}</span></div>
-            <div><strong>Temperatura:</strong><span>{{ registro.temperatura }} °C</span></div>
         </div>
     </section>
 
     <section class="card">
-        <h2>Acción correctiva y observaciones</h2>
+        <h2>Registros de temperatura</h2>
 
-        <div class="text-block">
-            <strong>Acción correctiva:</strong>
-            <p>{{ registro.accion_correctiva|default:"Sin acción correctiva." }}</p>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th>Temperatura °C</th>
+                        <th>Acción correctiva</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in registro.detalles.all %}
+                        <tr>
+                            <td>{{ detalle.numero }}</td>
+                            <td>{{ detalle.temperatura }}</td>
+                            <td>{{ detalle.accion_correctiva|default:"Sin acción correctiva." }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="empty">No existen registros de temperatura.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+    </section>
+    <section class="card">
+        <h2>Observaciones</h2>
 
         <div class="text-block">
-            <strong>Observaciones:</strong>
             <p>{{ registro.observaciones|default:"Sin observaciones." }}</p>
         </div>
     </section>
-
     <section class="card">
         <h2>Verificaciones</h2>
 

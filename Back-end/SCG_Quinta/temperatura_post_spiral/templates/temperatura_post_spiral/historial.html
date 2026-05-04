@@ -110,7 +110,7 @@
                         <th>Producto</th>
                         <th>Código</th>
                         <th>Lote</th>
-                        <th>Temp. °C</th>
+                        <th>Registros temp.</th>
                         <th>Estado</th>
                         <th>Detalle</th>
                     </tr>
@@ -124,7 +124,7 @@
                             <td>{{ r.producto }}</td>
                             <td>{{ r.codigo }}</td>
                             <td>{{ r.lote }}</td>
-                            <td>{{ r.temperatura }}</td>
+                            <td>{{ r.detalles.count }}</td>
                             <td>
                                 <span class="badge {{ r.clase_estado }}">
                                     {{ r.estado_verificacion }}

@@ -130,7 +130,7 @@ def registrar_temperatura(request):
 
 @login_required
 def historial(request):
-    registros = RegistroTemperaturaPostSpiral.objects.all()
+    registros = RegistroTemperaturaPostSpiral.objects.prefetch_related('detalles').all()
     registros = aplicar_filtros_registros(request, registros)
 
     clientes = (
@@ -159,7 +159,10 @@ def historial(request):
 
 @login_required
 def detalle_registro(request, pk):
-    registro = get_object_or_404(RegistroTemperaturaPostSpiral, pk=pk)
+    registro = get_object_or_404(
+        RegistroTemperaturaPostSpiral.objects.prefetch_related('detalles'),
+        pk=pk
+    )
 
     return render(request, 'temperatura_post_spiral/detalle.html', {
         'registro': registro

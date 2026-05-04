@@ -65,20 +65,24 @@ class RegistroTemperaturaPostSpiral(models.Model):
 
     @property
     def estado_verificacion(self):
+        tiene_accion = self.detalles.filter(accion_correctiva__isnull=False).exclude(accion_correctiva__exact='').exists()
+
         if self.verificado:
             return 'Verificado final'
 
-        if self.acciones_correctivas_requieren_revision and not self.acciones_correctivas_verificadas:
+        if tiene_accion and not self.acciones_correctivas_verificadas:
             return 'Pendiente revisión acción correctiva'
 
         return 'Listo para verificación final'
 
     @property
     def clase_estado(self):
+        tiene_accion = self.detalles.filter(accion_correctiva__isnull=False).exclude(accion_correctiva__exact='').exists()
+
         if self.verificado:
             return 'estado-ok'
 
-        if self.acciones_correctivas_requieren_revision and not self.acciones_correctivas_verificadas:
+        if tiene_accion and not self.acciones_correctivas_verificadas:
             return 'estado-alerta'
 
         return 'estado-pendiente'
