@@ -250,7 +250,7 @@ def api_productos_por_cliente(request):
 
 @login_required
 def descargar_excel(request):
-    registros = RegistroTemperaturaPostSpiral.objects.all()
+    registros = RegistroTemperaturaPostSpiral.objects.prefetch_related('detalles').all()
     registros = aplicar_filtros_registros(request, registros)
 
     wb = Workbook()
@@ -266,11 +266,11 @@ def descargar_excel(request):
         'Código',
         'Lote',
         'Tiempo permanencia producto',
+        'N° registro temperatura',
         'Temperatura °C',
         'Acción correctiva',
         'Observaciones',
         'Estado verificación',
-        'Requiere revisión acción correctiva',
         'Acción correctiva verificada',
         'Fecha revisión acción correctiva',
         'Revisor acción correctiva',
@@ -298,29 +298,57 @@ def descargar_excel(request):
         creado_en = timezone.localtime(r.creado_en).strftime('%d-%m-%Y %H:%M') if r.creado_en else ''
         actualizado_en = timezone.localtime(r.actualizado_en).strftime('%d-%m-%Y %H:%M') if r.actualizado_en else ''
 
-        ws.append([
-            r.usuario,
-            fecha_hora,
-            r.turno,
-            r.cliente,
-            r.producto,
-            r.codigo,
-            r.lote,
-            r.tiempo_permanencia_producto,
-            float(r.temperatura) if r.temperatura is not None else '',
-            r.accion_correctiva or '',
-            r.observaciones or '',
-            r.estado_verificacion,
-            'Sí' if r.acciones_correctivas_requieren_revision else 'No',
-            'Sí' if r.acciones_correctivas_verificadas else 'No',
-            fecha_revision,
-            r.nombre_revisor_accion_correctiva or '',
-            'Sí' if r.verificado else 'No',
-            fecha_verificacion,
-            r.nombre_verificador or '',
-            creado_en,
-            actualizado_en,
-        ])
+        detalles = r.detalles.all()
+
+        if detalles:
+            for detalle in detalles:
+                ws.append([
+                    r.usuario,
+                    fecha_hora,
+                    r.turno,
+                    r.cliente,
+                    r.producto,
+                    r.codigo,
+                    r.lote,
+                    r.tiempo_permanencia_producto,
+                    detalle.numero,
+                    float(detalle.temperatura) if detalle.temperatura is not None else '',
+                    detalle.accion_correctiva or '',
+                    r.observaciones or '',
+                    r.estado_verificacion,
+                    'Sí' if r.acciones_correctivas_verificadas else 'No',
+                    fecha_revision,
+                    r.nombre_revisor_accion_correctiva or '',
+                    'Sí' if r.verificado else 'No',
+                    fecha_verificacion,
+                    r.nombre_verificador or '',
+                    creado_en,
+                    actualizado_en,
+                ])
+        else:
+            ws.append([
+                r.usuario,
+                fecha_hora,
+                r.turno,
+                r.cliente,
+                r.producto,
+                r.codigo,
+                r.lote,
+                r.tiempo_permanencia_producto,
+                '',
+                '',
+                '',
+                r.observaciones or '',
+                r.estado_verificacion,
+                'Sí' if r.acciones_correctivas_verificadas else 'No',
+                fecha_revision,
+                r.nombre_revisor_accion_correctiva or '',
+                'Sí' if r.verificado else 'No',
+                fecha_verificacion,
+                r.nombre_verificador or '',
+                creado_en,
+                actualizado_en,
+            ])
 
     for column_cells in ws.columns:
         length = max(len(str(cell.value or '')) for cell in column_cells)
