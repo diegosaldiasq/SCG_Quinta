@@ -87,26 +87,23 @@ def registrar_temperatura(request):
 
             detalles = formset.save(commit=False)
 
+            if len(detalles) < 10:
+                messages.error(request, 'Debe ingresar mínimo 10 registros de temperatura.')
+                return render(request, 'temperatura_post_spiral/registrar.html', {
+                    'form': form,
+                    'formset': formset,
+                })
+
             requiere_revision = False
-            numero = 1
 
-            # Eliminar objetos marcados, si existieran
-            for obj in formset.deleted_objects:
-                obj.delete()
-
-            for detalle in detalles:
-                # Evita guardar filas completamente vacías
-                if detalle.temperatura is None and not detalle.accion_correctiva:
-                    continue
-
+            for index, detalle in enumerate(detalles, start=1):
                 detalle.registro = registro
-                detalle.numero = numero
+                detalle.numero = index
 
                 if detalle.accion_correctiva and detalle.accion_correctiva.strip():
                     requiere_revision = True
 
                 detalle.save()
-                numero += 1
 
             registro.acciones_correctivas_requieren_revision = requiere_revision
             registro.save(update_fields=[
@@ -117,7 +114,7 @@ def registrar_temperatura(request):
             messages.success(request, 'Registro guardado correctamente.')
             return redirect('temperatura_post_spiral:historial')
 
-        messages.error(request, 'Revise los datos ingresados. Hay campos obligatorios o registros incompletos.')
+        messages.error(request, 'Revise los datos ingresados.')
 
     else:
         form = RegistroTemperaturaPostSpiralForm()

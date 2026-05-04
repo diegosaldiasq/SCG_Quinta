@@ -3,105 +3,115 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectProducto = document.getElementById("id_producto_sala_cremas");
     const codigoPreview = document.getElementById("codigo_producto_preview");
 
-    if (!selectCliente || !selectProducto) return;
-
-    function limpiarProductos() {
-        selectProducto.innerHTML = '<option value="">Seleccione producto</option>';
-        if (codigoPreview) codigoPreview.value = "";
-    }
-
-    function cargarProductos(cliente) {
-        limpiarProductos();
-
-        if (!cliente) return;
-
-        const url = `${window.URL_PRODUCTOS_POR_CLIENTE}?cliente=${encodeURIComponent(cliente)}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(producto => {
-                    const option = document.createElement("option");
-                    option.value = producto.id;
-                    option.textContent = producto.producto;
-                    option.dataset.codigo = producto.codigo;
-                    selectProducto.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error("Error cargando productos:", error);
-            });
-    }
-
-    selectCliente.addEventListener("change", function () {
-        cargarProductos(this.value);
-    });
-
-    selectProducto.addEventListener("change", function () {
-        const selected = selectProducto.options[selectProducto.selectedIndex];
-
-        if (codigoPreview) {
-            codigoPreview.value = selected.dataset.codigo || "";
+    if (selectCliente && selectProducto) {
+        function limpiarProductos() {
+            selectProducto.innerHTML = '<option value="">Seleccione producto</option>';
+            if (codigoPreview) codigoPreview.value = "";
         }
-    });
-});
 
-document.addEventListener("DOMContentLoaded", function () {
+        function cargarProductos(cliente) {
+            limpiarProductos();
+
+            if (!cliente) return;
+
+            const url = `${window.URL_PRODUCTOS_POR_CLIENTE}?cliente=${encodeURIComponent(cliente)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(producto => {
+                        const option = document.createElement("option");
+                        option.value = producto.id;
+                        option.textContent = producto.producto;
+                        option.dataset.codigo = producto.codigo;
+                        selectProducto.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error cargando productos:", error);
+                });
+        }
+
+        selectCliente.addEventListener("change", function () {
+            cargarProductos(this.value);
+        });
+
+        selectProducto.addEventListener("change", function () {
+            const selected = selectProducto.options[selectProducto.selectedIndex];
+
+            if (codigoPreview) {
+                codigoPreview.value = selected.dataset.codigo || "";
+            }
+        });
+    }
+
     const btnAgregar = document.getElementById("btn-agregar-linea");
     const tbody = document.getElementById("tbody-detalles");
     const totalForms = document.getElementById("id_detalles-TOTAL_FORMS");
 
     if (!btnAgregar || !tbody || !totalForms) return;
 
-    function actualizarNumeros() {
+    const MIN_FILAS = 10;
+
+    function renumerarFilas() {
         const filas = tbody.querySelectorAll(".fila-detalle");
+
         filas.forEach((fila, index) => {
             const numero = fila.querySelector(".numero-linea");
             if (numero) numero.textContent = index + 1;
+
+            fila.querySelectorAll("input, textarea, select, label").forEach((el) => {
+                if (el.name) {
+                    el.name = el.name.replace(/detalles-\d+-/g, `detalles-${index}-`);
+                }
+
+                if (el.id) {
+                    el.id = el.id.replace(/id_detalles-\d+-/g, `id_detalles-${index}-`);
+                }
+
+                if (el.htmlFor) {
+                    el.htmlFor = el.htmlFor.replace(/id_detalles-\d+-/g, `id_detalles-${index}-`);
+                }
+            });
+        });
+
+        totalForms.value = filas.length;
+    }
+
+    function limpiarFila(fila) {
+        fila.querySelectorAll("input, textarea, select").forEach((input) => {
+            input.value = "";
         });
     }
 
     btnAgregar.addEventListener("click", function () {
-        const formIndex = parseInt(totalForms.value);
         const primeraFila = tbody.querySelector(".fila-detalle");
+        if (!primeraFila) return;
+
         const nuevaFila = primeraFila.cloneNode(true);
-
-        nuevaFila.querySelectorAll("input, textarea, select").forEach((input) => {
-            if (input.name) {
-                input.name = input.name.replace(/detalles-\d+-/g, `detalles-${formIndex}-`);
-            }
-
-            if (input.id) {
-                input.id = input.id.replace(/id_detalles-\d+-/g, `id_detalles-${formIndex}-`);
-            }
-
-            if (input.type === "checkbox") {
-                input.checked = false;
-            } else if (input.type !== "hidden") {
-                input.value = "";
-            } else {
-                input.value = "";
-            }
-        });
+        limpiarFila(nuevaFila);
 
         tbody.appendChild(nuevaFila);
-        totalForms.value = formIndex + 1;
-
-        actualizarNumeros();
+        renumerarFilas();
     });
 
-    tbody.addEventListener("change", function (e) {
-        if (e.target && e.target.name && e.target.name.includes("-DELETE")) {
-            actualizarNumeros();
+    tbody.addEventListener("click", function (e) {
+        const btnQuitar = e.target.closest(".btn-quitar-linea");
+        if (!btnQuitar) return;
+
+        const filas = tbody.querySelectorAll(".fila-detalle");
+
+        if (filas.length <= MIN_FILAS) {
+            alert("Debe mantener mínimo 10 registros de temperatura.");
+            return;
         }
-    });
-});
 
-document.addEventListener("change", function (e) {
-    if (e.target && e.target.name && e.target.name.includes("-DELETE")) {
-        const fila = e.target.closest("tr");
+        const fila = btnQuitar.closest("tr");
         if (fila) {
-            fila.style.display = e.target.checked ? "none" : "";
+            fila.remove();
+            renumerarFilas();
         }
-    }
+    });
+
+    renumerarFilas();
 });

@@ -107,7 +107,6 @@ DetalleTemperaturaPostSpiralFormSet = inlineformset_factory(
     form=DetalleTemperaturaPostSpiralForm,
     extra=10,
     min_num=10,
-    max_num=1000,
     validate_min=True,
-    can_delete=True
+    can_delete=False
 )

@@ -102,7 +102,7 @@
                                 <th>N°</th>
                                 <th>Temperatura °C</th>
                                 <th>Acción correctiva</th>
-                                <th>Eliminar</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
 
@@ -122,11 +122,9 @@
                                     </td>
 
                                     <td class="td-eliminar">
-                                        {% if detalle_form.DELETE %}
-                                            <td>
-                                                {{ detalle_form.DELETE }}
-                                            </td>
-                                        {% endif %}
+                                        <button type="button" class="btn btn-small btn-quitar-linea">
+                                            Quitar
+                                        </button>
                                     </td>
 
                                     {{ detalle_form.id }}
