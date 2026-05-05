@@ -13,6 +13,92 @@
     <link rel="stylesheet" href="{% static 'control_layout_tortas/estilos_registro_layout.css' %}">
     <link rel="icon" href="{% static 'control_layout_tortas/images/logoquinta2.png' %}">
 </head>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const plantaSelect = document.getElementById("id_planta");
+    const clienteSelect = document.getElementById("id_cliente");
+    const productoSelect = document.getElementById("id_producto_manual");
+    const codigoInput = document.getElementById("id_codigo_auto");
+    const layoutInput = document.getElementById("id_layout");
+
+    function limpiarSelect(select, texto) {
+        select.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = texto;
+        select.appendChild(option);
+    }
+
+    function cargarClientes() {
+        const planta = plantaSelect.value;
+
+        limpiarSelect(clienteSelect, "Selecciona cliente");
+        limpiarSelect(productoSelect, "Selecciona producto");
+        codigoInput.value = "";
+        layoutInput.value = "";
+
+        if (!planta) return;
+
+        fetch(`{% url 'control_layout_tortas:api_clientes_por_planta' %}?planta=${encodeURIComponent(planta)}`)
+            .then(response => response.json())
+            .then(data => {
+                data.clientes.forEach(cliente => {
+                    const option = document.createElement("option");
+                    option.value = cliente;
+                    option.textContent = cliente;
+                    clienteSelect.appendChild(option);
+                });
+            });
+    }
+
+    function cargarProductos() {
+        const planta = plantaSelect.value;
+        const cliente = clienteSelect.value;
+
+        limpiarSelect(productoSelect, "Selecciona producto");
+        codigoInput.value = "";
+        layoutInput.value = "";
+
+        if (!planta || !cliente) return;
+
+        fetch(`{% url 'control_layout_tortas:api_productos_por_planta_cliente' %}?planta=${encodeURIComponent(planta)}&cliente=${encodeURIComponent(cliente)}`)
+            .then(response => response.json())
+            .then(data => {
+                data.productos.forEach(producto => {
+                    const option = document.createElement("option");
+                    option.value = producto.id;
+                    option.textContent = producto.nombre;
+                    option.dataset.codigo = producto.codigo || "";
+                    productoSelect.appendChild(option);
+                });
+            });
+    }
+
+    function cargarLayout() {
+        const planta = plantaSelect.value;
+        const cliente = clienteSelect.value;
+        const productoId = productoSelect.value;
+
+        codigoInput.value = "";
+        layoutInput.value = "";
+
+        if (!planta || !cliente || !productoId) return;
+
+        fetch(`{% url 'control_layout_tortas:api_layout_por_producto' %}?planta=${encodeURIComponent(planta)}&cliente=${encodeURIComponent(cliente)}&producto_id=${encodeURIComponent(productoId)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    codigoInput.value = data.codigo || "";
+                    layoutInput.value = data.layout_id || "";
+                }
+            });
+    }
+
+    plantaSelect.addEventListener("change", cargarClientes);
+    clienteSelect.addEventListener("change", cargarProductos);
+    productoSelect.addEventListener("change", cargarLayout);
+});
+</script>
 <body>
 
 <div class="contenedor">

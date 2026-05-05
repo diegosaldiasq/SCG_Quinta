@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Prefetch, Count, Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -442,3 +442,91 @@ def desverificar_registro(request, pk):
 def redireccionar_intermedio(request):
     url_index = reverse("intermedio")
     return HttpResponseRedirect(url_index)
+
+@login_required
+def api_clientes_por_planta(request):
+    planta = request.GET.get("planta", "").strip()
+
+    qs = LayoutTorta.objects.filter(activo=True).select_related("producto")
+
+    if planta:
+        qs = qs.filter(planta=planta)
+
+    clientes = (
+        qs.exclude(producto__cliente="")
+        .values_list("producto__cliente", flat=True)
+        .distinct()
+        .order_by("producto__cliente")
+    )
+
+    return JsonResponse({
+        "clientes": list(clientes)
+    })
+
+
+@login_required
+def api_productos_por_planta_cliente(request):
+    planta = request.GET.get("planta", "").strip()
+    cliente = request.GET.get("cliente", "").strip()
+
+    qs = LayoutTorta.objects.filter(activo=True).select_related("producto")
+
+    if planta:
+        qs = qs.filter(planta=planta)
+
+    if cliente:
+        qs = qs.filter(producto__cliente=cliente)
+
+    productos = []
+    vistos = set()
+
+    for layout in qs.order_by("producto__nombre", "producto__codigo", "-version"):
+        producto = layout.producto
+
+        if producto.id in vistos:
+            continue
+
+        vistos.add(producto.id)
+
+        productos.append({
+            "id": producto.id,
+            "nombre": producto.nombre,
+            "codigo": producto.codigo,
+        })
+
+    return JsonResponse({
+        "productos": productos
+    })
+
+
+@login_required
+def api_layout_por_producto(request):
+    planta = request.GET.get("planta", "").strip()
+    cliente = request.GET.get("cliente", "").strip()
+    producto_id = request.GET.get("producto_id", "").strip()
+
+    layout = (
+        LayoutTorta.objects
+        .filter(
+            activo=True,
+            planta=planta,
+            producto_id=producto_id,
+            producto__cliente=cliente,
+        )
+        .select_related("producto")
+        .order_by("-version")
+        .first()
+    )
+
+    if not layout:
+        return JsonResponse({
+            "ok": False,
+            "layout_id": "",
+            "codigo": "",
+        })
+
+    return JsonResponse({
+        "ok": True,
+        "layout_id": layout.id,
+        "codigo": layout.producto.codigo,
+    })
