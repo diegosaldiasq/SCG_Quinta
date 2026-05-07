@@ -137,169 +137,92 @@
         <div class="login-container">
             <!-- Selección de Cliente -->
             <label for="cliente">Cliente</label>
-            <select id="cliente" class="input">
+            <select id="cliente" name="cliente" required>
                 <option value="">-- Selecciona cliente --</option>
-                <option value="Jumbo">Jumbo</option>
-                <option value="SISA">Santa Isabel</option>
-                <option value="Walmart">Walmart</option>
-                <option value="Unimarc">Unimarc</option>
             </select>
 
             <!-- Selección de Producto -->
             <label for="producto">Producto</label>
-            <select id="producto" class="input">
+            <select id="producto" name="producto" required>
                 <option value="">-- Selecciona producto --</option>
             </select>
 
             <!-- Campo que mostrará el código producto -->
             <label for="codigo">Código producto</label>
-            <input type="text" id="codigo" class="input" readonly placeholder="–">
+            <input type="text" id="codigo_producto" name="codigo_producto" readonly placeholder="–">
 
             <!-- Campo que mostrará el peso receta -->
             <label for="peso">Peso receta (gr)</label>
-            <input type="text" id="peso" class="input" readonly placeholder="–">
+            <input type="number" id="peso_receta" name="peso_receta" readonly placeholder="–">
 
             <script>
-                // Definimos clientes → productos → peso
-                const productosPorCliente = {
-                Jumbo: [
-                    { codigo: '393241', value: 'Torta Beatiz', text: 'Torta Beatriz', peso: '1891' },
-                    { codigo: '393240', value: 'Torta Bom Bom', text: 'Torta Bom Bom', peso: '1356' },
-                    { codigo: '393149', value: 'Torta tres leches', text: 'Torta tres leches', peso: '1644' },
-                    { codigo: '393191', value: 'Torta cuatro leches', text: 'Torta cuatro leches', peso: '1700' },
-                    { codigo: '393129', value: 'Torta piña', text: 'Torta piña', peso: '1580' },
-                    { codigo: '393141', value: 'Torta lucuma', text: 'Torta lucuma', peso: '1210' },
-                    { codigo: '393171', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1440' },
-                    { codigo: '393145', value: 'Torta selva negra', text: 'Torta selva negra', peso: '1550' },
-                    { codigo: '393167', value: 'Torta truffa', text: 'Torta truffa', peso: '1672' },
-                    { codigo: '393153', value: 'Torta viena', text: 'Torta viena', peso: '1490' },
-                    { codigo: '393396', value: 'Torta San Jorge lucuma', text: 'Torta San Jorge lucuma', peso: '2050' },
-                    { codigo: '393397', value: 'Torta San Jorge guinda', text: 'Torta San Jorge guinda', peso: '1872' },
-                    { codigo: '393398', value: 'Torta San Jorge chocolate', text: 'Torta San Jorge chocolate', peso: '1700' },
-                    { codigo: '405220', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '1140' },
-                    { codigo: '405217', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '1470' },
-                    { codigo: '393443', value: 'Torta merengue nugat', text: 'Torta merengue nugat', peso: '1310' },
-                    { codigo: '405458', value: 'Torta merengue manzana frambuesa', text: 'Torta merengue manzana frambuesa', peso: '1450' },
-                    { codigo: '405254', value: 'Torta chocolate real', text: 'Torta chocolate real', peso: '860' },
-                    { codigo: '393414', value: 'Torta caluga frambuesa', text: 'Torta caluga frambuesa', peso: '1120' },
-                    { codigo: '405548', value: 'Torta caluga nuez', text: 'Torta caluga nuez', peso: '1005' },
-                    { codigo: '405258', value: 'Torta selva negra vegana', text: 'Torta selva negra vegana', peso: '1010' },
-                    { codigo: '402261', value: 'Torta panqueque guinda chocolate', text: 'Torta panqueque guinda chocolate', peso: '1814' },
-                    { codigo: '405598', value: 'Torta tentacion de chocolate', text: 'Torta tentacion de chocolate', peso: '1120' },
-                    { codigo: '405599', value: 'Torta lemon cake', text: 'Torta lemon cake', peso: '1175' },
-                    { codigo: '405629', value: 'Torta red velvet', text: 'Torta red velvet', peso: '1900' },
-                    { codigo: '405628', value: 'Torta ignacia', text: 'Torta ignacia', peso: '1550' },
-                    { codigo: '405630', value: 'Torta carrot cake', text: 'Torta carrot cake', peso: '1630' },
-                    { codigo: '393429', value: 'Pie de frambuesa familiar', text: 'Pie de frambuesa familiar', peso: '815' },
-                    { codigo: '393431', value: 'Pie de maracuya familiar', text: 'Pie de maracuya familiar', peso: '785' },
-                    { codigo: '393431', value: 'Pie de limon familiar', text: 'Pie de limon familiar', peso: '860' },
-                    { codigo: '405414', value: 'Media torta San Jorge lucuma', text: 'Media torta San Jorge lucuma', peso: '840' },
-                    { codigo: '393433', value: 'Tarta soft familiar', text: 'Tarta soft familiar', peso: '950' },
-                    { codigo: '393432', value: 'Tartaleta fruta mixta familiar', text: 'Tartaleta fruta mixta familiar', peso: '1300' },
-                    { codigo: '405606', value: 'Chocotorta', text: 'Chocotorta', peso: '915' }
-                ],
-                SISA: [
-                    { codigo: '393266', value: 'Torta amor', text: 'Torta amor', peso: '1373' },
-                    { codigo: '393011', value: 'Torta crema piña', text: 'Torta crema piña', peso: '1180' },
-                    { codigo: '393013', value: 'Torta crema selva negra', text: 'Torta crema selva negra', peso: '1200' },
-                    { codigo: '405523', value: 'Torta chocolate mediana', text: 'Torta chocolate mediana', peso: '810' },
-                    { codigo: '393213', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '860' },
-                    { codigo: '393212', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '970' },
-                    { codigo: '405605', value: 'Torta merengue cookies', text: 'Torta merengue cookies', peso: '1000' },
-                    { codigo: '405604', value: 'Torta merengue lemon pie', text: 'Torta merengue lemon pie', peso: '815' },
-                    { codigo: '353253', value: 'Torta mocaccino mediana', text: 'Torta mocaccino mediana', peso: '700' },
-                    { codigo: '393018', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1380' },
-                    { codigo: '393015', value: 'Torta tres leches', text: 'Torta tres leches', peso: '1300' },
-                    { codigo: '405692', value: 'Torta crema manjar', text: 'Torta crema manjar', peso: '1130'},
-                    { codigo: '393017', value: 'Torta yogurt', text: 'Torta yogurt', peso: '1610' },
-                    { codigo: '393019', value: 'Torta viena', text: 'Torta viena', peso: '1470' },
-                    { codigo: '405760', value: 'Torta viena vainilla', text: 'Torta viena vainilla', peso: '1685' },
-                    { codigo: '393356', value: 'Torta sabor lucuma', text: 'Torta sabor lucuma', peso: '1180' },
-                    { codigo: '393354', value: 'Torta sacher', text: 'Torta sacher', peso: '1110' },
-                    { codigo: '405256', value: 'Torta doña Isabel', text: 'Torta doña Isabel', peso: '1350' },
-                    { codigo: '405295', value: 'Torta cookies & cream', text: 'Torta cookies & cream', peso: '735' },
-                    { codigo: '405460', value: 'Torta panqueque chocolate manjar', text: 'Torta panqueque chocolate manjar', peso: '1814' },
-                    { codigo: '405631', value: 'Tarta cóctel de frutas', text: 'Tarta cóctel de frutas', peso: '670' },
-                    { codigo: '393270', value: 'Tartaleta fruta mixta mediana', text: 'Tartaleta fruta mixta mediana', peso: '826' },
-                    { codigo: '393000', value: 'Pie de limon familiar', text: 'Pie de limon familiar', peso: '870' }
-                ],
-                Walmart: [
-                    { codigo: '393058', value: 'Torta chocoguinda', text: 'Torta chocoguinda', peso: '1180' },
-                    { codigo: '393347', value: 'Torta chocolate manjar', text: 'Torta chocolate manjar', peso: '1410' },
-                    { codigo: '393275', value: 'Torta chocolate 8pp', text: 'Torta chocolate 8pp', peso: '770' },
-                    { codigo: '393402', value: 'Torta crema frambuesa', text: 'Torta crema frambuesa', peso: '1045' },
-                    { codigo: '392500', value: 'Torta crema moka 15pp', text: 'Torta crema moka 15pp', peso: '1090' },
-                    { codigo: '393033', value: 'Torta crema piña 15pp', text: 'Torta crema piña 15pp', peso: '1230' },
-                    { codigo: '405726', value: 'Torta amor 15pp', text: 'Torta amor 15pp', peso: '1275' },
-                    { codigo: '405641', value: 'Torta viena 15pp', text: 'Torta viena 15pp', peso: '1340' },
-                    { codigo: '392495', value: 'Torta mousse manjar 15pp', text: 'Torta mousse manjar 15pp', peso: '1130' },
-                    { codigo: '393295', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1410' },
-                    { codigo: '405727', value: 'Torta san jorge lactea', text: 'Torta san jorge lactea', peso: '1610' },
-                    { codigo: '393020', value: 'Torta selva negra 15pp', text: 'Torta selva negra 15pp', peso: '1180' },
-                    { codigo: '392494', value: 'Torta tres leches 15pp', text: 'Torta tres leches 15pp', peso: '1185' },
-                    { codigo: '405262', value: 'Torta hoja manjar chocolate artesanal', text: 'Torta hoja manjar chocolate artesanal', peso: '1510' },
-                    { codigo: '405315', value: 'Torta frutos del bosque', text: 'Torta frutos del bosque', peso: '740' },
-                    { codigo: '393445', value: 'Torta chocolate avellana', text: 'Torta chocolate avellana', peso: '850' },
-                    { codigo: '405488', value: 'Torta selva negra crema lactea 15pp', text: 'Torta selva negra crema lactea 15pp', peso: '1290' },
-                    { codigo: '405487', value: 'Torta piña crema lactea 15pp', text: 'Torta piña crema lactea 15pp', peso: '1440' },
-                    { codigo: '405568', value: 'Torta selva negra crema lactea mediana', text: 'Torta selva negra crema lactea mediana', peso: '865' },
-                    { codigo: '405567', value: 'Torta piña crema lactea mediana', text: 'Torta piña crema lactea mediana', peso: '910' },
-                    { codigo: '405623', value: 'Torta hoja manjar merengue mediana', text: 'Torta hoja manjar merengue mediana', peso: '770' }
-                ],
-                Unimarc: [
-                    { codigo: '393272', value: 'Torta crema manjar mini', text: 'Torta crema manjar mini', peso: '720' },
-                    { codigo: '393273', value: 'Torta guinda mini', text: 'Torta guinda mini', peso: '720' },
-                    { codigo: '405243', value: 'Torta hoja manjar 15p', text: 'Torta hoja manjar 15p', peso: '1220' },
-                    { codigo: '393391', value: 'Torta holandesa smu', text: 'Torta holandesa smu', peso: '1180' },
-                    { codigo: '393409', value: 'Torta panqueque naranja', text: 'Torta panqueque naranja', peso: '1400' },
-                    { codigo: '393441', value: 'Torta yogurt frutilla', text: 'Torta yogurt frutilla', peso: '1500' },
-                    { codigo: '393440', value: 'Torta cuatro leches', text: 'Torta cuatro leches', peso: '1200' },
-                    { codigo: '405579', value: 'Torta merengue frambuesa', text: 'Torta merengue frambuesa', peso: '920' },
-                    { codigo: '405508', value: 'Torta merengue lucuma', text: 'Torta merengue lucuma', peso: '980' },
-                    { codigo: '405637', value: 'Torta holandesa mediana', text: 'Torta holandesa mediana', peso: '740' },
-                    { codigo: '405657', value: 'Torta panqueque naranja mediana', text: 'Torta panqueque naranja mediana', peso: '1260' },
-                    { codigo: '405620', value: 'Torta san jorge', text: 'Torta san jorge', peso: '1340' }
-                ]
-                };
+            const AREA_CONTROL_PESOS = "TORTAS";
 
-                // Obtenemos los elementos del DOM
-                const selectCliente  = document.getElementById('cliente');
-                const selectProducto = document.getElementById('producto');
-                const inputPeso      = document.getElementById('peso');
-                const inputCodigo    = document.getElementById('codigo');
+            const selectCliente = document.getElementById("cliente");
+            const selectProducto = document.getElementById("producto");
+            const inputCodigo = document.getElementById("codigo_producto");
+            const inputPesoReceta = document.getElementById("peso_receta");
 
-                // Cuando cambia el cliente, recargamos productos y deshabilitamos peso
-                selectCliente.addEventListener('change', () => {
-                    const cliente = selectCliente.value;
-                    const lista   = productosPorCliente[cliente] || [];
+            let productosBase = [];
 
-                    // Reiniciamos select producto
-                    selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
-                    selectProducto.disabled  = lista.length === 0;
-                    inputPeso.value          = '';
-                    inputCodigo.value        = '';
+            async function cargarClientes() {
+                const response = await fetch(`/control_de_pesos/api/clientes_base/?area=${AREA_CONTROL_PESOS}`);
+                const data = await response.json();
 
-                    // Creamos opciones
-                    lista.forEach(prod => {
-                        const opt = document.createElement('option');
-                        opt.value       = prod.value;
-                        opt.textContent = prod.text;
-                        opt.setAttribute('data-peso', prod.peso);
-                        opt.setAttribute('data-codigo', prod.codigo);
-                        selectProducto.appendChild(opt);
+                selectCliente.innerHTML = `<option value="">-- Selecciona cliente --</option>`;
+
+                if (data.ok) {
+                    data.clientes.forEach(cliente => {
+                        const option = document.createElement("option");
+                        option.value = cliente;
+                        option.textContent = cliente;
+                        selectCliente.appendChild(option);
                     });
-                });
+                }
+            }
 
-                selectProducto.addEventListener('change', () => {
-                    const opt = selectProducto.selectedOptions[0];
-                    if (opt) {
-                        inputPeso.value   = opt.getAttribute('data-peso') || '';
-                        inputCodigo.value = opt.getAttribute('data-codigo') || '';
-                    } else {
-                        inputPeso.value   = '';
-                        inputCodigo.value = '';
-                    }
-                });
+            async function cargarProductosPorCliente(cliente) {
+                selectProducto.innerHTML = `<option value="">-- Selecciona producto --</option>`;
+                inputCodigo.value = "";
+                inputPesoReceta.value = "";
+                productosBase = [];
+
+                if (!cliente) return;
+
+                const url = `/control_de_pesos/api/productos_base/?area=${AREA_CONTROL_PESOS}&cliente=${encodeURIComponent(cliente)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.ok) {
+                    productosBase = data.productos;
+
+                    productosBase.forEach(item => {
+                        const option = document.createElement("option");
+                        option.value = item.id;
+                        option.textContent = `${item.codigo} - ${item.producto}`;
+                        selectProducto.appendChild(option);
+                    });
+                }
+            }
+
+            selectCliente.addEventListener("change", function () {
+                cargarProductosPorCliente(this.value);
+            });
+
+            selectProducto.addEventListener("change", function () {
+                const productoSeleccionado = productosBase.find(p => String(p.id) === String(this.value));
+
+                if (!productoSeleccionado) {
+                    inputCodigo.value = "";
+                    inputPesoReceta.value = "";
+                    return;
+                }
+
+                inputCodigo.value = productoSeleccionado.codigo || "";
+                inputPesoReceta.value = productoSeleccionado.peso_receta || "";
+            });
+
+            document.addEventListener("DOMContentLoaded", cargarClientes);
             </script>
 
             <div class="muestras-box">
