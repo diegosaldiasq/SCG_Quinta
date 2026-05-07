@@ -30,7 +30,7 @@ class TipoCapa(models.TextChoices):
     REMOJO = "REMOJO", "Remojo"
     RELLENO = "RELLENO", "Relleno"
     RELLENO_MANUAL = "RELLENO_MANUAL", "Relleno manual"
-    REBOZADO = "REBOZADO", "Rebozado"
+    REBOSADO = "REBOSADO", "Rebosado"
     GRANA = "GRANA", "Grana"
     BRILLO = "BRILLO", "Brillo"
     MONOS = "MONOS", "Moños"
