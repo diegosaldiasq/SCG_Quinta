@@ -163,14 +163,33 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <!--Boton volver -->
-            <div class="actions">
-                <a href="{% url 'control_sala_cremas:redireccionar_seleccion_verifica_2' %}" class="btn btn-secondary">
-                    Volver
-                </a>
-            </div>
-        </div>
+            {% if page_obj.has_other_pages %}
+            <div class="paginacion">
 
+                {% if page_obj.has_previous %}
+                    <a class="page-link" href="?page=1&{{ query_params }}">Primera</a>
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ query_params }}">Anterior</a>
+                {% endif %}
+
+                <span class="page-current">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ query_params }}">Siguiente</a>
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ query_params }}">Última</a>
+                {% endif %}
+
+            </div>
+            {% endif %}
+            <!--Boton volver -->
+            
+        </div>
+        <div class="top-actions">
+            <a href="{% url 'control_sala_cremas:redireccionar_seleccion_verifica_2' %}" class="btn btn-volver">
+                Volver
+            </a>
+        </div>
     </div>
 
 </div>

@@ -275,6 +275,68 @@ tbody tr:hover {
     font-size: 13px;
 }
 
+.top-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 18px;
+    padding-left: 6px;
+}
+
+.btn-volver {
+    background: #ffffff;
+    color: var(--rojo-quinta);
+    border: 2px solid var(--rojo-quinta);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-volver:hover {
+    background: var(--rojo-quinta);
+    color: #ffffff;
+}
+
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+}
+
+.page-link,
+.page-current {
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.page-link {
+    background: var(--rojo-quinta);
+    color: white;
+}
+
+.page-link:hover {
+    background: #923022;
+}
+
+.page-current {
+    background: #f3f4f6;
+    color: var(--gris-texto);
+}
+
+@media (max-width: 768px) {
+    .top-actions {
+        justify-content: center;
+        padding-left: 0;
+    }
+
+    .btn-volver {
+        width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
     .page {
         padding: 18px 10px;

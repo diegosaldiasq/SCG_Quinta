@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.utils.timezone import localtime
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 
 from openpyxl import Workbook
@@ -74,9 +75,18 @@ def historial_sala_cremas(request):
     if batidora:
         registros = registros.filter(numero_batidora__icontains=batidora)
 
+    paginator = Paginator(registros, 20)  # 20 registros por página
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    query_params = request.GET.copy()
+    query_params.pop("page", None)
+
     return render(request, "control_sala_cremas/historial_sala_cremas.html", {
-        "registros": registros,
+        "registros": page_obj,
+        "page_obj": page_obj,
         "filtros": request.GET,
+        "query_params": query_params.urlencode(),
     })
 
 
