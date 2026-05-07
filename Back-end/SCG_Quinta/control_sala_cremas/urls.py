@@ -12,4 +12,6 @@ urlpatterns = [
     path("verificar/<int:pk>/", views.verificar_registro_sala_cremas, name="verificar_registro_sala_cremas"),
     path("selecciones/", views.redireccionar_selecciones_2, name="redireccionar_selecciones_2"),
     path("seleccion-verifica/", views.redireccionar_seleccion_verifica_2, name="redireccionar_seleccion_verifica_2"),
+    path("verificar-ajax/<int:pk>/", views.verificar_registro_ajax, name="verificar_registro_ajax"),
+    path("verificar-multiple-ajax/", views.verificar_multiple_ajax, name="verificar_multiple_ajax"),
 ]

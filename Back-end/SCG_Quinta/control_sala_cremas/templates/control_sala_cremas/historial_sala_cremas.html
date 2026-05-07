@@ -19,11 +19,20 @@
         <div class="header">
             <img src="{% static 'inicio/images/logoquinta.png' %}" alt="Logo Quinta" class="logo">
             <h1>Historial Sala de Cremas</h1>
-            <p>Consulta, filtra y descarga los registros ingresados</p>
+            <p>Consulta, filtra, verifica y descarga los registros ingresados</p>
         </div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <form method="GET" class="filtros">
             <div class="grid">
+
                 <div class="field">
                     <label>Desde</label>
                     <input type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}">
@@ -38,8 +47,18 @@
                     <label>Turno</label>
                     <select name="turno">
                         <option value="">Todos</option>
-                        <option value="Día" {% if filtros.turno == "Día" %}selected{% endif %}>Día</option>
-                        <option value="Noche" {% if filtros.turno == "Noche" %}selected{% endif %}>Noche</option>
+                        <option value="Turno A" {% if filtros.turno == "Turno A" %}selected{% endif %}>Turno A</option>
+                        <option value="Turno B" {% if filtros.turno == "Turno B" %}selected{% endif %}>Turno B</option>
+                        <option value="Turno C" {% if filtros.turno == "Turno C" %}selected{% endif %}>Turno C</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Estado</label>
+                    <select name="estado">
+                        <option value="">Todos</option>
+                        <option value="verificado" {% if filtros.estado == "verificado" %}selected{% endif %}>Verificado</option>
+                        <option value="pendiente" {% if filtros.estado == "pendiente" %}selected{% endif %}>Pendiente</option>
                     </select>
                 </div>
 
@@ -62,9 +81,13 @@
                     <label>N° Batidora</label>
                     <input type="text" name="batidora" value="{{ filtros.batidora }}" placeholder="Batidora">
                 </div>
+
             </div>
 
             <div class="actions">
+                <a href="{% url 'control_sala_cremas:registro_sala_cremas' %}" class="btn btn-secondary">
+                    Nuevo registro
+                </a>
 
                 <button type="submit" class="btn btn-primary">
                     Filtrar
@@ -80,11 +103,20 @@
             </div>
         </form>
 
+        <div class="bulk-actions">
+            <button type="button" id="btnVerificarSeleccionados" class="btn btn-primary">
+                Verificar seleccionados
+            </button>
+        </div>
+
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th class="check-column">
+                            <input type="checkbox" id="checkTodos">
+                        </th>
+                        <th>#</th>
                         <th>Fecha</th>
                         <th>Usuario</th>
                         <th>Turno</th>
@@ -96,7 +128,8 @@
                         <th>Aplicación</th>
                         <th>Densidad</th>
                         <th>Temperatura</th>
-                        <th>Batidora</th>
+                        <th>N° Batidora</th>
+                        <th>Acción correctiva</th>
                         <th>Observaciones</th>
                         <th>Estado</th>
                         <th>Verificado por</th>
@@ -107,9 +140,20 @@
 
                 <tbody>
                     {% for r in registros %}
-                        <tr>
+                        <tr id="registro-{{ r.id }}">
+                            <td class="check-column">
+                                {% if not r.verificado %}
+                                    <input type="checkbox" class="check-registro" value="{{ r.id }}">
+                                {% endif %}
+                            </td>
+
                             <td>{{ r.id }}</td>
-                            <td>{{ r.fecha_hora|date:"d-m-Y H:i" }}</td>
+
+                            <td>
+                                {{ r.fecha_hora|date:"d-m-Y" }}<br>
+                                {{ r.fecha_hora|time:"H:i" }}
+                            </td>
+
                             <td>{{ r.usuario }}</td>
                             <td>{{ r.turno }}</td>
                             <td>{{ r.cliente }}</td>
@@ -118,11 +162,13 @@
                             <td>{{ r.lote }}</td>
                             <td>{{ r.tipo_crema }}</td>
                             <td>{{ r.aplicacion }}</td>
-                            <td>{{ r.densidad|floatformat:2 }}</td> <!-- 2 decimales -->
+                            <td>{{ r.densidad }}</td>
                             <td>{{ r.temperatura }} °C</td>
                             <td>{{ r.numero_batidora }}</td>
+                            <td>{{ r.accion_correctiva|default:"-" }}</td>
                             <td>{{ r.observaciones|default:"-" }}</td>
-                            <td>
+
+                            <td class="estado-columna">
                                 {% if r.verificado %}
                                     <span class="badge-ok">Verificado</span>
                                 {% else %}
@@ -130,9 +176,11 @@
                                 {% endif %}
                             </td>
 
-                            <td>{{ r.verificado_por|default:"-" }}</td>
+                            <td class="verificado-por-columna">
+                                {{ r.verificado_por|default:"-" }}
+                            </td>
 
-                            <td>
+                            <td class="fecha-verificacion-columna">
                                 {% if r.fecha_verificacion %}
                                     {{ r.fecha_verificacion|date:"d-m-Y H:i" }}
                                 {% else %}
@@ -140,15 +188,15 @@
                                 {% endif %}
                             </td>
 
-                            <td>
+                            <td class="accion-columna">
                                 {% if not r.verificado %}
-                                    <form method="POST" action="{% url 'control_sala_cremas:verificar_registro_sala_cremas' r.id %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            Verificar
-                                        </button>
-                                    </form>
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary btn-sm btn-verificar"
+                                        data-id="{{ r.id }}"
+                                    >
+                                        Verificar
+                                    </button>
                                 {% else %}
                                     -
                                 {% endif %}
@@ -156,19 +204,26 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="11" class="empty">
+                            <td colspan="20" class="empty">
                                 No existen registros para los filtros seleccionados.
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            {% if page_obj.has_other_pages %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
             <div class="paginacion">
 
                 {% if page_obj.has_previous %}
-                    <a class="page-link" href="?page=1&{{ query_params }}">Primera</a>
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ query_params }}">Anterior</a>
+                    <a class="page-link" href="?page=1&{{ query_params }}">
+                        Primera
+                    </a>
+
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ query_params }}">
+                        Anterior
+                    </a>
                 {% endif %}
 
                 <span class="page-current">
@@ -176,23 +231,179 @@
                 </span>
 
                 {% if page_obj.has_next %}
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ query_params }}">Siguiente</a>
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ query_params }}">Última</a>
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ query_params }}">
+                        Siguiente
+                    </a>
+
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ query_params }}">
+                        Última
+                    </a>
                 {% endif %}
 
             </div>
-            {% endif %}
-            <!--Boton volver -->
-            
-        </div>
-        <div class="top-actions">
-            <a href="{% url 'control_sala_cremas:redireccionar_seleccion_verifica_2' %}" class="btn btn-volver">
-                Volver
+        {% endif %}
+
+        <div class="volver-wrapper">
+            <a href="{% url 'inicio:inicio' %}" class="btn btn-volver">
+                ← Volver
             </a>
         </div>
+
     </div>
 
 </div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
+const checkTodos = document.getElementById("checkTodos");
+const btnVerificarSeleccionados = document.getElementById("btnVerificarSeleccionados");
+
+if (checkTodos) {
+    checkTodos.addEventListener("change", function () {
+        document.querySelectorAll(".check-registro").forEach(check => {
+            check.checked = this.checked;
+        });
+    });
+}
+
+document.querySelectorAll(".btn-verificar").forEach(btn => {
+    btn.addEventListener("click", function () {
+        const id = this.dataset.id;
+
+        fetch(`/control_sala_cremas/verificar-ajax/${id}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.error || "No se pudo verificar el registro.");
+                return;
+            }
+
+            const fila = document.getElementById(`registro-${id}`);
+
+            if (!fila) return;
+
+            const estado = fila.querySelector(".estado-columna");
+            const verificadoPor = fila.querySelector(".verificado-por-columna");
+            const fechaVerificacion = fila.querySelector(".fecha-verificacion-columna");
+            const accion = fila.querySelector(".accion-columna");
+            const check = fila.querySelector(".check-registro");
+
+            if (estado) {
+                estado.innerHTML = '<span class="badge-ok">Verificado</span>';
+            }
+
+            if (verificadoPor) {
+                verificadoPor.textContent = data.verificador;
+            }
+
+            if (fechaVerificacion) {
+                fechaVerificacion.textContent = data.fecha;
+            }
+
+            if (accion) {
+                accion.innerHTML = "-";
+            }
+
+            if (check) {
+                check.remove();
+            }
+        });
+    });
+});
+
+if (btnVerificarSeleccionados) {
+    btnVerificarSeleccionados.addEventListener("click", function () {
+        const seleccionados = Array.from(document.querySelectorAll(".check-registro:checked"))
+            .map(check => check.value);
+
+        if (seleccionados.length === 0) {
+            alert("Debes seleccionar al menos un registro pendiente.");
+            return;
+        }
+
+        if (!confirm(`¿Verificar ${seleccionados.length} registro(s)?`)) {
+            return;
+        }
+
+        fetch("{% url 'control_sala_cremas:verificar_multiple_ajax' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
+            },
+            body: JSON.stringify({
+                ids: seleccionados
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.error || "No se pudo verificar.");
+                return;
+            }
+
+            data.ids.forEach(id => {
+                const fila = document.getElementById(`registro-${id}`);
+
+                if (!fila) return;
+
+                const estado = fila.querySelector(".estado-columna");
+                const verificadoPor = fila.querySelector(".verificado-por-columna");
+                const fechaVerificacion = fila.querySelector(".fecha-verificacion-columna");
+                const accion = fila.querySelector(".accion-columna");
+                const check = fila.querySelector(".check-registro");
+
+                if (estado) {
+                    estado.innerHTML = '<span class="badge-ok">Verificado</span>';
+                }
+
+                if (verificadoPor) {
+                    verificadoPor.textContent = data.verificador;
+                }
+
+                if (fechaVerificacion) {
+                    fechaVerificacion.textContent = data.fecha;
+                }
+
+                if (accion) {
+                    accion.innerHTML = "-";
+                }
+
+                if (check) {
+                    check.remove();
+                }
+            });
+
+            if (checkTodos) {
+                checkTodos.checked = false;
+            }
+        });
+    });
+}
+</script>
 
 </body>
 </html>

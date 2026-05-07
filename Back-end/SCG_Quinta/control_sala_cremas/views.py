@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.utils.timezone import localtime
 from django.urls import reverse
 from django.core.paginator import Paginator
+from django.http import JsonResponse
+import json
 
 
 from openpyxl import Workbook
@@ -53,6 +55,7 @@ def historial_sala_cremas(request):
     producto = request.GET.get("producto")
     lote = request.GET.get("lote")
     batidora = request.GET.get("batidora")
+    estado = request.GET.get("estado")
 
     if fecha_desde:
         registros = registros.filter(fecha_hora__date__gte=fecha_desde)
@@ -74,6 +77,11 @@ def historial_sala_cremas(request):
 
     if batidora:
         registros = registros.filter(numero_batidora__icontains=batidora)
+    if estado == "verificado":
+        registros = registros.filter(verificado=True)
+
+    elif estado == "pendiente":
+        registros = registros.filter(verificado=False)
 
     paginator = Paginator(registros, 20)  # 20 registros por página
     page_number = request.GET.get("page")
@@ -231,3 +239,64 @@ def redireccionar_selecciones_2(request):
 def redireccionar_seleccion_verifica_2(request):
     url_seleccion_verifica = reverse('seleccion_verifica_2')
     return HttpResponseRedirect(url_seleccion_verifica)
+
+@login_required
+def verificar_registro_ajax(request, pk):
+
+    if request.method != "POST":
+        return JsonResponse({"success": False})
+
+    registro = get_object_or_404(RegistroSalaCremas, pk=pk)
+
+    if hasattr(request.user, "nombre_completo"):
+        verificador = request.user.nombre_completo
+    else:
+        verificador = request.user.username
+
+    registro.verificado = True
+    registro.verificado_por = verificador
+    registro.fecha_verificacion = timezone.now()
+
+    registro.save()
+
+    return JsonResponse({
+        "success": True,
+        "verificador": registro.verificado_por,
+        "fecha": localtime(registro.fecha_verificacion).strftime("%d-%m-%Y %H:%M")
+    })
+
+@login_required
+def verificar_multiple_ajax(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "Método no permitido"})
+
+    data = json.loads(request.body)
+    ids = data.get("ids", [])
+
+    if not ids:
+        return JsonResponse({"success": False, "error": "No se seleccionaron registros"})
+
+    if hasattr(request.user, "nombre_completo"):
+        verificador = request.user.nombre_completo
+    else:
+        verificador = request.user.get_full_name() or request.user.username
+
+    fecha = timezone.now()
+
+    registros = RegistroSalaCremas.objects.filter(
+        id__in=ids,
+        verificado=False
+    )
+
+    registros.update(
+        verificado=True,
+        verificado_por=verificador,
+        fecha_verificacion=fecha
+    )
+
+    return JsonResponse({
+        "success": True,
+        "ids": ids,
+        "verificador": verificador,
+        "fecha": localtime(fecha).strftime("%d-%m-%Y %H:%M")
+    })
