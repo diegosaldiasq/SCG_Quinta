@@ -330,6 +330,7 @@ tbody tr:hover {
     display: flex;
     justify-content: center;
     margin-top: 24px;
+    gap: 12px;
 }
 
 .btn-volver {
