@@ -9,5 +9,7 @@ urlpatterns = [
     path('graficos/', views.graficos_control_pesos, name='graficos_control_pesos'),
     path('api/graficos_control_pesos/', views.api_graficos_control_pesos, name='api_graficos_control_pesos'),
     path('api/productos_por_cliente/', views.api_productos_por_cliente, name='api_productos_por_cliente'),
-    path('redireccionar_intermedio_4/', views.redireccionar_intermedio_4, name='redireccionar_intermedio_4')
+    path('redireccionar_intermedio_4/', views.redireccionar_intermedio_4, name='redireccionar_intermedio_4'),
+    path("api/clientes_base/", views.api_clientes_control_pesos, name="api_clientes_control_pesos"),
+    path("api/productos_base/", views.api_productos_base_control_pesos, name="api_productos_base_control_pesos"),
 ]

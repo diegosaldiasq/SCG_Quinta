@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET
 from django.db.models.functions import Trim, Upper
 import json
 
-from .models import DatosFormularioControlDePesos
+from .models import DatosFormularioControlDePesos, ProductoControlPeso
 
 
 @login_required
@@ -227,3 +227,50 @@ def api_graficos_control_pesos(request):
 def redireccionar_intermedio_4(request):
     url_intermedio = reverse('intermedio_4')
     return HttpResponseRedirect(url_intermedio)
+
+@login_required
+@require_GET
+def api_clientes_control_pesos(request):
+    area = (request.GET.get("area") or "TORTAS").strip().upper()
+
+    clientes = (
+        ProductoControlPeso.objects
+        .filter(area=area, activo=True)
+        .order_by("cliente")
+        .values_list("cliente", flat=True)
+        .distinct()
+    )
+
+    return JsonResponse({
+        "ok": True,
+        "clientes": list(clientes)
+    })
+
+
+@login_required
+@require_GET
+def api_productos_base_control_pesos(request):
+    area = (request.GET.get("area") or "TORTAS").strip().upper()
+    cliente = (request.GET.get("cliente") or "").strip()
+
+    qs = ProductoControlPeso.objects.filter(area=area, activo=True)
+
+    if cliente:
+        qs = qs.filter(cliente__iexact=cliente)
+
+    productos = list(
+        qs.order_by("producto").values(
+            "id",
+            "cliente",
+            "codigo",
+            "producto",
+            "peso_receta",
+            "porcentaje_perdida",
+            "altura",
+        )
+    )
+
+    return JsonResponse({
+        "ok": True,
+        "productos": productos
+    })

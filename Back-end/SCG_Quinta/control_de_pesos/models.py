@@ -19,3 +19,26 @@ class DatosFormularioControlDePesos(models.Model):
 
     def __str__(self):
         return f"{self.nombre_tecnologo} {self.fecha_registro}"
+    
+class ProductoControlPeso(models.Model):
+    AREA_CHOICES = [
+        ("TORTAS", "Tortas"),
+        ("PRELISTOS", "Prelistos"),
+        ("INSUMOS_KUCHEN", "Insumos Kuchen"),
+    ]
+
+    area = models.CharField(max_length=30, choices=AREA_CHOICES, default="TORTAS")
+    cliente = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=30)
+    producto = models.CharField(max_length=200)
+    peso_receta = models.IntegerField()
+    porcentaje_perdida = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    altura = models.IntegerField(null=True, blank=True)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["area", "cliente", "producto"]
+        unique_together = ("area", "cliente", "codigo", "producto")
+
+    def __str__(self):
+        return f"{self.area} - {self.cliente} - {self.codigo} - {self.producto}"
