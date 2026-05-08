@@ -196,6 +196,7 @@ def api_graficos_control_pesos(request):
         'peso_receta',
         'peso_real',
         'altura',
+        'un_pp',
         'lote',
         'turno'
     )
@@ -205,6 +206,7 @@ def api_graficos_control_pesos(request):
         peso_receta = int(r['peso_receta']) if r['peso_receta'] is not None else None
         peso_real = int(r['peso_real']) if r['peso_real'] is not None else None
         altura = int(r['altura']) if r['altura'] is not None else None
+        un_pp = float(r['un_pp']) if r['un_pp'] is not None else None
 
         registros.append({
             'id': r['id'],
@@ -215,6 +217,7 @@ def api_graficos_control_pesos(request):
             'peso_receta': peso_receta,
             'peso_real': peso_real,
             'altura': altura,
+            'un_pp': un_pp,
             'desviacion': (peso_real or 0) - (peso_receta or 0),
             'lote': r['lote'],
             'turno': r['turno'],
@@ -267,6 +270,7 @@ def api_productos_base_control_pesos(request):
             "peso_receta",
             "porcentaje_perdida",
             "altura",
+            "un_pp",
         )
     )
 

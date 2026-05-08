@@ -34,6 +34,7 @@ class ProductoControlPeso(models.Model):
     peso_receta = models.IntegerField()
     porcentaje_perdida = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     altura = models.IntegerField(null=True, blank=True)
+    un_pp = models.DecimalField("Unidades por persona", max_digits=10, decimal_places=2, null=True, blank=True)
     activo = models.BooleanField(default=True)
 
     class Meta:

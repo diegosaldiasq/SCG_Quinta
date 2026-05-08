@@ -10,13 +10,14 @@ class ProductoControlPesoAdmin(admin.ModelAdmin):
         "codigo",
         "producto",
         "peso_receta",
+        "un_pp",
         "porcentaje_perdida",
         "altura",
         "activo",
     )
     list_filter = ("area", "cliente", "activo")
     search_fields = ("cliente", "codigo", "producto")
-    list_editable = ("peso_receta", "porcentaje_perdida", "altura", "activo")
+    list_editable = ("peso_receta", "un_pp", "porcentaje_perdida", "altura", "activo")
 
 
 @admin.register(DatosFormularioControlDePesos)
