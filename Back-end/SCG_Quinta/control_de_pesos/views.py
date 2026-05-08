@@ -203,8 +203,6 @@ def api_graficos_control_pesos(request):
     for r in qs:
         peso_receta = int(r['peso_receta']) if r['peso_receta'] is not None else None
         peso_real = int(r['peso_real']) if r['peso_real'] is not None else None
-        altura = int(r['altura']) if r['altura'] is not None else None
-        un_pp = float(r['un_pp']) if r['un_pp'] is not None else None
 
         registros.append({
             'id': r['id'],
