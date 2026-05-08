@@ -136,156 +136,91 @@
 
         <div class="login-container">
             <label for="cliente">Cliente</label>
-            <select id="cliente" class="input">
+            <select id="cliente" name="cliente" class="input input-select" required>
                 <option value="">-- Selecciona cliente --</option>
-                <option value="Jumbo">Jumbo</option>
-                <option value="SISA">Santa Isabel</option>
-                <option value="Walmart">Walmart</option>
-                <option value="Unimarc">Unimarc</option>
             </select>
 
             <label for="producto">Producto</label>
-            <select id="producto" class="input">
+            <select id="producto" name="producto" class="input input-select" required>
                 <option value="">-- Selecciona producto --</option>
             </select>
 
-            <label for="codigo">Código producto</label>
-            <input type="text" id="codigo" class="input" readonly placeholder="–">
+            <label for="codigo_producto">Código producto</label>
+            <input type="text" id="codigo_producto" name="codigo_producto" class="input" readonly placeholder="-">
 
-            <label for="peso">Peso receta (gr)</label>
-            <input type="text" id="peso" class="input" readonly placeholder="–">
+            <label for="peso_receta">Peso receta (gr)</label>
+            <input type="number" id="peso_receta" name="peso_receta" class="input" readonly placeholder="-">
 
             <script>
-                const productosPorCliente = {
-                    Jumbo: [
-                        { codigo: '393204', value: 'Prelisto torta Beatiz', text: 'Prelisto torta Beatriz', peso: '1380' },
-                        { codigo: '393202', value: 'Prelisto torta Bom Bom', text: 'Prelisto torta Bom Bom', peso: '960' },
-                        { codigo: '393148', value: 'Prelisto torta tres leches', text: 'Prelisto torta tres leches', peso: '1530' },
-                        { codigo: '393192', value: 'Prelisto torta cuatro leches', text: 'Prelisto torta cuatro leches', peso: '1570' },
-                        { codigo: '393128', value: 'Prelisto torta piña', text: 'Prelisto torta piña', peso: '1260' },
-                        { codigo: '381012', value: 'Prelisto torta lucuma', text: 'Prelisto torta lucuma', peso: '850' },
-                        { codigo: '393172', value: 'Prelisto torta panqueque naranja', text: 'Prelisto torta panqueque naranja', peso: '1140' },
-                        { codigo: '393144', value: 'Prelisto torta selva negra', text: 'Prelisto torta selva negra', peso: '1260' },
-                        { codigo: '393168', value: 'Prelisto torta truffa', text: 'Prelisto torta truffa', peso: '1270' },
-                        { codigo: '393152', value: 'Prelisto torta viena', text: 'Prelisto torta viena', peso: '1110' },
-                        { codigo: '393393', value: 'Prelisto torta San Jorge lucuma', text: 'Prelisto torta San Jorge lucuma', peso: '1600' },
-                        { codigo: '393394', value: 'Prelisto torta San Jorge guinda', text: 'Prelisto torta San Jorge guinda', peso: '1410' },
-                        { codigo: '393395', value: 'Prelisto torta San Jorge chocolate', text: 'Prelisto torta San Jorge chocolate', peso: '1290' },
-                        { codigo: '405219', value: 'Prelisto torta merengue lucuma', text: 'Prelisto torta merengue lucuma', peso: '750' },
-                        { codigo: '405218', value: 'Prelisto torta merengue frambuesa', text: 'Prelisto torta merengue frambuesa', peso: '1070' }, // Actualizado 05-11-25
-                        { codigo: '393442', value: 'Prelisto torta merengue nugat', text: 'Prelisto torta merengue nugat', peso: '890' },
-                        { codigo: '405457', value: 'Prelisto torta merengue manzana frambuesa', text: 'Prelisto torta merengue manzana frambuesa', peso: '970' }, // Actualizado 17-11-25
-                        { codigo: '405252', value: 'Prelisto torta chocolate manjar', text: 'Prelisto torta chocolate manjar', peso: '1120' },
-                        { codigo: '405253', value: 'Prelisto torta chocolate real', text: 'Prelisto torta chocolate real', peso: '760' },
-                        { codigo: '393416', value: 'Prelisto torta caluga', text: 'Prelisto torta caluga', peso: '1080' },
-                        { codigo: '405257', value: 'Prelisto torta selva negra vegana', text: 'Prelisto torta selva negra vegana', peso: '780' },
-                        //{ codigo: '405259', value: 'Prelisto torta piña vegana', text: 'Prelisto torta piña vegana', peso: '770' }, Descontinuado 30-10-25
-                        { codigo: '402260', value: 'Prelisto torta panqueque guinda chocolate', text: 'Prelisto torta panqueque guinda chocolate', peso: '1480' },
-                        { codigo: '405595', value: 'Prelisto torta tentacion de chocolate', text: 'Prelisto torta tentacion de chocolate', peso: '940' },
-                        { codigo: '405596', value: 'Prelisto torta lemon cake', text: 'Prelisto torta lemon cake', peso: '950' },
-                        { codigo: '405625', value: 'Prelisto torta ignacia', text: 'Prelisto torta ignacia', peso: '1210' },
-                        { codigo: '405626', value: 'Prelisto torta red velvet', text: 'Prelisto torta red velvet', peso: '1790' },
-                        { codigo: '405627', value: 'Prelisto torta carrot cake', text: 'Prelisto torta carrot cake', peso: '1170' }
-                        ],
-                    SISA: [
-                        { codigo: '393267', value: 'Prelisto torta amor', text: 'Prelisto torta amor', peso: '1000' },
-                        //{ codigo: '393164', value: 'Prelisto torta crema manjar mediana', text: 'Prelisto torta crema manjar mediana', peso: '660' }, Descontinuado 30-10-25 
-                        { codigo: '381005', value: 'Prelisto torta crema piña', text: 'Prelisto torta crema piña', peso: '890' },
-                        { codigo: '381006', value: 'Prelisto torta crema selva negra', text: 'Prelisto torta crema selva negra', peso: '980' },
-                        { codigo: '393165', value: 'Prelisto torta chocolate mediana', text: 'Prelisto torta chocolate mediana', peso: '630' },
-                        { codigo: '393369', value: 'Prelisto torta merengue frambuesa', text: 'Prelisto torta merengue frambuesa', peso: '550' },
-                        { codigo: '393368', value: 'Prelisto torta merengue lucuma', text: 'Prelisto torta merengue lucuma', peso: '650' },
-                        { codigo: '405602', value: 'Prelisto torta merengue cookies', text: 'Prelisto torta merengue cookies', peso: '636' },
-                        { codigo: '405601', value: 'Prelisto torta merengue lemon pie', text: 'Prelisto torta merengue lemon pie', peso: '610' },
-                        { codigo: '353217', value: 'Prelisto torta mocaccino mediana', text: 'Prelisto torta mocaccino mediana', peso: '590' },
-                        { codigo: '381034', value: 'Prelisto torta panqueque naranja', text: 'Prelisto torta panqueque naranja', peso: '1140' },
-                        { codigo: '381004', value: 'Prelisto torta tres leches', text: 'Prelisto torta tres leches', peso: '1090' },
-                        { codigo: '405689', value: 'Prelisto torta crema manjar', text: 'Prelisto torta crema manjar', peso: '860'},
-                        { codigo: '381041', value: 'Prelisto torta yogurt', text: 'Prelisto torta yogurt', peso: '1550' },
-                        { codigo: '381003', value: 'Prelisto torta viena', text: 'Prelisto torta viena', peso: '1120' },
-                        { codigo: '405756', value: 'Prelisto torta viena vainilla', text: 'Prelisto torta viena vainilla', peso: '1100' },
-                        //{ codigo: '393363', value: 'Prelisto torta guinda chocolate', text: 'Prelisto torta guinda chocolate', peso: '950' }, Descontinuado
-                        { codigo: '393351', value: 'Prelisto torta sabor lucuma', text: 'Prelisto torta sabor lucuma', peso: '910' },
-                        { codigo: '393352', value: 'Prelisto torta sacher', text: 'Prelisto torta sacher', peso: '850' },
-                        { codigo: '405255', value: 'Prelisto torta doña Isabel', text: 'Prelisto torta doña Isabel', peso: '988' },
-                        { codigo: '405299', value: 'Prelisto torta cookies & cream', text: 'Prelisto torta cookies & cream', peso: '540' },
-                        { codigo: '405459', value: 'Prelisto torta panqueque chocolate manjar', text: 'Prelisto torta panqueque chocolate manjar', peso: '1480' },
-                        //{ codigo: '405298', value: 'Prelisto torta caramel macchiato', text: 'Prelisto torta caramel macchiato', peso: '650' }, Descontinuado 30-10-25
-                        //{ codigo: '405296', value: 'Prelisto torta piña colada', text: 'Prelisto torta piña colada', peso: '610' } Descontinuado 30-10-25
-                    ],
-                    Walmart: [
-                        { codigo: '381021', value: 'Prelisto torta chocoguinda', text: 'Prelisto torta chocoguinda', peso: '880' },
-                        { codigo: '393346', value: 'Prelisto torta chocolate manjar', text: 'Prelisto torta chocolate manjar', peso: '1000' },
-                        { codigo: '393274', value: 'Prelisto torta chocolate 8pp', text: 'Prelisto torta chocolate 8pp', peso: '620' },
-                        { codigo: '381018', value: 'Prelisto torta crema moka 15pp', text: 'Prelisto torta crema moka 15pp', peso: '880' },
-                        { codigo: '393211', value: 'Prelisto torta crema piña 15pp', text: 'Prelisto torta crema piña 15pp', peso: '980' },
-                        //{ codigo: '393040', value: 'Prelisto torta holandesa 15pp', text: 'Prelisto torta holandesa 15pp', peso: '860' }, Descontinuada
-                        { codigo: '405724', value: 'Prelisto torta amor 15pp', text: 'Prelisto torta amor 15pp', peso: '988' },
-                        { codigo: '405639', value: 'Prelisto torta viena 15pp', text: 'Prelisto torta viena 15pp', peso: '910' },
-                        { codigo: '381017', value: 'Prelisto torta mousse manjar 15pp', text: 'Prelisto torta mousse manjar 15pp', peso: '780' },
-                        { codigo: '393312', value: 'Prelisto torta panqueque naranja', text: 'Prelisto torta panqueque naranja', peso: '1070' },
-                        { codigo: '393208', value: 'Prelisto torta san jorge lactea', text: 'Prelisto torta san jorge lactea', peso: '1160' }, // Actualizado 19-11-25
-                        { codigo: '393210', value: 'Prelisto torta selva negra 15pp', text: 'Prelisto torta selva negra 15pp', peso: '980' },
-                        { codigo: '381016', value: 'Prelisto torta tres leches 15pp', text: 'Prelisto torta tres leches 15pp', peso: '1025' }, // Actualizado 19-11-25
-                        { codigo: '405261', value: 'Prelisto torta hoja manjar chocolate artesanal', text: 'Prelisto torta hoja manjar chocolate artesanal', peso: '1080' },
-                        { codigo: '405314', value: 'Prelisto torta frutos del bosque', text: 'Prelisto torta frutos del bosque', peso: '600' },
-                        { codigo: '393444', value: 'Prelisto torta chocolate avellana', text: 'Prelisto torta chocolate avellana', peso: '682' },
-                        { codigo: '405486', value: 'Prelisto torta selva negra crema lactea', text: 'Prelisto torta selva negra crema lactea', peso: '1040' },
-                        { codigo: '405485', value: 'Prelisto torta piña crema lactea', text: 'Prelisto torta piña crema lactea', peso: '1100' },
-                        { codigo: '405566', value: 'Prelisto torta selva negra crema lactea mediana', text: 'Prelisto torta selva negra crema lactea mediana', peso: '660' },
-                        { codigo: '405565', value: 'Prelisto torta piña crema lactea mediana', text: 'Prelisto torta piña crema lactea mediana', peso: '640' },
-                        { codigo: '405619', value: 'Prelisto torta hoja manjar merengue mediana', text: 'Prelisto torta hoja manjar merengue mediana', peso: '555' }    
-                    ],
-                    Unimarc: [
-                        { codigo: '393279', value: 'Prelisto torta crema manjar mini', text: 'Prelisto torta crema manjar mini', peso: '540' },
-                        { codigo: '393280', value: 'Prelisto torta guinda mini', text: 'Prelisto torta guinda mini', peso: '540' },
-                        { codigo: '405242', value: 'Prelisto torta hoja manjar 15p', text: 'Prelisto torta hoja manjar 15p', peso: '750' },
-                        { codigo: '393390', value: 'Prelisto torta holandesa smu', text: 'Prelisto torta holandesa smu', peso: '860' },
-                        { codigo: '393408', value: 'Prelisto torta panqueque naranja', text: 'Prelisto torta panqueque naranja', peso: '1140' },
-                        { codigo: '405381', value: 'Prelisto torta yogurt frutilla', text: 'Prelisto torta yogurt frutilla', peso: '1400' },
-                        { codigo: '393439', value: 'Prelisto torta cuatro leches', text: 'Prelisto torta cuatro leches', peso: '1000' },
-                        { codigo: '405575', value: 'Prelisto torta merengue frambuesa', text: 'Prelisto torta merengue frambuesa', peso: '590' },
-                        { codigo: '405576', value: 'Prelisto torta merengue lucuma', text: 'Prelisto torta merengue lucuma', peso: '650' },
-                        { codigo: '405636', value: 'Prelisto torta holandesa mediana', text: 'Prelisto torta holandesa mediana', peso: '530' },
-                        { codigo: '405655', value: 'Prelisto panqueque naranja mediana', text: 'Prelisto panqueque naranja mediana', peso: '1090' },
-                        { codigo: '405616', value: 'Prelisto torta san jorge', text: 'Prelisto torta san jorge', peso: '1000' }
-                    ]
-                };
+            const AREA_CONTROL_PESOS = "PRELISTOS";
 
-                const selectCliente  = document.getElementById('cliente');
-                const selectProducto = document.getElementById('producto');
-                const inputPeso      = document.getElementById('peso');
-                const inputCodigo    = document.getElementById('codigo');
+            const selectCliente = document.getElementById("cliente");
+            const selectProducto = document.getElementById("producto");
+            const inputCodigo = document.getElementById("codigo_producto");
+            const inputPesoReceta = document.getElementById("peso_receta");
 
-                selectCliente.addEventListener('change', () => {
-                    const cliente = selectCliente.value;
-                    const lista   = productosPorCliente[cliente] || [];
+            let productosBase = [];
 
-                    selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
-                    selectProducto.disabled  = lista.length === 0;
-                    inputPeso.value = '';
-                    inputCodigo.value = '';
+            async function cargarClientesBase() {
+                const response = await fetch(`/control_de_pesos/api/clientes_base/?area=${AREA_CONTROL_PESOS}`);
+                const data = await response.json();
 
-                    lista.forEach(prod => {
-                        const opt = document.createElement('option');
-                        opt.value = prod.value;
-                        opt.textContent = prod.text;
-                        opt.setAttribute('data-peso', prod.peso);
-                        opt.setAttribute('data-codigo', prod.codigo);
-                        selectProducto.appendChild(opt);
+                selectCliente.innerHTML = `<option value="">-- Selecciona cliente --</option>`;
+
+                if (data.ok) {
+                    data.clientes.forEach(cliente => {
+                        const option = document.createElement("option");
+                        option.value = cliente;
+                        option.textContent = cliente;
+                        selectCliente.appendChild(option);
                     });
-                });
+                }
+            }
 
-                selectProducto.addEventListener('change', () => {
-                    const opt = selectProducto.selectedOptions[0];
-                    if (opt) {
-                        inputPeso.value   = opt.getAttribute('data-peso') || '';
-                        inputCodigo.value = opt.getAttribute('data-codigo') || '';
-                    } else {
-                        inputPeso.value   = '';
-                        inputCodigo.value = '';
-                    }
-                });
+            async function cargarProductosPorClienteBase(cliente) {
+                selectProducto.innerHTML = `<option value="">-- Selecciona producto --</option>`;
+                inputCodigo.value = "";
+                inputPesoReceta.value = "";
+                productosBase = [];
+
+                if (!cliente) return;
+
+                const url = `/control_de_pesos/api/productos_base/?area=${AREA_CONTROL_PESOS}&cliente=${encodeURIComponent(cliente)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.ok) {
+                    productosBase = data.productos;
+
+                    productosBase.forEach(item => {
+                        const option = document.createElement("option");
+                        option.value = item.id;
+                        option.textContent = item.producto;
+                        selectProducto.appendChild(option);
+                    });
+                }
+            }
+
+            selectCliente.addEventListener("change", function () {
+                cargarProductosPorClienteBase(this.value);
+            });
+
+            selectProducto.addEventListener("change", function () {
+                const productoSeleccionado = productosBase.find(
+                    p => String(p.id) === String(this.value)
+                );
+
+                if (!productoSeleccionado) {
+                    inputCodigo.value = "";
+                    inputPesoReceta.value = "";
+                    return;
+                }
+
+                inputCodigo.value = productoSeleccionado.codigo || "";
+                inputPesoReceta.value = productoSeleccionado.peso_receta || "";
+            });
+
+            document.addEventListener("DOMContentLoaded", cargarClientesBase);
             </script>
 
             <div class="muestras-box">

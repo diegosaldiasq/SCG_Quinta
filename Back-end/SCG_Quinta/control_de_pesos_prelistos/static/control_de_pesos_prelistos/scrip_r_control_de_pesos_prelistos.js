@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const turnoInput = document.getElementById("turno");
     const clienteInput = document.getElementById("cliente");
     const productoInput = document.getElementById("producto");
-    const codigoInput = document.getElementById("codigo");
-    const pesoRecetaInput = document.getElementById("peso");
+    const codigoInput = document.getElementById("codigo_producto");
+    const pesoRecetaInput = document.getElementById("peso_receta");
 
     const tbodyMuestras = document.getElementById("tbody-muestras");
     const btnAgregarFila = document.getElementById("btn-agregar-fila");
@@ -104,7 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
             try {
                 const cliente = clienteInput ? clienteInput.value : "";
                 const codigoProducto = codigoInput ? codigoInput.value : "";
-                const producto = productoInput ? productoInput.value : "";
+
+                const producto = productoInput && productoInput.selectedIndex >= 0
+                    ? productoInput.options[productoInput.selectedIndex].text
+                    : "";
+
                 const pesoReceta = pesoRecetaInput ? pesoRecetaInput.value : "";
                 const lote = loteInput ? loteInput.value : "";
                 const turno = turnoInput ? turnoInput.value : "";

@@ -26,214 +26,91 @@
 
       <!-- Cliente -->
       <label for="cliente">Cliente</label>
-      <select id="cliente" class="input">
-        <option value="">-- Selecciona cliente --</option>
-        <option value="Jumbo">Jumbo</option>
-        <option value="SISA">Santa Isabel</option>
-        <option value="Walmart">Walmart</option>
-        <option value="Sub">Sub</option>
-        <option value="Insumo">Insumo</option>
-        <option value="Pasteles">Pasteles</option>
-        <option value="Prelisto pasteles">Prelisto pasteles</option>
+      <select id="cliente" name="cliente" class="input input-select" required>
+          <option value="">-- Selecciona cliente --</option>
       </select>
 
-      <!-- Producto -->
       <label for="producto">Producto</label>
-      <select id="producto" class="input" disabled>
-        <option value="">-- Selecciona producto --</option>
+      <select id="producto" name="producto" class="input input-select" required>
+          <option value="">-- Selecciona producto --</option>
       </select>
 
-      <!-- Código -->
-      <label for="codigo">Código producto</label>
-      <input type="text" id="codigo" class="input" readonly placeholder="–" />
+      <label for="codigo_producto">Código producto</label>
+      <input type="text" id="codigo_producto" name="codigo_producto" class="input" readonly placeholder="-">
 
-      <!-- Peso receta -->
-      <label for="peso">Peso receta (gr)</label>
-      <input type="text" id="peso" class="input" readonly placeholder="–" />
+      <label for="peso_receta">Peso receta (gr)</label>
+      <input type="number" id="peso_receta" name="peso_receta" class="input" readonly placeholder="-">
 
       <script>
-        // ===== Datos =====
-        const productosPorCliente = {
-          Jumbo: [
-            { codigo: '405286', value: 'Kuchen frambuesa stroissel', text: 'Kuchen frambuesa stroissel', peso: '905' },
-            { codigo: '405286', value: 'Kuchen frambuesa stroissel (crudo)', text: 'Kuchen frambuesa stroissel (crudo)', peso: '943' },
-            { codigo: '405313', value: 'Stroissel manzana', text: 'Stroissel manzana', peso: '1090' },
-            { codigo: '405313', value: 'Stroissel manzana (crudo)', text: 'Stroissel manzana (crudo)', peso: '1131' },
-            { codigo: '405481', value: 'Kuchen manzana', text: 'Kuchen manzana', peso: '1030' },
-            { codigo: '405481', value: 'Kuchen manzana (crudo)', text: 'Kuchen manzana (crudo)', peso: '963' },
-            { codigo: '405289', value: 'Kuchen manzana trenzado', text: 'Kuchen manzana trenzado', peso: '1200' },
-            { codigo: '405289', value: 'Kuchen manzana trenzado (crudo)', text: 'Kuchen manzana trenzado (crudo)', peso: '1084' },
-            { codigo: '405287', value: 'Kuchen durazno trenzado', text: 'Kuchen durazno trenzado', peso: '1075' },
-            { codigo: '405287', value: 'Kuchen durazno trenzado (crudo)', text: 'Kuchen durazno trenzado (crudo)', peso: '1119' },
-          ],
-          SISA: [
-            { codigo: '405517', value: 'Streussel manzana mediano', text: 'Streussel manzana mediano', peso: '530' },
-            { codigo: '405517', value: 'Streussel manzana mediano (crudo)', text: 'Streussel manzana mediano (crudo)', peso: '560' },
-            { codigo: '405290', value: 'Kuchen durazno mediano', text: 'Kuchen durazno mediano', peso: '715' },
-            { codigo: '405290', value: 'Kuchen durazno mediano (crudo)', text: 'Kuchen durazno mediano (crudo)', peso: '753' },
-            { codigo: '393319', value: 'Kuchen manzana mediano', text: 'Kuchen manzana mediano', peso: '680' },
-            { codigo: '393319', value: 'Kuchen manzana mediano (crudo)', text: 'Kuchen manzana mediano (crudo)', peso: '753' },
-            { codigo: '393318', value: 'Kuchen frambuesa mediano', text: 'Kuchen frambuesa mediano', peso: '690' },
-            { codigo: '393318', value: 'Kuchen frambuesa mediano (crudo)', text: 'Kuchen frambuesa mediano (crudo)', peso: '753' },
-            { codigo: '430439', value: 'Tarta vainilla y dulce de leche', text: 'Tarta vainilla y dulce de leche', peso: '415' },
-            { codigo: '430439', value: 'Tarta vainilla y dulce de leche (crudo)', text: 'Tarta vainilla y dulce de leche (crudo)', peso: '440' },
-            { codigo: '405438', value: 'Tarta dulce de leche, lúcuma y nuez', text: 'Tarta dulce de leche, lúcuma y nuez', peso: '425' },
-            { codigo: '405438', value: 'Tarta dulce de leche, lúcuma y nuez (crudo)', text: 'Tarta dulce de leche, lúcuma y nuez (crudo)', peso: '455' },
-            //{ codigo: '405291', value: 'Kuchen frutos del bosque mediano', text: 'Kuchen frutos del bosque mediano', peso: '560' } Descontinuado
-          ],
-          Walmart: [
-            { codigo: '392466', value: 'Kuchen tradicional frambuesa', text: 'Kuchen tradicional frambuesa', peso: '1100' },
-            { codigo: '392468', value: 'Kuchen tradicional manzana', text: 'Kuchen tradicional manzana', peso: '1100' },
-            { codigo: '392467', value: 'Kuchen tradicional 4 sabores', text: 'Kuchen tradicional 4 sabores', peso: '1100' }
-          ],
-          Sub: [
-            { codigo: '393254', value: 'Sub bizcocho blanco 17', text: 'Sub bizcocho blanco 17', peso: '390' },
-            { codigo: '393041', value: 'Sub bizcocho blanco 19', text: 'Sub bizcocho blanco 19', peso: '500' },
-            { codigo: '393218', value: 'Sub bizcocho chocolate 17', text: 'Sub bizcocho chocolate 17', peso: '390' },
-            { codigo: '393045', value: 'Sub bizcocho chocolate 19', text: 'Sub bizcocho chocolate 19', peso: '500' },
-            { codigo: '393118', value: 'Sub plancha vainilla', text: 'Sub plancha vainilla', peso: '3550' },
-            { codigo: '393119', value: 'Sub plancha chocolate', text: 'Sub plancha chocolate', peso: '3550' },
-            { codigo: '393051', value: 'Sub tartaleta familiar', text: 'Sub tartaleta familiar', peso: '290' },
-            { codigo: '393348', value: 'Sub tartaleta mediana', text: 'Sub tartaleta mediana', peso: '220' },
-            { codigo: '393349', value: 'Sub tartaleta familiar receta tradicional', text: 'Sub tartaleta familiar receta tradicional', peso: '280' }
-          ],
-          Insumo: [
-            { codigo: '393215', value: 'Insumo interplanta bizcocho blanco 17', text: 'Insumo interplanta bizcocho blanco 17', peso: '290' },
-            { codigo: '353001', value: 'Insumo interplanta bizcocho blanco 19', text: 'Insumo interplanta bizcocho blanco 19', peso: '390' },
-            { codigo: '393216', value: 'Insumo interplanta bizcocho chocolate 17', text: 'Insumo interplanta bizcocho chocolate 17', peso: '290' },
-            { codigo: '353002', value: 'Insumo interplanta bizcocho chocolate 19', text: 'Insumo interplanta bizcocho chocolate 19', peso: '390' },
-            { codigo: '402259', value: 'Insumo interplanta brownie vegano 17', text: 'Insumo interplanta brownie vegano 17', peso: '520' },
-            { codigo: '353003', value: 'Insumo plancha vainilla', text: 'Insumo plancha vainilla', peso: '2800' },
-            { codigo: '353004', value: 'Insumo plancha chocolate', text: 'Insumo plancha chocolate', peso: '2800' },
-            { codigo: '353012', value: 'Insumo tartaleta familiar walmart', text: 'Insumo tartaleta familiar walmart', peso: '253' },
-            { codigo: '393349', value: 'Insumo tartaleta mediana', text: 'Insumo tartaleta mediana', peso: '180' },
-            { codigo: '393427', value: 'Insumo tartaleta familiar tradicional', text: 'Insumo tartaleta familiar tradicional', peso: '240' },
-            { codigo: '393040', value: 'Insumo disco de hoja 15p', text: 'Insumo disco de hoja 15p', peso: '130' },
-            { codigo: '393253', value: 'Insumo disco de hoja 10p', text: 'Insumo disco de hoja 10p', peso: '95' }, // Sub disco de hoja 10p
-            { codigo: '353009', value: 'Insumo disco de panqueque vainilla 19', text: 'Insumo disco de panqueques vainilla 19', peso: '60' },
-            { codigo: '353010', value: 'Insumo disco de panqueque chocolate 19', text: 'Insumo disco de panqueques chocolate 19', peso: '60' },
-            { codigo: '405656', value: 'Insumo disco de panqueque vainilla 17', text: 'Insumo disco de panqueques vainilla 17', peso: '55' },
-            { codigo: '403268', value: 'Insumo disco de panqueque chocolate 17', text: 'Insumo disco de panqueques chocolate 17', peso: '55' }
-          ],
-          Pasteles: [
-            { codigo: '392342', value: 'Pastel de hoja manjar sisa', text: 'Pastel de hoja manjar sisa', peso: '215' },
-            { codigo: '392488', value: 'Pastel de yogurt sisa', text: 'Pastel de yogurt sisa', peso: '230' },
-            { codigo: '393006', value: 'Pastel selva negra sisa', text: 'Pastel selva negra sisa', peso: '196' },
-            { codigo: '393007', value: 'Pastel de piña sisa', text: 'Pastel de piña sisa', peso: '173' },
-            { codigo: '393008', value: 'Pastel tres leches sisa', text: 'Pastel tres leches sisa', peso: '184' },
-            { codigo: '393009', value: 'Pastel viena sisa', text: 'Pastel viena sisa', peso: '210' },
-            { codigo: '393066', value: 'Pastel de piña walmart', text: 'Pastel de piña walmart', peso: '170' },
-            { codigo: '393067', value: 'Pastel selva negra walmart', text: 'Pastel selva negra walmart', peso: '170' },
-            { codigo: '393069', value: 'Pastel chocoguinda walmart', text: 'Pastel chocoguinda walmart', peso: '170' },
-            { codigo: '393087', value: 'Pastel tres leches walmart', text: 'Pastel tres leches walmart', peso: '160' },
-            { codigo: '393173', value: 'Pastel de piña jumbo', text: 'Pastel de piña jumbo', peso: '248' },
-            { codigo: '393177', value: 'Pastel truffa jumbo', text: 'Pastel truffa jumbo', peso: '292' },
-            { codigo: '393179', value: 'Pastel tres leches jumbo', text: 'Pastel tres leches jumbo', peso: '248' },
-            { codigo: '393183', value: 'Pastel hoja manjar pastelera jumbo', text: 'Pastel hoja manjar pastelera jumbo', peso: '276' },
-            { codigo: '393185', value: 'Pastel panqueque naranja jumbo', text: 'Pastel panqueque naranja jumbo', peso: '316' },
-            { codigo: '393189', value: 'Pastel selva negra jumbo', text: 'Pastel selva negra jumbo', peso: '230' },
-            { codigo: '405245', value: 'Pastel hoja manjar unimarc', text: 'Pastel hoja manjar unimarc', peso: '240' }
-          ],
-        'Prelisto pasteles': [
-            { codigo: '393345', value: 'Prelisto pastel hoja manjar sisa', text: 'Prelisto pastel hoja manjar sisa', peso: '6200' },
-            { codigo: '353006', value: 'Prelisto pastel yogurt sisa', text: 'Prelisto pastel yogurt sisa', peso: '5548' },
-            { codigo: '385004', value: 'Prelisto pastel selva negra sisa', text: 'Prelisto pastel selva negra sisa', peso: '5400' },
-            { codigo: '385002', value: 'Prelisto pastel piña sisa', text: 'Prelisto pastel piña sisa', peso: '5200' },
-            { codigo: '385003', value: 'Prelisto pastel tres leches sisa', text: 'Prelisto pastel tres leches sisa', peso: '4900' },
-            { codigo: '385005', value: 'Prelisto pastel viena sisa', text: 'Prelisto pastel viena sisa', peso: '6300' },
-            { codigo: '393070', value: 'Prelisto pastel piña walmart', text: 'Prelisto pastel piña walmart', peso: '4500' },
-            { codigo: '393071', value: 'Prelisto pastel selva negra walmart', text: 'Prelisto pastel selva negra walmart', peso: '4500' },
-            { codigo: '393073', value: 'Prelisto pastel chocoguinda walmart', text: 'Prelisto pastel chocoguinda walmart', peso: '4500' },
-            { codigo: '393166', value: 'Prelisto pastel tres leches walmart', text: 'Prelisto pastel tres leches walmart', peso: '4800' },
-            { codigo: '393174', value: 'Prelisto pastel piña jumbo', text: 'Prelisto pastel piña jumbo', peso: '5200' },
-            { codigo: '393178', value: 'Prelisto pastel truffa jumbo', text: 'Prelisto pastel truffa jumbo', peso: '5200' },
-            { codigo: '393180', value: 'Prelisto pastel tres leches jumbo', text: 'Prelisto pastel tres leches jumbo', peso: '6300' },
-            { codigo: '393184', value: 'Prelisto pastel hoja manjar pastelera jumbo', text: 'Prelisto pastel hoja manjar pastelera jumbo', peso: '7000' },
-            { codigo: '393186', value: 'Prelisto pastel panqueque naranja jumbo', text: 'Prelisto pastel panqueque naranja jumbo', peso: '8850' },
-            { codigo: '393190', value: 'Prelisto pastel selva negra jumbo', text: 'Prelisto pastel selva negra jumbo', peso: '5000' },
-            { codigo: '405244', value: 'Prelisto pastel hoja manjar unimarc', text: 'Prelisto pastel hoja manjar unimarc', peso: '6400' }
-        ]
-        };
+      const AREA_CONTROL_PESOS = "INSUMOS_KUCHEN";
 
-        // ===== Helpers =====
-        const byId = (id) => document.getElementById(id);
+      const selectCliente = document.getElementById("cliente");
+      const selectProducto = document.getElementById("producto");
+      const inputCodigo = document.getElementById("codigo_producto");
+      const inputPesoReceta = document.getElementById("peso_receta");
 
-        const selectCliente = byId('cliente');
-        const selectProducto = byId('producto');
-        const inputPeso = byId('peso');
-        const inputCodigo = byId('codigo');
-        //const inputAltura = byId('altura');
-        //const labelAltura = byId('label-altura');
+      let productosBase = [];
 
-        function resetProducto() {
-          selectProducto.innerHTML = '<option value="">-- Selecciona producto --</option>';
-          selectProducto.disabled = true;
-        }
+      async function cargarClientesBase() {
+          const response = await fetch(`/control_de_pesos/api/clientes_base/?area=${AREA_CONTROL_PESOS}`);
+          const data = await response.json();
 
-        function limpiarCamposProducto() {
-          inputPeso.value = '';
-          inputCodigo.value = '';
-        }
+          selectCliente.innerHTML = `<option value="">-- Selecciona cliente --</option>`;
 
-        function setAlturaVisible(show) {
-            // ocultar/mostrar header
-            const thAltura = document.querySelectorAll(".tabla-muestras th:nth-child(3)");
-
-            // ocultar/mostrar celdas
-            const tdAltura = document.querySelectorAll(".tabla-muestras td:nth-child(3)");
-
-            thAltura.forEach(el => {
-                el.style.display = show ? "" : "none";
-            });
-
-            tdAltura.forEach(el => {
-                el.style.display = show ? "" : "none";
-            });
-        }
-
-        function poblarProductos(cliente) {
-          const lista = productosPorCliente[cliente] || [];
-          resetProducto();
-          limpiarCamposProducto();
-
-          if (!lista.length) return;
-
-          lista.forEach(prod => {
-            const opt = document.createElement('option');
-            opt.value = prod.value;
-            opt.textContent = prod.text;
-            opt.dataset.peso = prod.peso;
-            opt.dataset.codigo = prod.codigo;
-            selectProducto.appendChild(opt);
-          });
-
-          selectProducto.disabled = false;
-        }
-
-        // ===== Eventos =====
-        selectCliente.addEventListener('change', () => {
-          const cliente = selectCliente.value;
-
-          // Mostrar altura solo para Pasteles
-          setAlturaVisible(cliente === 'Pasteles' || cliente === 'Insumo');
-
-          // Cargar productos
-          poblarProductos(cliente);
-        });
-
-        selectProducto.addEventListener('change', () => {
-          const opt = selectProducto.selectedOptions[0];
-          if (!opt || !opt.value) {
-            limpiarCamposProducto();
-            return;
+          if (data.ok) {
+              data.clientes.forEach(cliente => {
+                  const option = document.createElement("option");
+                  option.value = cliente;
+                  option.textContent = cliente;
+                  selectCliente.appendChild(option);
+              });
           }
-          inputPeso.value = opt.dataset.peso || '';
-          inputCodigo.value = opt.dataset.codigo || '';
-        });
+      }
 
-        // Estado inicial (por si vienes con valores precargados)
-        setAlturaVisible(selectCliente.value === 'Pasteles' || selectCliente.value === 'Insumo');
-        if (selectCliente.value) poblarProductos(selectCliente.value);
+      async function cargarProductosPorClienteBase(cliente) {
+          selectProducto.innerHTML = `<option value="">-- Selecciona producto --</option>`;
+          inputCodigo.value = "";
+          inputPesoReceta.value = "";
+          productosBase = [];
+
+          if (!cliente) return;
+
+          const url = `/control_de_pesos/api/productos_base/?area=${AREA_CONTROL_PESOS}&cliente=${encodeURIComponent(cliente)}`;
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.ok) {
+              productosBase = data.productos;
+
+              productosBase.forEach(item => {
+                  const option = document.createElement("option");
+                  option.value = item.id;
+                  option.textContent = item.producto;
+                  selectProducto.appendChild(option);
+              });
+          }
+      }
+
+      selectCliente.addEventListener("change", function () {
+          cargarProductosPorClienteBase(this.value);
+      });
+
+      selectProducto.addEventListener("change", function () {
+          const productoSeleccionado = productosBase.find(
+              p => String(p.id) === String(this.value)
+          );
+
+          if (!productoSeleccionado) {
+              inputCodigo.value = "";
+              inputPesoReceta.value = "";
+              return;
+          }
+
+          inputCodigo.value = productoSeleccionado.codigo || "";
+          inputPesoReceta.value = productoSeleccionado.peso_receta || "";
+      });
+
+      document.addEventListener("DOMContentLoaded", cargarClientesBase);
       </script>
 
       <div class="muestras-box">
