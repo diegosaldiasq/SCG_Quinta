@@ -195,8 +195,6 @@ def api_graficos_control_pesos(request):
         'codigo_producto',
         'peso_receta',
         'peso_real',
-        'altura',
-        'un_pp',
         'lote',
         'turno'
     )
@@ -216,8 +214,6 @@ def api_graficos_control_pesos(request):
             'codigo_producto': r['codigo_producto'],
             'peso_receta': peso_receta,
             'peso_real': peso_real,
-            'altura': altura,
-            'un_pp': un_pp,
             'desviacion': (peso_real or 0) - (peso_receta or 0),
             'lote': r['lote'],
             'turno': r['turno'],
