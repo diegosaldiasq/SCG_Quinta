@@ -1,13 +1,9 @@
 from django.contrib import admin
-
-from .models import (
-    DatosFormularioControlDePesosInsumosKuchen
-)
+from .models import DatosFormularioControlDePesosInsumosKuchen
 
 
 @admin.register(DatosFormularioControlDePesosInsumosKuchen)
 class DatosFormularioControlDePesosInsumosKuchenAdmin(admin.ModelAdmin):
-
     list_display = (
         "fecha_registro",
         "nombre_tecnologo",
@@ -17,7 +13,6 @@ class DatosFormularioControlDePesosInsumosKuchenAdmin(admin.ModelAdmin):
         "peso_receta",
         "peso_real",
         "altura",
-        "desviacion_porcentaje",
         "lote",
         "turno",
         "verificado",
@@ -38,13 +33,5 @@ class DatosFormularioControlDePesosInsumosKuchenAdmin(admin.ModelAdmin):
         "nombre_tecnologo",
     )
 
-    readonly_fields = (
-        "fecha_registro",
-        "desviacion_porcentaje",
-    )
-
-    ordering = (
-        "-fecha_registro",
-    )
-
+    ordering = ("-fecha_registro",)
     list_per_page = 50
