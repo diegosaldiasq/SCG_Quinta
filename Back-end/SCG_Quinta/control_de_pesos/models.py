@@ -27,14 +27,14 @@ class ProductoControlPeso(models.Model):
         ("INSUMOS_KUCHEN", "Insumos Kuchen"),
     ]
     CLIENTE_CHOICES = [
-        ("JUMBO", "Jumbo"),
+        ("Jumbo", "Jumbo"),
         ("SISA", "SISA"),
-        ("WALMART", "Walmart"),
-        ("UNIMARC", "Unimarc"),
-        ("INSUMO", "Insumo"),
-        ("SUB", "Sub"),
-        ("PASTELES", "Pasteles"),
-        ("PRELISTO PASTELES", "Prelisto Pasteles"),
+        ("Walmart", "Walmart"),
+        ("Unimarc", "Unimarc"),
+        ("Insumo", "Insumo"),
+        ("SUB", "SUB"),
+        ("Pasteles", "Pasteles"),
+        ("Prelisto Pasteles", "Prelisto Pasteles"),
     ]
 
     area = models.CharField(max_length=30, choices=AREA_CHOICES, default="TORTAS")
