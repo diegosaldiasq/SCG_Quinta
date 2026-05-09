@@ -32,7 +32,7 @@ class ProductoControlPeso(models.Model):
         ("Walmart", "Walmart"),
         ("Unimarc", "Unimarc"),
         ("Insumo", "Insumo"),
-        ("SUB", "SUB"),
+        ("Sub", "Sub"),
         ("Pasteles", "Pasteles"),
         ("Prelisto pasteles", "Prelisto pasteles"),
     ]
