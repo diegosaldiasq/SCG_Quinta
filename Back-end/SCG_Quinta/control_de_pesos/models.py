@@ -34,7 +34,7 @@ class ProductoControlPeso(models.Model):
         ("Insumo", "Insumo"),
         ("SUB", "SUB"),
         ("Pasteles", "Pasteles"),
-        ("Prelisto Pasteles", "Prelisto Pasteles"),
+        ("Prelisto pasteles", "Prelisto pasteles"),
     ]
 
     area = models.CharField(max_length=30, choices=AREA_CHOICES, default="TORTAS")
