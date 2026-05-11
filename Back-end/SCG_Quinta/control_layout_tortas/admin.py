@@ -20,8 +20,8 @@ class LayoutTortaAdmin(admin.ModelAdmin):
 
 @admin.register(ProductoTorta)
 class ProductoTortaAdmin(admin.ModelAdmin):
-    list_display = ("cliente", "nombre", "codigo")
-    search_fields = ("cliente", "nombre", "codigo")
+    list_display = ("cliente", "nombre", "codigo", "porcentaje_perdida")
+    search_fields = ("cliente", "nombre", "codigo", "porcentaje_perdida")
 
 
 class RegistroCapaInline(admin.TabularInline):
