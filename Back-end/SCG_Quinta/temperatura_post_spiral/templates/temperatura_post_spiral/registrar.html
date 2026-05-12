@@ -204,6 +204,9 @@
         if (!e.target.classList.contains("btn-negativo")) return;
 
         const wrapper = e.target.closest(".temperatura-wrap");
+
+        if (!wrapper) return;
+
         const input = wrapper.querySelector(".input-temperatura");
 
         let valor = input.value.trim();
@@ -211,7 +214,12 @@
         if (valor.startsWith("-")) {
             input.value = valor.substring(1);
         } else {
-            input.value = "-" + valor;
+
+            if (valor === "") {
+                input.value = "-";
+            } else {
+                input.value = "-" + valor;
+            }
         }
 
         input.focus();
