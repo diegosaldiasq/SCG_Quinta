@@ -91,6 +91,7 @@
             <th>Objetivo (g)</th>
             <th>Real (g)</th>
             <th>Desv (g)</th>
+            <th>Tolerancia (g)</th>
             <th>Comentario</th>
             <th>Cumple</th>
           </tr>
@@ -135,6 +136,12 @@
                 <span class="desv-ok">{{ d.desviacion_g }}</span>
               {% else %}
                 <span class="desv-no">{{ d.desviacion_g }}</span>
+              {% endif %}
+            </td>
+
+            <td data-label="Tolerancia (g)">
+              {% if d.capa.tolerancia_g is not None %}
+                (±{{ d.capa.tolerancia_g }})
               {% endif %}
             </td>
 
