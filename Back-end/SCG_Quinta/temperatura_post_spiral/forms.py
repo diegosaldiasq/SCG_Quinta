@@ -80,6 +80,17 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
             self.fields['cliente_selector'].initial = self.instance.cliente
 
 class DetalleTemperaturaPostSpiralForm(forms.ModelForm):
+
+    temperatura = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control input-temperatura',
+            'inputmode': 'decimal',
+            'autocomplete': 'off',
+            'placeholder': 'Ej: -12.0'
+        })
+    )
+
     class Meta:
         model = DetalleTemperaturaPostSpiral
         fields = [
@@ -88,29 +99,26 @@ class DetalleTemperaturaPostSpiralForm(forms.ModelForm):
         ]
 
         widgets = {
-            'temperatura': forms.CharField(attrs={
-                'class': 'form-control input-temperatura',
-                'inputmode': 'decimal',
-                'autocomplete': 'off',
-                'placeholder': 'Ej: -12.0'
-            }),
             'accion_correctiva': forms.Textarea(attrs={
                 'class': 'form-control input-accion',
                 'rows': 2,
                 'placeholder': 'Completar solo si aplica'
             }),
         }
+
     def clean_temperatura(self):
 
         valor = self.cleaned_data.get('temperatura')
 
         if valor in [None, '']:
-            return valor
+            return None
 
-        if isinstance(valor, str):
-            valor = valor.replace(',', '.')
+        valor = str(valor).strip().replace(',', '.')
 
-        return valor
+        try:
+            return float(valor)
+        except ValueError:
+            raise forms.ValidationError('Ingrese una temperatura válida.')
 
 
 DetalleTemperaturaPostSpiralFormSet = inlineformset_factory(
