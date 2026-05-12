@@ -3,6 +3,7 @@ from django import forms
 from control_sala_cremas.models import ProductoSalaCremas
 from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiral
 from django.forms import inlineformset_factory
+from decimal import Decimal, InvalidOperation
 
 
 class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
@@ -116,9 +117,11 @@ class DetalleTemperaturaPostSpiralForm(forms.ModelForm):
         valor = str(valor).strip().replace(',', '.')
 
         try:
-            return float(valor)
-        except ValueError:
-            raise forms.ValidationError('Ingrese una temperatura válida.')
+            return Decimal(valor)
+        except InvalidOperation:
+            raise forms.ValidationError(
+                'Ingrese una temperatura válida.'
+            )
 
 
 DetalleTemperaturaPostSpiralFormSet = inlineformset_factory(
