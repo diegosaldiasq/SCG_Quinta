@@ -112,7 +112,7 @@ def registrar_temperatura(request):
             ])
 
             messages.success(request, 'Registro guardado correctamente.')
-            return redirect('temperatura_post_spiral:historial')
+            return redirect('temperatura_post_spiral:registrar')
 
         messages.error(request, 'Revise los datos ingresados.')
 
