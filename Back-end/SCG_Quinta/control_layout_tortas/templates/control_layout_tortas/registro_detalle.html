@@ -92,8 +92,8 @@
             <th>Real (g)</th>
             <th>Desv (g)</th>
             <th>Tolerancia (g)</th>
-            <th>Comentario</th>
             <th>Cumple</th>
+            <th>Comentario</th>
           </tr>
         </thead>
 
@@ -145,10 +145,6 @@
               {% endif %}
             </td>
 
-            <td data-label="Comentario">
-              {{ d.comentario }}
-            </td>
-
             <td data-label="Cumple">
 
               {% if d.cumple is None %}
@@ -159,6 +155,10 @@
                 <span class="estado estado-no">NO</span>
               {% endif %}
 
+            </td>
+
+            <td data-label="Comentario">
+              {{ d.comentario }}
             </td>
 
           </tr>
