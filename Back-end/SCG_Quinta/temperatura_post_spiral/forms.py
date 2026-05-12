@@ -90,6 +90,9 @@ class DetalleTemperaturaPostSpiralForm(forms.ModelForm):
         widgets = {
             'temperatura': forms.NumberInput(attrs={
                 'class': 'form-control input-temperatura',
+                'type': 'text',
+                'inputmode': 'decimal',
+                'autocomplete': 'off',
                 'step': '0.01',
                 'placeholder': 'Ej: -12.0'
             }),

@@ -153,6 +153,25 @@
     window.URL_PRODUCTOS_POR_CLIENTE = "{% url 'temperatura_post_spiral:api_productos_por_cliente' %}";
 </script>
 <script src="{% static 'temperatura_post_spiral/temperatura_post_spiral.js' %}"></script>
+<script>
+    document.querySelector("form").addEventListener("submit", function(e) {
+
+        const inputs = document.querySelectorAll(".input-temperatura");
+
+        for (const input of inputs) {
+
+            const valor = input.value.trim();
+
+            if (valor && !/^-?\d+([.,]\d+)?$/.test(valor)) {
+
+                alert("Ingrese una temperatura válida.");
+                input.focus();
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+</script>
 
 </body>
 </html>
