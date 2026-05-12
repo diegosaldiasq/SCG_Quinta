@@ -132,8 +132,11 @@
                                     <td class="numero-linea">{{ forloop.counter }}</td>
 
                                     <td>
-                                        <button type="button" class="btn-negativo">−</button>
-                                        {{ detalle_form.temperatura }}
+                                        <div class="temperatura-wrap">
+                                            <button type="button" class="btn-negativo">−</button>
+
+                                            {{ detalle_form.temperatura }}
+                                        </div>
                                         {{ detalle_form.temperatura.errors }}
                                     </td>
 
