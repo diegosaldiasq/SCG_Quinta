@@ -13,6 +13,30 @@
     <link rel="stylesheet" href="{% static 'temperatura_post_spiral/estilos_temperatura_post_spiral.css' %}">
     <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}">
 </head>
+<style>
+    .temperatura-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    }
+
+    .btn-negativo{
+        width:42px;
+        min-width:42px;
+        height:42px;
+        border:none;
+        border-radius:12px;
+        background:#B43C2C;
+        color:white;
+        font-size:24px;
+        font-weight:bold;
+        cursor:pointer;
+    }
+
+    .btn-negativo:active{
+        transform:scale(0.95);
+    }
+</style>
 <body>
 
 <div class="page">
@@ -108,6 +132,7 @@
                                     <td class="numero-linea">{{ forloop.counter }}</td>
 
                                     <td>
+                                        <button type="button" class="btn-negativo">−</button>
                                         {{ detalle_form.temperatura }}
                                         {{ detalle_form.temperatura.errors }}
                                     </td>
@@ -170,6 +195,23 @@
                 return;
             }
         }
+    });
+    document.addEventListener("click", function(e) {
+
+        if (!e.target.classList.contains("btn-negativo")) return;
+
+        const wrapper = e.target.closest(".temperatura-wrap");
+        const input = wrapper.querySelector(".input-temperatura");
+
+        let valor = input.value.trim();
+
+        if (valor.startsWith("-")) {
+            input.value = valor.substring(1);
+        } else {
+            input.value = "-" + valor;
+        }
+
+        input.focus();
     });
 </script>
 
