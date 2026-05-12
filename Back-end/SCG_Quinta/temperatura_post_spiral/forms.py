@@ -88,7 +88,7 @@ class DetalleTemperaturaPostSpiralForm(forms.ModelForm):
         ]
 
         widgets = {
-            'temperatura': forms.TextInput(attrs={
+            'temperatura': forms.CharField(attrs={
                 'class': 'form-control input-temperatura',
                 'inputmode': 'decimal',
                 'autocomplete': 'off',
@@ -100,6 +100,17 @@ class DetalleTemperaturaPostSpiralForm(forms.ModelForm):
                 'placeholder': 'Completar solo si aplica'
             }),
         }
+    def clean_temperatura(self):
+
+        valor = self.cleaned_data.get('temperatura')
+
+        if valor in [None, '']:
+            return valor
+
+        if isinstance(valor, str):
+            valor = valor.replace(',', '.')
+
+        return valor
 
 
 DetalleTemperaturaPostSpiralFormSet = inlineformset_factory(
