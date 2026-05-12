@@ -14,27 +14,55 @@
     <link rel="icon" href="{% static 'inicio/images/logoquinta2.png' %}">
 </head>
 <style>
-    .temperatura-wrap{
-    display:flex;
-    align-items:center;
-    gap:8px;
+    .temperatura-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
     }
 
-    .btn-negativo{
-        width:42px;
-        min-width:42px;
-        height:42px;
-        border:none;
-        border-radius:12px;
-        background:#B43C2C;
-        color:white;
-        font-size:24px;
-        font-weight:bold;
-        cursor:pointer;
+    .temperatura-wrap .input-temperatura {
+        flex: 1;
+        min-width: 110px;
     }
 
-    .btn-negativo:active{
-        transform:scale(0.95);
+    .btn-negativo {
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: 12px;
+        background: var(--rojo-quinta);
+        color: white;
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    @media (max-width: 600px) {
+        .tabla-detalles {
+            min-width: 760px;
+        }
+
+        .tabla-detalles th:nth-child(2),
+        .tabla-detalles td:nth-child(2) {
+            min-width: 240px;
+        }
+
+        .temperatura-wrap {
+            gap: 6px;
+        }
+
+        .btn-negativo {
+            width: 42px;
+            min-width: 42px;
+            height: 42px;
+        }
+
+        .temperatura-wrap .input-temperatura {
+            min-width: 150px;
+            font-size: 16px;
+        }
     }
 </style>
 <body>
