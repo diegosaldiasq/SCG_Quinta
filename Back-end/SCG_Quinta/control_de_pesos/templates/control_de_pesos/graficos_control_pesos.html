@@ -297,38 +297,33 @@
       chartLinea = new Chart(ctx,{
         type:'line',
         data:{
-          datasets: [
+          datasets:[
             {
-                label: "Peso real",
-                data: registros.map(r => ({
-                    x: r.ts,
-                    y: r.peso_real
-                })),
-                borderWidth: 2,
-                tension: 0.25
+                label:'Peso real (gr)',
+                data: real,
+                borderWidth:2,
+                pointRadius:2,
+                tension:.25
             },
 
-            {
-                label: "Peso mínimo / receta",
-                data: registros.map(r => ({
-                    x: r.ts,
-                    y: r.peso_minimo
-                })),
-                borderWidth: 2,
-                borderDash: [6, 6],
-                pointRadius: 0
-            },
+            ...(rec.length ? [{
+                label:'Peso mínimo / receta',
+                data: rec,
+                borderWidth:2,
+                pointRadius:0,
+                stepped:true,
+                borderDash:[6,6]
+            }] : []),
 
-            {
-                label: "Peso máximo con pérdida",
-                data: registros.map(r => ({
-                    x: r.ts,
-                    y: r.peso_maximo
-                })),
-                borderWidth: 2,
-                borderDash: [6, 6],
-                pointRadius: 0
-            }
+            ...(maxL.length ? [{
+                label:'Peso máximo con pérdida',
+                data: maxL,
+                borderWidth:2,
+                pointRadius:0,
+                stepped:true,
+                borderDash:[10,5]
+            }] : [])
+
         ]
         },
         options:{
@@ -365,6 +360,86 @@
           plugins:{ tooltip:{ mode:'index', intersect:false } }
         }
       });
+    }
+
+    /* =========================
+      GRAFICO ALTURAS
+    ========================= */
+
+    const registrosConAltura = regs.filter(r =>
+        r.altura !== null &&
+        r.altura_objetivo !== null
+    );
+
+    const cardAlturas = document.getElementById('cardAlturas');
+
+    if (registrosConAltura.length > 0) {
+
+        cardAlturas.style.display = 'block';
+
+        const alturaReal = registrosConAltura.map(r => ({
+            x: parseFechaLocal(r.ts),
+            y: Number(r.altura)
+        }));
+
+        const alturaObjetivo = registrosConAltura.map(r => ({
+            x: parseFechaLocal(r.ts),
+            y: Number(r.altura_objetivo)
+        }));
+
+        const ctxAlturas = document.getElementById('chartAlturas').getContext('2d');
+
+        new Chart(ctxAlturas, {
+            type:'line',
+
+            data:{
+                datasets:[
+
+                    {
+                        label:'Altura real (mm)',
+                        data: alturaReal,
+                        borderWidth:2,
+                        pointRadius:2,
+                        tension:.25
+                    },
+
+                    {
+                        label:'Altura objetivo (mm)',
+                        data: alturaObjetivo,
+                        borderWidth:2,
+                        pointRadius:0,
+                        stepped:true,
+                        borderDash:[6,6]
+                    }
+
+                ]
+            },
+
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+
+                parsing:false,
+
+                scales:{
+                    x:{
+                        type:'time'
+                    },
+
+                    y:{
+                        title:{
+                            display:true,
+                            text:'Altura (mm)'
+                        }
+                    }
+                }
+            }
+        });
+
+    } else {
+
+        cardAlturas.style.display = 'none';
+
     }
 
     function construirHistograma(regs){
@@ -405,58 +480,6 @@
           }
         }
       });
-    }
-
-    const registrosConAltura = registros.filter(r => r.altura !== null && r.altura_objetivo !== null);
-
-    if (registrosConAltura.length > 0) {
-        document.getElementById("chartAlturas").style.display = "block";
-
-        if (graficoAlturas) {
-            graficoAlturas.destroy();
-        }
-
-        graficoAlturas = new Chart(document.getElementById("graficoAlturas"), {
-            type: "line",
-            data: {
-                datasets: [
-                    {
-                        label: "Altura real",
-                        data: registrosConAltura.map(r => ({ x: r.ts, y: r.altura })),
-                        borderWidth: 2,
-                        tension: 0.25
-                    },
-                    {
-                        label: "Altura objetivo",
-                        data: registrosConAltura.map(r => ({ x: r.ts, y: r.altura_objetivo })),
-                        borderWidth: 2,
-                        borderDash: [6, 6],
-                        pointRadius: 0
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                parsing: false,
-                scales: {
-                    x: {
-                        type: "time",
-                        time: {
-                            tooltipFormat: "dd-MM-yyyy HH:mm"
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: "Altura mm"
-                        }
-                    }
-                }
-            }
-        });
-    } else {
-        document.getElementById("chartAlturas").style.display = "none";
     }
 
     // ---------- Datos ----------

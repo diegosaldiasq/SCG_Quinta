@@ -195,6 +195,7 @@ def api_graficos_control_pesos(request):
         'codigo_producto',
         'peso_receta',
         'peso_real',
+        'altura',
         'lote',
         'turno'
     )
@@ -243,6 +244,10 @@ def api_graficos_control_pesos(request):
             "lote": r["lote"],
             "turno": r["turno"],
         })
+    return JsonResponse({
+        "ok": True,
+        "registros": registros
+    })
 
 
 @login_required
