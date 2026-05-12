@@ -201,23 +201,48 @@ def api_graficos_control_pesos(request):
 
     registros = []
     for r in qs:
-        peso_receta = int(r['peso_receta']) if r['peso_receta'] is not None else None
-        peso_real = int(r['peso_real']) if r['peso_real'] is not None else None
+        producto_base = ProductoControlPeso.objects.filter(
+            area="TORTAS",
+            cliente__iexact=r["cliente"],
+            codigo=r["codigo_producto"],
+            producto__iexact=r["producto"],
+            activo=True
+        ).first()
+
+        peso_receta = int(producto_base.peso_receta) if producto_base else (
+            int(r["peso_receta"]) if r["peso_receta"] is not None else None
+        )
+
+        perdida_operacional = float(producto_base.porcentaje_perdida) if producto_base else 0
+
+        peso_maximo = None
+        if peso_receta is not None and perdida_operacional < 100:
+            peso_maximo = round(peso_receta / (1 - (perdida_operacional / 100)), 2)
+
+        altura_objetivo = int(producto_base.altura) if producto_base and producto_base.altura else None
+        peso_real = int(r["peso_real"]) if r["peso_real"] is not None else None
+        altura_real = int(r["altura"]) if r["altura"] is not None else None
 
         registros.append({
-            'id': r['id'],
-            'ts': r['fecha_registro'].isoformat(),
-            'cliente': r['cliente'],
-            'producto': r['producto'],
-            'codigo_producto': r['codigo_producto'],
-            'peso_receta': peso_receta,
-            'peso_real': peso_real,
-            'desviacion': (peso_real or 0) - (peso_receta or 0),
-            'lote': r['lote'],
-            'turno': r['turno'],
-        })
+            "id": r["id"],
+            "ts": r["fecha_registro"].isoformat(),
+            "cliente": r["cliente"],
+            "producto": r["producto"],
+            "codigo_producto": r["codigo_producto"],
 
-    return JsonResponse({'ok': True, 'registros': registros})
+            "peso_receta": peso_receta,
+            "peso_minimo": peso_receta,
+            "peso_maximo": peso_maximo,
+            "perdida_operacional": perdida_operacional,
+
+            "peso_real": peso_real,
+            "altura": altura_real,
+            "altura_objetivo": altura_objetivo,
+
+            "desviacion": (peso_real or 0) - (peso_receta or 0),
+            "lote": r["lote"],
+            "turno": r["turno"],
+        })
 
 
 @login_required
