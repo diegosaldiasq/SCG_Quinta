@@ -381,7 +381,7 @@
               tension: 0.25
             },
             ...(maxL.length ? [{
-              label: 'Peso máximo con pérdida',
+              label: 'Peso máximo / receta',
               data: maxL.map(p => ({ ...p, y: Math.round(p.y) })), // redondear a 0 decimales
               borderWidth: 2,
               pointRadius: 0,
@@ -389,7 +389,7 @@
               borderDash: [10, 5]
             }] : []),
             ...(minL.length ? [{
-              label: 'Peso mínimo / receta',
+              label: 'Peso mínimo / neto',
               data: minL,
               borderWidth: 2,
               pointRadius: 0,
