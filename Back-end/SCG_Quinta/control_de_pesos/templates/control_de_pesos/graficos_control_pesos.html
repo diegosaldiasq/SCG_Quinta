@@ -348,8 +348,8 @@
         .find(p => Number.isFinite(p.perdida_operacional))?.perdida_operacional ?? null;
 
       F.pesoRef.textContent = pesoRecetaDisplay != null
-        ? `Peso receta: ${pesoRecetaDisplay} gr`
-        : 'Peso receta: –';
+        ? `Peso neto: ${pesoRecetaDisplay} gr`
+        : 'Peso neto: –';
 
       F.notaTol.textContent = perdidaDisplay != null
         ? `Máximo: peso receta | Mínimo: peso neto - receta con pérdida operacional (${perdidaDisplay}%)`
