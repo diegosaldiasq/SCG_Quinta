@@ -154,22 +154,8 @@
 
     function parseFechaLocal(ts) {
       if (!ts) return null;
-
-      const m = ts.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(\.\d{3})\d{3}([+-]\d{2}:\d{2}|Z)?$/);
-      if (m) ts = `${m[1]}${m[2]}${m[3] || ''}`;
-
       const d = new Date(ts);
-
-      if (isNaN(d)) {
-        const m2 = ts.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/);
-        if (m2) {
-          const [_, Y, M, D, h, mm, s, ms] = m2;
-          return new Date(+Y, +M - 1, +D, +h, +mm, +s, +(ms || 0));
-        }
-        return null;
-      }
-
-      return d;
+      return isNaN(d) ? null : d;
     }
 
     function loadFilters() {
@@ -278,13 +264,16 @@
     }
 
     function sanitizarSerie(data) {
-      return data.map(d => ({
-        t: parseFechaLocal(d.ts),
-        y: Number(d.peso_real),
-        peso_minimo: d.peso_minimo != null ? Number(d.peso_minimo) : null,
-        peso_maximo: d.peso_maximo != null ? Number(d.peso_maximo) : null,
-        perdida_operacional: d.perdida_operacional != null ? Number(d.perdida_operacional) : null,
-      })).filter(p => p.t && Number.isFinite(p.y));
+      return data
+        .map(d => ({
+          t: parseFechaLocal(d.ts),
+          y: Number(d.peso_real),
+          peso_minimo: d.peso_minimo != null ? Number(d.peso_minimo) : null,
+          peso_maximo: d.peso_maximo != null ? Number(d.peso_maximo) : null,
+          perdida_operacional: d.perdida_operacional != null ? Number(d.perdida_operacional) : null,
+        }))
+        .filter(p => p.t && Number.isFinite(p.y))
+        .sort((a, b) => a.t - b.t);
     }
 
     function construirSerieTemporal(regs) {
@@ -313,21 +302,21 @@
       }
 
       const real = pts.map(p => ({
-        x: p.t,
+        x: p.t.getTime(),
         y: p.y
       }));
 
       const minL = pts
         .filter(p => Number.isFinite(p.peso_minimo))
         .map(p => ({
-          x: p.t,
+          x: p.t.getTime(),
           y: p.peso_minimo
         }));
 
       const maxL = pts
         .filter(p => Number.isFinite(p.peso_maximo))
         .map(p => ({
-          x: p.t,
+          x: p.t.getTime(),
           y: p.peso_maximo
         }));
 
@@ -360,8 +349,6 @@
       const yMin = Math.min(...ys);
       const yMax = Math.max(...ys);
       const pad = (yMax - yMin) * 0.05 || 5;
-      const yMinFinal = Math.floor(yMin - pad);
-      const yMaxFinal = Math.ceil(yMax + pad);
 
       chartLinea = new Chart(ctx, {
         type: 'line',
@@ -374,7 +361,6 @@
               pointRadius: 2,
               tension: 0.25
             },
-
             ...(minL.length ? [{
               label: 'Peso mínimo / receta',
               data: minL,
@@ -383,7 +369,6 @@
               stepped: true,
               borderDash: [6, 6]
             }] : []),
-
             ...(maxL.length ? [{
               label: 'Peso máximo con pérdida',
               data: maxL,
@@ -401,6 +386,7 @@
           animation: false,
           resizeDelay: 150,
           parsing: false,
+          normalized: true,
           interaction: {
             mode: 'nearest',
             intersect: false,
@@ -409,19 +395,20 @@
           scales: {
             x: {
               type: 'time',
+              min: minDate.getTime(),
+              max: maxDate.getTime(),
               time: {
                 unit,
-                round: unit,
                 displayFormats: {
                   minute: 'HH:mm',
                   hour: 'HH:mm',
-                  day: 'MMM d',
-                  month: 'MMM yyyy',
+                  day: 'dd-MM-yyyy',
+                  month: 'MM-yyyy',
                 }
               },
               ticks: {
                 autoSkip: true,
-                maxTicksLimit: 10
+                maxTicksLimit: 12
               }
             },
             y: {
@@ -430,8 +417,8 @@
                 text: 'gr'
               },
               beginAtZero: false,
-              min: yMinFinal,
-              max: yMaxFinal,
+              min: Math.floor(yMin - pad),
+              max: Math.ceil(yMax + pad),
               grace: 0
             }
           },
@@ -451,15 +438,17 @@
 
       if (!cardAlturas || !canvasAlturas) return;
 
-      const registrosConAltura = regs.filter(r =>
-        r.altura !== null &&
-        r.altura !== undefined &&
-        r.altura_objetivo !== null &&
-        r.altura_objetivo !== undefined &&
-        Number.isFinite(Number(r.altura)) &&
-        Number.isFinite(Number(r.altura_objetivo)) &&
-        parseFechaLocal(r.ts)
-      );
+      const registrosConAltura = regs
+        .filter(r =>
+          r.altura !== null &&
+          r.altura !== undefined &&
+          r.altura_objetivo !== null &&
+          r.altura_objetivo !== undefined &&
+          Number.isFinite(Number(r.altura)) &&
+          Number.isFinite(Number(r.altura_objetivo)) &&
+          parseFechaLocal(r.ts)
+        )
+        .sort((a, b) => parseFechaLocal(a.ts) - parseFechaLocal(b.ts));
 
       if (!registrosConAltura.length) {
         cardAlturas.style.display = 'none';
@@ -469,16 +458,16 @@
       cardAlturas.style.display = 'block';
 
       const alturaReal = registrosConAltura.map(r => ({
-        x: parseFechaLocal(r.ts),
+        x: parseFechaLocal(r.ts).getTime(),
         y: Number(r.altura)
       }));
 
       const alturaObjetivo = registrosConAltura.map(r => ({
-        x: parseFechaLocal(r.ts),
+        x: parseFechaLocal(r.ts).getTime(),
         y: Number(r.altura_objetivo)
       }));
 
-      const fechas = alturaReal.map(p => p.x).filter(Boolean);
+      const fechas = alturaReal.map(p => new Date(p.x));
       const minDate = fechas[0];
       const maxDate = fechas[fechas.length - 1];
       const unit = unidadTiempoDesdeSpan(minDate, maxDate);
@@ -520,6 +509,7 @@
           animation: false,
           resizeDelay: 150,
           parsing: false,
+          normalized: true,
           interaction: {
             mode: 'nearest',
             intersect: false,
@@ -528,19 +518,20 @@
           scales: {
             x: {
               type: 'time',
+              min: minDate.getTime(),
+              max: maxDate.getTime(),
               time: {
                 unit,
-                round: unit,
                 displayFormats: {
                   minute: 'HH:mm',
                   hour: 'HH:mm',
-                  day: 'MMM d',
-                  month: 'MMM yyyy',
+                  day: 'dd-MM-yyyy',
+                  month: 'MM-yyyy',
                 }
               },
               ticks: {
                 autoSkip: true,
-                maxTicksLimit: 10
+                maxTicksLimit: 12
               }
             },
             y: {
