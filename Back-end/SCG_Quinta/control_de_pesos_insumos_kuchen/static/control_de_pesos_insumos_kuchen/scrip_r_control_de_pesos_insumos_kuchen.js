@@ -33,18 +33,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const selectCliente = document.getElementById("cliente");
 
+    function clienteRequiereAltura() {
+        const textoCliente = selectCliente && selectCliente.selectedIndex >= 0
+            ? selectCliente.options[selectCliente.selectedIndex].text.trim().toLowerCase()
+            : "";
+
+        return textoCliente === "insumo" || textoCliente === "pasteles";
+    }
+
     function setAlturaVisible(mostrar) {
+        const tituloMuestras = document.querySelector(".contenedor-muestras h3, .muestras-card h3, h3");
 
-        // columna altura
-        const thAltura = document.querySelector("th:nth-child(3)");
-
-        if (thAltura) {
-            thAltura.style.display = mostrar ? "" : "none";
+        if (tituloMuestras && tituloMuestras.textContent.includes("altura")) {
+            tituloMuestras.textContent = mostrar
+                ? "Muestras de peso y altura"
+                : "Muestras de peso";
         }
 
-        // inputs altura
-        document.querySelectorAll(".input-altura").forEach(input => {
+        document.querySelectorAll("th").forEach(th => {
+            if (th.textContent.trim().toLowerCase().includes("altura")) {
+                th.style.display = mostrar ? "" : "none";
+            }
+        });
 
+        document.querySelectorAll(".input-altura").forEach(input => {
             const td = input.closest("td");
 
             if (td) {
@@ -57,6 +69,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 input.value = "";
             }
         });
+    }
+
+    function actualizarAlturaPorCliente() {
+        setAlturaVisible(clienteRequiereAltura());
+    }
+
+    if (selectCliente) {
+        actualizarAlturaPorCliente();
+        selectCliente.addEventListener("change", actualizarAlturaPorCliente);
     }
 
     function crearFilaMuestra(numero) {
@@ -116,11 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
             tbodyMuestras.appendChild(nuevaFila);
             renumerarFilas();
              // 🔥 mantener lógica altura
-            const cliente = document.getElementById("cliente").value;
-            setAlturaVisible(
-                cliente.toLowerCase() === 'pasteles' ||
-                cliente.toLowerCase() === 'insumo'
-            );
+            actualizarAlturaPorCliente();
         });
 
         tbodyMuestras.addEventListener("click", function (e) {
