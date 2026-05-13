@@ -725,7 +725,7 @@
         r.codigo_producto ?? '',
         Number.isFinite(+r.peso_receta) ? +r.peso_receta : '',
         Number.isFinite(+r.perdida_operacional) ? +r.perdida_operacional : '',
-        Number.isFinite(+r.peso_maximo) ? Math.round(+r.peso_maximo) : '', #redondear a 0 decimales
+        Number.isFinite(+r.peso_maximo) ? Math.round(+r.peso_maximo) : '', // redondear a 0 decimales
         Number.isFinite(+r.peso_real) ? +r.peso_real : '',
         Number.isFinite(+r.desviacion) ? +r.desviacion : '',
         Number.isFinite(+r.altura_objetivo) ? +r.altura_objetivo : '',
