@@ -352,8 +352,8 @@
         : 'Peso receta: –';
 
       F.notaTol.textContent = perdidaDisplay != null
-        ? `Mínimo: peso receta | Máximo: receta con pérdida operacional (${perdidaDisplay}%)`
-        : 'Mínimo: peso receta | Máximo: receta con pérdida operacional';
+        ? `Máximo: peso receta | Mínimo: peso neto - receta con pérdida operacional (${perdidaDisplay}%)`
+        : 'Máximo: peso receta | Mínimo: peso neto - receta con pérdida operacional';
 
       const minDate = pts[0].t;
       const maxDate = pts[pts.length - 1].t;
