@@ -386,7 +386,6 @@
           animation: false,
           resizeDelay: 150,
           parsing: false,
-          normalized: true,
           interaction: {
             mode: 'nearest',
             intersect: false,
@@ -394,7 +393,10 @@
           },
           scales: {
             x: {
-              type: 'timeseries',
+              type: 'time',
+              bounds: 'data',
+              min: minDate,
+              max: maxDate,
               time: {
                 unit,
                 displayFormats: {
@@ -406,7 +408,7 @@
               },
               ticks: {
                 autoSkip: true,
-                maxTicksLimit: 8
+                maxTicksLimit: 10
               }
             },
             y: {
@@ -507,7 +509,6 @@
           animation: false,
           resizeDelay: 150,
           parsing: false,
-          normalized: true,
           interaction: {
             mode: 'nearest',
             intersect: false,
@@ -515,7 +516,10 @@
           },
           scales: {
             x: {
-              type: 'timeseries',
+              type: 'time',
+              bounds: 'data',
+              min: minDate,
+              max: maxDate,
               time: {
                 unit,
                 displayFormats: {
@@ -527,7 +531,7 @@
               },
               ticks: {
                 autoSkip: true,
-                maxTicksLimit: 8
+                maxTicksLimit: 10
               }
             },
             y: {
