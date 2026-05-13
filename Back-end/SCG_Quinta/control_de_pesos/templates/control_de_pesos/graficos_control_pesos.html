@@ -7,58 +7,71 @@
   <title>Gráficos Control de Pesos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Fuentes -->
   <link rel="preconnect" href="https://fonts.googleapis.com"> 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="{% static 'control_de_pesos/estilos_graficos_control_pesos.css' %}">
 
-  <!-- Favicon -->
   <link rel="icon" href="{% static 'control_de_pesos/images/logoquinta2.png' %}" />
 
-  <!-- Chart.js + adapter tiempo -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3/locale/es/index.min.js"></script>
-
-  <!-- SheetJS: Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
   <div class="login">
     <img src="{% static 'control_de_pesos/images/logoquinta.png' %}" alt="logo" class="logo">
+
     <div class="login-container">
       <h1 class="title">Gráficos · Control de Pesos (Tortas)</h1>
     </div>
 
-    <!-- FILTROS -->
     <div class="card">
       <div class="filtros">
         <div>
           <label>Cliente</label>
           <select id="f-cliente">
             <option value="">Todos</option>
-            {% for c in clientes %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+            {% for c in clientes %}
+              <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
           </select>
         </div>
+
         <div>
           <label>Producto</label>
           <select id="f-producto" disabled>
             <option value="">Todos</option>
           </select>
         </div>
+
         <div>
           <label>Turno</label>
           <select id="f-turno">
             <option value="">Todos</option>
-            {% for t in turnos %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+            {% for t in turnos %}
+              <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
           </select>
         </div>
-        <div><label>Lote</label><input id="f-lote" type="text" placeholder="Ej: 240915-01" /></div>
-        <div><label>Desde</label><input id="f-desde" type="date" /></div>
-        <div><label>Hasta</label><input id="f-hasta" type="date" /></div>
+
+        <div>
+          <label>Lote</label>
+          <input id="f-lote" type="text" placeholder="Ej: 240915-01" />
+        </div>
+
+        <div>
+          <label>Desde</label>
+          <input id="f-desde" type="date" />
+        </div>
+
+        <div>
+          <label>Hasta</label>
+          <input id="f-hasta" type="date" />
+        </div>
       </div>
 
       <div class="acciones">
@@ -66,12 +79,10 @@
         <button class="primary-button" id="btn-limpiar" type="button">Limpiar</button>
         <button class="primary-button" id="btn-descargar" type="button">Descargar Excel</button>
         <span id="resumen" class="badge">0 registros</span>
-        <span id="peso-ref" class="badge">Peso neto (etiqueta): –</span>
+        <span id="peso-ref" class="badge">Peso receta: –</span>
       </div>
     </div>
 
-    
-    <!-- GRÁFICOS -->
     <div class="grid">
 
       <div class="card">
@@ -103,7 +114,7 @@
           <canvas id="chartAlturas"></canvas>
         </div>
         <small class="badge" style="margin-top:10px;">
-          Se muestra solo para productos con altura registrada
+          Altura real vs altura registrada en base de productos
         </small>
       </div>
 
@@ -116,9 +127,12 @@
     </div>
   </div>
 
-  <!-- ====== JS principal ====== -->
   <script type="module">
-    if (window.__CP_INIT__) { /* evita doble init */ } else { window.__CP_INIT__ = true; }
+    if (window.__CP_INIT__) {
+      console.warn('Control de pesos ya inicializado');
+    } else {
+      window.__CP_INIT__ = true;
+    }
 
     const XLSX = window.XLSX;
     const qs = new URLSearchParams(location.search);
@@ -135,66 +149,85 @@
       pesoRef: $('peso-ref'),
       notaTol: $('nota-tolerancia'),
     };
+
     const STORAGE_KEY = 'filtros_graficos_control_pesos_v1';
 
-    // ---------- Parser robusto de fechas ----------
     function parseFechaLocal(ts) {
       if (!ts) return null;
+
       const m = ts.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(\.\d{3})\d{3}([+-]\d{2}:\d{2}|Z)?$/);
       if (m) ts = `${m[1]}${m[2]}${m[3] || ''}`;
+
       const d = new Date(ts);
+
       if (isNaN(d)) {
         const m2 = ts.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/);
         if (m2) {
-          const [_, Y,M,D,h,mm,s,ms] = m2;
+          const [_, Y, M, D, h, mm, s, ms] = m2;
           return new Date(+Y, +M - 1, +D, +h, +mm, +s, +(ms || 0));
         }
         return null;
       }
+
       return d;
     }
 
-    // ---------- Filtros persistentes ----------
-    function loadFilters(){
-      const f = Object.fromEntries(['cliente','producto','turno','lote','desde','hasta'].map(k => [k, qs.get(k) || '']));
-      if (!qs.toString()){
-        try { Object.assign(f, JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')); } catch(e){}
+    function loadFilters() {
+      const f = Object.fromEntries(
+        ['cliente', 'producto', 'turno', 'lote', 'desde', 'hasta'].map(k => [k, qs.get(k) || ''])
+      );
+
+      if (!qs.toString()) {
+        try {
+          Object.assign(f, JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'));
+        } catch (e) {}
       }
+
       F.cliente.value = f.cliente || '';
-      F.turno.value   = f.turno   || '';
-      F.lote.value    = f.lote    || '';
-      F.desde.value   = f.desde   || '';
-      F.hasta.value   = f.hasta   || '';
-      if (f.cliente) cargarProductos(f.cliente, f.producto);
+      F.turno.value = f.turno || '';
+      F.lote.value = f.lote || '';
+      F.desde.value = f.desde || '';
+      F.hasta.value = f.hasta || '';
+
+      if (f.cliente) {
+        cargarProductos(f.cliente, f.producto);
+      }
     }
 
-    function saveFilters(){
+    function saveFilters() {
       const f = {
         cliente: F.cliente.value,
         producto: F.producto.value,
         turno: F.turno.value,
         lote: F.lote.value,
         desde: F.desde.value,
-        hasta: F.hasta.value
+        hasta: F.hasta.value,
       };
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
       history.replaceState(null, '', '?' + new URLSearchParams(f).toString());
     }
 
-    // ---------- Poblar productos dependientes ----------
-    async function cargarProductos(cliente, preselect=''){
+    async function cargarProductos(cliente, preselect = '') {
       F.producto.innerHTML = '<option value="">Todos</option>';
       F.producto.disabled = true;
+
       if (!cliente) return;
+
       try {
         const r = await fetch(`{% url 'api_productos_por_cliente' %}?cliente=${encodeURIComponent(cliente)}`, {
           credentials: 'same-origin'
         });
+
         const ct = r.headers.get('content-type') || '';
+
         if (!ct.includes('application/json')) {
-          console.error('Respuesta no JSON (sesión expirada?)'); return;
+          console.error('Respuesta no JSON. Probablemente sesión expirada.');
+          return;
         }
+
         const j = await r.json();
+
         if (j.ok) {
           (j.productos || []).forEach(p => {
             const o = document.createElement('option');
@@ -202,322 +235,485 @@
             o.textContent = p.producto;
             F.producto.appendChild(o);
           });
+
           F.producto.disabled = false;
-          if (preselect) F.producto.value = preselect;
+
+          if (preselect) {
+            F.producto.value = preselect;
+          }
         }
       } catch (e) {
         console.error('Fallo cargarProductos', e);
       }
     }
-    F.cliente.addEventListener('change', () => cargarProductos(F.cliente.value, ''));
 
-    // ---------- Gráficos ----------
-    function unidadTiempoDesdeSpan(minDate, maxDate){
+    F.cliente.addEventListener('change', () => {
+      cargarProductos(F.cliente.value, '');
+    });
+
+    function unidadTiempoDesdeSpan(minDate, maxDate) {
       const span = maxDate - minDate;
-      const H = 60*60*1000, D = 24*H;
-      if (span <= 2*H)   return 'minute';
-      if (span <= 2*D)   return 'hour';
-      if (span <= 90*D)  return 'day';
-      //return 'month';
+      const H = 60 * 60 * 1000;
+      const D = 24 * H;
+
+      if (span <= 2 * H) return 'minute';
+      if (span <= 2 * D) return 'hour';
+      if (span <= 90 * D) return 'day';
+
+      return 'month';
     }
 
-    let chartLinea, chartHist;
-    function destruirCharts(){ try{chartLinea?.destroy()}catch{} try{chartHist?.destroy()}catch{} }
+    let chartLinea = null;
+    let chartHist = null;
+    let chartAlturas = null;
 
-    const TOLERANCIA_PCT = 3;
-    function sanitizarSerie(data){
+    function destruirCharts() {
+      try { chartLinea?.destroy(); } catch (e) {}
+      try { chartHist?.destroy(); } catch (e) {}
+      try { chartAlturas?.destroy(); } catch (e) {}
+
+      chartLinea = null;
+      chartHist = null;
+      chartAlturas = null;
+    }
+
+    function sanitizarSerie(data) {
       return data.map(d => ({
         t: parseFechaLocal(d.ts),
         y: Number(d.peso_real),
-        receta: d.peso_receta != null ? Number(d.peso_receta) : null
+        peso_minimo: d.peso_minimo != null ? Number(d.peso_minimo) : null,
+        peso_maximo: d.peso_maximo != null ? Number(d.peso_maximo) : null,
+        perdida_operacional: d.perdida_operacional != null ? Number(d.perdida_operacional) : null,
       })).filter(p => p.t && Number.isFinite(p.y));
     }
 
-    function construirSerieTemporal(regs){
-      const ctx = document.getElementById('chartLinea').getContext('2d');
+    function construirSerieTemporal(regs) {
+      const canvas = document.getElementById('chartLinea');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
       const pts = sanitizarSerie(regs);
-      if (!pts.length){
-        chartLinea = new Chart(ctx,{
-          type:'line',
-          data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
-          options:{responsive:true,maintainAspectRatio:false}
+
+      if (!pts.length) {
+        chartLinea = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [{ label: 'Sin datos', data: [] }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
         });
+
         F.pesoRef.textContent = 'Peso receta: –';
         F.notaTol.textContent = 'Sin datos';
         return;
       }
 
-      // serie de receta con forward-fill (línea escalonada)
-      const recetaFF = [];
-      let last = null;
-      for (const p of pts) {
-        if (Number.isFinite(p.receta)) last = p.receta;
-        recetaFF.push(last);
-      }
+      const real = pts.map(p => ({
+        x: p.t,
+        y: p.y
+      }));
 
-      const pesoRecetaDisplay = [...recetaFF].reverse().find(v => Number.isFinite(v)) ?? null;
+      const minL = pts
+        .filter(p => Number.isFinite(p.peso_minimo))
+        .map(p => ({
+          x: p.t,
+          y: p.peso_minimo
+        }));
+
+      const maxL = pts
+        .filter(p => Number.isFinite(p.peso_maximo))
+        .map(p => ({
+          x: p.t,
+          y: p.peso_maximo
+        }));
+
+      const pesoRecetaDisplay = [...pts]
+        .reverse()
+        .find(p => Number.isFinite(p.peso_minimo))?.peso_minimo ?? null;
+
+      const perdidaDisplay = [...pts]
+        .reverse()
+        .find(p => Number.isFinite(p.perdida_operacional))?.perdida_operacional ?? null;
+
       F.pesoRef.textContent = pesoRecetaDisplay != null
-        ? `Peso receta ref: ${pesoRecetaDisplay}`
+        ? `Peso receta: ${pesoRecetaDisplay} gr`
         : 'Peso receta: –';
-      F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
 
-      const real = pts.map(p => ({x:p.t,y:p.y}));
+      F.notaTol.textContent = perdidaDisplay != null
+        ? `Mínimo: peso receta | Máximo: receta con pérdida operacional (${perdidaDisplay}%)`
+        : 'Mínimo: peso receta | Máximo: receta con pérdida operacional';
 
-      const rec  = [];
-      const minL = [];
-      const maxL = [];
-      for (let i=0; i<pts.length; i++){
-        const v = recetaFF[i];
-        if (!Number.isFinite(v)) continue;
-        const x = pts[i].t;
-        const d = v * (TOLERANCIA_PCT/100);
-        rec.push({x, y:v});
-        minL.push({x, y:v - d});
-        maxL.push({x, y:v + d});
-      }
-
-      // unidad dinámica para el eje X
       const minDate = pts[0].t;
       const maxDate = pts[pts.length - 1].t;
       const unit = unidadTiempoDesdeSpan(minDate, maxDate);
 
-      // Rango Y usando todos los valores (real + receta + límites)
       const ys = [
-        ...real.map(p=>p.y),
-        ...rec.map(p=>p.y),
-        ...minL.map(p=>p.y),
-        ...maxL.map(p=>p.y),
+        ...real.map(p => p.y),
+        ...minL.map(p => p.y),
+        ...maxL.map(p => p.y),
       ].filter(Number.isFinite);
+
       const yMin = Math.min(...ys);
       const yMax = Math.max(...ys);
-      const pad  = (yMax - yMin) * 0.05 || 5;
+      const pad = (yMax - yMin) * 0.05 || 5;
       const yMinFinal = Math.floor(yMin - pad);
-      const yMaxFinal = Math.ceil (yMax + pad);
+      const yMaxFinal = Math.ceil(yMax + pad);
 
-      chartLinea = new Chart(ctx,{
-        type:'line',
-        data:{
-          datasets:[
+      chartLinea = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [
             {
-                label:'Peso real (gr)',
-                data: real,
-                borderWidth:2,
-                pointRadius:2,
-                tension:.25
+              label: 'Peso real (gr)',
+              data: real,
+              borderWidth: 2,
+              pointRadius: 2,
+              tension: 0.25
             },
 
-            ...(rec.length ? [{
-                label:'Peso mínimo / receta',
-                data: rec,
-                borderWidth:2,
-                pointRadius:0,
-                stepped:true,
-                borderDash:[6,6]
+            ...(minL.length ? [{
+              label: 'Peso mínimo / receta',
+              data: minL,
+              borderWidth: 2,
+              pointRadius: 0,
+              stepped: true,
+              borderDash: [6, 6]
             }] : []),
 
             ...(maxL.length ? [{
-                label:'Peso máximo con pérdida',
-                data: maxL,
-                borderWidth:2,
-                pointRadius:0,
-                stepped:true,
-                borderDash:[10,5]
+              label: 'Peso máximo con pérdida',
+              data: maxL,
+              borderWidth: 2,
+              pointRadius: 0,
+              stepped: true,
+              borderDash: [10, 5]
             }] : [])
-
-        ]
+          ]
         },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          devicePixelRatio:1,
-          animation:false,
-          resizeDelay:150,
-          adapters:{ date:{ locale: window.dateFnsLocaleEs } },
-          interaction:{ mode:'nearest', intersect:false, axis:'x' },
-          scales:{
-            x:{
-              type:'time',
-              time:{
-                unit,
-                round: unit,
-                displayFormats:{
-                  minute:'HH:mm',
-                  hour:'HH:mm',
-                  day:'MMM d',
-                  //month:'MMM yyyy',
-                }
-              },
-              ticks:{ autoSkip:true, maxTicksLimit: 10 }
-            },
-            y:{
-              title:{display:true,text:'gr'},
-              beginAtZero:false,
-              min:yMinFinal,
-              max:yMaxFinal,
-              grace:0
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: 1,
+          animation: false,
+          resizeDelay: 150,
+          parsing: false,
+          adapters: {
+            date: {
+              locale: window.dateFnsLocaleEs
             }
           },
-          plugins:{ tooltip:{ mode:'index', intersect:false } }
-        }
-      });
-    }
-
-    /* =========================
-      GRAFICO ALTURAS
-    ========================= */
-
-    const registrosConAltura = regs.filter(r =>
-        r.altura !== null &&
-        r.altura_objetivo !== null
-    );
-
-    const cardAlturas = document.getElementById('cardAlturas');
-
-    if (registrosConAltura.length > 0) {
-
-        cardAlturas.style.display = 'block';
-
-        const alturaReal = registrosConAltura.map(r => ({
-            x: parseFechaLocal(r.ts),
-            y: Number(r.altura)
-        }));
-
-        const alturaObjetivo = registrosConAltura.map(r => ({
-            x: parseFechaLocal(r.ts),
-            y: Number(r.altura_objetivo)
-        }));
-
-        const ctxAlturas = document.getElementById('chartAlturas').getContext('2d');
-
-        new Chart(ctxAlturas, {
-            type:'line',
-
-            data:{
-                datasets:[
-
-                    {
-                        label:'Altura real (mm)',
-                        data: alturaReal,
-                        borderWidth:2,
-                        pointRadius:2,
-                        tension:.25
-                    },
-
-                    {
-                        label:'Altura objetivo (mm)',
-                        data: alturaObjetivo,
-                        borderWidth:2,
-                        pointRadius:0,
-                        stepped:true,
-                        borderDash:[6,6]
-                    }
-
-                ]
-            },
-
-            options:{
-                responsive:true,
-                maintainAspectRatio:false,
-
-                parsing:false,
-
-                scales:{
-                    x:{
-                        type:'time'
-                    },
-
-                    y:{
-                        title:{
-                            display:true,
-                            text:'Altura (mm)'
-                        }
-                    }
+          interaction: {
+            mode: 'nearest',
+            intersect: false,
+            axis: 'x'
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit,
+                round: unit,
+                displayFormats: {
+                  minute: 'HH:mm',
+                  hour: 'HH:mm',
+                  day: 'MMM d',
+                  month: 'MMM yyyy',
                 }
+              },
+              ticks: {
+                autoSkip: true,
+                maxTicksLimit: 10
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'gr'
+              },
+              beginAtZero: false,
+              min: yMinFinal,
+              max: yMaxFinal,
+              grace: 0
             }
-        });
-
-    } else {
-
-        cardAlturas.style.display = 'none';
-
-    }
-
-    function construirHistograma(regs){
-      const desv = regs.map(d => Number(d.desviacion)).filter(Number.isFinite);
-      const ctx = document.getElementById('chartHist').getContext('2d');
-      if (!desv.length){
-        chartHist = new Chart(ctx,{
-          type:'bar',
-          data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
-          options:{responsive:true,maintainAspectRatio:false}
-        });
-        return;
-      }
-      const min = Math.min(...desv), max = Math.max(...desv);
-      const bins = 20, step = Math.max(1, Math.ceil((max-min)/bins));
-      const labels = [], counts = new Array(bins).fill(0);
-      for (let i=0;i<bins;i++){
-        const a=min+i*step, b=a+step;
-        labels.push(`${a} a ${b}`);
-      }
-      desv.forEach(v => {
-        let idx = Math.floor((v-min)/step);
-        if (idx>=bins) idx=bins-1;
-        if (idx<0) idx=0;
-        counts[idx]++;
-      });
-
-      chartHist = new Chart(ctx,{
-        type:'bar',
-        data:{ labels, datasets:[{ label:'Frecuencia', data:counts }] },
-        options:{
-          responsive:true, maintainAspectRatio:false, devicePixelRatio:1,
-          animation:false, resizeDelay:150,
-          interaction:{ mode:'index', intersect:false },
-          scales:{
-            x:{ title:{display:true,text:'Desviación (gr)'} },
-            y:{ beginAtZero:true, grace:'8%' }
+          },
+          plugins: {
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
           }
         }
       });
     }
 
-    // ---------- Datos ----------
-    async function cargarDatos(){
-      const q = new URLSearchParams({
-        cliente:F.cliente.value||'',
-        producto:F.producto.value||'',
-        turno:F.turno.value||'',
-        lote:F.lote.value||'',
-        desde:F.desde.value||'',
-        hasta:F.hasta.value||''
+    function construirGraficoAlturas(regs) {
+      const cardAlturas = document.getElementById('cardAlturas');
+      const canvasAlturas = document.getElementById('chartAlturas');
+
+      if (!cardAlturas || !canvasAlturas) return;
+
+      const registrosConAltura = regs.filter(r =>
+        r.altura !== null &&
+        r.altura !== undefined &&
+        r.altura_objetivo !== null &&
+        r.altura_objetivo !== undefined &&
+        Number.isFinite(Number(r.altura)) &&
+        Number.isFinite(Number(r.altura_objetivo)) &&
+        parseFechaLocal(r.ts)
+      );
+
+      if (!registrosConAltura.length) {
+        cardAlturas.style.display = 'none';
+        return;
+      }
+
+      cardAlturas.style.display = 'block';
+
+      const alturaReal = registrosConAltura.map(r => ({
+        x: parseFechaLocal(r.ts),
+        y: Number(r.altura)
+      }));
+
+      const alturaObjetivo = registrosConAltura.map(r => ({
+        x: parseFechaLocal(r.ts),
+        y: Number(r.altura_objetivo)
+      }));
+
+      const fechas = alturaReal.map(p => p.x).filter(Boolean);
+      const minDate = fechas[0];
+      const maxDate = fechas[fechas.length - 1];
+      const unit = unidadTiempoDesdeSpan(minDate, maxDate);
+
+      const ys = [
+        ...alturaReal.map(p => p.y),
+        ...alturaObjetivo.map(p => p.y),
+      ].filter(Number.isFinite);
+
+      const yMin = Math.min(...ys);
+      const yMax = Math.max(...ys);
+      const pad = (yMax - yMin) * 0.05 || 2;
+
+      chartAlturas = new Chart(canvasAlturas.getContext('2d'), {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: 'Altura real (mm)',
+              data: alturaReal,
+              borderWidth: 2,
+              pointRadius: 2,
+              tension: 0.25
+            },
+            {
+              label: 'Altura objetivo (mm)',
+              data: alturaObjetivo,
+              borderWidth: 2,
+              pointRadius: 0,
+              stepped: true,
+              borderDash: [6, 6]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: 1,
+          animation: false,
+          resizeDelay: 150,
+          parsing: false,
+          adapters: {
+            date: {
+              locale: window.dateFnsLocaleEs
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            intersect: false,
+            axis: 'x'
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit,
+                round: unit,
+                displayFormats: {
+                  minute: 'HH:mm',
+                  hour: 'HH:mm',
+                  day: 'MMM d',
+                  month: 'MMM yyyy',
+                }
+              },
+              ticks: {
+                autoSkip: true,
+                maxTicksLimit: 10
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Altura (mm)'
+              },
+              beginAtZero: false,
+              min: Math.floor(yMin - pad),
+              max: Math.ceil(yMax + pad),
+              grace: 0
+            }
+          },
+          plugins: {
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          }
+        }
       });
+    }
+
+    function construirHistograma(regs) {
+      const desv = regs.map(d => Number(d.desviacion)).filter(Number.isFinite);
+      const ctx = document.getElementById('chartHist').getContext('2d');
+
+      if (!desv.length) {
+        chartHist = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [],
+            datasets: [{ label: 'Sin datos', data: [] }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+        return;
+      }
+
+      const min = Math.min(...desv);
+      const max = Math.max(...desv);
+      const bins = 20;
+      const step = Math.max(1, Math.ceil((max - min) / bins));
+
+      const labels = [];
+      const counts = new Array(bins).fill(0);
+
+      for (let i = 0; i < bins; i++) {
+        const a = min + i * step;
+        const b = a + step;
+        labels.push(`${a} a ${b}`);
+      }
+
+      desv.forEach(v => {
+        let idx = Math.floor((v - min) / step);
+        if (idx >= bins) idx = bins - 1;
+        if (idx < 0) idx = 0;
+        counts[idx]++;
+      });
+
+      chartHist = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Frecuencia',
+            data: counts
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: 1,
+          animation: false,
+          resizeDelay: 150,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Desviación (gr)'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grace: '8%'
+            }
+          }
+        }
+      });
+    }
+
+    async function cargarDatos() {
+      const q = new URLSearchParams({
+        cliente: F.cliente.value || '',
+        producto: F.producto.value || '',
+        turno: F.turno.value || '',
+        lote: F.lote.value || '',
+        desde: F.desde.value || '',
+        hasta: F.hasta.value || ''
+      });
+
       const url = `{% url 'api_graficos_control_pesos' %}?${q.toString()}`;
+
       try {
-        const r = await fetch(url, { credentials:'same-origin', cache:'no-store' });
+        const r = await fetch(url, {
+          credentials: 'same-origin',
+          cache: 'no-store'
+        });
+
         const ct = r.headers.get('content-type') || '';
+
         if (!ct.includes('application/json')) {
           alert('Sesión expirada. Vuelve a iniciar sesión.');
           return [];
         }
+
         if (!r.ok) return [];
+
         const j = await r.json();
         return j.ok ? (j.registros || []) : [];
+
       } catch (e) {
         console.error('Fallo cargarDatos', e);
         return [];
       }
     }
 
-    // ---------- Excel ----------
-    function descargarExcel(rows){
-      if (!rows.length) { alert('No hay datos para descargar.'); return; }
-      if (!XLSX) { alert('Librería Excel no disponible.'); return; }
+    function descargarExcel(rows) {
+      if (!rows.length) {
+        alert('No hay datos para descargar.');
+        return;
+      }
+
+      if (!XLSX) {
+        alert('Librería Excel no disponible.');
+        return;
+      }
 
       const headers = [[
-        'ID','Fecha registro','Cliente','Producto','Código',
-        'Peso receta (gr)','Peso real (gr)','Desviación (gr)','Lote','Turno'
+        'ID',
+        'Fecha registro',
+        'Cliente',
+        'Producto',
+        'Código',
+        'Peso receta (gr)',
+        'Pérdida operacional (%)',
+        'Peso mínimo (gr)',
+        'Peso máximo con pérdida (gr)',
+        'Peso real (gr)',
+        'Desviación (gr)',
+        'Altura objetivo (mm)',
+        'Altura real (mm)',
+        'Lote',
+        'Turno'
       ]];
+
       const body = rows.map(r => [
         r.id,
         parseFechaLocal(r.ts) || '',
@@ -525,8 +721,13 @@
         r.producto ?? '',
         r.codigo_producto ?? '',
         Number.isFinite(+r.peso_receta) ? +r.peso_receta : '',
-        Number.isFinite(+r.peso_real)   ? +r.peso_real   : '',
-        Number.isFinite(+r.desviacion)  ? +r.desviacion  : '',
+        Number.isFinite(+r.perdida_operacional) ? +r.perdida_operacional : '',
+        Number.isFinite(+r.peso_minimo) ? +r.peso_minimo : '',
+        Number.isFinite(+r.peso_maximo) ? +r.peso_maximo : '',
+        Number.isFinite(+r.peso_real) ? +r.peso_real : '',
+        Number.isFinite(+r.desviacion) ? +r.desviacion : '',
+        Number.isFinite(+r.altura_objetivo) ? +r.altura_objetivo : '',
+        Number.isFinite(+r.altura) ? +r.altura : '',
         r.lote ?? '',
         r.turno ?? ''
       ]);
@@ -535,45 +736,69 @@
       const ws = XLSX.utils.aoa_to_sheet([...headers, ...body]);
 
       ws['!cols'] = [
-        {wch:10},{wch:20},{wch:18},{wch:26},{wch:12},
-        {wch:18},{wch:18},{wch:16},{wch:14},{wch:10}
+        { wch: 10 },
+        { wch: 20 },
+        { wch: 18 },
+        { wch: 28 },
+        { wch: 12 },
+        { wch: 18 },
+        { wch: 22 },
+        { wch: 18 },
+        { wch: 28 },
+        { wch: 18 },
+        { wch: 16 },
+        { wch: 22 },
+        { wch: 18 },
+        { wch: 14 },
+        { wch: 10 }
       ];
-
-      const range = XLSX.utils.decode_range(ws['!ref']);
-      for (let r = 1; r <= range.e.r; r++) {
-        const addr = XLSX.utils.encode_cell({ r, c: 1 }); // B
-        if (ws[addr] && ws[addr].v instanceof Date) {
-          ws[addr].z = 'yyyy-mm-dd hh:mm';
-        }
-      }
 
       XLSX.utils.book_append_sheet(wb, ws, 'Control de Pesos');
       XLSX.writeFile(wb, 'control_pesos_filtrado.xlsx');
     }
 
-    // ---------- Eventos + Init ----------
-    async function aplicar(){
+    async function aplicar() {
       saveFilters();
+
       const data = await cargarDatos();
+
       F.resumen.textContent = `${data.length} registros`;
+
       destruirCharts();
-      if (data.length){
+
+      if (data.length) {
         construirSerieTemporal(data);
         construirHistograma(data);
+        construirGraficoAlturas(data);
       } else {
+        const cardAlturas = document.getElementById('cardAlturas');
+        if (cardAlturas) cardAlturas.style.display = 'none';
+
         const c1 = document.getElementById('chartLinea').getContext('2d');
-        chartLinea = new Chart(c1,{
-          type:'line',
-          data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
-          options:{maintainAspectRatio:false}
+        chartLinea = new Chart(c1, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [{ label: 'Sin datos', data: [] }]
+          },
+          options: {
+            maintainAspectRatio: false
+          }
         });
+
         const c2 = document.getElementById('chartHist').getContext('2d');
-        chartHist  = new Chart(c2,{
-          type:'bar',
-          data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
-          options:{maintainAspectRatio:false}
+        chartHist = new Chart(c2, {
+          type: 'bar',
+          data: {
+            labels: [],
+            datasets: [{ label: 'Sin datos', data: [] }]
+          },
+          options: {
+            maintainAspectRatio: false
+          }
         });
       }
+
       window.__datosActuales = data;
     }
 
@@ -584,12 +809,16 @@
 
     document.getElementById('btn-limpiar').addEventListener('click', e => {
       e.preventDefault();
-      ['f-cliente','f-producto','f-turno','f-lote','f-desde','f-hasta'].forEach(id => {
-        const el=$(id); el.value='';
+
+      ['f-cliente', 'f-producto', 'f-turno', 'f-lote', 'f-desde', 'f-hasta'].forEach(id => {
+        const el = $(id);
+        if (el) el.value = '';
       });
+
       F.producto.disabled = true;
       localStorage.removeItem(STORAGE_KEY);
-      history.replaceState(null,'',location.pathname);
+      history.replaceState(null, '', location.pathname);
+
       aplicar();
     });
 
@@ -598,7 +827,6 @@
       descargarExcel(window.__datosActuales || []);
     });
 
-    // Init
     loadFilters();
     aplicar();
   </script>
