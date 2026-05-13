@@ -302,21 +302,21 @@
       }
 
       const real = pts.map(p => ({
-        x: p.t.getTime(),
+        x: p.t,
         y: p.y
       }));
 
       const minL = pts
         .filter(p => Number.isFinite(p.peso_minimo))
         .map(p => ({
-          x: p.t.getTime(),
+          x: p.t,
           y: p.peso_minimo
         }));
 
       const maxL = pts
         .filter(p => Number.isFinite(p.peso_maximo))
         .map(p => ({
-          x: p.t.getTime(),
+          x: p.t,
           y: p.peso_maximo
         }));
 
@@ -395,10 +395,9 @@
           scales: {
             x: {
               type: 'time',
-              min: minDate.getTime(),
-              max: maxDate.getTime(),
               time: {
                 unit,
+                round: unit,
                 displayFormats: {
                   minute: 'HH:mm',
                   hour: 'HH:mm',
@@ -458,12 +457,12 @@
       cardAlturas.style.display = 'block';
 
       const alturaReal = registrosConAltura.map(r => ({
-        x: parseFechaLocal(r.ts).getTime(),
+        x: parseFechaLocal(r.ts),
         y: Number(r.altura)
       }));
 
       const alturaObjetivo = registrosConAltura.map(r => ({
-        x: parseFechaLocal(r.ts).getTime(),
+        x: parseFechaLocal(r.ts),
         y: Number(r.altura_objetivo)
       }));
 
@@ -518,8 +517,6 @@
           scales: {
             x: {
               type: 'time',
-              min: minDate.getTime(),
-              max: maxDate.getTime(),
               time: {
                 unit,
                 displayFormats: {
