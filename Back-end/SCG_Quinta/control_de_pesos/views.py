@@ -2,12 +2,14 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, time
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 from django.db.models.functions import Trim, Upper
 import json
+from django.utils.dateparse import parse_date
+from django.utils.timezone import make_aware
 
 from .models import DatosFormularioControlDePesos, ProductoControlPeso
 
@@ -173,19 +175,39 @@ def api_graficos_control_pesos(request):
     if lote:
         qs = qs.filter(lote_norm=lote)
 
+    # -------------------------
+    # FILTRO DESDE
+    # -------------------------
     if desde:
         try:
-            dt_desde = datetime.fromisoformat(desde)
-            qs = qs.filter(fecha_registro__date__gte=dt_desde.date())
-        except Exception:
-            pass
+            fecha_desde = parse_date(desde)
 
+            if fecha_desde:
+                dt_desde = make_aware(
+                    datetime.combine(fecha_desde, time.min)
+                )
+
+                qs = qs.filter(fecha_registro__gte=dt_desde)
+
+        except Exception as e:
+            print("Error filtro desde:", e)
+
+    # -------------------------
+    # FILTRO HASTA
+    # -------------------------
     if hasta:
         try:
-            dt_hasta = datetime.fromisoformat(hasta)
-            qs = qs.filter(fecha_registro__date__lte=dt_hasta.date())
-        except Exception:
-            pass
+            fecha_hasta = parse_date(hasta)
+
+            if fecha_hasta:
+                dt_hasta = make_aware(
+                    datetime.combine(fecha_hasta, time.max)
+                )
+
+                qs = qs.filter(fecha_registro__lte=dt_hasta)
+
+        except Exception as e:
+            print("Error filtro hasta:", e)
 
     qs = qs.order_by('fecha_registro').values(
         'id',
