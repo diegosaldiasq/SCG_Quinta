@@ -380,14 +380,6 @@
               pointRadius: 2,
               tension: 0.25
             },
-            ...(minL.length ? [{
-              label: 'Peso mínimo / receta',
-              data: minL,
-              borderWidth: 2,
-              pointRadius: 0,
-              stepped: true,
-              borderDash: [6, 6]
-            }] : []),
             ...(maxL.length ? [{
               label: 'Peso máximo con pérdida',
               data: maxL.map(p => ({ ...p, y: Math.round(p.y) })), // redondear a 0 decimales
@@ -395,6 +387,14 @@
               pointRadius: 0,
               stepped: true,
               borderDash: [10, 5]
+            }] : []),
+            ...(minL.length ? [{
+              label: 'Peso mínimo / receta',
+              data: minL,
+              borderWidth: 2,
+              pointRadius: 0,
+              stepped: true,
+              borderDash: [6, 6]
             }] : [])
           ]
         },
