@@ -31,6 +31,34 @@ document.addEventListener("DOMContentLoaded", function () {
         sessionStorage.removeItem("turno");
     }
 
+    const selectCliente = document.getElementById("cliente");
+
+    function setAlturaVisible(mostrar) {
+
+        // columna altura
+        const thAltura = document.querySelector("th:nth-child(3)");
+
+        if (thAltura) {
+            thAltura.style.display = mostrar ? "" : "none";
+        }
+
+        // inputs altura
+        document.querySelectorAll(".input-altura").forEach(input => {
+
+            const td = input.closest("td");
+
+            if (td) {
+                td.style.display = mostrar ? "" : "none";
+            }
+
+            input.disabled = !mostrar;
+
+            if (!mostrar) {
+                input.value = "";
+            }
+        });
+    }
+
     function crearFilaMuestra(numero) {
         const tr = document.createElement("tr");
         tr.className = "fila-muestra";
@@ -89,7 +117,10 @@ document.addEventListener("DOMContentLoaded", function () {
             renumerarFilas();
              // 🔥 mantener lógica altura
             const cliente = document.getElementById("cliente").value;
-            setAlturaVisible(cliente === 'Pasteles' || cliente === 'Insumo');
+            setAlturaVisible(
+                cliente.toLowerCase() === 'pasteles' ||
+                cliente.toLowerCase() === 'insumo'
+            );
         });
 
         tbodyMuestras.addEventListener("click", function (e) {
