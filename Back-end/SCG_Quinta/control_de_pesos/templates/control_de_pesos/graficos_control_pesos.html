@@ -238,15 +238,34 @@
     });
 
     function unidadTiempoDesdeSpan(minDate, maxDate) {
+
       const span = maxDate - minDate;
-      const H = 60 * 60 * 1000;
+
+      const MIN = 60 * 1000;
+      const H = 60 * MIN;
       const D = 24 * H;
 
-      if (span <= 2 * H) return 'minute';
-      if (span <= 2 * D) return 'hour';
-      if (span <= 90 * D) return 'day';
+      // menos de 6 horas
+      if (span <= 6 * H) {
+        return 'minute';
+      }
 
-      return 'month';
+      // menos de 3 días
+      if (span <= 3 * D) {
+        return 'hour';
+      }
+
+      // menos de 90 días
+      if (span <= 90 * D) {
+        return 'day';
+      }
+
+      // menos de 2 años
+      if (span <= 730 * D) {
+        return 'month';
+      }
+
+      return 'year';
     }
 
     let chartLinea = null;
@@ -399,11 +418,13 @@
               max: maxDate,
               time: {
                 unit,
+                tooltipFormat: 'dd-MM-yyyy HH:mm',
                 displayFormats: {
                   minute: 'HH:mm',
-                  hour: 'HH:mm',
+                  hour: 'dd-MM HH:mm',
                   day: 'dd-MM-yyyy',
                   month: 'MM-yyyy',
+                  year: 'yyyy'
                 }
               },
               ticks: {
@@ -522,11 +543,13 @@
               max: maxDate,
               time: {
                 unit,
+                tooltipFormat: 'dd-MM-yyyy HH:mm',
                 displayFormats: {
                   minute: 'HH:mm',
-                  hour: 'HH:mm',
+                  hour: 'dd-MM HH:mm',
                   day: 'dd-MM-yyyy',
                   month: 'MM-yyyy',
+                  year: 'yyyy'
                 }
               },
               ticks: {
