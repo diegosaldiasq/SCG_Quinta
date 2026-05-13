@@ -17,7 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
-  <script src="https://cdn.jsdelivr.net/npm/date-fns@3/locale/es/index.min.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 
@@ -401,11 +401,6 @@
           animation: false,
           resizeDelay: 150,
           parsing: false,
-          adapters: {
-            date: {
-              locale: window.dateFnsLocaleEs
-            }
-          },
           interaction: {
             mode: 'nearest',
             intersect: false,
@@ -525,11 +520,6 @@
           animation: false,
           resizeDelay: 150,
           parsing: false,
-          adapters: {
-            date: {
-              locale: window.dateFnsLocaleEs
-            }
-          },
           interaction: {
             mode: 'nearest',
             intersect: false,
