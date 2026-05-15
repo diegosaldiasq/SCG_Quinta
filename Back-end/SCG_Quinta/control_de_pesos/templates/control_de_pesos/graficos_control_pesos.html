@@ -712,6 +712,7 @@
 
       const headers = [[
         'ID',
+        'Usuario',
         'Fecha registro',
         'Cliente',
         'Producto',
@@ -729,6 +730,7 @@
 
       const body = rows.map(r => [
         r.id,
+        r.nombre_tecnologo ?? '',
         parseFechaLocal(r.ts) || '',
         r.cliente ?? '',
         r.producto ?? '',

@@ -211,6 +211,7 @@ def api_graficos_control_pesos(request):
 
     qs = qs.order_by('fecha_registro').values(
         'id',
+        'nombre_tecnologo',
         'fecha_registro',
         'cliente',
         'producto',
@@ -262,6 +263,7 @@ def api_graficos_control_pesos(request):
         registros.append({
             "id": r["id"],
             "ts": r["fecha_registro"].isoformat(),
+            "usuario": r["nombre_tecnologo"],
             "cliente": r["cliente"],
             "producto": r["producto"],
             "codigo_producto": r["codigo_producto"],
