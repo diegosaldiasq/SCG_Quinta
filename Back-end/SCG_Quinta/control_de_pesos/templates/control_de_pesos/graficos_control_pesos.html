@@ -730,7 +730,7 @@
 
       const body = rows.map(r => [
         r.id,
-        r.nombre_tecnologo ?? '',
+        r.usuario ?? '',
         parseFechaLocal(r.ts) || '',
         r.cliente ?? '',
         r.producto ?? '',
