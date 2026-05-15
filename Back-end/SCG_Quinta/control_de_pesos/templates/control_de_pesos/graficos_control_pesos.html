@@ -80,6 +80,7 @@
         <button class="primary-button" id="btn-descargar" type="button">Descargar Excel</button>
         <span id="resumen" class="badge">0 registros</span>
         <span id="peso-ref" class="badge">Peso neto: –</span>
+        <span id="peso-rec" class="badge">Peso receta: –</span>
       </div>
     </div>
 
@@ -147,6 +148,7 @@
       hasta: $('f-hasta'),
       resumen: $('resumen'),
       pesoRef: $('peso-ref'),
+      pesoRec: $('peso-rec'),
       notaTol: $('nota-tolerancia'),
     };
 
@@ -343,6 +345,10 @@
         .reverse()
         .find(p => Number.isFinite(p.peso_minimo))?.peso_minimo ?? null;
 
+      const pesoMaximoRecetaDisplay = [...pts]
+        .reverse()
+        .find(p => Number.isFinite(p.peso_maximo))?.peso_maximo ?? null;
+
       const perdidaDisplay = [...pts]
         .reverse()
         .find(p => Number.isFinite(p.perdida_operacional))?.perdida_operacional ?? null;
@@ -350,6 +356,10 @@
       F.pesoRef.textContent = pesoRecetaDisplay != null
         ? `Peso neto: ${pesoRecetaDisplay} gr`
         : 'Peso neto: –';
+
+      F.pesoRec.textContent = pesoMaximoRecetaDisplay != null
+        ? `Peso receta: ${pesoMaximoRecetaDisplay} gr`
+        : 'Peso receta: –';
 
       F.notaTol.textContent = perdidaDisplay != null
         ? `Máximo: peso receta | Mínimo: peso neto - receta con pérdida operacional (${perdidaDisplay}%)`
