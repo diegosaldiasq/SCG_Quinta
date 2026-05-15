@@ -25,6 +25,7 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
             'turno',
             'lote',
             'tiempo_permanencia_producto',
+            'temperatura_permanencia',
             'observaciones',
         ]
 
@@ -41,6 +42,10 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
             'tiempo_permanencia_producto': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej: 45 min'
+            }),
+            'temperatura_permanencia': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: -12.0'
             }),
             'observaciones': forms.Textarea(attrs={
                 'class': 'form-control',

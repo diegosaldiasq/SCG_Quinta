@@ -35,6 +35,12 @@ class RegistroTemperaturaPostSpiral(models.Model):
         verbose_name='Tiempo permanencia producto'
     )
 
+    temperatura_permanencia = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        verbose_name='Temperatura permanencia °C'
+    )
+
     observaciones = models.TextField(blank=True, null=True)
 
     acciones_correctivas_requieren_revision = models.BooleanField(default=False)
