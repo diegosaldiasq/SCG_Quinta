@@ -358,7 +358,7 @@
         : 'Peso neto: –';
 
       F.pesoRec.textContent = pesoMaximoRecetaDisplay != null
-        ? `Peso receta: ${pesoMaximoRecetaDisplay} gr`
+        ? `Peso receta: ${Math.round(pesoMaximoRecetaDisplay)} gr` // redondear a 0 decimales
         : 'Peso receta: –';
 
       F.notaTol.textContent = perdidaDisplay != null
