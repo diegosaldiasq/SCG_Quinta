@@ -45,6 +45,8 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
             }),
             'temperatura_permanencia': forms.TextInput(attrs={
                 'class': 'form-control input-temperatura',
+                'inputmode': 'decimal',
+                'autocomplete': 'off',
                 'placeholder': 'Ej: -12.0'
             }),
             'observaciones': forms.Textarea(attrs={
