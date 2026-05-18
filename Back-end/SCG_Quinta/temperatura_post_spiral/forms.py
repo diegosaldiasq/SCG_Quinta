@@ -43,8 +43,8 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ej: 45 min'
             }),
-            'temperatura_permanencia': forms.NumberInput(attrs={
-                'class': 'form-control',
+            'temperatura_permanencia': forms.TextInput(attrs={
+                'class': 'form-control input-temperatura',
                 'placeholder': 'Ej: -12.0'
             }),
             'observaciones': forms.Textarea(attrs={
