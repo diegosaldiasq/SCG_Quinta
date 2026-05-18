@@ -17,6 +17,16 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
         })
     )
 
+    temperatura_permanencia = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control input-temperatura',
+            'inputmode': 'decimal',
+            'autocomplete': 'off',
+            'placeholder': 'Ej: -12.0'
+        })
+    )
+
     class Meta:
         model = RegistroTemperaturaPostSpiral
         fields = [
@@ -43,22 +53,13 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ej: 45 min'
             }),
-            'temperatura_permanencia': forms.CharField(
-                required=False,
-                widget=forms.TextInput(attrs={
-                    'class': 'form-control input-temperatura',
-                    'inputmode': 'decimal',
-                    'autocomplete': 'off',
-                    'placeholder': 'Ej: -12.0'
-                })
-            ),
             'observaciones': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
                 'placeholder': 'Observaciones generales'
             }),
         }
-    
+
     def clean_temperatura_permanencia(self):
         valor = self.cleaned_data.get('temperatura_permanencia')
 
@@ -70,9 +71,7 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
         try:
             return Decimal(valor)
         except InvalidOperation:
-            raise forms.ValidationError(
-                'Ingrese una temperatura válida.'
-            )
+            raise forms.ValidationError('Ingrese una temperatura válida.')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
