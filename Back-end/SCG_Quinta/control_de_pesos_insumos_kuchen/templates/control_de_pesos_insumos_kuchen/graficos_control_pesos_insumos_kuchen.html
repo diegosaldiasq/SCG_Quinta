@@ -140,6 +140,7 @@
         hasta: $('f-hasta'),
         resumen: $('resumen'),
         pesoRef: $('peso-ref'),
+        pesoRec: $('peso-rec'),
         notaTol: $('nota-tolerancia'),
       };
 
@@ -279,7 +280,8 @@
             }
           });
 
-          F.pesoRef.textContent = 'Peso receta: –';
+          F.pesoRef.textContent = 'Peso neto: –';
+          F.pesoRec.textContent = 'Peso receta: –';
           F.notaTol.textContent = 'Sin datos';
           return;
         }
@@ -786,7 +788,8 @@
             }
           });
 
-          F.pesoRef.textContent = 'Peso receta: –';
+          F.pesoRef.textContent = 'Peso neto: –';
+          F.pesoRec.textContent = 'Peso receta: –';
           F.notaTol.textContent = 'Sin datos';
         }
 
