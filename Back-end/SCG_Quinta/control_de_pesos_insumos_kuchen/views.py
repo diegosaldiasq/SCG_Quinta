@@ -261,6 +261,18 @@ def api_graficos_control_pesos_insumos_kuchen(request):
                 else None
             )
 
+            desviacion = None
+
+            if peso_real is not None and peso_receta is not None:
+                if peso_maximo is not None:
+                    if peso_receta <= peso_real <= peso_maximo:
+                        desviacion = 0
+                    elif peso_real < peso_receta:
+                        desviacion = peso_real - peso_receta
+                    elif peso_real > peso_maximo:
+                        desviacion = peso_real - peso_maximo
+                else:
+                    desviacion = peso_real - peso_receta
             registros.append({
                 "id": r.id,
 
@@ -282,10 +294,7 @@ def api_graficos_control_pesos_insumos_kuchen(request):
                 "altura": altura_real,
                 "altura_objetivo": altura_objetivo,
 
-                "desviacion": (
-                    (peso_real or 0) -
-                    (peso_receta or 0)
-                ),
+                "desviacion": desviacion,
 
                 "lote": r.lote,
                 "turno": r.turno,
