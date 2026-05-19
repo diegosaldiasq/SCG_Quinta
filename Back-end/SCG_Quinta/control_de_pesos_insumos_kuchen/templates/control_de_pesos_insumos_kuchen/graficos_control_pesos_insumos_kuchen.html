@@ -78,7 +78,8 @@
         <button class="primary-button" id="btn-limpiar" type="button">Limpiar</button>
         <button class="primary-button" id="btn-descargar" type="button">Descargar Excel</button>
         <span id="resumen" class="badge">0 registros</span>
-        <span id="peso-ref" class="badge">Peso receta: –</span>
+        <span id="peso-ref" class="badge">Peso neto: –</span>
+        <span id="peso-rec" class="badge">Peso receta: –</span>
       </div>
     </div>
 
@@ -310,8 +311,16 @@
           .reverse()
           .find(p => Number.isFinite(p.perdida_operacional))?.perdida_operacional ?? null;
 
+        const pesoMaximoDisplay = Number.isFinite(pesoRecetaDisplay) && Number.isFinite(perdidaDisplay)
+          ? Math.round((pesoRecetaDisplay / (1 - (perdidaDisplay/100))))
+          : null;
+
         F.pesoRef.textContent = pesoRecetaDisplay != null
-          ? `Peso receta: ${pesoRecetaDisplay} gr`
+          ? `Peso neto: ${pesoRecetaDisplay} gr`
+          : 'Peso neto: –';
+
+        F.pesoRec.textContent = pesoMaximoDisplay != null
+          ? `Peso receta: ${pesoMaximoDisplay} gr`
           : 'Peso receta: –';
 
         F.notaTol.textContent = perdidaDisplay != null
