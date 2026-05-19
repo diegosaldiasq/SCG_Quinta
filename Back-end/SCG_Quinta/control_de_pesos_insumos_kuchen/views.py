@@ -8,6 +8,7 @@ from datetime import datetime, time
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
+from control_de_pesos.models import ProductoControlPeso
 
 # Create your views here.
 
@@ -139,72 +140,168 @@ def api_productos_por_cliente_insumos_kuchen(request):
 # --- API de datos para graficar
 @login_required
 def api_graficos_control_pesos_insumos_kuchen(request):
-    """
-    Filtros (GET):
-    - cliente, producto, turno, lote (contiene)
-    - desde, hasta (YYYY-MM-DD)
-    """
+
     try:
+
         qs = DatosFormularioControlDePesosInsumosKuchen.objects.all()
 
         cliente = request.GET.get("cliente", "").strip()
         producto = request.GET.get("producto", "").strip()
-        turno    = request.GET.get("turno", "").strip()
-        lote     = request.GET.get("lote", "").strip()
-        desde    = request.GET.get("desde", "").strip()
-        hasta    = request.GET.get("hasta", "").strip()
+        turno = request.GET.get("turno", "").strip()
+        lote = request.GET.get("lote", "").strip()
+        desde = request.GET.get("desde", "").strip()
+        hasta = request.GET.get("hasta", "").strip()
 
         if cliente:
             qs = qs.filter(cliente=cliente)
+
         if producto:
             qs = qs.filter(producto=producto)
+
         if turno:
             qs = qs.filter(turno=turno)
+
         if lote:
             qs = qs.filter(lote__icontains=lote)
 
-        # Fechas (cubre el día completo)
+        # =========================
+        # FILTRO DESDE
+        # =========================
         if desde:
             try:
                 d = datetime.strptime(desde, "%Y-%m-%d").date()
-                qs = qs.filter(fecha_registro__gte=datetime.combine(d, time.min, tzinfo=timezone.get_current_timezone()))
+
+                qs = qs.filter(
+                    fecha_registro__gte=datetime.combine(
+                        d,
+                        time.min,
+                        tzinfo=timezone.get_current_timezone()
+                    )
+                )
+
             except ValueError:
                 pass
+
+        # =========================
+        # FILTRO HASTA
+        # =========================
         if hasta:
             try:
                 h = datetime.strptime(hasta, "%Y-%m-%d").date()
-                qs = qs.filter(fecha_registro__lte=datetime.combine(h, time.max, tzinfo=timezone.get_current_timezone()))
+
+                qs = qs.filter(
+                    fecha_registro__lte=datetime.combine(
+                        h,
+                        time.max,
+                        tzinfo=timezone.get_current_timezone()
+                    )
+                )
+
             except ValueError:
                 pass
 
         qs = qs.order_by("fecha_registro")
 
         registros = []
+
         for r in qs:
-            try:
-                peso_receta = float(r.peso_receta) if r.peso_receta is not None else None
-                peso_real   = float(r.peso_real)   if r.peso_real   is not None else None
-                desv        = (peso_real - peso_receta) if (peso_real is not None and peso_receta is not None) else None
-            except Exception:
-                peso_receta = peso_real = desv = None
+
+            producto_base = ProductoControlPeso.objects.filter(
+                area="INSUMOS_KUCHEN",
+                cliente__iexact=r.cliente,
+                codigo=r.codigo_producto,
+                producto__iexact=r.producto,
+                activo=True
+            ).first()
+
+            peso_receta = (
+                int(producto_base.peso_receta)
+                if producto_base and producto_base.peso_receta is not None
+                else (
+                    int(r.peso_receta)
+                    if r.peso_receta is not None
+                    else None
+                )
+            )
+
+            perdida_operacional = (
+                float(producto_base.porcentaje_perdida)
+                if producto_base and producto_base.porcentaje_perdida is not None
+                else 0
+            )
+
+            peso_maximo = None
+
+            if (
+                peso_receta is not None and
+                perdida_operacional < 100
+            ):
+                peso_maximo = round(
+                    peso_receta / (
+                        1 - (perdida_operacional / 100)
+                    ),
+                    2
+                )
+
+            altura_objetivo = (
+                int(producto_base.altura)
+                if producto_base and producto_base.altura
+                else None
+            )
+
+            peso_real = (
+                int(r.peso_real)
+                if r.peso_real is not None
+                else None
+            )
+
+            altura_real = (
+                int(r.altura)
+                if r.altura is not None
+                else None
+            )
 
             registros.append({
                 "id": r.id,
+
                 "ts": r.fecha_registro.isoformat(),
+
                 "cliente": r.cliente,
                 "producto": r.producto,
                 "codigo_producto": r.codigo_producto,
+
                 "peso_receta": peso_receta,
+                "peso_minimo": peso_receta,
+
+                "peso_maximo": peso_maximo,
+
+                "perdida_operacional": perdida_operacional,
+
                 "peso_real": peso_real,
-                "altura": r.altura,
-                "desviacion": desv,
+
+                "altura": altura_real,
+                "altura_objetivo": altura_objetivo,
+
+                "desviacion": (
+                    (peso_real or 0) -
+                    (peso_receta or 0)
+                ),
+
                 "lote": r.lote,
                 "turno": r.turno,
             })
 
-        return JsonResponse({"ok": True, "registros": registros})
+        return JsonResponse({
+            "ok": True,
+            "registros": registros
+        })
+
     except Exception as e:
-        return JsonResponse({"ok": False, "error": str(e)}, status=500)
+
+        return JsonResponse({
+            "ok": False,
+            "error": str(e)
+        }, status=500)
     
 @login_required
 def redireccionar_intermedio_4(request):
