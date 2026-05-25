@@ -7,6 +7,17 @@ class LayoutCapaInline(admin.TabularInline):
     extra = 0
     ordering = ("orden",)
     autocomplete_fields = ("ingrediente",)
+    fields = (
+        'orden',
+        'tipo',
+        'ingrediente',
+        'etiqueta',
+        'etapa',
+        'peso_objetivo_g',
+        'tolerancia_menos_g',
+        'tolerancia_mas_g',
+        'obligatorio',
+    )
 
 
 @admin.register(LayoutTorta)
@@ -68,7 +79,28 @@ class IngredienteAdmin(admin.ModelAdmin):
 
 @admin.register(LayoutCapa)
 class LayoutCapaAdmin(admin.ModelAdmin):
-    list_display = ("layout", "orden", "tipo", "peso_objetivo_g")
-    list_filter = ("tipo", "layout__planta", "layout__activo")
-    search_fields = ("layout__producto__nombre", "layout__producto__codigo")
-    ordering = ("layout", "orden")
+    list_display = (
+        'layout',
+        'orden',
+        'tipo',
+        'ingrediente',
+        'etapa',
+        'peso_objetivo_g',
+        'obligatorio',
+    )
+
+    list_filter = (
+        'etapa',
+        'tipo',
+        'obligatorio',
+        'layout__planta',
+    )
+
+    search_fields = (
+        'layout__producto__nombre',
+        'layout__producto__codigo',
+        'ingrediente__nombre',
+        'etiqueta',
+    )
+
+    ordering = ('layout', 'orden')

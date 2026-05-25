@@ -111,28 +111,42 @@ class LayoutTorta(models.Model):
 
 
 class LayoutCapa(models.Model):
-    layout = models.ForeignKey(LayoutTorta, on_delete=models.CASCADE, related_name="capas")
+
+    ETAPA_CHOICES = [
+        ('PRELISTO', 'Prelisto'),
+        ('DECORADO', 'Decorado'),
+        ('AMBAS', 'Ambas'),
+    ]
+
+    layout = models.ForeignKey(
+        LayoutTorta,
+        on_delete=models.CASCADE,
+        related_name='capas'
+    )
+
     orden = models.PositiveIntegerField()
     tipo = models.CharField(max_length=30, choices=TipoCapa.choices)
     ingrediente = models.ForeignKey(Ingrediente, on_delete=models.PROTECT)
-    etiqueta = models.CharField(
-        max_length=120,
-        blank=True,
-        default="",
-        help_text="Texto libre opcional."
+    etiqueta = models.CharField(max_length=100, blank=True, null=True)
+
+    etapa = models.CharField(
+        max_length=20,
+        choices=ETAPA_CHOICES,
+        default='AMBAS',
+        verbose_name='Etapa del proceso'
     )
-    peso_objetivo_g = models.DecimalField(max_digits=8, decimal_places=1)
-    tolerancia_menos_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
-    tolerancia_mas_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
+
+    peso_objetivo_g = models.DecimalField(max_digits=10, decimal_places=2)
+    tolerancia_menos_g = models.DecimalField(max_digits=10, decimal_places=2)
+    tolerancia_mas_g = models.DecimalField(max_digits=10, decimal_places=2)
     obligatorio = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ["layout", "orden"]
-        unique_together = [("layout", "orden")]
+        unique_together = ('layout', 'orden')
+        ordering = ['orden']
 
     def __str__(self):
-        label = self.etiqueta.strip() or self.ingrediente.nombre
-        return f"{self.layout} #{self.orden} {label}"
+        return f'{self.layout} - {self.orden} - {self.tipo} - {self.get_etapa_display()}'
 
 
 class RegistroLayout(models.Model):
