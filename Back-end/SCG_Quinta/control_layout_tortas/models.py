@@ -150,6 +150,18 @@ class LayoutCapa(models.Model):
 
 
 class RegistroLayout(models.Model):
+    ETAPA_REGISTRO_CHOICES = [
+    ('PRELISTO', 'Prelisto'),
+    ('DECORADO', 'Decorado'),
+    ('AMBAS', 'Ambas'),
+    ]
+
+    etapa_registro = models.CharField(
+        max_length=20,
+        choices=ETAPA_REGISTRO_CHOICES,
+        default='AMBAS',
+        verbose_name='Etapa a registrar'
+    )
     planta = models.CharField(max_length=10, choices=Planta.choices)
     layout = models.ForeignKey(LayoutTorta, on_delete=models.PROTECT)
     fecha = models.DateField(default=timezone.localdate)

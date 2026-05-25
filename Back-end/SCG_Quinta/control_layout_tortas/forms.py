@@ -30,6 +30,7 @@ class RegistroLayoutForm(forms.ModelForm):
             "linea",
             "lote",
             "operador",
+            'etapa_registro',
             "peso_real_obtenido_g",
             "observaciones",
         ]
@@ -39,6 +40,10 @@ class RegistroLayoutForm(forms.ModelForm):
             "layout": forms.HiddenInput(),
             "operador": forms.TextInput(attrs={"readonly": "readonly"}),
             "peso_real_obtenido_g": forms.HiddenInput(),
+            'etapa_registro': forms.Select(attrs={
+                'class': 'form-control',
+                'id': 'id_etapa_registro'
+            }),
         }
 
     def __init__(self, *args, **kwargs):

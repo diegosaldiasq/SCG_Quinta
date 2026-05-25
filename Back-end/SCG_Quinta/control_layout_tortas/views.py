@@ -44,6 +44,15 @@ class RegistroCreateView(LoginRequiredMixin, View):
             return str(email).strip()
 
         return str(user)
+    
+    def _filtrar_capas_por_etapa(self, capas_qs, etapa_registro):
+        if etapa_registro == "PRELISTO":
+            return capas_qs.filter(etapa__in=["PRELISTO", "AMBAS"])
+
+        if etapa_registro == "DECORADO":
+            return capas_qs.filter(etapa__in=["DECORADO", "AMBAS"])
+
+        return capas_qs
 
     def _resolver_layout(self, planta, cliente, producto_id):
         if not planta or not cliente or not producto_id:
@@ -62,7 +71,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
             .first()
         )
 
-    def _calcular_resumen(self, layout):
+    def _calcular_resumen(self, layout, etapa_registro="AMBAS"):
         if not layout:
             return {
                 "total_capas": 0,
@@ -71,7 +80,10 @@ class RegistroCreateView(LoginRequiredMixin, View):
                 "peso_final_con_perdida": Decimal("0.0"),
             }
 
-        capas_qs = layout.capas.all()
+        capas_qs = self._filtrar_capas_por_etapa(
+            layout.capas.all(),
+            etapa_registro
+        )
 
         total_capas = capas_qs.count()
         peso_objetivo_total = capas_qs.aggregate(
@@ -102,7 +114,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
         except (InvalidOperation, TypeError, ValueError):
             return None
 
-    def _build_detalle_rows(self, layout, post_data=None):
+    def _build_detalle_rows(self, layout, post_data=None, etapa_registro="AMBAS"):
         if not layout:
             return []
 
@@ -115,9 +127,14 @@ class RegistroCreateView(LoginRequiredMixin, View):
         posted_pesos = post_data.getlist("peso_real_g") if post_data else []
         posted_comentarios = post_data.getlist("comentario") if post_data else []
 
-        capas = list(
-            layout.capas.select_related("ingrediente").order_by("orden")
+        capas_qs = layout.capas.select_related("ingrediente").order_by("orden")
+
+        capas_qs = self._filtrar_capas_por_etapa(
+            capas_qs,
+            etapa_registro
         )
+
+        capas = list(capas_qs)
 
         rows = []
         for idx, capa in enumerate(capas):
@@ -176,7 +193,14 @@ class RegistroCreateView(LoginRequiredMixin, View):
             form.initial["layout"] = layout.id
 
     def _contexto_base(self, form, layout=None, detalle_rows=None, peso_real_obtenido_actual=0):
-        resumen = self._calcular_resumen(layout)
+        etapa_registro = "AMBAS"
+
+        if form and hasattr(form, "cleaned_data") and form.is_bound and form.is_valid():
+            etapa_registro = form.cleaned_data.get("etapa_registro") or "AMBAS"
+        elif form:
+            etapa_registro = form.data.get("etapa_registro") or form.initial.get("etapa_registro") or "AMBAS"
+
+        resumen = self._calcular_resumen(layout, etapa_registro)
 
         codigo_producto = ""
         if layout and layout.producto:
@@ -232,9 +256,10 @@ class RegistroCreateView(LoginRequiredMixin, View):
             )
 
         layout = form.cleaned_data.get("layout")
+        etapa_registro = form.cleaned_data.get("etapa_registro") or "AMBAS"
         self._set_campos_visualizacion_form(form, layout)
 
-        detalle_rows = self._build_detalle_rows(layout, request.POST)
+        detalle_rows = self._build_detalle_rows(layout, request.POST, etapa_registro)
         peso_real_preview = self._calcular_peso_real_desde_rows(detalle_rows)
 
         guardar = "_guardar" in request.POST
@@ -258,7 +283,7 @@ class RegistroCreateView(LoginRequiredMixin, View):
         registro.verificado = False
         registro.completado = False
 
-        resumen = self._calcular_resumen(layout)
+        resumen = self._calcular_resumen(layout, etapa_registro)
         registro.total_capas = resumen["total_capas"]
         registro.peso_objetivo_total_g = resumen["peso_objetivo_total"]
         registro.porcentaje_perdida = resumen["porcentaje_perdida"]
@@ -504,6 +529,19 @@ def api_layout_por_producto(request):
     planta = request.GET.get("planta", "").strip()
     cliente = request.GET.get("cliente", "").strip()
     producto_id = request.GET.get("producto_id", "").strip()
+    etapa = request.GET.get("etapa", "AMBAS").strip() or "AMBAS"
+
+    capas_qs = layout.capas.all()
+
+    if etapa == "PRELISTO":
+        capas_qs = capas_qs.filter(etapa__in=["PRELISTO", "AMBAS"])
+    elif etapa == "DECORADO":
+        capas_qs = capas_qs.filter(etapa__in=["DECORADO", "AMBAS"])
+
+    total_capas = capas_qs.count()
+    peso_objetivo_total = capas_qs.aggregate(
+        total=Sum("peso_objetivo_g")
+    )["total"] or Decimal("0.0")
 
     layout = (
         LayoutTorta.objects
@@ -529,4 +567,6 @@ def api_layout_por_producto(request):
         "ok": True,
         "layout_id": layout.id,
         "codigo": layout.producto.codigo,
+        "total_capas": total_capas,
+        "peso_objetivo_total": round(peso_objetivo_total, 1),
     })
