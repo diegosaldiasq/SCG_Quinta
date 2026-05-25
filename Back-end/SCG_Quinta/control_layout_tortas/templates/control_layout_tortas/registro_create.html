@@ -20,6 +20,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const productoSelect = document.getElementById("id_producto_manual");
     const codigoInput = document.getElementById("id_codigo_auto");
     const layoutInput = document.getElementById("id_layout");
+    const selectEtapa = document.getElementById("id_etapa_registro");
+
+    if (selectEtapa) {
+        selectEtapa.addEventListener("change", function () {
+            const form = selectEtapa.closest("form");
+
+            if (!form) return;
+
+            // Envía el formulario como preview, no como guardado definitivo
+            let inputPreview = document.createElement("input");
+            inputPreview.type = "hidden";
+            inputPreview.name = "_preview";
+            inputPreview.value = "1";
+
+            form.appendChild(inputPreview);
+            form.submit();
+        });
+    }
 
     function limpiarSelect(select, texto) {
         select.innerHTML = "";
