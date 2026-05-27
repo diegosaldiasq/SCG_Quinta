@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from .forms import TurnoOEEForm, CATALOGO
 from .models import TurnoOEE, Producto, Detencion, Reproceso, ResumenTurnoOee
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
