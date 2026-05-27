@@ -5,16 +5,26 @@ from control_de_pesos.models import ProductoControlPeso
 
 class ProductoControlPesoChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return f"{obj.cliente} - {obj.codigo} - {obj.producto}"
+        return obj.producto
 
 
 class RegistroSalaCremasForm(forms.ModelForm):
+
+    cliente_selector = forms.ChoiceField(
+        label="Cliente",
+        required=True,
+        choices=[],
+        widget=forms.Select(attrs={
+            "class": "form-control",
+            "id": "id_cliente"
+        })
+    )
 
     producto_control_peso = ProductoControlPesoChoiceField(
         queryset=ProductoControlPeso.objects.filter(
             activo=True,
             area="TORTAS"
-        ).order_by("cliente", "producto"),
+        ).order_by("producto"),
         label="Producto",
         widget=forms.Select(attrs={
             "class": "form-control",
@@ -24,9 +34,9 @@ class RegistroSalaCremasForm(forms.ModelForm):
 
     class Meta:
         model = RegistroSalaCremas
-
         fields = [
             "turno",
+            "cliente_selector",
             "producto_control_peso",
             "lote",
             "tipo_crema",
@@ -38,22 +48,15 @@ class RegistroSalaCremasForm(forms.ModelForm):
         ]
 
         widgets = {
-            "turno": forms.Select(attrs={
-                "class": "form-control"
-            }),
+            "turno": forms.Select(attrs={"class": "form-control"}),
 
             "lote": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Lote"
             }),
 
-            "tipo_crema": forms.Select(attrs={
-                "class": "form-control"
-            }),
-
-            "aplicacion": forms.Select(attrs={
-                "class": "form-control"
-            }),
+            "tipo_crema": forms.Select(attrs={"class": "form-control"}),
+            "aplicacion": forms.Select(attrs={"class": "form-control"}),
 
             "densidad": forms.NumberInput(attrs={
                 "class": "form-control",
@@ -78,3 +81,20 @@ class RegistroSalaCremasForm(forms.ModelForm):
                 "placeholder": "Observaciones del proceso",
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        clientes = ProductoControlPeso.objects.filter(
+            activo=True,
+            area="TORTAS"
+        ).values_list("cliente", flat=True).distinct().order_by("cliente")
+
+        self.fields["cliente_selector"].choices = [("", "Seleccione cliente")] + [
+            (cliente, cliente) for cliente in clientes
+        ]
+
+        self.fields["producto_control_peso"].queryset = ProductoControlPeso.objects.filter(
+            activo=True,
+            area="TORTAS"
+        ).order_by("producto")

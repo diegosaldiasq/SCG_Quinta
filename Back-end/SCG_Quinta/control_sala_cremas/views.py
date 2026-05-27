@@ -40,8 +40,14 @@ def registro_sala_cremas(request):
     else:
         form = RegistroSalaCremasForm()
 
+    productos_base = ProductoControlPeso.objects.filter(
+        activo=True,
+        area="TORTAS"
+    ).order_by("cliente", "producto")
+
     return render(request, "control_sala_cremas/registro_sala_cremas.html", {
         "form": form,
+        "productos_base": productos_base,
     })
 
 
