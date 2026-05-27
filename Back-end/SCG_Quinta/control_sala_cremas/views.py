@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import json
+from control_de_pesos.models import ProductoControlPeso
 
 
 from openpyxl import Workbook
@@ -186,13 +187,13 @@ def descargar_sala_cremas_excel(request):
 
 @login_required
 def api_clientes_sala_cremas(request):
-    clientes = (
-        ProductoSalaCremas.objects
-        .filter(activo=True)
-        .values_list("cliente", flat=True)
-        .distinct()
-        .order_by("cliente")
-    )
+    clientes = ProductoControlPeso.objects.filter(
+        activo=True,
+        area='TORTAS'
+    ).values_list(
+        'cliente',
+        flat=True
+    ).distinct().order_by('cliente')
     return JsonResponse({"clientes": list(clientes)})
 
 
@@ -200,12 +201,15 @@ def api_clientes_sala_cremas(request):
 def api_productos_por_cliente_sala_cremas(request):
     cliente = request.GET.get("cliente", "")
 
-    productos = (
-        ProductoSalaCremas.objects
-        .filter(cliente=cliente, activo=True)
-        .values("producto", "codigo")
-        .order_by("producto")
-    )
+    productos = ProductoControlPeso.objects.filter(
+        activo=True,
+        area='TORTAS',
+        cliente=cliente
+    ).values(
+        'id',
+        'producto',
+        'codigo'
+    ).order_by('producto')
 
     return JsonResponse({"productos": list(productos)})
 

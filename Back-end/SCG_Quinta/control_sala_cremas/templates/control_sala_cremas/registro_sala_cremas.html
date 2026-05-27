@@ -15,51 +15,22 @@
 </head>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const clienteSelect = document.getElementById("id_cliente");
-    const productoSelect = document.getElementById("id_producto");
-    const codigoInput = document.getElementById("id_codigo");
+    const productoSelect = document.getElementById("id_producto_control_peso");
+    const clienteDisplay = document.getElementById("cliente-display");
+    const codigoDisplay = document.getElementById("codigo-display");
 
-    const urlClientes = "{% url 'control_sala_cremas:api_clientes_sala_cremas' %}";
-    const urlProductos = "{% url 'control_sala_cremas:api_productos_por_cliente_sala_cremas' %}";
+    if (!productoSelect) return;
 
-    fetch(urlClientes)
-        .then(response => response.json())
-        .then(data => {
-            clienteSelect.innerHTML = '<option value="">Seleccione cliente</option>';
+    function actualizarDatosProducto() {
+        const selected = productoSelect.options[productoSelect.selectedIndex];
 
-            data.clientes.forEach(cliente => {
-                const option = document.createElement("option");
-                option.value = cliente;
-                option.textContent = cliente;
-                clienteSelect.appendChild(option);
-            });
-        });
+        clienteDisplay.value = selected.dataset.cliente || "";
+        codigoDisplay.value = selected.dataset.codigo || "";
+    }
 
-    clienteSelect.addEventListener("change", function () {
-        const cliente = this.value;
+    actualizarDatosProducto();
 
-        productoSelect.innerHTML = '<option value="">Seleccione producto</option>';
-        codigoInput.value = "";
-
-        if (!cliente) return;
-
-        fetch(`${urlProductos}?cliente=${encodeURIComponent(cliente)}`)
-            .then(response => response.json())
-            .then(data => {
-                data.productos.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.producto;
-                    option.textContent = item.producto;
-                    option.dataset.codigo = item.codigo;
-                    productoSelect.appendChild(option);
-                });
-            });
-    });
-
-    productoSelect.addEventListener("change", function () {
-        const selected = this.options[this.selectedIndex];
-        codigoInput.value = selected.dataset.codigo || "";
-    });
+    productoSelect.addEventListener("change", actualizarDatosProducto);
 });
 </script>
 <body>
@@ -94,18 +65,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
 
                 <div class="field">
-                    <label>Cliente</label>
-                    {{ form.cliente }}
+                    <label>Producto</label>
+                    {{ form.producto_control_peso }}
                 </div>
 
                 <div class="field">
-                    <label>Producto</label>
-                    {{ form.producto }}
+                    <label>Cliente</label>
+                    <input type="text" id="cliente-display" readonly class="form-control">
                 </div>
 
                 <div class="field">
                     <label>Código</label>
-                    {{ form.codigo }}
+                    <input type="text" id="codigo-display" readonly class="form-control">
                 </div>
 
                 <div class="field">

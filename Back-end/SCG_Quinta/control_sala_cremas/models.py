@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from control_de_pesos.models import ProductoControlPeso
 
 
 class ProductoSalaCremas(models.Model):
@@ -37,6 +38,15 @@ class RegistroSalaCremas(models.Model):
         ("Ambas", "Ambas"),
     ]
 
+    producto_control_peso = models.ForeignKey(
+        ProductoControlPeso,
+        on_delete=models.PROTECT,
+        related_name='registros_sala_cremas',
+        verbose_name='Producto',
+        null=True,
+        blank=True
+    )
+
     usuario = models.CharField(max_length=150)
     fecha_hora = models.DateTimeField(default=timezone.now)
 
@@ -64,3 +74,12 @@ class RegistroSalaCremas(models.Model):
 
     def __str__(self):
         return f"{self.producto} - Lote {self.lote}"
+    
+    def save(self, *args, **kwargs):
+
+        if self.producto_control_peso:
+            self.cliente = self.producto_control_peso.cliente
+            self.producto = self.producto_control_peso.producto
+            self.codigo = self.producto_control_peso.codigo
+
+        super().save(*args, **kwargs)

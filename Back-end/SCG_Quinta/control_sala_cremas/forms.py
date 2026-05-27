@@ -1,18 +1,30 @@
 from django import forms
 from .models import RegistroSalaCremas
+from control_de_pesos.models import ProductoControlPeso
 
 
 class RegistroSalaCremasForm(forms.ModelForm):
+
+    producto_control_peso = forms.ModelChoiceField(
+        queryset=ProductoControlPeso.objects.filter(
+            activo=True,
+            area='TORTAS'
+        ).order_by('cliente', 'producto'),
+        label='Producto',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'id_producto_control_peso'
+        })
+    )
+
     class Meta:
         model = RegistroSalaCremas
         fields = [
             "turno",
-            "cliente",
-            "producto",
-            "codigo",
+            "producto_control_peso",
             "lote",
-            "tipo_crema",   # 👈 nuevo
-            "aplicacion",   # 👈 nuevo
+            "tipo_crema",
+            "aplicacion",
             "densidad",
             "temperatura",
             "numero_batidora",
@@ -21,38 +33,35 @@ class RegistroSalaCremasForm(forms.ModelForm):
 
         widgets = {
             "turno": forms.Select(attrs={"class": "form-control"}),
-            "cliente": forms.Select(attrs={"class": "form-control", "id": "id_cliente"}),
-            "producto": forms.Select(attrs={"class": "form-control", "id": "id_producto"}),
-            "codigo": forms.TextInput(attrs={
+
+            "lote": forms.TextInput(attrs={
                 "class": "form-control",
-                "id": "id_codigo",
-                "readonly": "readonly",
+                "placeholder": "Lote"
             }),
-            "lote": forms.TextInput(attrs={"class": "form-control", "placeholder": "Lote"}),
+
             "tipo_crema": forms.Select(attrs={"class": "form-control"}),
             "aplicacion": forms.Select(attrs={"class": "form-control"}),
+
             "densidad": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.001",
                 "placeholder": "Ej: 0.850",
             }),
+
             "temperatura": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.01",
                 "placeholder": "Ej: 18.5",
             }),
+
             "numero_batidora": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "N° batidora",
             }),
+
             "observaciones": forms.Textarea(attrs={
                 "class": "form-control",
                 "rows": 3,
                 "placeholder": "Observaciones del proceso",
             }),
         }
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields["cliente"].choices = [("", "Seleccione cliente")]
-        self.fields["producto"].choices = [("", "Seleccione producto")]
