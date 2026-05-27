@@ -33,12 +33,14 @@ from openpyxl.styles import Font, PatternFill
 # Create your views here.
 
 AREA_OEE_PRODUCTOS = "TORTAS"
+CLIENTES_PERMITIDOS = ["Jumbo", "Sisa"]
 
 
 def obtener_catalogo_desde_bd():
     qs = ProductoControlPeso.objects.filter(
         area=AREA_OEE_PRODUCTOS,
-        activo=True
+        activo=True,
+        cliente__in=CLIENTES_PERMITIDOS
     ).order_by("cliente", "producto")
 
     catalogo = {}
@@ -47,7 +49,7 @@ def obtener_catalogo_desde_bd():
         catalogo.setdefault(item.cliente, []).append({
             "producto": item.producto,
             "codigo": item.codigo,
-            "un_pp": float(item.un_pp or 0),
+            "un_pp": float(item.un_pp or 80)  # valor por defecto si no hay un_pp,
         })
 
     return catalogo
