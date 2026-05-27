@@ -19,17 +19,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const clienteDisplay = document.getElementById("cliente-display");
     const codigoDisplay = document.getElementById("codigo-display");
 
-    if (!productoSelect) return;
+    if (!productoSelect || !clienteDisplay || !codigoDisplay) return;
 
     function actualizarDatosProducto() {
         const selected = productoSelect.options[productoSelect.selectedIndex];
 
-        clienteDisplay.value = selected.dataset.cliente || "";
-        codigoDisplay.value = selected.dataset.codigo || "";
+        if (!selected || !selected.textContent.includes(" - ")) {
+            clienteDisplay.value = "";
+            codigoDisplay.value = "";
+            return;
+        }
+
+        const partes = selected.textContent.split(" - ");
+
+        clienteDisplay.value = partes[0] || "";
+        codigoDisplay.value = partes[1] || "";
     }
 
     actualizarDatosProducto();
-
     productoSelect.addEventListener("change", actualizarDatosProducto);
 });
 </script>
@@ -65,13 +72,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
 
                 <div class="field">
-                    <label>Producto</label>
-                    {{ form.producto_control_peso }}
+                    <label>Cliente</label>
+                    <input type="text" id="cliente-display" readonly class="form-control">
                 </div>
 
                 <div class="field">
-                    <label>Cliente</label>
-                    <input type="text" id="cliente-display" readonly class="form-control">
+                    <label>Producto</label>
+                    {{ form.producto_control_peso }}
                 </div>
 
                 <div class="field">
