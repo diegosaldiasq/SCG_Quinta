@@ -33,7 +33,7 @@ from openpyxl.styles import Font, PatternFill
 # Create your views here.
 
 AREA_OEE_PRODUCTOS = "TORTAS"
-CLIENTES_PERMITIDOS = ["Jumbo", "Sisa"]
+CLIENTES_PERMITIDOS = ["Jumbo", "SISA"]
 
 
 def obtener_catalogo_desde_bd():
