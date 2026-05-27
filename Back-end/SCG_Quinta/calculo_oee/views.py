@@ -3,7 +3,7 @@ from .forms import TurnoOEEForm, CATALOGO
 from .models import TurnoOEE, Producto, Detencion, Reproceso, ResumenTurnoOee
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from .forms import ProduccionRealForm
+from .forms import ProduccionRealForm, TurnoOEEForm
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -13,7 +13,8 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from .constants import TASA_NOMINAL_POR_PRODUCTO, TASA_NOMINAL_DEFECTO
+#from .constants import TASA_NOMINAL_POR_PRODUCTO, TASA_NOMINAL_DEFECTO
+from control_de_pesos.models import ProductoControlPeso
 from django.forms.models import model_to_dict
 from openpyxl import Workbook
 from datetime import datetime
@@ -31,6 +32,41 @@ from openpyxl.styles import Font, PatternFill
 
 
 # Create your views here.
+
+AREA_OEE_PRODUCTOS = "TORTAS"
+
+
+def obtener_catalogo_desde_bd():
+    qs = ProductoControlPeso.objects.filter(
+        area=AREA_OEE_PRODUCTOS,
+        activo=True
+    ).order_by("cliente", "producto")
+
+    catalogo = {}
+
+    for item in qs:
+        catalogo.setdefault(item.cliente, []).append({
+            "producto": item.producto,
+            "codigo": item.codigo,
+            "un_pp": float(item.un_pp or 0),
+        })
+
+    return catalogo
+
+
+def obtener_un_pp(cliente, producto, codigo):
+    item = ProductoControlPeso.objects.filter(
+        area=AREA_OEE_PRODUCTOS,
+        activo=True,
+        cliente=cliente,
+        producto=producto,
+        codigo=codigo
+    ).first()
+
+    if not item or not item.un_pp:
+        return 0
+
+    return float(item.un_pp)
 
 @csrf_exempt
 @login_required
@@ -117,13 +153,10 @@ def crear_turno(request):
     else:
         form = TurnoOEEForm()
     
-    catalogo_obj = CATALOGO
-
-    # ✅ PASA EL DICT DIRECTO
     return render(request, 'calculo_oee/crear_turno.html', {
-        'form': form,
-        'catalogo_obj': CATALOGO,
-    })
+    'form': form,
+    'catalogo_obj': obtener_catalogo_desde_bd(),
+})
 
 
 @login_required
@@ -154,10 +187,13 @@ def resumen_turno(request, lote_id):
             )
             # Tasa nominal promedio (promedio simple)
             tasas = []
+
             for p in productos_qs:
-                clave = (p.producto, p.codigo)
-                tasas.append(TASA_NOMINAL_POR_PRODUCTO.get(clave, TASA_NOMINAL_DEFECTO))
-            tasa_nominal = sum(tasas) / len(tasas) if tasas else TASA_NOMINAL_DEFECTO
+                un_pp = obtener_un_pp(p.cliente, p.producto, p.codigo)
+                if un_pp:
+                    tasas.append(un_pp)
+
+            tasa_nominal = sum(tasas) / len(tasas) if tasas else 80  # valor por defecto si no hay tasas
         else:
             # Caída a lógica previa de un solo producto en el turno
             produccion_planificada = lote.produccion_planeada or 0
@@ -165,8 +201,7 @@ def resumen_turno(request, lote_id):
             productos_concat = lote.producto
             codigos_concat = lote.codigo or ""
             cliente_concat = lote.cliente
-            clave = (lote.producto, lote.codigo)
-            tasa_nominal = TASA_NOMINAL_POR_PRODUCTO.get(clave, TASA_NOMINAL_DEFECTO)
+            tasa_nominal = obtener_un_pp(lote.cliente, lote.producto, lote.codigo)
 
         tiempo_paro = sum(d.duracion for d in lote.detenciones.all())
         productos_malos = sum(r.cantidad for r in lote.reprocesos.all())
