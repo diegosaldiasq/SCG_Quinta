@@ -25,7 +25,9 @@ class RegistroSalaCremas(models.Model):
         ("Turno C", "Turno C"),
     ]
     TIPOS_CREMA = [
-        ("Crema batida", "Crema batida"),
+        ("Crema batida vegetal", "Crema batida vegetal"),
+        ("Crema batida lactea", "Crema batida lactea"),
+        ("Crema batida saborisada", "Crema batida saborisada"),
         ("Crema pastelera", "Crema pastelera"),
         ("Merengue", "Merengue"),
         ("Manjar", "Manjar"),
