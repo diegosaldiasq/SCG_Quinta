@@ -243,7 +243,8 @@
                     data.forEach(item => {
                         const option = document.createElement('option');
                         option.value = item.id;
-                        option.textContent = `${item.codigo} - ${item.producto}`;
+                        option.textContent = item.producto;
+                        option.dataset.codigo = item.codigo;
                         productoSelect.appendChild(option);
                     });
                 });
