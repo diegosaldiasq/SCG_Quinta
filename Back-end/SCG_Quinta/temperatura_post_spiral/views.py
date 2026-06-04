@@ -231,7 +231,7 @@ def verificar_final(request, pk):
 def api_productos_por_cliente(request):
     cliente = request.GET.get('cliente', '').strip()
 
-    productos = (
+    productos_qs = (
         ProductoControlPeso.objects
         .filter(
             cliente=cliente,
@@ -241,21 +241,22 @@ def api_productos_por_cliente(request):
         .exclude(producto__exact='')
         .exclude(codigo__isnull=True)
         .exclude(codigo__exact='')
-        .values('codigo', 'producto')
-        .distinct()
-        .order_by('producto')
+        .order_by('producto', 'codigo', 'id')
     )
 
-    data = [
-        {
-            'id': item['codigo'],
-            'codigo': item['codigo'],
-            'producto': item['producto'],
-        }
-        for item in productos
-    ]
+    productos_unicos = {}
 
-    return JsonResponse(data, safe=False)
+    for p in productos_qs:
+        clave = f'{p.codigo}|{p.producto}'
+
+        if clave not in productos_unicos:
+            productos_unicos[clave] = {
+                'id': p.id,
+                'codigo': p.codigo,
+                'producto': p.producto,
+            }
+
+    return JsonResponse(list(productos_unicos.values()), safe=False)
 
 
 @login_required
