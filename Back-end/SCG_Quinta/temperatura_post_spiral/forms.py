@@ -92,6 +92,27 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
         ]
 
         self.fields['producto_sala_cremas'].queryset = ProductoControlPeso.objects.none()
+        if self.data.get('cliente_selector'):
+            cliente = self.data.get('cliente_selector')
+
+            self.fields['producto_sala_cremas'].queryset = (
+                ProductoControlPeso.objects
+                .filter(
+                    cliente=cliente,
+                    area__iexact='Tortas'
+                )
+                .order_by('producto')
+            )
+
+        elif self.instance and self.instance.pk:
+            self.fields['producto_sala_cremas'].queryset = (
+                ProductoControlPeso.objects
+                .filter(
+                    cliente=self.instance.cliente,
+                    area__iexact='Tortas'
+                )
+                .order_by('producto')
+            )
         self.fields['producto_sala_cremas'].empty_label = 'Seleccione producto'
 
         if self.instance and self.instance.pk:
