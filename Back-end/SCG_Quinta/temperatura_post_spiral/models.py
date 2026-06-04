@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-#from control_sala_cremas.models import ProductoSalaCremas
 from control_de_pesos.models import ProductoControlPeso
 
 

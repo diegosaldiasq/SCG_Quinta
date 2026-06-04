@@ -10,7 +10,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 
-#from control_sala_cremas.models import ProductoSalaCremas
 from control_de_pesos.models import ProductoControlPeso
 from .forms import RegistroTemperaturaPostSpiralForm, DetalleTemperaturaPostSpiralFormSet
 from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiral
