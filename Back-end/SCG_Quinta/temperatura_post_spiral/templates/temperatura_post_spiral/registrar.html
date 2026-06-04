@@ -224,32 +224,6 @@
 </script>
 <script src="{% static 'temperatura_post_spiral/temperatura_post_spiral.js' %}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const clienteSelect = document.getElementById('id_cliente_selector');
-        const productoSelect = document.getElementById('id_producto_sala_cremas');
-
-        if (!clienteSelect || !productoSelect) return;
-
-        clienteSelect.addEventListener('change', function () {
-            const cliente = this.value;
-
-            productoSelect.innerHTML = '<option value="">Seleccione producto</option>';
-
-            if (!cliente) return;
-
-            fetch(`/temperatura_post_spiral/api/productos-por-cliente/?cliente=${encodeURIComponent(cliente)}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = item.producto;
-                        option.dataset.codigo = item.codigo;
-                        productoSelect.appendChild(option);
-                    });
-                });
-        });
-    });
     document.querySelector("form").addEventListener("submit", function(e) {
 
         const inputs = document.querySelectorAll(".input-temperatura");
