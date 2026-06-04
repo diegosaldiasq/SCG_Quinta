@@ -250,6 +250,48 @@
                 });
         });
     });
+    document.querySelector("form").addEventListener("submit", function(e) {
+
+        const inputs = document.querySelectorAll(".input-temperatura");
+
+        for (const input of inputs) {
+
+            const valor = input.value.trim();
+
+            if (valor && !/^-?\d+([.,]\d+)?$/.test(valor)) {
+
+                alert("Ingrese una temperatura válida.");
+                input.focus();
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+    document.addEventListener("click", function(e) {
+
+        if (!e.target.classList.contains("btn-negativo")) return;
+
+        const wrapper = e.target.closest(".temperatura-wrap");
+
+        if (!wrapper) return;
+
+        const input = wrapper.querySelector(".input-temperatura");
+
+        let valor = input.value.trim();
+
+        if (valor.startsWith("-")) {
+            input.value = valor.substring(1);
+        } else {
+
+            if (valor === "") {
+                input.value = "-";
+            } else {
+                input.value = "-" + valor;
+            }
+        }
+
+        input.focus();
+    });
 </script>
 
 </body>
