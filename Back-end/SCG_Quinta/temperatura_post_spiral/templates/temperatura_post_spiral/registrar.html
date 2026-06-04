@@ -224,47 +224,30 @@
 </script>
 <script src="{% static 'temperatura_post_spiral/temperatura_post_spiral.js' %}"></script>
 <script>
-    document.querySelector("form").addEventListener("submit", function(e) {
+    document.addEventListener('DOMContentLoaded', function () {
+        const clienteSelect = document.getElementById('id_cliente_selector');
+        const productoSelect = document.getElementById('id_producto_sala_cremas');
 
-        const inputs = document.querySelectorAll(".input-temperatura");
+        if (!clienteSelect || !productoSelect) return;
 
-        for (const input of inputs) {
+        clienteSelect.addEventListener('change', function () {
+            const cliente = this.value;
 
-            const valor = input.value.trim();
+            productoSelect.innerHTML = '<option value="">Seleccione producto</option>';
 
-            if (valor && !/^-?\d+([.,]\d+)?$/.test(valor)) {
+            if (!cliente) return;
 
-                alert("Ingrese una temperatura válida.");
-                input.focus();
-                e.preventDefault();
-                return;
-            }
-        }
-    });
-    document.addEventListener("click", function(e) {
-
-        if (!e.target.classList.contains("btn-negativo")) return;
-
-        const wrapper = e.target.closest(".temperatura-wrap");
-
-        if (!wrapper) return;
-
-        const input = wrapper.querySelector(".input-temperatura");
-
-        let valor = input.value.trim();
-
-        if (valor.startsWith("-")) {
-            input.value = valor.substring(1);
-        } else {
-
-            if (valor === "") {
-                input.value = "-";
-            } else {
-                input.value = "-" + valor;
-            }
-        }
-
-        input.focus();
+            fetch(`/temperatura_post_spiral/api/productos-por-cliente/?cliente=${encodeURIComponent(cliente)}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = `${item.codigo} - ${item.producto}`;
+                        productoSelect.appendChild(option);
+                    });
+                });
+        });
     });
 </script>
 

@@ -10,7 +10,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 
-from control_sala_cremas.models import ProductoSalaCremas
+#from control_sala_cremas.models import ProductoSalaCremas
+from control_de_pesos.models import ProductoControlPeso
 from .forms import RegistroTemperaturaPostSpiralForm, DetalleTemperaturaPostSpiralFormSet
 from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiral
 from django.db import transaction
@@ -231,19 +232,18 @@ def verificar_final(request, pk):
 def api_productos_por_cliente(request):
     cliente = request.GET.get('cliente', '').strip()
 
-    productos = ProductoSalaCremas.objects.filter(cliente=cliente).order_by('producto')
+    productos = ProductoControlPeso.objects.filter(
+        cliente=cliente
+    ).order_by('producto')
 
-    data = []
-
-    for p in productos:
-        nombre_producto = getattr(p, 'producto', '') or getattr(p, 'nombre', '') or ''
-        codigo = getattr(p, 'codigo', '') or ''
-
-        data.append({
+    data = [
+        {
             'id': p.id,
-            'producto': nombre_producto,
-            'codigo': codigo,
-        })
+            'producto': p.producto,
+            'codigo': p.codigo,
+        }
+        for p in productos
+    ]
 
     return JsonResponse(data, safe=False)
 

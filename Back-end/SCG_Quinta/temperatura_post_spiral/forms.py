@@ -1,6 +1,7 @@
 from django import forms
 
-from control_sala_cremas.models import ProductoSalaCremas
+#from control_sala_cremas.models import ProductoSalaCremas
+from control_de_pesos.models import ProductoControlPeso
 from .models import RegistroTemperaturaPostSpiral, DetalleTemperaturaPostSpiral
 from django.forms import inlineformset_factory
 from decimal import Decimal, InvalidOperation
@@ -77,7 +78,7 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         clientes = (
-            ProductoSalaCremas.objects
+            ProductoControlPeso.objects
             .exclude(cliente__isnull=True)
             .exclude(cliente__exact='')
             .values_list('cliente', flat=True)
@@ -89,17 +90,17 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
             (cliente, cliente) for cliente in clientes
         ]
 
-        self.fields['producto_sala_cremas'].queryset = ProductoSalaCremas.objects.none()
+        self.fields['producto_sala_cremas'].queryset = ProductoControlPeso.objects.none()
         self.fields['producto_sala_cremas'].empty_label = 'Seleccione producto'
 
         if 'cliente_selector' in self.data:
             cliente = self.data.get('cliente_selector')
-            self.fields['producto_sala_cremas'].queryset = ProductoSalaCremas.objects.filter(
+            self.fields['producto_sala_cremas'].queryset = ProductoControlPeso.objects.filter(
                 cliente=cliente
             ).order_by('producto')
 
         elif self.instance and self.instance.pk:
-            self.fields['producto_sala_cremas'].queryset = ProductoSalaCremas.objects.filter(
+            self.fields['producto_sala_cremas'].queryset = ProductoControlPeso.objects.filter(
                 cliente=self.instance.cliente
             ).order_by('producto')
             self.fields['cliente_selector'].initial = self.instance.cliente

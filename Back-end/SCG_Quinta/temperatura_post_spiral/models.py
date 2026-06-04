@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
-from control_sala_cremas.models import ProductoSalaCremas
+#from control_sala_cremas.models import ProductoSalaCremas
+from control_de_pesos.models import ProductoControlPeso
 
 
 class RegistroTemperaturaPostSpiral(models.Model):
@@ -13,7 +14,7 @@ class RegistroTemperaturaPostSpiral(models.Model):
     ]
 
     producto_sala_cremas = models.ForeignKey(
-        ProductoSalaCremas,
+        ProductoControlPeso,
         on_delete=models.PROTECT,
         related_name='registros_temperatura_post_spiral',
         verbose_name='Producto'
@@ -63,9 +64,9 @@ class RegistroTemperaturaPostSpiral(models.Model):
 
     def save(self, *args, **kwargs):
         if self.producto_sala_cremas:
-            self.cliente = getattr(self.producto_sala_cremas, 'cliente', '') or ''
-            self.producto = getattr(self.producto_sala_cremas, 'producto', '') or getattr(self.producto_sala_cremas, 'nombre', '') or ''
-            self.codigo = getattr(self.producto_sala_cremas, 'codigo', '') or ''
+            self.cliente = self.producto_sala_cremas.cliente or ''
+            self.producto = self.producto_sala_cremas.producto or ''
+            self.codigo = self.producto_sala_cremas.codigo or ''
 
         super().save(*args, **kwargs)
 
