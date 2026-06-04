@@ -79,6 +79,7 @@ class RegistroTemperaturaPostSpiralForm(forms.ModelForm):
 
         clientes = (
             ProductoControlPeso.objects
+            .filter(area__iexact='Tortas')
             .exclude(cliente__isnull=True)
             .exclude(cliente__exact='')
             .values_list('cliente', flat=True)

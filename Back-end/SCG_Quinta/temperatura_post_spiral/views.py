@@ -233,7 +233,8 @@ def api_productos_por_cliente(request):
     cliente = request.GET.get('cliente', '').strip()
 
     productos = ProductoControlPeso.objects.filter(
-        cliente=cliente
+        cliente=cliente,
+        area__iexact='Tortas'
     ).order_by('producto')
 
     data = [
