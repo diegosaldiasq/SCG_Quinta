@@ -232,18 +232,28 @@ def verificar_final(request, pk):
 def api_productos_por_cliente(request):
     cliente = request.GET.get('cliente', '').strip()
 
-    productos = ProductoControlPeso.objects.filter(
-        cliente=cliente,
-        area__iexact='Tortas'
-    ).order_by('producto')
+    productos = (
+        ProductoControlPeso.objects
+        .filter(
+            cliente=cliente,
+            area__iexact='Tortas'
+        )
+        .exclude(producto__isnull=True)
+        .exclude(producto__exact='')
+        .exclude(codigo__isnull=True)
+        .exclude(codigo__exact='')
+        .values('codigo', 'producto')
+        .distinct()
+        .order_by('producto')
+    )
 
     data = [
         {
-            'id': p.id,
-            'producto': p.producto,
-            'codigo': p.codigo,
+            'id': item['codigo'],
+            'codigo': item['codigo'],
+            'producto': item['producto'],
         }
-        for p in productos
+        for item in productos
     ]
 
     return JsonResponse(data, safe=False)
