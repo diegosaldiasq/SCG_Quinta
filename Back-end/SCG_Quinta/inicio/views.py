@@ -125,7 +125,6 @@ def vista_permisos(request):
                 usuario_id = dato.get('id')
 
                 if not usuario_id:
-                    no_encontrados.append(dato)
                     continue
 
                 usuario = DatosFormularioCrearCuenta.objects.filter(id=usuario_id).first()
