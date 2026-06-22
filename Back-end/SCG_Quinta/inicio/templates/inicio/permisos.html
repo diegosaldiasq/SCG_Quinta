@@ -39,13 +39,13 @@
                         <span>{{ usuario.perfil_usuario }}</span>
                         <span>¿Está Activo?</span>
                         {% if usuario.is_active %}
-                            <input type="checkbox" {% if usuario.is_active %}checked{% endif %}>
+                            <input type="checkbox" class="check-activo" {% if usuario.is_active %}checked{% endif %}>
                         {% else %}
                             <input type="checkbox">
                         {% endif %}
                         <span>¿Es Jefatura?</span>
                         {% if usuario.is_staff %}
-                            <input type="checkbox" {% if usuario.is_staff %}checked{% endif %}>
+                            <input type="checkbox" class="check-staff" {% if usuario.is_staff %}checked{% endif %}>
                         {% else %}
                             <input type="checkbox">
                         {% endif %}
