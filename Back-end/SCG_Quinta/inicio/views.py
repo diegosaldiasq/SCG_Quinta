@@ -109,41 +109,43 @@ def permisos(request):
 @login_required
 @require_POST
 def vista_permisos(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return JsonResponse({'existe': False, 'error': 'Sin permiso'}, status=403)
+
     try:
         body_unicode = request.body.decode('utf-8') or '{}'
         body_data = json.loads(body_unicode)
         datos = body_data.get('userData', [])
 
-        no_encontrados = []
         actualizados = 0
+        no_encontrados = []
 
         with transaction.atomic():
             for dato in datos:
-                # Normaliza y limpia el nombre que viene del front
-                nombre = unicodedata.normalize('NFKC', str(dato.get('name', ''))).strip()
-                es_activo = bool(dato.get('isActive'))
-                es_jefatura = bool(dato.get('isStaff'))
+                usuario_id = dato.get('id')
 
-                if not nombre:
+                if not usuario_id:
+                    no_encontrados.append(dato)
                     continue
 
-                # Busca de forma tolerante (sin mayúsculas/minúsculas, tolera espacios)
-                q = DatosFormularioCrearCuenta.objects
-                usuario = (
-                    q.filter(nombre_completo__iexact=nombre).first()
-                    or q.filter(nombre_completo__icontains=nombre).first()
-                )
+                usuario = DatosFormularioCrearCuenta.objects.filter(id=usuario_id).first()
 
                 if not usuario:
-                    no_encontrados.append(nombre)
+                    no_encontrados.append(usuario_id)
                     continue
 
-                usuario.is_active = es_activo
-                usuario.is_staff = es_jefatura
+                usuario.is_active = bool(dato.get('isActive'))
+                usuario.is_staff = bool(dato.get('isStaff'))
                 usuario.save(update_fields=['is_active', 'is_staff'])
+
                 actualizados += 1
 
-        return JsonResponse({'existe': True, 'actualizados': actualizados, 'no_encontrados': no_encontrados})
+        return JsonResponse({
+            'existe': actualizados > 0,
+            'actualizados': actualizados,
+            'no_encontrados': no_encontrados
+        })
+
     except Exception as e:
         return JsonResponse({'existe': False, 'error': str(e)}, status=500)
 

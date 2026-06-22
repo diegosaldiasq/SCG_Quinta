@@ -7,46 +7,45 @@ $.ajaxSetup({
     }
 });
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("miBoton").addEventListener("click", async function() {
+    document.getElementById("miBoton").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
         try {
-            event.preventDefault(); // <-- para no recargar la pagina al enviar el formulario
-            var userData = [];
+            const userData = [];
 
-            let users = document.querySelectorAll('.usuario');
+            document.querySelectorAll('.usuario').forEach(function(user) {
+                const id = user.dataset.id;
+                const name = user.querySelector('.nombre-usuario').innerText.trim();
+                const isActive = user.querySelector('.check-activo').checked;
+                const isStaff = user.querySelector('.check-staff').checked;
 
-            users.forEach(function(user) {
-                let name = user.querySelector('span').innerText;
-                let isActive = user.querySelectorAll('input[type="checkbox"]')[0].checked;
-                let isStaff = user.querySelectorAll('input[type="checkbox"]')[1].checked;
-        
                 userData.push({
+                    id: id,
                     name: name,
                     isActive: isActive,
                     isStaff: isStaff
                 });
-            });          
-            
-            // Obtener el CSRF token
-            var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+            });
 
-            var response = await fetch('/inicio/vista_permisos/', {
+            const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+            const response = await fetch('/inicio/vista_permisos/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken // Aquí deberías agregar el csrf token para Django si es necesario
+                    'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({ userData: userData })
             });
-            var data = await response.json();
-            debugger; // <-- Agrega esta línea
-            if (data.existe) {
-                //window.location.href = "/inicio/permiso_creado/";
-                alert("Se actualizaron los permisos correctamente.");
-                return true;
+
+            const data = await response.json();
+
+            if (response.ok && data.existe) {
+                alert(`Se actualizaron ${data.actualizados} usuarios correctamente.`);
             } else {
-                alert("No se pudo actualizar los permisos.");
-                //return false;
+                alert(data.error || "No se pudo actualizar los permisos.");
             }
+
         } catch (error) {
             console.error("Hubo un error:", error);
             alert("Hubo un problema al guardar los permisos.");
