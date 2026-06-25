@@ -112,6 +112,9 @@
           </div>
         </div>
 
+        <h2>Gráfico Unidades por Persona</h2>
+        <canvas id="graficoUnidadesPersona"></canvas>
+
         <!-- === GRÁFICO 2: DETENCIONES === -->
         <h2 style="text-align:center; margin-top:24px;">Gráfico Detenciones</h2>
 
@@ -210,9 +213,10 @@
 
     const ctxOEE = $('#graficoOEE').getContext('2d');
     const ctxDet = $('#graficoDetenciones').getContext('2d');
+    const ctxUnidadesPersona = $('#graficoUnidadesPersona').getContext('2d');
     const legendDetBox = $('#legendDet');
 
-    let chartOEE, chartDet;
+    let chartOEE, chartDet, chartUnidadesPersona;
 
     function getCheckedValues(panel) {
       return Array.from(panel.querySelectorAll('input[type="checkbox"]:checked'))
@@ -417,6 +421,8 @@
       const promedioOEEData = labels.map(() => promedioOEE);
       const target  = data.map(d => +d.target || 0);
       const loteIds = data.map(d => d.lote_id);
+      const unidadesPPReal = data.map(d => +d.unidades_pp_real || 0);
+      const unidadesPPTeorico = data.map(d => +d.unidades_pp_teorico || 0);
 
       const showValuesPlugin = {
         id: 'showValuesPlugin',
@@ -495,6 +501,50 @@
           }
         },
         plugins:[showValuesPlugin]
+      });
+      if (chartUnidadesPersona) chartUnidadesPersona.destroy();
+
+      chartUnidadesPersona = new Chart(ctxUnidadesPersona, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Unidades por persona real',
+              data: unidadesPPReal
+            },
+            {
+              label: 'Unidades por persona teórico',
+              data: unidadesPPTeorico
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'right' },
+            title: {
+              display: true,
+              text: 'Unidades por persona: Real vs Teórico'
+            },
+            tooltip: {
+              callbacks: {
+                label(item) {
+                  return `${item.dataset.label}: ${Number(item.raw).toFixed(1)} un/persona`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Unidades por persona'
+              }
+            }
+          }
+        }
       });
     }
 

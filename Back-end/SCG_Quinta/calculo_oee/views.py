@@ -722,9 +722,14 @@ def resumen_turno_oee_api(request):
 
         qs = (ResumenTurnoOee.objects
               .annotate(target=Value(65.83, output_field=FloatField()))  # ajusta tu target si es otro
-              .values('id', 'fecha', 'turno', 'linea',
-                      'disponibilidad', 'eficiencia', 'oee',
-                      'target', 'lote_id'))
+              .values(
+                        'id', 'fecha', 'turno', 'linea',
+                        'disponibilidad', 'eficiencia', 'oee', 'target', 'lote_id',
+                        'produccion_real',
+                        'produccion_teorica',
+                        'numero_personas',
+                        'unidades_por_persona',
+                    ))
 
         if semanas:
             qs = qs.annotate(sem=ExtractWeek('fecha')) \
@@ -743,8 +748,17 @@ def resumen_turno_oee_api(request):
         elif hasta:
             qs = qs.filter(fecha__lte=hasta)
 
-        datos = sorted(qs, key=lambda d: (d['fecha'], str(d['turno'])))
-        return JsonResponse(list(datos), safe=False, json_dumps_params={'ensure_ascii': False})
+        datos = []
+        for d in sorted(qs, key=lambda x: (x['fecha'], str(x['turno']))):
+            personas = d.get('numero_personas') or 0
+            prod_teorica = d.get('produccion_teorica') or 0
+
+            d['unidades_pp_real'] = round(d.get('unidades_por_persona') or 0, 2)
+            d['unidades_pp_teorico'] = round(prod_teorica / personas, 2) if personas else 0
+
+            datos.append(d)
+
+        return JsonResponse(datos, safe=False, json_dumps_params={'ensure_ascii': False})
 
     except Exception as e:
         return HttpResponseBadRequest(f"error_api_resumen: {e}")
