@@ -512,16 +512,25 @@
             {
               label: 'Unidades por persona real',
               data: unidadesPPReal,
-              borderColor: 'blue',
-              fill: false,
-              tension: 0.25
+              borderColor: '#2196F3',
+              backgroundColor: '#2196F3',
+              borderWidth: 3,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              tension: 0.3,
+              fill: false
             },
             {
               label: 'Unidades por persona teórico',
               data: unidadesPPTeorico,
-              borderColor: 'red',
-              fill: false,
-              tension: 0.25
+              borderColor: '#E53935',
+              backgroundColor: '#E53935',
+              borderWidth: 3,
+              borderDash: [10, 5],      // ← Línea segmentada
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              tension: 0,
+              fill: false
             }
           ]
         },
