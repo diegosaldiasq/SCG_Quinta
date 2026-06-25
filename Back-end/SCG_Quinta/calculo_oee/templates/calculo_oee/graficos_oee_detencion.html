@@ -505,17 +505,23 @@
       if (chartUnidadesPersona) chartUnidadesPersona.destroy();
 
       chartUnidadesPersona = new Chart(ctxUnidadesPersona, {
-        type: 'bar',
+        type: 'line',
         data: {
           labels,
           datasets: [
             {
               label: 'Unidades por persona real',
-              data: unidadesPPReal
+              data: unidadesPPReal,
+              borderColor: 'blue',
+              fill: false,
+              tension: 0.25
             },
             {
               label: 'Unidades por persona teórico',
-              data: unidadesPPTeorico
+              data: unidadesPPTeorico,
+              borderColor: 'red',
+              fill: false,
+              tension: 0.25
             }
           ]
         },
@@ -526,13 +532,6 @@
             title: {
               display: true,
               text: 'Unidades por persona: Real vs Teórico'
-            },
-            tooltip: {
-              callbacks: {
-                label(item) {
-                  return `${item.dataset.label}: ${Number(item.raw).toFixed(1)} un/persona`;
-                }
-              }
             }
           },
           scales: {
