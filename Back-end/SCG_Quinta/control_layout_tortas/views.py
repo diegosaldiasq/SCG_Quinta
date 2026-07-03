@@ -469,6 +469,11 @@ def redireccionar_intermedio(request):
     return HttpResponseRedirect(url_index)
 
 @login_required
+def redireccionar_intermedio_2(request):
+    url_index = reverse("intermedio_2")
+    return HttpResponseRedirect(url_index)
+
+@login_required
 def api_clientes_por_planta(request):
     planta = request.GET.get("planta", "").strip()
 

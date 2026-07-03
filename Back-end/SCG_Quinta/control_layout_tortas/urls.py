@@ -15,6 +15,7 @@ urlpatterns = [
     path("<int:pk>/verificar/", views.verificar_registro, name="verificar_registro"),
     path("<int:pk>/desverificar/", views.desverificar_registro, name="desverificar_registro"),
     path("intermedio/", views.redireccionar_intermedio, name="redireccionar_intermedio"),
+    path("intermedio_2/", views.redireccionar_intermedio_2, name="redireccionar_intermedio_2"),
     path("api/clientes/", views.api_clientes_por_planta, name="api_clientes_por_planta"),
     path("api/productos/", views.api_productos_por_planta_cliente, name="api_productos_por_planta_cliente"),
     path("api/layout/", views.api_layout_por_producto, name="api_layout_por_producto"),
