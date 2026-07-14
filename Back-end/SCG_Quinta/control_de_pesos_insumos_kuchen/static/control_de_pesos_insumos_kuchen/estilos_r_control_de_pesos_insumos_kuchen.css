@@ -13,7 +13,7 @@
     --lg: 18px;
 }
 
-/* Evita que padding y bordes aumenten el ancho de los elementos */
+/* El padding queda incluido dentro del ancho */
 *,
 *::before,
 *::after {
@@ -22,11 +22,10 @@
 
 html,
 body {
-    width: 100%;
-    max-width: 100%;
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
+    width: 100%;
+    min-height: 100%;
 }
 
 body {
@@ -35,14 +34,16 @@ body {
     background-repeat: repeat;
 }
 
-/* ===== CONTENEDOR PRINCIPAL ===== */
+/* ==================================================
+   ESTRUCTURA PRINCIPAL
+   ================================================== */
 
 .login {
     width: 100%;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    justify-content: center;
+    align-content: start;
 }
 
 .logo {
@@ -50,52 +51,55 @@ body {
     width: 200px;
     max-width: 90%;
     height: auto;
-    margin-bottom: 16px;
+    margin: 0 auto 16px;
 }
 
 .login-container {
     display: grid;
     grid-template-rows: auto 1fr auto;
     justify-items: center;
-    width: min(600px, calc(100% - 16px));
-    max-width: 600px;
+
+    width: 600px;
+    max-width: calc(100vw - 24px);
+
     margin: 0 auto 30px;
     background-color: var(--naranjo-claro-quinta);
     border-radius: 32px;
-    overflow: hidden;
 }
 
-/* ===== TEXTOS ===== */
+/* ==================================================
+   TÍTULOS Y ETIQUETAS
+   ================================================== */
 
 .title {
     width: 100%;
     margin: 0 0 8px;
     padding: 0 8px;
+
     font-size: var(--lg);
+    line-height: 1.2;
     text-align: center;
     overflow-wrap: anywhere;
 }
 
 .subtitle {
-    width: 100%;
-    margin: 0 0 32px;
-    padding: 0 8px;
+    margin-top: 0;
+    margin-bottom: 32px;
+
     color: var(--rojo-quinta);
     font-size: var(--md);
     font-weight: bold;
     text-align: center;
-    overflow-wrap: anywhere;
 }
 
 .sub-subtitle {
-    width: 100%;
-    margin: 0 0 32px;
-    padding: 0 8px;
+    margin-top: 0;
+    margin-bottom: 32px;
+
     color: var(--black);
     font-size: var(--sm);
     font-weight: bold;
     text-align: center;
-    overflow-wrap: anywhere;
 }
 
 .label {
@@ -105,58 +109,51 @@ body {
     font-weight: bold;
 }
 
-/* ===== CAMPOS DE FORMULARIO ===== */
-
-form {
-    width: 100%;
-    max-width: 100%;
-}
+/* ==================================================
+   CAMPOS
+   ================================================== */
 
 .input {
-    width: 100%;
-    max-width: 100%;
     height: 32px;
-    margin-bottom: 12px;
     padding: 6px;
+    margin-bottom: 12px;
+
     background-color: var(--text-input-field);
     border: none;
     border-radius: 8px;
+
+    font-family: inherit;
     font-size: var(--md);
 }
 
+/* Evita que inputs y select sobrepasen su contenedor */
 input,
 select,
-textarea,
-button {
+textarea {
+    max-width: 100%;
     font-family: inherit;
 }
 
-select,
-input,
-textarea {
-    max-width: 100%;
-}
-
-/* ===== BOTONES PRINCIPALES ===== */
+/* ==================================================
+   BOTONES GENERALES
+   ================================================== */
 
 .botones {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    width: 100%;
-    max-width: 100%;
+    justify-self: center;
     gap: 16px;
-    padding: 0 12px;
 }
 
 .primary-button {
     width: 180px;
-    max-width: 100%;
     height: 40px;
-    padding: 6px 10px;
+
     background-color: var(--rojo-quinta);
     border: none;
     border-radius: 8px;
+
     color: var(--white);
     cursor: pointer;
     font-size: var(--md);
@@ -168,22 +165,24 @@ textarea {
     margin-bottom: 30px;
 }
 
-/* ===== CONTENEDOR DE MUESTRAS ===== */
+/* ==================================================
+   CONTENEDOR DE MUESTRAS
+   ================================================== */
 
 .muestras-box {
-    width: 100%;
+    width: calc(100% - 24px);
     max-width: 100%;
     margin-top: 18px;
     padding: 16px;
+
     background: rgba(255, 255, 255, 0.75);
     border: 1px solid #e5e7eb;
     border-radius: 14px;
-    overflow: hidden;
 }
 
 .muestras-titulo {
-    width: 100%;
     margin: 0 0 12px;
+
     color: var(--rojo-quinta);
     font-size: 16px;
     font-weight: 700;
@@ -193,78 +192,92 @@ textarea {
 .tabla-muestras-wrap {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: auto;
 }
+
+/* ==================================================
+   TABLA DE MUESTRAS
+   ================================================== */
 
 .tabla-muestras {
     width: 100%;
     max-width: 100%;
+
     table-layout: fixed;
     border-collapse: collapse;
-    background: var(--white);
-    border-radius: 10px;
-    overflow: hidden;
+
+    background-color: var(--white);
 }
 
 .tabla-muestras th,
 .tabla-muestras td {
-    padding: 10px;
+    padding: 10px 6px;
+
     border: 1px solid #e5e7eb;
     text-align: center;
     vertical-align: middle;
-    overflow: hidden;
 }
 
 .tabla-muestras th {
-    background: #f8f8f8;
+    background-color: #f8f8f8;
     font-size: 13px;
     font-weight: 700;
 }
 
-/* Anchos de las columnas */
-.tabla-muestras th:nth-child(1),
-.tabla-muestras td:nth-child(1) {
-    width: 8%;
+/*
+No se usan nth-child con porcentajes fijos porque algunos
+productos tienen Altura y otros no.
+
+Esto funciona tanto para:
+# | Peso | Acción
+
+como para:
+# | Peso | Altura | Acción
+*/
+
+.tabla-muestras th:first-child,
+.tabla-muestras td:first-child {
+    width: 42px;
 }
 
-.tabla-muestras th:nth-child(2),
-.tabla-muestras td:nth-child(2) {
-    width: 32%;
-}
-
-.tabla-muestras th:nth-child(3),
-.tabla-muestras td:nth-child(3) {
-    width: 32%;
-}
-
-.tabla-muestras th:nth-child(4),
-.tabla-muestras td:nth-child(4) {
-    width: 28%;
+.tabla-muestras th:last-child,
+.tabla-muestras td:last-child {
+    width: 105px;
 }
 
 .tabla-muestras input {
     display: block;
+
     width: 100%;
     min-width: 0;
     max-width: 100%;
+    height: 34px;
+
     margin: 0;
-    padding: 7px 6px;
+    padding: 6px;
+
     background-color: var(--text-input-field);
     border: none;
     border-radius: 6px;
+
+    font-family: inherit;
     font-size: 14px;
 }
 
 .num-muestra {
-    font-weight: 700;
     color: var(--rojo-quinta);
+    font-weight: 700;
 }
+
+/* ==================================================
+   BOTONES DE MUESTRAS
+   ================================================== */
 
 .acciones-muestras {
     display: flex;
     justify-content: center;
+
     width: 100%;
-    max-width: 100%;
     margin-top: 14px;
 }
 
@@ -272,11 +285,14 @@ textarea {
     min-width: 180px;
     min-height: 42px;
     padding: 8px 16px;
+
     background-color: var(--naranjo-quinta);
     border: none;
     border-radius: 8px;
+
     color: var(--white);
     cursor: pointer;
+    font-family: inherit;
     font-size: 16px;
     font-weight: bold;
 }
@@ -288,11 +304,14 @@ textarea {
 .btn-eliminar-fila {
     min-height: 36px;
     padding: 8px 12px;
+
     background-color: var(--rojo-quinta);
     border: none;
     border-radius: 8px;
+
     color: var(--white);
     cursor: pointer;
+    font-family: inherit;
     font-size: 13px;
     font-weight: bold;
     white-space: nowrap;
@@ -303,15 +322,18 @@ textarea {
     cursor: not-allowed;
 }
 
-/* ===== TABLET ===== */
+/* ==================================================
+   TABLET
+   ================================================== */
 
 @media (max-width: 768px) {
     .login-container {
-        width: calc(100% - 16px);
-        max-width: none;
+        width: 600px;
+        max-width: calc(100vw - 16px);
     }
 
     .muestras-box {
+        width: calc(100% - 16px);
         padding: 12px 8px;
     }
 
@@ -329,47 +351,58 @@ textarea {
         font-size: 12px;
     }
 
+    .tabla-muestras th:first-child,
+    .tabla-muestras td:first-child {
+        width: 34px;
+    }
+
+    .tabla-muestras th:last-child,
+    .tabla-muestras td:last-child {
+        width: 88px;
+    }
+
     .btn-eliminar-fila {
         padding: 6px 7px;
         font-size: 10px;
     }
 }
 
-/* ===== CELULAR ===== */
+/* ==================================================
+   CELULAR
+   ================================================== */
 
 @media (max-width: 640px) {
     .login {
-        min-height: 100vh;
+        display: block;
+        width: 100%;
     }
 
     .logo {
         width: 180px;
-        max-width: 88%;
         margin-bottom: 10px;
     }
 
     .login-container {
         width: calc(100% - 8px);
         max-width: none;
+
         margin: 0 4px 24px;
         border-radius: 22px;
     }
 
     .title {
-        padding: 0 4px;
-        font-size: 13px;
-        line-height: 1.25;
+        padding: 0 5px;
+        font-size: 12px;
+        line-height: 1.2;
     }
 
     .subtitle {
         margin-bottom: 20px;
-        padding: 0 4px;
         font-size: 12px;
     }
 
     .sub-subtitle {
         margin-bottom: 20px;
-        padding: 0 4px;
         font-size: 11px;
     }
 
@@ -378,7 +411,7 @@ textarea {
     }
 
     .input {
-        height: 31px;
+        height: 30px;
         padding: 5px;
         font-size: 11px;
     }
@@ -386,8 +419,10 @@ textarea {
     .muestras-box {
         width: 100%;
         max-width: 100%;
+
         margin-top: 14px;
-        padding: 10px 4px;
+        padding: 10px 5px;
+
         border-right: none;
         border-left: none;
         border-radius: 10px;
@@ -395,19 +430,16 @@ textarea {
 
     .muestras-titulo {
         margin-bottom: 8px;
-        font-size: 11px;
-        line-height: 1.2;
+        font-size: 10px;
     }
 
     .tabla-muestras-wrap {
         width: 100%;
-        max-width: 100%;
         overflow-x: hidden;
     }
 
     .tabla-muestras {
         width: 100%;
-        max-width: 100%;
         table-layout: fixed;
     }
 
@@ -423,33 +455,22 @@ textarea {
         white-space: normal;
     }
 
-    .tabla-muestras th:nth-child(1),
-    .tabla-muestras td:nth-child(1) {
-        width: 8%;
+    .tabla-muestras th:first-child,
+    .tabla-muestras td:first-child {
+        width: 28px;
     }
 
-    .tabla-muestras th:nth-child(2),
-    .tabla-muestras td:nth-child(2) {
-        width: 34%;
-    }
-
-    .tabla-muestras th:nth-child(3),
-    .tabla-muestras td:nth-child(3) {
-        width: 34%;
-    }
-
-    .tabla-muestras th:nth-child(4),
-    .tabla-muestras td:nth-child(4) {
-        width: 24%;
+    .tabla-muestras th:last-child,
+    .tabla-muestras td:last-child {
+        width: 78px;
     }
 
     .tabla-muestras input {
-        display: block;
         width: 100%;
         min-width: 0;
         max-width: 100%;
         height: 28px;
-        margin: 0;
+
         padding: 3px;
         font-size: 10px;
     }
@@ -463,12 +484,13 @@ textarea {
         min-width: 0;
         max-width: 100%;
         min-height: 28px;
-        padding: 3px 1px;
+
+        padding: 3px 2px;
         border-radius: 5px;
+
         font-size: 7px;
         white-space: nowrap;
         overflow: hidden;
-        text-overflow: clip;
     }
 
     .acciones-muestras {
@@ -482,25 +504,21 @@ textarea {
         min-width: 0;
         max-width: 100%;
         min-height: 38px;
+
         padding: 6px;
         font-size: 11px;
     }
 
     .botones {
-        width: 100%;
-        max-width: 100%;
         gap: 8px;
-        padding: 0 8px;
     }
 
     .primary-button {
-        flex: 1;
-        width: auto;
-        min-width: 0;
-        max-width: 100%;
+        width: 100px;
         height: 38px;
-        padding: 5px 4px;
-        font-size: 10px;
+        padding: 5px;
+
+        font-size: 9px;
     }
 
     .login-button {
@@ -509,7 +527,9 @@ textarea {
     }
 }
 
-/* ===== CELULARES MUY PEQUEÑOS ===== */
+/* ==================================================
+   CELULARES MUY PEQUEÑOS
+   ================================================== */
 
 @media (max-width: 360px) {
     .login-container {
@@ -520,14 +540,18 @@ textarea {
     }
 
     .muestras-box {
-        padding-right: 2px;
-        padding-left: 2px;
+        padding-right: 3px;
+        padding-left: 3px;
     }
 
-    .tabla-muestras th,
-    .tabla-muestras td {
-        padding-right: 1px;
-        padding-left: 1px;
+    .tabla-muestras th:first-child,
+    .tabla-muestras td:first-child {
+        width: 24px;
+    }
+
+    .tabla-muestras th:last-child,
+    .tabla-muestras td:last-child {
+        width: 70px;
     }
 
     .tabla-muestras th {
@@ -536,22 +560,16 @@ textarea {
 
     .tabla-muestras input {
         height: 26px;
-        padding: 2px;
         font-size: 9px;
     }
 
     .btn-eliminar-fila {
         min-height: 26px;
-        padding: 2px 0;
         font-size: 6px;
     }
 
-    .botones {
-        gap: 5px;
-        padding: 0 4px;
-    }
-
     .primary-button {
-        font-size: 9px;
+        width: 92px;
+        font-size: 8px;
     }
 }
