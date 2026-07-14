@@ -95,26 +95,26 @@ body {
     margin-top: 14px;
     margin-bottom: 30px;
 }
-/* ===== CONTENEDOR ===== */
+/* ===== CONTENEDOR DE MUESTRAS ===== */
+
 .muestras-box {
+    width: calc(100% - 24px);
+    box-sizing: border-box;
     margin-top: 18px;
-    padding: 18px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.92);
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.75);
     border: 1px solid #e5e7eb;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
-/* ===== TITULO ===== */
 .muestras-titulo {
-    margin: 0 0 14px 0;
+    margin: 0 0 12px 0;
     font-size: 16px;
     font-weight: 700;
     color: #B43C2C;
     text-align: center;
 }
 
-/* ===== TABLA ===== */
 .tabla-muestras-wrap {
     width: 100%;
     overflow-x: auto;
@@ -122,9 +122,10 @@ body {
 
 .tabla-muestras {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     background: #fff;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
 }
 
@@ -137,52 +138,70 @@ body {
 }
 
 .tabla-muestras th {
-    background: #f8fafc;
+    background: #f8f8f8;
     font-weight: 700;
     font-size: 13px;
 }
 
-/* ===== INPUTS ===== */
-.tabla-muestras input {
-    width: 100%;
-    min-width: 120px;
-    padding: 8px 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
-    box-sizing: border-box;
+/* Anchos de columnas */
+.tabla-muestras th:nth-child(1),
+.tabla-muestras td:nth-child(1) {
+    width: 8%;
 }
 
-/* ===== NUMERO ===== */
+.tabla-muestras th:nth-child(2),
+.tabla-muestras td:nth-child(2) {
+    width: 32%;
+}
+
+.tabla-muestras th:nth-child(3),
+.tabla-muestras td:nth-child(3) {
+    width: 32%;
+}
+
+.tabla-muestras th:nth-child(4),
+.tabla-muestras td:nth-child(4) {
+    width: 28%;
+}
+
+.tabla-muestras input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 7px 6px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--text-input-field);
+    font-size: 14px;
+}
+
 .num-muestra {
     font-weight: 700;
     color: #B43C2C;
-    min-width: 50px;
 }
 
-/* ===== BOTONES ===== */
 .acciones-muestras {
     margin-top: 14px;
     display: flex;
     justify-content: center;
-    gap: 10px;
 }
 
 .btn-secundario {
     background-color: #d07020;
-    border-radius: 10px;
+    border-radius: 8px;
     border: none;
     color: white;
     min-width: 180px;
     cursor: pointer;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: bold;
     min-height: 42px;
-    padding: 10px 16px;
+    padding: 8px 16px;
 }
 
 .btn-secundario:hover {
-    opacity: 0.92;
+    opacity: 0.95;
 }
 
 .btn-eliminar-fila {
@@ -193,103 +212,47 @@ body {
     cursor: pointer;
     font-size: 13px;
     font-weight: bold;
+    min-height: 36px;
     padding: 8px 12px;
 }
 
-.btn-eliminar-fila:hover {
-    opacity: 0.9;
-}
-
 .btn-eliminar-fila:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
-/* =========================
-   📱 MOBILE (CLAVE)
-========================= */
-@media (max-width: 600px) {
-
+@media (max-width: 640px) {
     .muestras-box {
-        padding: 12px;
+        width: calc(100% - 12px);
+        padding: 10px 6px;
     }
 
-    /* 👉 Convertimos tabla a formato vertical */
-    .tabla-muestras thead {
-        display: none;
-    }
-
-    .tabla-muestras,
-    .tabla-muestras tbody,
-    .tabla-muestras tr {
-        display: block;
-        width: 100%;
-    }
-
-    .tabla-muestras tr {
-        margin-bottom: 14px;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 10px;
-        background: white;
-    }
-
+    .tabla-muestras th,
     .tabla-muestras td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: none;
-        padding: 6px 0;
-        gap: 10px;
+        padding: 6px 3px;
     }
 
-    /* 👉 Etiquetas simuladas */
-    .tabla-muestras td:nth-child(1)::before {
-        content: "#";
-        font-weight: bold;
-    }
-
-    .tabla-muestras td:nth-child(2)::before {
-        content: "Peso";
-        font-weight: bold;
-    }
-
-    .tabla-muestras td:nth-child(3)::before {
-        content: "Altura";
-        font-weight: bold;
-    }
-
-    .tabla-muestras td:nth-child(4)::before {
-        content: "";
+    .tabla-muestras th {
+        font-size: 9px;
     }
 
     .tabla-muestras input {
-        min-width: 90px;
-        flex: 1;
+        min-width: 0;
+        width: 100%;
+        height: 30px;
+        padding: 4px;
+        font-size: 11px;
     }
 
-    .acciones-muestras {
-        flex-direction: column;
+    .btn-eliminar-fila {
+        width: auto;
+        min-height: 30px;
+        padding: 5px 6px;
+        font-size: 9px;
+        white-space: nowrap;
     }
 
     .btn-secundario {
         width: 100%;
-    }
-
-    .btn-eliminar-fila {
-        width: 100%;
-    }
-}
-@media (max-width: 650px) {
-    .login-container {
-        width: 100%;
-    }
-    .botones {
-        gap: 8px;
-    }
-    .primary-button {
-        width: 120px;
-        font-size: 10px;
-        height: 40px;
     }
 }
