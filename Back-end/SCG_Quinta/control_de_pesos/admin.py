@@ -13,8 +13,8 @@ class ProductoControlPesoAdmin(admin.ModelAdmin):
         "un_pp",
         "porcentaje_perdida",
         "altura",
-        "activo",
         "diff_altura",
+        "activo",
     )
     list_filter = ("area", "cliente", "activo")
     search_fields = ("cliente", "codigo", "producto")
