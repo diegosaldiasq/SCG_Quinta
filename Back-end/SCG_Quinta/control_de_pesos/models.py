@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal
 
 # Create your models here.
 
@@ -46,6 +47,13 @@ class ProductoControlPeso(models.Model):
     altura = models.IntegerField(null=True, blank=True)
     un_pp = models.DecimalField("Unidades por persona", max_digits=10, decimal_places=2, null=True, blank=True)
     activo = models.BooleanField(default=True)
+    diff_altura = models.DecimalField(
+        "Diferencia de altura",
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Diferencia permitida para calcular altura mínima y máxima."
+    )
 
     class Meta:
         ordering = ["area", "cliente", "producto"]
