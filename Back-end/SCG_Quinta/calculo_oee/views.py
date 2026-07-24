@@ -27,6 +27,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.functions import ExtractWeek, ExtractYear
 from django.db.models import Sum
 from openpyxl.styles import Font, PatternFill
+from datetime import timedelta, date
 
 
 
@@ -882,3 +883,188 @@ def panel_oee_y_detenciones(request):
 def redireccionar_intermedio_2(request):
     url_inicio = reverse('intermedio_2')
     return HttpResponseRedirect(url_inicio)
+
+# =============== API y backend panel detenciones semanales OEE =================
+
+@login_required
+@require_GET
+def detenciones_semanales_opciones_api(request):
+    """
+    Entrega las semanas, años y líneas disponibles para los filtros.
+    Solo considera los turnos B y C.
+    """
+
+    turnos = TurnoOEE.objects.filter(
+        turno__in=["B", "C", "Turno B", "Turno C"]
+    )
+
+    semanas = (
+        turnos
+        .annotate(numero_semana=ExtractWeek("fecha"))
+        .values_list("numero_semana", flat=True)
+        .distinct()
+    )
+
+    anios = (
+        turnos
+        .annotate(numero_anio=ExtractYear("fecha"))
+        .values_list("numero_anio", flat=True)
+        .distinct()
+    )
+
+    lineas = (
+        turnos
+        .exclude(linea__isnull=True)
+        .exclude(linea="")
+        .values_list("linea", flat=True)
+        .distinct()
+        .order_by("linea")
+    )
+
+    return JsonResponse({
+        "semanas": sorted(
+            [semana for semana in semanas if semana is not None]
+        ),
+        "anios": sorted(
+            [anio for anio in anios if anio is not None]
+        ),
+        "lineas": list(lineas),
+    })
+
+
+@login_required
+@require_GET
+def detenciones_semanales_api(request):
+    """
+    Entrega cada detención con:
+    - fecha
+    - día
+    - turno
+    - línea
+    - motivo
+    - hora inicial
+    - hora final
+    - duración
+    - minutos desde medianoche
+
+    El gráfico utiliza los minutos para posicionar cada barra.
+    """
+
+    semana = request.GET.get("semana")
+    anio = request.GET.get("anio")
+    linea = request.GET.get("linea")
+
+    if not semana or not anio:
+        return JsonResponse(
+            {"error": "Debe seleccionar semana y año."},
+            status=400
+        )
+
+    try:
+        semana = int(semana)
+        anio = int(anio)
+    except (TypeError, ValueError):
+        return JsonResponse(
+            {"error": "La semana y el año deben ser valores numéricos."},
+            status=400
+        )
+
+    # Lunes y domingo correspondientes a la semana ISO
+    try:
+        fecha_inicio = date.fromisocalendar(anio, semana, 1)
+        fecha_fin = fecha_inicio + timedelta(days=6)
+    except ValueError:
+        return JsonResponse(
+            {"error": "La semana seleccionada no es válida."},
+            status=400
+        )
+
+    queryset = (
+        Detencion.objects
+        .select_related("lote")
+        .filter(
+            lote__fecha__date__gte=fecha_inicio,
+            lote__fecha__date__lte=fecha_fin,
+            lote__turno__in=["B", "C", "Turno B", "Turno C"],
+        )
+        .order_by(
+            "lote__fecha",
+            "lote__turno",
+            "hora_inicio"
+        )
+    )
+
+    if linea:
+        queryset = queryset.filter(lote__linea=linea)
+
+    nombres_dias = [
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+        "Domingo",
+    ]
+
+    datos = []
+
+    for detencion in queryset:
+        turno_original = str(detencion.lote.turno).upper().strip()
+
+        if turno_original in ["B", "TURNO B"]:
+            turno = "B"
+        elif turno_original in ["C", "TURNO C"]:
+            turno = "C"
+        else:
+            continue
+
+        fecha_registro = detencion.lote.fecha.date()
+        indice_dia = fecha_registro.weekday()
+
+        hora_inicio = detencion.hora_inicio
+        hora_fin = detencion.hora_fin
+
+        inicio_minutos = hora_inicio.hour * 60 + hora_inicio.minute
+        fin_minutos = hora_fin.hour * 60 + hora_fin.minute
+
+        # Por seguridad, si una detención cruza medianoche.
+        if fin_minutos < inicio_minutos:
+            fin_minutos += 24 * 60
+
+        datos.append({
+            "id": detencion.id,
+            "lote_id": detencion.lote_id,
+            "fecha": fecha_registro.isoformat(),
+            "dia": nombres_dias[indice_dia],
+            "dia_indice": indice_dia,
+            "etiqueta_dia": (
+                f"{nombres_dias[indice_dia]} "
+                f"{fecha_registro.strftime('%d-%m')}"
+            ),
+            "turno": turno,
+            "linea": detencion.lote.linea,
+            "motivo": detencion.motivo or "Sin motivo",
+            "comentarios": detencion.comentarios or "",
+            "hora_inicio": hora_inicio.strftime("%H:%M"),
+            "hora_fin": hora_fin.strftime("%H:%M"),
+            "inicio_minutos": inicio_minutos,
+            "fin_minutos": fin_minutos,
+            "duracion": detencion.duracion,
+        })
+
+    return JsonResponse({
+        "semana": semana,
+        "anio": anio,
+        "fecha_inicio": fecha_inicio.isoformat(),
+        "fecha_fin": fecha_fin.isoformat(),
+        "datos": datos,
+    })
+
+
+@login_required
+def grafico_detenciones_semanales(request):
+    return render(
+        request,
+        "calculo_oee/grafico_detenciones_semanales.html"
+    )

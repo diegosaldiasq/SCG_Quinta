@@ -23,4 +23,7 @@ urlpatterns = [
     path("graficos/panel-oee-detenciones/", views.panel_oee_y_detenciones, name="panel_oee_y_detenciones"),
     path('redireccionar_intermedio_4/', views.redireccionar_intermedio_4, name='redireccionar_intermedio_4'),
     path('redireccionar_intermedio_2/', views.redireccionar_intermedio_2, name='redireccionar_intermedio_2'),
+    path("grafico_detenciones_semanales/", views.grafico_detenciones_semanales, name="grafico_detenciones_semanales"),
+    path("api/detenciones_semanales/opciones/", views.detenciones_semanales_opciones_api, name="detenciones_semanales_opciones_api"),
+    path("api/detenciones_semanales/", views.detenciones_semanales_api, name="detenciones_semanales_api"),
 ]
