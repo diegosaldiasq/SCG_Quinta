@@ -860,7 +860,7 @@
     setupDropdown(ddSemanas);
     setupDropdown(ddLineas);
 
-    function buildParams() {
+    function construirParametrosBase() {
       const params = new URLSearchParams();
 
       for (const semana of getCheckedValues(panelSemanas)) {
@@ -875,16 +875,32 @@
         params.append('linea', linea);
       }
 
-      for (const turno of getTurnosSeleccionados()) {
-        params.append('turno', turno);
-      }
-
       if (fDesde.value) {
         params.set('desde', fDesde.value);
       }
 
       if (fHasta.value) {
         params.set('hasta', fHasta.value);
+      }
+
+      return params;
+    }
+
+    function buildParams() {
+      const params = construirParametrosBase();
+
+      for (const turno of getTurnosSeleccionados()) {
+        params.append('turno', `Turno ${turno}`);
+      }
+
+      return params;
+    }
+
+    function buildParamsURL() {
+      const params = construirParametrosBase();
+
+      for (const turno of getTurnosSeleccionados()) {
+        params.append('turno', turno);
       }
 
       return params;
@@ -978,7 +994,17 @@
         ddLineas
       );
 
-      const turnosURL = params.getAll('turno');
+      const turnosURL = params
+        .getAll('turno')
+        .map(turno =>
+          String(turno)
+            .toUpperCase()
+            .replace(/^TURNO\s*/, '')
+            .trim()
+        )
+        .filter(turno =>
+          ['A', 'B', 'C'].includes(turno)
+        );
 
       if (turnosURL.length) {
         setTurnosSeleccionados(turnosURL);
@@ -2577,13 +2603,13 @@
     btnAplicar.onclick = async event => {
       event.preventDefault();
 
-      const params = buildParams();
+      const paramsURL = buildParamsURL();
 
       history.replaceState(
         null,
         '',
-        params.toString()
-          ? `?${params.toString()}`
+        paramsURL.toString()
+          ? `?${paramsURL.toString()}`
           : location.pathname
       );
 
