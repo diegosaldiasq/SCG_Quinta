@@ -573,8 +573,3 @@ def usuarios_conectados(request):
     }
 
     return render(request, "inicio/usuarios_conectados.html", context)
-
-@login_required
-def redireccionar_panel_detenciones_semanales(request):
-    url_panel_detenciones_semanales = reverse('grafico_detenciones_semanales')
-    return HttpResponseRedirect(url_panel_detenciones_semanales)
