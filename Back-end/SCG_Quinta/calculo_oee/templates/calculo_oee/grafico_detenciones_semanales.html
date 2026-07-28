@@ -659,16 +659,6 @@
     let chartUnidadesPersona = null;
     let chartDetencionesSemanales = null;
 
-    /*
-    Motivos visibles en la leyenda del gráfico porcentual
-    de detenciones.
-
-    null significa que todavía no se ha construido la leyenda,
-    por lo que la línea de tiempo semanal debe mostrar todos
-    los motivos disponibles.
-    */
-    let motivosDetencionesSeleccionados = null;
-
     const INICIO_TURNO_A = 0;
     const FIN_TURNO_A = 480;
 
@@ -1407,84 +1397,8 @@
         });
     }
 
-    function normalizarMotivoFiltro(valor) {
-      return String(valor || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/^\s*\d+\s*[-.:)]\s*/, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function obtenerMotivosDetencionesSeleccionados() {
-      if (motivosDetencionesSeleccionados === null) {
-        return null;
-      }
-
-      return new Set(
-        Array.from(motivosDetencionesSeleccionados)
-          .map(normalizarMotivoFiltro)
-          .filter(Boolean)
-      );
-    }
-
-    function actualizarMotivosSeleccionadosDesdeGrafico(
-      chart
-    ) {
-      motivosDetencionesSeleccionados = new Set(
-        chart.data.datasets
-          .map((dataset, index) => ({
-            motivo: dataset.label,
-            visible: chart.isDatasetVisible(index)
-          }))
-          .filter(item =>
-            item.visible &&
-            normalizarMotivoFiltro(item.motivo) !==
-              normalizarMotivoFiltro('Tiempo Productivo')
-          )
-          .map(item =>
-            normalizarMotivoFiltro(item.motivo)
-          )
-          .filter(Boolean)
-      );
-    }
-
-    function filtrarDetencionesSemanalesPorMotivo(
-      detenciones
-    ) {
-      const motivosSeleccionados =
-        obtenerMotivosDetencionesSeleccionados();
-
-      if (motivosSeleccionados === null) {
-        return detenciones;
-      }
-
-      if (!motivosSeleccionados.size) {
-        return [];
-      }
-
-      return detenciones.filter(detencion => {
-        const motivoNormalizado =
-          normalizarMotivoFiltro(
-            detencion.motivo
-          );
-
-        return motivosSeleccionados.has(
-          motivoNormalizado
-        );
-      });
-    }
-
     function renderLegendDet(chart) {
       legendDetBox.innerHTML = '';
-
-      const seleccionAnterior =
-        motivosDetencionesSeleccionados === null
-          ? null
-          : new Set(
-              motivosDetencionesSeleccionados
-            );
 
       chart.data.datasets.forEach(
         (dataset, index) => {
@@ -1501,57 +1415,17 @@
             document.createElement('input');
 
           checkbox.type = 'checkbox';
-          checkbox.dataset.motivo =
-            dataset.label;
+          checkbox.checked =
+            chart.isDatasetVisible(index);
 
-          if (seleccionAnterior === null) {
-            checkbox.checked = true;
-
-            chart.setDatasetVisibility(
-              index,
-              true
-            );
-          } else if (
-            dataset.label === 'Tiempo Productivo'
-          ) {
-            /*
-            Tiempo Productivo sigue visible en el gráfico
-            porcentual, pero no participa como filtro de la
-            línea de tiempo porque no es una detención real.
-            */
-            checkbox.checked =
-              chart.isDatasetVisible(index);
-          } else {
-            checkbox.checked =
-              seleccionAnterior.has(
-                normalizarMotivoFiltro(
-                  dataset.label
-                )
-              );
-
+          checkbox.onchange = () => {
             chart.setDatasetVisibility(
               index,
               checkbox.checked
             );
-          }
 
-          checkbox.addEventListener(
-            'change',
-            async () => {
-              chart.setDatasetVisibility(
-                index,
-                checkbox.checked
-              );
-
-              actualizarMotivosSeleccionadosDesdeGrafico(
-                chart
-              );
-
-              chart.update('none');
-
-              await cargarDetencionesSemanales();
-            }
-          );
+            chart.update();
+          };
 
           const swatch =
             document.createElement('span');
@@ -1581,12 +1455,6 @@
 
           legendDetBox.appendChild(row);
         }
-      );
-
-      chart.update();
-
-      actualizarMotivosSeleccionadosDesdeGrafico(
-        chart
       );
     }
 
@@ -2650,19 +2518,6 @@
         const respuesta =
           await respuestaHttp.json();
 
-        const datosOriginales =
-          respuesta.datos || [];
-
-        const datosSemanalesFiltrados =
-          filtrarDetencionesSemanalesPorMotivo(
-            datosOriginales
-          );
-
-        const respuestaFiltrada = {
-          ...respuesta,
-          datos: datosSemanalesFiltrados
-        };
-
         informacionDetencionesSemanales.innerHTML = `
           <strong>
             Semana ${respuesta.semana}
@@ -2686,36 +2541,28 @@
           </span>
 
           <span>
-            Detenciones visibles:
-            ${datosSemanalesFiltrados.length}
-            de ${datosOriginales.length}
+            Detenciones:
+            ${respuesta.datos.length}
           </span>
         `;
 
         actualizarLeyendasSemanales(turnos);
 
-        if (!datosSemanalesFiltrados.length) {
+        if (!respuesta.datos.length) {
           destruirGraficoDetencionesSemanales();
 
           mensajeDetencionesSemanales.style.display =
             'block';
 
           mensajeDetencionesSemanales.textContent =
-            motivosDetencionesSeleccionados?.size === 0
-              ? (
-                  'Debes seleccionar al menos un motivo ' +
-                  'en la leyenda del gráfico de detenciones.'
-                )
-              : (
-                  'No existen detenciones de los motivos ' +
-                  'seleccionados para estos filtros.'
-                );
+            'No existen detenciones para los ' +
+            'filtros seleccionados.';
 
           return;
         }
 
         construirGraficoDetencionesSemanales(
-          respuestaFiltrada,
+          respuesta,
           turnos
         );
 
@@ -2779,10 +2626,9 @@
 
       await Promise.all([
         cargarOEE(),
-        cargarDetenciones()
+        cargarDetenciones(),
+        cargarDetencionesSemanales()
       ]);
-
-      await cargarDetencionesSemanales();
     };
 
     btnLimpiar.onclick = async () => {
@@ -2803,12 +2649,6 @@
 
       setTurnosSeleccionados(['B', 'C']);
 
-      /*
-      Al limpiar filtros se restablecen todos los motivos
-      cuando vuelva a construirse el gráfico de detenciones.
-      */
-      motivosDetencionesSeleccionados = null;
-
       sAnios.selectedIndex = -1;
       fDesde.value = '';
       fHasta.value = '';
@@ -2821,10 +2661,9 @@
 
       await Promise.all([
         cargarOEE(),
-        cargarDetenciones()
+        cargarDetenciones(),
+        cargarDetencionesSemanales()
       ]);
-
-      await cargarDetencionesSemanales();
     };
 
     await cargarOpciones();
