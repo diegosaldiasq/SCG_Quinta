@@ -243,7 +243,24 @@ def api_graficos_control_pesos(request):
         if peso_receta is not None and perdida_operacional < 100:
             peso_maximo = round(peso_receta / (1 - (perdida_operacional / 100)), 2)
 
-        altura_objetivo = int(producto_base.altura) if producto_base and producto_base.altura else None
+        altura_objetivo = (
+            float(producto_base.altura)
+            if producto_base and producto_base.altura is not None
+            else None
+        )
+
+        diferencia_altura = (
+            float(producto_base.diff_altura)
+            if producto_base and producto_base.diff_altura is not None
+            else None
+        )
+
+        altura_minima = None
+        altura_maxima = None
+
+        if altura_objetivo is not None and diferencia_altura is not None:
+            altura_minima = altura_objetivo - diferencia_altura
+            altura_maxima = altura_objetivo + diferencia_altura
         peso_real = int(r["peso_real"]) if r["peso_real"] is not None else None
         altura_real = int(r["altura"]) if r["altura"] is not None else None
 
@@ -276,7 +293,9 @@ def api_graficos_control_pesos(request):
             "peso_real": peso_real,
             "altura": altura_real,
             "altura_objetivo": altura_objetivo,
-
+            "diferencia_altura": diferencia_altura,
+            "altura_minima": altura_minima,
+            "altura_maxima": altura_maxima,
             "desviacion": desviacion,
 
             "lote": r["lote"],
@@ -332,6 +351,7 @@ def api_productos_base_control_pesos(request):
             "peso_receta",
             "porcentaje_perdida",
             "altura",
+            "diff_altura",
             "un_pp",
         )
     )

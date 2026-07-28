@@ -464,128 +464,213 @@
     }
 
     function construirGraficoAlturas(regs) {
-      const cardAlturas = document.getElementById('cardAlturas');
-      const canvasAlturas = document.getElementById('chartAlturas');
+        const cardAlturas = document.getElementById('cardAlturas');
+        const canvasAlturas = document.getElementById('chartAlturas');
 
-      if (!cardAlturas || !canvasAlturas) return;
+        if (!cardAlturas || !canvasAlturas) return;
 
-      const registrosConAltura = regs
-        .filter(r =>
-          r.altura !== null &&
-          r.altura !== undefined &&
-          r.altura_objetivo !== null &&
-          r.altura_objetivo !== undefined &&
-          Number.isFinite(Number(r.altura)) &&
-          Number.isFinite(Number(r.altura_objetivo)) &&
-          parseFechaLocal(r.ts)
-        )
-        .sort((a, b) => parseFechaLocal(a.ts) - parseFechaLocal(b.ts));
+        const registrosConAltura = regs
+            .filter(r =>
+                r.altura !== null &&
+                r.altura !== undefined &&
+                r.altura_objetivo !== null &&
+                r.altura_objetivo !== undefined &&
+                Number.isFinite(Number(r.altura)) &&
+                Number.isFinite(Number(r.altura_objetivo)) &&
+                parseFechaLocal(r.ts)
+            )
+            .sort(
+                (a, b) =>
+                    parseFechaLocal(a.ts) - parseFechaLocal(b.ts)
+            );
 
-      if (!registrosConAltura.length) {
-        cardAlturas.style.display = 'none';
-        return;
-      }
-
-      cardAlturas.style.display = 'block';
-
-      const alturaReal = registrosConAltura.map(r => ({
-        x: parseFechaLocal(r.ts),
-        y: Number(r.altura)
-      }));
-
-      const alturaObjetivo = registrosConAltura.map(r => ({
-        x: parseFechaLocal(r.ts),
-        y: Number(r.altura_objetivo)
-      }));
-
-      const fechas = alturaReal.map(p => new Date(p.x));
-      const minDate = fechas[0];
-      const maxDate = fechas[fechas.length - 1];
-      const unit = unidadTiempoDesdeSpan(minDate, maxDate);
-
-      const ys = [
-        ...alturaReal.map(p => p.y),
-        ...alturaObjetivo.map(p => p.y),
-      ].filter(Number.isFinite);
-
-      const yMin = Math.min(...ys);
-      const yMax = Math.max(...ys);
-      const pad = (yMax - yMin) * 0.05 || 2;
-
-      chartAlturas = new Chart(canvasAlturas.getContext('2d'), {
-        type: 'line',
-        data: {
-          datasets: [
-            {
-              label: 'Altura real (mm)',
-              data: alturaReal,
-              borderWidth: 2,
-              pointRadius: 2,
-              tension: 0.25
-            },
-            {
-              label: 'Altura objetivo (mm)',
-              data: alturaObjetivo,
-              borderWidth: 2,
-              pointRadius: 0,
-              stepped: true,
-              borderDash: [6, 6]
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          devicePixelRatio: 1,
-          animation: false,
-          resizeDelay: 150,
-          parsing: false,
-          interaction: {
-            mode: 'nearest',
-            intersect: false,
-            axis: 'x'
-          },
-          scales: {
-            x: {
-              type: 'time',
-              bounds: 'data',
-              min: minDate,
-              max: maxDate,
-              time: {
-                unit,
-                tooltipFormat: 'dd-MM-yyyy HH:mm',
-                displayFormats: {
-                  minute: 'HH:mm',
-                  hour: 'dd-MM HH:mm',
-                  day: 'dd-MM-yyyy',
-                  month: 'MM-yyyy',
-                  year: 'yyyy'
-                }
-              },
-              ticks: {
-                autoSkip: true,
-                maxTicksLimit: 10
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'Altura (mm)'
-              },
-              beginAtZero: false,
-              min: Math.floor(yMin - pad),
-              max: Math.ceil(yMax + pad),
-              grace: 0
-            }
-          },
-          plugins: {
-            tooltip: {
-              mode: 'index',
-              intersect: false
-            }
-          }
+        if (!registrosConAltura.length) {
+            cardAlturas.style.display = 'none';
+            return;
         }
-      });
+
+        cardAlturas.style.display = 'block';
+
+        const alturaReal = registrosConAltura.map(r => ({
+            x: parseFechaLocal(r.ts),
+            y: Number(r.altura)
+        }));
+
+        const alturaObjetivo = registrosConAltura.map(r => ({
+            x: parseFechaLocal(r.ts),
+            y: Number(r.altura_objetivo)
+        }));
+
+        const alturaMinima = registrosConAltura
+            .filter(r => Number.isFinite(Number(r.altura_minima)))
+            .map(r => ({
+                x: parseFechaLocal(r.ts),
+                y: Number(r.altura_minima)
+            }));
+
+        const alturaMaxima = registrosConAltura
+            .filter(r => Number.isFinite(Number(r.altura_maxima)))
+            .map(r => ({
+                x: parseFechaLocal(r.ts),
+                y: Number(r.altura_maxima)
+            }));
+
+        const fechas = alturaReal.map(p => new Date(p.x));
+        const minDate = fechas[0];
+        const maxDate = fechas[fechas.length - 1];
+        const unit = unidadTiempoDesdeSpan(minDate, maxDate);
+
+        const ys = [
+            ...alturaReal.map(p => p.y),
+            ...alturaObjetivo.map(p => p.y),
+            ...alturaMinima.map(p => p.y),
+            ...alturaMaxima.map(p => p.y)
+        ].filter(Number.isFinite);
+
+        const yMin = Math.min(...ys);
+        const yMax = Math.max(...ys);
+        const pad = (yMax - yMin) * 0.05 || 2;
+
+        chartAlturas = new Chart(
+            canvasAlturas.getContext('2d'),
+            {
+                type: 'line',
+
+                data: {
+                    datasets: [
+                        {
+                            label: 'Altura real (mm)',
+                            data: alturaReal,
+                            borderColor: '#2563eb',
+                            backgroundColor: '#2563eb',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            tension: 0.25,
+                            order: 1
+                        },
+                        {
+                            label: 'Altura objetivo (mm)',
+                            data: alturaObjetivo,
+                            borderColor: '#111827',
+                            backgroundColor: '#111827',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            stepped: true,
+                            borderDash: [6, 6],
+                            order: 2
+                        },
+                        {
+                            label: 'Altura mínima (mm)',
+                            data: alturaMinima,
+                            borderColor: '#dc2626',
+                            backgroundColor: '#dc2626',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            stepped: true,
+                            borderDash: [4, 4],
+                            order: 3
+                        },
+                        {
+                            label: 'Altura máxima (mm)',
+                            data: alturaMaxima,
+                            borderColor: '#16a34a',
+                            backgroundColor: '#16a34a',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            stepped: true,
+                            borderDash: [4, 4],
+                            order: 3
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    devicePixelRatio: 1,
+                    animation: false,
+                    resizeDelay: 150,
+                    parsing: false,
+
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false,
+                        axis: 'x'
+                    },
+
+                    scales: {
+                        x: {
+                            type: 'time',
+                            bounds: 'data',
+                            min: minDate,
+                            max: maxDate,
+
+                            time: {
+                                unit,
+                                tooltipFormat: 'dd-MM-yyyy HH:mm',
+
+                                displayFormats: {
+                                    minute: 'HH:mm',
+                                    hour: 'dd-MM HH:mm',
+                                    day: 'dd-MM-yyyy',
+                                    month: 'MM-yyyy',
+                                    year: 'yyyy'
+                                }
+                            },
+
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            }
+                        },
+
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Altura (mm)'
+                            },
+
+                            beginAtZero: false,
+                            min: Math.floor(yMin - pad),
+                            max: Math.ceil(yMax + pad),
+                            grace: 0
+                        }
+                    },
+
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+
+                            callbacks: {
+                                afterBody: function (items) {
+                                    if (!items.length) return '';
+
+                                    const indice = items[0].dataIndex;
+                                    const registro = registrosConAltura[indice];
+
+                                    if (
+                                        registro &&
+                                        Number.isFinite(
+                                            Number(registro.diferencia_altura)
+                                        )
+                                    ) {
+                                        return (
+                                            'Diferencia permitida: ±' +
+                                            Number(registro.diferencia_altura) +
+                                            ' mm'
+                                        );
+                                    }
+
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
     }
 
     function construirHistograma(regs) {
