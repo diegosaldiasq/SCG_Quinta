@@ -1407,13 +1407,25 @@
         });
     }
 
+    function normalizarMotivoFiltro(valor) {
+      return String(valor || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/^\s*\d+\s*[-.:)]\s*/, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
     function obtenerMotivosDetencionesSeleccionados() {
       if (motivosDetencionesSeleccionados === null) {
         return null;
       }
 
       return new Set(
-        motivosDetencionesSeleccionados
+        Array.from(motivosDetencionesSeleccionados)
+          .map(normalizarMotivoFiltro)
+          .filter(Boolean)
       );
     }
 
@@ -1428,9 +1440,13 @@
           }))
           .filter(item =>
             item.visible &&
-            item.motivo !== 'Tiempo Productivo'
+            normalizarMotivoFiltro(item.motivo) !==
+              normalizarMotivoFiltro('Tiempo Productivo')
           )
-          .map(item => item.motivo)
+          .map(item =>
+            normalizarMotivoFiltro(item.motivo)
+          )
+          .filter(Boolean)
       );
     }
 
@@ -1448,11 +1464,16 @@
         return [];
       }
 
-      return detenciones.filter(detencion =>
-        motivosSeleccionados.has(
-          detencion.motivo
-        )
-      );
+      return detenciones.filter(detencion => {
+        const motivoNormalizado =
+          normalizarMotivoFiltro(
+            detencion.motivo
+          );
+
+        return motivosSeleccionados.has(
+          motivoNormalizado
+        );
+      });
     }
 
     function renderLegendDet(chart) {
@@ -1503,7 +1524,9 @@
           } else {
             checkbox.checked =
               seleccionAnterior.has(
-                dataset.label
+                normalizarMotivoFiltro(
+                  dataset.label
+                )
               );
 
             chart.setDatasetVisibility(
@@ -1520,11 +1543,11 @@
                 checkbox.checked
               );
 
-              chart.update();
-
               actualizarMotivosSeleccionadosDesdeGrafico(
                 chart
               );
+
+              chart.update('none');
 
               await cargarDetencionesSemanales();
             }
