@@ -3,1691 +3,2816 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap"
+    rel="stylesheet"
+  >
 
-    <title>Detenciones semanales OEE</title>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'calculo_oee/estilos_oee.css' %}"
+  >
 
-    <link
-        rel="stylesheet"
-        href="{% static 'calculo_oee/estilos_oee.css' %}"
-    >
+  <link
+    rel="icon"
+    href="{% static 'calculo_oee/images/logoquinta2.png' %}"
+  >
 
-    <link
-        rel="icon"
-        href="{% static 'calculo_oee/images/logoquinta2.png' %}"
-    >
+  <title>Panel de Gráficos · OEE & Detenciones</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0"></script>
 
-        body {
-            margin: 0;
-            background-image:
-                url("{% static 'calculo_oee/images/Fondo.png' %}");
-            background-position: center top;
-            background-repeat: repeat;
-            font-family: "Quicksand", sans-serif;
-        }
+  <style>
+    .filtros {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
 
-        .pagina-detenciones {
-            width: min(1500px, 96%);
-            margin: 24px auto;
-        }
+    .filtro-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
 
-        .encabezado-detenciones {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+    .filtro-box > label {
+      font-weight: 700;
+      color: #333;
+    }
 
-        .encabezado-detenciones img {
-            width: 135px;
-            height: auto;
-            display: block;
-        }
+    .filtro-box select,
+    .filtro-box input[type="date"] {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 10px;
+      border: 1px solid #cfd5da;
+      border-radius: 7px;
+      background: #fff;
+      font-family: "Quicksand", sans-serif;
+    }
 
-        .encabezado-detenciones h1 {
-            margin: 0;
-            font-size: clamp(24px, 3vw, 38px);
-            color: #333;
-            text-align: center;
-        }
+    .turnos-inline {
+      width: 100%;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid #cfd5da;
+      border-radius: 7px;
+      background: #fff;
+    }
 
-        .panel {
-            background: #fff;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow:
-                0 4px 15px rgba(0, 0, 0, 0.08);
-        }
+    .turno-inline-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 0;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
 
-        .filtros {
-            display: grid;
-            grid-template-columns:
-                minmax(110px, 0.55fr)
-                minmax(140px, 0.65fr)
-                minmax(210px, 1fr)
-                minmax(280px, 1.2fr)
-                auto
-                auto;
-            gap: 14px;
-            align-items: end;
-            margin-bottom: 20px;
-        }
+    .turno-inline-item input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: #b43c2c;
+    }
 
-        .grupo-filtro {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            min-width: 0;
-        }
+    .multi-dropdown {
+      position: relative;
+    }
 
-        .grupo-filtro > label {
-            font-weight: 700;
-            color: #444;
-        }
+    .multi-dropdown-btn {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 10px;
+      text-align: left;
+      border: 1px solid #cfd5da;
+      border-radius: 7px;
+      background: #fff;
+      cursor: pointer;
+      font-family: "Quicksand", sans-serif;
+    }
 
-        .grupo-filtro select {
-            width: 100%;
-            min-height: 42px;
-            padding: 8px 10px;
-            border: 1px solid #cfd5da;
-            border-radius: 7px;
-            background: #fff;
-            font-size: 15px;
-        }
+    .multi-dropdown-panel {
+      display: none;
+      position: absolute;
+      z-index: 50;
+      top: calc(100% + 4px);
+      left: 0;
+      width: max(100%, 240px);
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .14);
+    }
 
-        .opciones-turnos {
-            min-height: 42px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: 8px 12px;
-            border: 1px solid #cfd5da;
-            border-radius: 7px;
-            background: #fff;
-        }
+    .multi-dropdown.open .multi-dropdown-panel {
+      display: block;
+    }
 
-        .turno-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin: 0;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
+    .multi-dropdown-actions {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
 
-        .turno-checkbox input {
-            width: 17px;
-            height: 17px;
-            margin: 0;
-            cursor: pointer;
-            accent-color: #b43c2c;
-        }
+    .multi-dropdown-actions button {
+      border: 0;
+      border-radius: 5px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-family: "Quicksand", sans-serif;
+    }
 
-        .boton {
-            min-height: 42px;
-            border: 0;
-            border-radius: 7px;
-            padding: 9px 18px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 14px;
-            white-space: nowrap;
-        }
+    .multi-option {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 4px;
+      cursor: pointer;
+    }
 
-        .boton-aplicar {
-            background: #b43c2c;
-            color: #fff;
-        }
+    .multi-option input {
+      width: 16px;
+      height: 16px;
+      accent-color: #b43c2c;
+    }
 
-        .boton-limpiar {
-            background: #e8ebee;
-            color: #333;
-        }
+    .acciones-filtros {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
 
-        .boton:hover {
-            opacity: 0.9;
-        }
+    .panel-graficos h2 {
+      text-align: center;
+    }
 
-        .boton:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
+    .grafico-contenedor {
+      width: 100%;
+      background: #fff;
+      overflow-x: auto;
+    }
 
-        .informacion-semana {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-            color: #555;
-            font-size: 14px;
-        }
+    .grafico-oee {
+      height: 380px;
+    }
 
-        .informacion-semana span,
-        .informacion-semana strong {
-            white-space: nowrap;
-        }
+    .grafico-detenciones {
+      height: 420px;
+    }
 
-        .leyenda-turnos {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 18px;
-            margin-bottom: 15px;
-        }
+    .grafico-semanal {
+      position: relative;
+      height: 580px;
+    }
 
-        .leyenda-item {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 14px;
-        }
+    .grafico-semanal canvas {
+      min-width: 1000px;
+    }
 
-        .color-turno {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            flex: 0 0 auto;
-        }
+    .seccion-detenciones-semanales {
+      width: 100%;
+      margin-top: 34px;
+      padding-top: 22px;
+      border-top: 2px solid #ececec;
+    }
 
-        .color-a {
-            background:
-                rgba(153, 102, 255, 0.82);
-        }
+    .descripcion-grafico-semanal {
+      margin: 0 0 12px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
 
-        .color-b {
-            background:
-                rgba(54, 162, 235, 0.82);
-        }
+    .informacion-detenciones-semanales {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 16px;
+      margin: 12px 0;
+      color: #555;
+      font-size: 14px;
+    }
 
-        .color-c {
-            background:
-                rgba(255, 159, 64, 0.82);
-        }
+    .leyenda-detenciones-semanales {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 18px;
+      margin: 12px 0;
+    }
 
-        .color-limpieza {
-            background:
-                rgba(120, 120, 120, 0.55);
-        }
+    .leyenda-semanal-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 14px;
+    }
 
-        .contenedor-grafico {
-            position: relative;
-            width: 100%;
-            height: 580px;
-            overflow-x: auto;
-            background: #fff;
-        }
+    .color-semanal {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      flex: 0 0 auto;
+      border-radius: 4px;
+    }
 
-        .contenedor-grafico canvas {
-            min-width: 1000px;
-        }
+    .color-semanal-a {
+      background: rgba(153, 102, 255, .82);
+    }
 
-        .sin-datos {
-            display: none;
-            padding: 30px;
-            text-align: center;
-            font-weight: 700;
-            color: #777;
-        }
+    .color-semanal-b {
+      background: rgba(54, 162, 235, .82);
+    }
 
-        .cargando {
-            display: none;
-            padding: 10px;
-            text-align: center;
-            color: #666;
-        }
+    .color-semanal-c {
+      background: rgba(255, 159, 64, .82);
+    }
 
-        .botones-inferiores {
-            margin-top: 16px;
-            text-align: center;
-        }
+    .color-semanal-limpieza {
+      background: rgba(120, 120, 120, .55);
+    }
 
-        @media (max-width: 1200px) {
-            .filtros {
-                grid-template-columns:
-                    repeat(2, minmax(220px, 1fr));
-            }
+    .mensaje-detenciones-semanales {
+      display: none;
+      padding: 20px;
+      text-align: center;
+      color: #777;
+      font-weight: 700;
+    }
 
-            .boton {
-                width: 100%;
-            }
-        }
+    @media (max-width: 700px) {
+      .grafico-semanal {
+        height: 500px;
+      }
 
-        @media (max-width: 700px) {
-            .pagina-detenciones {
-                width: 98%;
-                margin: 10px auto;
-            }
-
-            .panel {
-                padding: 12px;
-            }
-
-            .filtros {
-                grid-template-columns: 1fr;
-            }
-
-            .opciones-turnos {
-                justify-content: space-between;
-            }
-
-            .contenedor-grafico {
-                height: 500px;
-            }
-
-            .encabezado-detenciones img {
-                width: 110px;
-            }
-        }
-    </style>
+      .leyenda-detenciones-semanales,
+      .informacion-detenciones-semanales {
+        justify-content: flex-start;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="login">
+    <img
+      src="{% static 'calculo_oee/images/logoquinta.png' %}"
+      alt="Logo Quinta"
+      class="logo"
+    >
 
-<div class="pagina-detenciones">
+    <div class="login-container">
+      <h1 class="title">Panel Gráfico · OEE y Detenciones</h1>
 
-    <div class="encabezado-detenciones">
-        <img
-            src="{% static 'calculo_oee/images/logoquinta.png' %}"
-            alt="Logo Quinta"
-        >
+      <!-- === FILTROS === -->
+      <div class="filtros">
+        <div class="filtro-box">
+          <label>Semanas</label>
 
-        <h1>Detenciones semanales OEE</h1>
-    </div>
-
-    <div class="panel">
-
-        <div class="filtros">
-
-            <div class="grupo-filtro">
-                <label for="filtroAnio">
-                    Año
-                </label>
-
-                <select id="filtroAnio"></select>
-            </div>
-
-            <div class="grupo-filtro">
-                <label for="filtroSemana">
-                    Semana
-                </label>
-
-                <select id="filtroSemana"></select>
-            </div>
-
-            <div class="grupo-filtro">
-                <label for="filtroLinea">
-                    Línea
-                </label>
-
-                <select id="filtroLinea">
-                    <option value="">
-                        Todas las líneas
-                    </option>
-                </select>
-            </div>
-
-            <div class="grupo-filtro">
-                <label>
-                    Turnos
-                </label>
-
-                <div class="opciones-turnos">
-
-                    <label class="turno-checkbox">
-                        <input
-                            type="checkbox"
-                            name="turno"
-                            value="A"
-                            checked
-                        >
-                        Turno A
-                    </label>
-
-                    <label class="turno-checkbox">
-                        <input
-                            type="checkbox"
-                            name="turno"
-                            value="B"
-                            checked
-                        >
-                        Turno B
-                    </label>
-
-                    <label class="turno-checkbox">
-                        <input
-                            type="checkbox"
-                            name="turno"
-                            value="C"
-                            checked
-                        >
-                        Turno C
-                    </label>
-
-                </div>
-            </div>
-
+          <div class="multi-dropdown" id="dd_semanas">
             <button
-                type="button"
-                id="btnAplicar"
-                class="boton boton-aplicar"
+              type="button"
+              class="multi-dropdown-btn"
+              data-placeholder="Seleccionar semanas"
             >
-                Aplicar
+              Seleccionar semanas
             </button>
 
-            <button
-                type="button"
-                id="btnLimpiar"
-                class="boton boton-limpiar"
-            >
-                Limpiar
-            </button>
-
+            <div
+              class="multi-dropdown-panel"
+              id="panel_semanas"
+            ></div>
+          </div>
         </div>
 
+        <div class="filtro-box">
+          <label for="f_anios">Año</label>
+          <select id="f_anios"></select>
+        </div>
+
+        <div class="filtro-box">
+          <label>Líneas</label>
+
+          <div class="multi-dropdown" id="dd_lineas">
+            <button
+              type="button"
+              class="multi-dropdown-btn"
+              data-placeholder="Seleccionar líneas"
+            >
+              Seleccionar líneas
+            </button>
+
+            <div
+              class="multi-dropdown-panel"
+              id="panel_lineas"
+            ></div>
+          </div>
+        </div>
+
+        <!-- NUEVO FILTRO DE TURNOS -->
+        <div class="filtro-box">
+          <label>Turnos</label>
+
+          <div class="turnos-inline" id="filtro_turnos">
+            <label class="turno-inline-item">
+              <input
+                type="checkbox"
+                name="f_turno"
+                value="A"
+              >
+              Turno A
+            </label>
+
+            <label class="turno-inline-item">
+              <input
+                type="checkbox"
+                name="f_turno"
+                value="B"
+                checked
+              >
+              Turno B
+            </label>
+
+            <label class="turno-inline-item">
+              <input
+                type="checkbox"
+                name="f_turno"
+                value="C"
+                checked
+              >
+              Turno C
+            </label>
+          </div>
+        </div>
+
+        <div class="filtro-box">
+          <label for="f_desde">Desde</label>
+          <input type="date" id="f_desde">
+        </div>
+
+        <div class="filtro-box">
+          <label for="f_hasta">Hasta</label>
+          <input type="date" id="f_hasta">
+        </div>
+      </div>
+
+      <div class="acciones-filtros">
+        <button id="btn_aplicar" class="primary-button">
+          Aplicar filtros
+        </button>
+
+        <button
+          id="btn_limpiar"
+          class="primary-button"
+          type="button"
+        >
+          Limpiar
+        </button>
+
+        <button
+          id="btn_sel_todo_sem"
+          class="primary-button"
+          type="button"
+        >
+          Semanas: seleccionar todo
+        </button>
+
+        <button
+          id="btn_sel_todo_lin"
+          class="primary-button"
+          type="button"
+        >
+          Líneas: seleccionar todo
+        </button>
+
+        <button
+          id="btn_sel_todo_tur"
+          class="primary-button"
+          type="button"
+        >
+          Turnos: seleccionar todo
+        </button>
+      </div>
+
+      <div class="panel-graficos">
+        <!-- === GRÁFICO 1: OEE === -->
+        <h2 style="margin-top:8px;">Gráfico OEE</h2>
+
+        <div class="grafico-contenedor grafico-oee">
+          <canvas
+            id="graficoOEE"
+            style="display:block; width:100%; height:380px;"
+          ></canvas>
+        </div>
+
+        <div class="oee-explicacion">
+          <div class="oee-item disponibilidad">
+            <div class="oee-titulo">Disponibilidad</div>
+
+            <div class="oee-texto">
+              Mide el tiempo real productivo versus el tiempo planificado
+              del turno. Considera detenciones por fallas, ajustes,
+              limpieza y otros eventos no productivos.
+            </div>
+          </div>
+
+          <div class="oee-item eficiencia">
+            <div class="oee-titulo">Eficiencia</div>
+
+            <div class="oee-texto">
+              Evalúa qué tan rápido produce la línea respecto a su
+              velocidad estándar o ideal. Refleja pérdidas por
+              microdetenciones o reducción de velocidad.
+            </div>
+          </div>
+
+          <div class="oee-item oee">
+            <div class="oee-titulo">OEE</div>
+
+            <div class="oee-texto">
+              Indicador global que combina Disponibilidad, Eficiencia
+              y Calidad. Representa el rendimiento real total de la
+              línea productiva.
+            </div>
+          </div>
+        </div>
+
+        <!-- === GRÁFICO 2: UNIDADES POR PERSONA === -->
+        <h2>Gráfico Unidades por Persona</h2>
+        <canvas id="graficoUnidadesPersona"></canvas>
+
+        <!-- === GRÁFICO 3: DETENCIONES PORCENTUALES === -->
+        <h2 style="margin-top:24px;">Gráfico Detenciones</h2>
+
         <div
-            id="informacionSemana"
-            class="informacion-semana"
+          id="legendDet"
+          style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:6px 14px;
+            margin:6px 0 10px;
+            align-items:center;
+          "
         ></div>
 
-        <div class="leyenda-turnos">
+        <div class="grafico-contenedor grafico-detenciones">
+          <canvas
+            id="graficoDetenciones"
+            style="display:block; width:100%; height:420px;"
+          ></canvas>
+        </div>
 
+        <div class="legend-objetivo">
+          <div class="legend-objetivo-item colacion">
+            <span class="dot"></span>
+
+            <div>
+              <strong>Colación</strong><br>
+              30 min · 6,25%
+            </div>
+          </div>
+
+          <div class="legend-objetivo-item aseo">
+            <span class="dot"></span>
+
+            <div>
+              <strong>Aseo de línea</strong><br>
+              60 min · 12,5%
+            </div>
+          </div>
+
+          <div class="legend-objetivo-item preparacion">
+            <span class="dot"></span>
+
+            <div>
+              <strong>Preparación de insumos</strong><br>
+              54 min · 11,25%
+            </div>
+          </div>
+
+          <div class="legend-objetivo-item mantenimiento">
+            <span class="dot"></span>
+
+            <div>
+              <strong>Falla mecánica</strong><br>
+              20 min · 4,17%
+            </div>
+          </div>
+
+          <div class="legend-objetivo-item tiempo-productivo">
+            <span class="dot"></span>
+
+            <div>
+              <strong>Tiempo Productivo</strong><br>
+              286 min · 65,83%
+            </div>
+          </div>
+
+          <div class="legend-total">
+            🎯 Objetivo Total detenciones:
+            <strong>164 min · 34,17%</strong>
+          </div>
+        </div>
+
+        <!-- === GRÁFICO 4: DETENCIONES SEMANALES === -->
+        <section class="seccion-detenciones-semanales">
+          <h2>Línea de tiempo semanal de detenciones</h2>
+
+          <p class="descripcion-grafico-semanal">
+            Para visualizar este gráfico selecciona exactamente una semana.
+            El horario se adapta a los turnos seleccionados.
+          </p>
+
+          <div
+            id="informacionDetencionesSemanales"
+            class="informacion-detenciones-semanales"
+          ></div>
+
+          <div class="leyenda-detenciones-semanales">
             <div
-                class="leyenda-item"
-                data-leyenda-turno="A"
+              class="leyenda-semanal-item"
+              data-leyenda-semanal="A"
             >
-                <span
-                    class="color-turno color-a"
-                ></span>
-
-                Turno A: 23:00 a 07:00
+              <span class="color-semanal color-semanal-a"></span>
+              Turno A: 23:00 a 07:00
             </div>
 
             <div
-                class="leyenda-item"
-                data-leyenda-turno="B"
+              class="leyenda-semanal-item"
+              data-leyenda-semanal="B"
             >
-                <span
-                    class="color-turno color-b"
-                ></span>
-
-                Turno B: 07:00 a 14:30
+              <span class="color-semanal color-semanal-b"></span>
+              Turno B: 07:00 a 14:30
             </div>
 
             <div
-                class="leyenda-item"
-                data-leyenda-turno="C"
+              class="leyenda-semanal-item"
+              data-leyenda-semanal="C"
             >
-                <span
-                    class="color-turno color-c"
-                ></span>
-
-                Turno C: 14:30 a 22:00
+              <span class="color-semanal color-semanal-c"></span>
+              Turno C: 14:30 a 22:00
             </div>
 
             <div
-                class="leyenda-item"
-                id="leyendaLimpieza"
+              class="leyenda-semanal-item"
+              id="leyendaLimpiezaSemanal"
             >
-                <span
-                    class="color-turno color-limpieza"
-                ></span>
-
-                Limpieza profunda: 22:00 a 23:00
+              <span class="color-semanal color-semanal-limpieza"></span>
+              Limpieza profunda: 22:00 a 23:00
             </div>
+          </div>
 
-        </div>
+          <div
+            id="mensajeDetencionesSemanales"
+            class="mensaje-detenciones-semanales"
+          ></div>
 
-        <div
-            id="mensajeCargando"
-            class="cargando"
-        >
-            Cargando detenciones...
-        </div>
+          <div class="grafico-contenedor grafico-semanal">
+            <canvas id="graficoDetencionesSemanales"></canvas>
+          </div>
+        </section>
 
-        <div
-            id="mensajeSinDatos"
-            class="sin-datos"
-        >
-            No existen detenciones registradas para los filtros seleccionados.
-        </div>
-
-        <div class="contenedor-grafico">
-            <canvas
-                id="graficoDetencionesSemanales"
-            ></canvas>
-        </div>
-
-    </div>
-
-    <div class="botones-inferiores">
-        <a
+        <div class="botones" style="margin-top:16px;">
+          <a
             href="{% url 'redireccionar_intermedio_4' %}"
             class="primary-button login-button"
-        >
+          >
             🏠 Volver al Inicio
-        </a>
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
 
-</div>
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
 
-<script
-    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7"
-></script>
+    Chart.defaults.font.family = 'Quicksand, sans-serif';
 
-<script
-    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0"
-></script>
+    const $ = selector => document.querySelector(selector);
 
-<script>
-document.addEventListener(
-    "DOMContentLoaded",
-    async function () {
-        const filtroAnio =
-            document.getElementById("filtroAnio");
+    const sAnios = $('#f_anios');
+    const fDesde = $('#f_desde');
+    const fHasta = $('#f_hasta');
 
-        const filtroSemana =
-            document.getElementById("filtroSemana");
+    const panelSemanas = $('#panel_semanas');
+    const panelLineas = $('#panel_lineas');
 
-        const filtroLinea =
-            document.getElementById("filtroLinea");
+    const ddSemanas = $('#dd_semanas');
+    const ddLineas = $('#dd_lineas');
 
-        const btnAplicar =
-            document.getElementById("btnAplicar");
+    const btnAplicar = $('#btn_aplicar');
+    const btnLimpiar = $('#btn_limpiar');
+    const btnSelTodoSem = $('#btn_sel_todo_sem');
+    const btnSelTodoLin = $('#btn_sel_todo_lin');
+    const btnSelTodoTur = $('#btn_sel_todo_tur');
 
-        const btnLimpiar =
-            document.getElementById("btnLimpiar");
+    const ctxOEE = $('#graficoOEE').getContext('2d');
+    const ctxDet = $('#graficoDetenciones').getContext('2d');
 
-        const mensajeCargando =
-            document.getElementById(
-                "mensajeCargando"
-            );
+    const ctxUnidadesPersona =
+      $('#graficoUnidadesPersona').getContext('2d');
 
-        const mensajeSinDatos =
-            document.getElementById(
-                "mensajeSinDatos"
-            );
+    const ctxDetencionesSemanales =
+      $('#graficoDetencionesSemanales').getContext('2d');
 
-        const informacionSemana =
-            document.getElementById(
-                "informacionSemana"
-            );
+    const legendDetBox = $('#legendDet');
 
-        const leyendaLimpieza =
-            document.getElementById(
-                "leyendaLimpieza"
-            );
+    const informacionDetencionesSemanales =
+      $('#informacionDetencionesSemanales');
 
-        const canvas =
-            document.getElementById(
-                "graficoDetencionesSemanales"
-            );
+    const mensajeDetencionesSemanales =
+      $('#mensajeDetencionesSemanales');
 
-        let grafico = null;
-        let periodosDisponibles = [];
+    const leyendaLimpiezaSemanal =
+      $('#leyendaLimpiezaSemanal');
 
-        const URL_OPCIONES =
-            "{% url 'detenciones_semanales_opciones_api' %}";
+    let chartOEE = null;
+    let chartDet = null;
+    let chartUnidadesPersona = null;
+    let chartDetencionesSemanales = null;
 
-        const URL_DATOS =
-            "{% url 'detenciones_semanales_api' %}";
+    /*
+    Motivos visibles en la leyenda del gráfico porcentual
+    de detenciones.
 
-        /*
-        Escala operacional:
+    null significa que todavía no se ha construido la leyenda,
+    por lo que la línea de tiempo semanal debe mostrar todos
+    los motivos disponibles.
+    */
+    let motivosDetencionesSeleccionados = null;
 
-        0     = 23:00
-        480   = 07:00
-        930   = 14:30
-        1380  = 22:00
-        1440  = 23:00
-        */
+    const INICIO_TURNO_A = 0;
+    const FIN_TURNO_A = 480;
 
-        const INICIO_TURNO_A = 0;
-        const FIN_TURNO_A = 480;
+    const INICIO_TURNO_B = 480;
+    const FIN_TURNO_B = 930;
 
-        const INICIO_TURNO_B = 480;
-        const FIN_TURNO_B = 930;
+    const INICIO_TURNO_C = 930;
+    const FIN_TURNO_C = 1380;
 
-        const INICIO_TURNO_C = 930;
-        const FIN_TURNO_C = 1380;
+    const INICIO_LIMPIEZA = 1380;
+    const FIN_LIMPIEZA = 1440;
 
-        const INICIO_LIMPIEZA = 1380;
-        const FIN_LIMPIEZA = 1440;
+    const nombresDiasSemana = [
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+      'Domingo'
+    ];
 
-        const nombresDias = [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado",
-            "Domingo"
-        ];
+    function getCheckedValues(panel) {
+      return Array.from(
+        panel.querySelectorAll(
+          'input[type="checkbox"]:checked'
+        )
+      )
+        .map(cb => cb.value)
+        .filter(Boolean);
+    }
 
-        function obtenerTurnosSeleccionados() {
-            return Array.from(
-                document.querySelectorAll(
-                    'input[name="turno"]:checked'
-                )
-            ).map(input => input.value);
+    function getTurnosSeleccionados() {
+      return Array.from(
+        document.querySelectorAll(
+          'input[name="f_turno"]:checked'
+        )
+      )
+        .map(cb => cb.value)
+        .filter(turno => ['A', 'B', 'C'].includes(turno));
+    }
+
+    function setTurnosSeleccionados(valores) {
+      const seleccionados = new Set(
+        valores.map(valor =>
+          String(valor)
+            .toUpperCase()
+            .replace(/^TURNO\s*/, '')
+            .trim()
+        )
+      );
+
+      document.querySelectorAll(
+        'input[name="f_turno"]'
+      ).forEach(input => {
+        input.checked = seleccionados.has(input.value);
+      });
+    }
+
+    function updateDropdownButtonText(dropdown) {
+      const btn =
+        dropdown.querySelector('.multi-dropdown-btn');
+
+      const placeholder =
+        btn.dataset.placeholder || 'Seleccionar';
+
+      const checked =
+        dropdown.querySelectorAll(
+          'input[type="checkbox"]:checked'
+        );
+
+      const labels =
+        Array.from(checked).map(
+          cb => cb.dataset.label || cb.value
+        );
+
+      if (!labels.length) {
+        btn.textContent = placeholder;
+        return;
+      }
+
+      if (labels.length <= 2) {
+        btn.textContent = labels.join(', ');
+        return;
+      }
+
+      btn.textContent = `${labels.length} seleccionados`;
+    }
+
+    function renderCheckboxPanel(
+      panel,
+      values,
+      dropdown
+    ) {
+      panel.innerHTML = '';
+
+      const actions = document.createElement('div');
+      actions.className = 'multi-dropdown-actions';
+
+      const btnTodos = document.createElement('button');
+      btnTodos.type = 'button';
+      btnTodos.textContent = 'Todos';
+
+      btnTodos.onclick = () => {
+        panel.querySelectorAll(
+          'input[type="checkbox"]'
+        ).forEach(cb => {
+          cb.checked = true;
+        });
+
+        updateDropdownButtonText(dropdown);
+      };
+
+      const btnNinguno = document.createElement('button');
+      btnNinguno.type = 'button';
+      btnNinguno.textContent = 'Ninguno';
+
+      btnNinguno.onclick = () => {
+        panel.querySelectorAll(
+          'input[type="checkbox"]'
+        ).forEach(cb => {
+          cb.checked = false;
+        });
+
+        updateDropdownButtonText(dropdown);
+      };
+
+      actions.appendChild(btnTodos);
+      actions.appendChild(btnNinguno);
+      panel.appendChild(actions);
+
+      values.forEach(value => {
+        const label = document.createElement('label');
+        label.className = 'multi-option';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = String(value);
+        checkbox.dataset.label = String(value);
+
+        checkbox.addEventListener('change', () => {
+          updateDropdownButtonText(dropdown);
+        });
+
+        const span = document.createElement('span');
+        span.textContent = value;
+
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        panel.appendChild(label);
+      });
+
+      updateDropdownButtonText(dropdown);
+    }
+
+    function setCheckedValues(
+      panel,
+      values,
+      dropdown
+    ) {
+      const set = new Set(values.map(String));
+
+      panel.querySelectorAll(
+        'input[type="checkbox"]'
+      ).forEach(cb => {
+        cb.checked = set.has(cb.value);
+      });
+
+      updateDropdownButtonText(dropdown);
+    }
+
+    function setupDropdown(dropdown) {
+      const btn =
+        dropdown.querySelector('.multi-dropdown-btn');
+
+      btn.addEventListener('click', event => {
+        event.stopPropagation();
+
+        document.querySelectorAll(
+          '.multi-dropdown.open'
+        ).forEach(dd => {
+          if (dd !== dropdown) {
+            dd.classList.remove('open');
+          }
+        });
+
+        dropdown.classList.toggle('open');
+      });
+    }
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll(
+        '.multi-dropdown.open'
+      ).forEach(dd => {
+        dd.classList.remove('open');
+      });
+    });
+
+    setupDropdown(ddSemanas);
+    setupDropdown(ddLineas);
+
+    function construirParametrosBase() {
+      const params = new URLSearchParams();
+
+      for (const semana of getCheckedValues(panelSemanas)) {
+        params.append('semana', semana);
+      }
+
+      if (sAnios.value) {
+        params.append('anio', sAnios.value);
+      }
+
+      for (const linea of getCheckedValues(panelLineas)) {
+        params.append('linea', linea);
+      }
+
+      if (fDesde.value) {
+        params.set('desde', fDesde.value);
+      }
+
+      if (fHasta.value) {
+        params.set('hasta', fHasta.value);
+      }
+
+      return params;
+    }
+
+    function buildParams() {
+      const params = construirParametrosBase();
+
+      for (const turno of getTurnosSeleccionados()) {
+        params.append('turno', `Turno ${turno}`);
+      }
+
+      return params;
+    }
+
+    function buildParamsURL() {
+      const params = construirParametrosBase();
+
+      for (const turno of getTurnosSeleccionados()) {
+        params.append('turno', turno);
+      }
+
+      return params;
+    }
+
+    async function cargarOpciones() {
+      const urlOpt =
+        "{% url 'resumen_turno_oee_opciones' %}";
+
+      const respuesta = await fetch(
+        urlOpt,
+        { credentials: 'same-origin' }
+      );
+
+      if (!respuesta.ok) {
+        return;
+      }
+
+      const {
+        semanas = [],
+        anios = [],
+        lineas = []
+      } = await respuesta.json();
+
+      const fillSelect = (
+        select,
+        valores,
+        descendente = false
+      ) => {
+        select.innerHTML = '';
+
+        const lista = [...valores].sort(
+          (a, b) =>
+            descendente
+              ? Number(b) - Number(a)
+              : Number(a) - Number(b)
+        );
+
+        lista.forEach(valor => {
+          const opcion = document.createElement('option');
+          opcion.value = valor;
+          opcion.textContent = valor;
+          select.appendChild(opcion);
+        });
+      };
+
+      const semanasOrdenadas =
+        [...semanas].sort((a, b) => a - b);
+
+      const lineasOrdenadas =
+        [...lineas].sort();
+
+      renderCheckboxPanel(
+        panelSemanas,
+        semanasOrdenadas,
+        ddSemanas
+      );
+
+      renderCheckboxPanel(
+        panelLineas,
+        lineasOrdenadas,
+        ddLineas
+      );
+
+      fillSelect(sAnios, anios, true);
+
+      if (sAnios.options.length) {
+        sAnios.selectedIndex = 0;
+      }
+    }
+
+    function aplicarFiltrosDesdeURL() {
+      const params =
+        new URLSearchParams(location.search);
+
+      setCheckedValues(
+        panelSemanas,
+        params.getAll('semana'),
+        ddSemanas
+      );
+
+      const anio = params.get('anio');
+
+      if (anio) {
+        sAnios.value = anio;
+      }
+
+      setCheckedValues(
+        panelLineas,
+        params.getAll('linea'),
+        ddLineas
+      );
+
+      const turnosURL = params
+        .getAll('turno')
+        .map(turno =>
+          String(turno)
+            .toUpperCase()
+            .replace(/^TURNO\s*/, '')
+            .trim()
+        )
+        .filter(turno =>
+          ['A', 'B', 'C'].includes(turno)
+        );
+
+      if (turnosURL.length) {
+        setTurnosSeleccionados(turnosURL);
+      }
+
+      const desde = params.get('desde');
+
+      if (desde) {
+        fDesde.value = desde;
+      }
+
+      const hasta = params.get('hasta');
+
+      if (hasta) {
+        fHasta.value = hasta;
+      }
+    }
+
+    const fmtFecha = valor => {
+      if (!valor) {
+        return '';
+      }
+
+      /*
+      Las APIs pueden entregar la fecha como:
+      - 2026-07-20
+      - 2026-07-20T00:00:00
+      - 2026-07-20T00:00:00Z
+
+      Tomamos únicamente YYYY-MM-DD para evitar que aparezca
+      T00:00:00 en las etiquetas de los primeros tres gráficos.
+      */
+      const texto = String(valor).trim();
+      const coincidencia = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+      if (coincidencia) {
+        const [, anio, mes, dia] = coincidencia;
+        return `${dia}-${mes}-${anio}`;
+      }
+
+      const fecha = new Date(texto);
+
+      if (Number.isNaN(fecha.getTime())) {
+        return texto;
+      }
+
+      return (
+        String(fecha.getDate()).padStart(2, '0') +
+        '-' +
+        String(fecha.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        fecha.getFullYear()
+      );
+    };
+
+    const turnoRank = turno => {
+      const normalizado =
+        String(turno)
+          .toUpperCase()
+          .replace(/^TURNO\s*/, '')
+          .trim();
+
+      return ({
+        A: 0,
+        B: 1,
+        C: 2
+      })[normalizado] ?? 999;
+    };
+
+    async function cargarOEE() {
+      const url =
+        `{% url 'resumen_turno_oee_api' %}?` +
+        buildParams().toString();
+
+      const respuesta = await fetch(
+        url,
+        { credentials: 'same-origin' }
+      );
+
+      if (!respuesta.ok) {
+        return;
+      }
+
+      const data = await respuesta.json();
+
+      if (!Array.isArray(data) || !data.length) {
+        if (chartOEE) {
+          chartOEE.destroy();
+          chartOEE = null;
         }
 
-        function obtenerRangoHorario(turnos) {
-            const rangos = {
-                A: {
-                    inicio: INICIO_TURNO_A,
-                    fin: FIN_TURNO_A
-                },
-                B: {
-                    inicio: INICIO_TURNO_B,
-                    fin: FIN_TURNO_B
-                },
-                C: {
-                    inicio: INICIO_TURNO_C,
-                    fin: FIN_TURNO_C
+        if (chartUnidadesPersona) {
+          chartUnidadesPersona.destroy();
+          chartUnidadesPersona = null;
+        }
+
+        return;
+      }
+
+      data.sort(
+        (a, b) =>
+          new Date(a.fecha) - new Date(b.fecha) ||
+          turnoRank(a.turno) - turnoRank(b.turno)
+      );
+
+      const labels =
+        data.map(
+          item =>
+            `${fmtFecha(item.fecha)} (${item.turno})`
+        );
+
+      const disponibilidad =
+        data.map(item => +item.disponibilidad || 0);
+
+      const eficiencia =
+        data.map(item => +item.eficiencia || 0);
+
+      const oee =
+        data.map(item => +item.oee || 0);
+
+      const oeeValidos =
+        oee.filter(valor =>
+          Number.isFinite(valor) && valor > 0
+        );
+
+      const promedioOEE =
+        oeeValidos.length
+          ? (
+              oeeValidos.reduce(
+                (acumulado, valor) =>
+                  acumulado + valor,
+                0
+              ) / oeeValidos.length
+            )
+          : 0;
+
+      const promedioOEEData =
+        labels.map(() => promedioOEE);
+
+      const target =
+        data.map(item => +item.target || 0);
+
+      const loteIds =
+        data.map(item => item.lote_id);
+
+      const unidadesPPReal =
+        data.map(
+          item => +item.unidades_pp_real || 0
+        );
+
+      const unidadesPPTeorico =
+        data.map(
+          item => +item.unidades_pp_teorico || 0
+        );
+
+      const showValuesPlugin = {
+        id: 'showValuesPlugin',
+
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+
+          chart.data.datasets.forEach(
+            (dataset, datasetIndex) => {
+              if (dataset.label !== 'OEE') {
+                return;
+              }
+
+              const meta =
+                chart.getDatasetMeta(datasetIndex);
+
+              meta.data.forEach(
+                (element, index) => {
+                  const value =
+                    dataset.data[index];
+
+                  if (value == null) {
+                    return;
+                  }
+
+                  const position =
+                    element.tooltipPosition();
+
+                  ctx.save();
+                  ctx.font =
+                    '12px Quicksand, sans-serif';
+
+                  ctx.fillStyle =
+                    dataset.borderColor || '#000';
+
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'bottom';
+
+                  ctx.fillText(
+                    Number(value).toFixed(1) + '%',
+                    position.x,
+                    position.y - 6
+                  );
+
+                  ctx.restore();
                 }
-            };
+              );
+            }
+          );
+        }
+      };
 
-            if (!turnos.length) {
-                return null;
+      if (chartOEE) {
+        chartOEE.destroy();
+      }
+
+      chartOEE = new Chart(ctxOEE, {
+        type: 'line',
+
+        data: {
+          labels,
+
+          datasets: [
+            {
+              label: 'Disponibilidad',
+              data: disponibilidad,
+              borderColor: 'blue',
+              fill: false,
+              tension: .25
+            },
+            {
+              label: 'Eficiencia',
+              data: eficiencia,
+              borderColor: 'red',
+              fill: false,
+              tension: .25
+            },
+            {
+              label: 'OEE',
+              data: oee,
+              borderColor: 'green',
+              fill: false,
+              tension: .25
+            },
+            {
+              label:
+                `Promedio OEE periodo ` +
+                `(${promedioOEE.toFixed(2)}%)`,
+              data: promedioOEEData,
+              borderColor: '#f3ba14',
+              borderDash: [8, 6],
+              borderWidth: 2,
+              pointRadius: 0,
+              fill: false,
+              tension: 0
+            },
+            {
+              label: 'Target (65.83%)',
+              data: target,
+              borderColor: 'purple',
+              borderDash: [6, 6],
+              fill: false
+            }
+          ]
+        },
+
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+
+          interaction: {
+            mode: 'nearest',
+            intersect: true
+          },
+
+          onClick(event, elements) {
+            if (!elements.length) {
+              return;
             }
 
-            const inicios = turnos.map(
-                turno => rangos[turno].inicio
+            const index = elements[0].index;
+            const loteId = loteIds[index];
+
+            if (loteId) {
+              const urlResumen =
+                `{% url 'resumen_turno' 0 %}`
+                  .replace('0', loteId);
+
+              const returnTo =
+                window.location.pathname +
+                window.location.search;
+
+              window.location.href =
+                `${urlResumen}?next=` +
+                encodeURIComponent(returnTo);
+            }
+          },
+
+          plugins: {
+            legend: {
+              position: 'right'
+            },
+
+            title: {
+              display: true,
+              text: 'Tendencia OEE'
+            },
+
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+
+          scales: {
+            y: {
+              beginAtZero: true,
+              suggestedMax: 100,
+
+              ticks: {
+                callback: value => value + '%'
+              }
+            }
+          }
+        },
+
+        plugins: [showValuesPlugin]
+      });
+
+      if (chartUnidadesPersona) {
+        chartUnidadesPersona.destroy();
+      }
+
+      chartUnidadesPersona =
+        new Chart(ctxUnidadesPersona, {
+          type: 'line',
+
+          data: {
+            labels,
+
+            datasets: [
+              {
+                label:
+                  'Unidades por persona real',
+                data: unidadesPPReal,
+                borderColor: '#2196F3',
+                backgroundColor: '#2196F3',
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: .3,
+                fill: false
+              },
+              {
+                label:
+                  'Unidades por persona teórico',
+                data: unidadesPPTeorico,
+                borderColor: '#E53935',
+                backgroundColor: '#E53935',
+                borderWidth: 3,
+                borderDash: [10, 5],
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0,
+                fill: false
+              }
+            ]
+          },
+
+          options: {
+            responsive: true,
+
+            plugins: {
+              legend: {
+                position: 'right'
+              },
+
+              title: {
+                display: true,
+                text:
+                  'Unidades por persona: Real vs Teórico'
+              }
+            },
+
+            scales: {
+              y: {
+                beginAtZero: true,
+
+                title: {
+                  display: true,
+                  text: 'Unidades por persona'
+                }
+              }
+            }
+          }
+        });
+    }
+
+    function obtenerMotivosDetencionesSeleccionados() {
+      if (motivosDetencionesSeleccionados === null) {
+        return null;
+      }
+
+      return new Set(
+        motivosDetencionesSeleccionados
+      );
+    }
+
+    function actualizarMotivosSeleccionadosDesdeGrafico(
+      chart
+    ) {
+      motivosDetencionesSeleccionados = new Set(
+        chart.data.datasets
+          .map((dataset, index) => ({
+            motivo: dataset.label,
+            visible: chart.isDatasetVisible(index)
+          }))
+          .filter(item =>
+            item.visible &&
+            item.motivo !== 'Tiempo Productivo'
+          )
+          .map(item => item.motivo)
+      );
+    }
+
+    function filtrarDetencionesSemanalesPorMotivo(
+      detenciones
+    ) {
+      const motivosSeleccionados =
+        obtenerMotivosDetencionesSeleccionados();
+
+      if (motivosSeleccionados === null) {
+        return detenciones;
+      }
+
+      if (!motivosSeleccionados.size) {
+        return [];
+      }
+
+      return detenciones.filter(detencion =>
+        motivosSeleccionados.has(
+          detencion.motivo
+        )
+      );
+    }
+
+    function renderLegendDet(chart) {
+      legendDetBox.innerHTML = '';
+
+      const seleccionAnterior =
+        motivosDetencionesSeleccionados === null
+          ? null
+          : new Set(
+              motivosDetencionesSeleccionados
             );
 
-            const finales = turnos.map(
-                turno => rangos[turno].fin
+      chart.data.datasets.forEach(
+        (dataset, index) => {
+          const row =
+            document.createElement('label');
+
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          row.style.gap = '8px';
+          row.style.cursor = 'pointer';
+          row.style.userSelect = 'none';
+
+          const checkbox =
+            document.createElement('input');
+
+          checkbox.type = 'checkbox';
+          checkbox.dataset.motivo =
+            dataset.label;
+
+          if (seleccionAnterior === null) {
+            checkbox.checked = true;
+
+            chart.setDatasetVisibility(
+              index,
+              true
             );
-
-            let fin = Math.max(...finales);
-
+          } else if (
+            dataset.label === 'Tiempo Productivo'
+          ) {
             /*
-            Cuando se selecciona el Turno C,
-            se muestra también el período de
-            limpieza profunda hasta las 23:00.
+            Tiempo Productivo sigue visible en el gráfico
+            porcentual, pero no participa como filtro de la
+            línea de tiempo porque no es una detención real.
             */
-            if (turnos.includes("C")) {
-                fin = FIN_LIMPIEZA;
+            checkbox.checked =
+              chart.isDatasetVisible(index);
+          } else {
+            checkbox.checked =
+              seleccionAnterior.has(
+                dataset.label
+              );
+
+            chart.setDatasetVisibility(
+              index,
+              checkbox.checked
+            );
+          }
+
+          checkbox.addEventListener(
+            'change',
+            async () => {
+              chart.setDatasetVisibility(
+                index,
+                checkbox.checked
+              );
+
+              chart.update();
+
+              actualizarMotivosSeleccionadosDesdeGrafico(
+                chart
+              );
+
+              await cargarDetencionesSemanales();
             }
+          );
 
-            return {
-                inicio: Math.min(...inicios),
-                fin: fin
-            };
+          const swatch =
+            document.createElement('span');
+
+          swatch.style.width = '14px';
+          swatch.style.height = '14px';
+          swatch.style.borderRadius = '4px';
+          swatch.style.display = 'inline-block';
+
+          swatch.style.background =
+            typeof dataset.backgroundColor === 'string'
+              ? dataset.backgroundColor
+              : '#999';
+
+          swatch.style.border =
+            '1px solid rgba(0,0,0,.15)';
+
+          const text =
+            document.createElement('span');
+
+          text.textContent = dataset.label;
+          text.style.fontSize = '14px';
+
+          row.appendChild(checkbox);
+          row.appendChild(swatch);
+          row.appendChild(text);
+
+          legendDetBox.appendChild(row);
+        }
+      );
+
+      chart.update();
+
+      actualizarMotivosSeleccionadosDesdeGrafico(
+        chart
+      );
+    }
+
+    async function cargarDetenciones() {
+      const url =
+        `{% url 'detenciones_turno_api' %}?` +
+        buildParams().toString();
+
+      const respuesta = await fetch(
+        url,
+        { credentials: 'same-origin' }
+      );
+
+      if (!respuesta.ok) {
+        return;
+      }
+
+      const data = await respuesta.json();
+
+      if (!Array.isArray(data) || !data.length) {
+        if (chartDet) {
+          chartDet.destroy();
+          chartDet = null;
         }
 
-        function minutosAHora(
-            minutosOperacionales
-        ) {
-            const inicioJornada = 23 * 60;
+        legendDetBox.innerHTML = '';
+        return;
+      }
 
-            let minutosReales =
-                Number(minutosOperacionales)
-                + inicioJornada;
+      data.sort(
+        (a, b) =>
+          new Date(a.fecha) - new Date(b.fecha) ||
+          turnoRank(a.turno) - turnoRank(b.turno)
+      );
 
-            minutosReales =
-                minutosReales % (24 * 60);
+      const byLote = new Map();
+      const motivosSet = new Set();
+      const loteOrder = [];
 
-            const horas = Math.floor(
-                minutosReales / 60
-            );
+      for (const item of data) {
+        const loteId = item.lote_id;
 
-            const minutos =
-                minutosReales % 60;
-
-            return (
-                String(horas).padStart(2, "0")
-                + ":"
-                + String(minutos).padStart(2, "0")
-            );
+        if (!loteId) {
+          continue;
         }
 
-        function fechaChile(fechaISO) {
-            if (!fechaISO) {
-                return "";
-            }
+        if (!byLote.has(loteId)) {
+          byLote.set(loteId, {
+            label: [
+              fmtFecha(item.fecha),
+              String(item.turno)
+            ],
 
-            const partes = fechaISO.split("-");
+            motivos: {},
+            minutos_turno:
+              item.minutos_turno ?? null
+          });
 
-            return (
-                partes[2]
-                + "-"
-                + partes[1]
-                + "-"
-                + partes[0]
-            );
+          loteOrder.push(loteId);
+        } else {
+          const objeto = byLote.get(loteId);
+
+          if (
+            objeto.minutos_turno == null &&
+            item.minutos_turno != null
+          ) {
+            objeto.minutos_turno =
+              item.minutos_turno;
+          }
         }
 
-        function obtenerSemanaActual() {
-            const hoy = new Date();
+        byLote.get(loteId).motivos[item.motivo] =
+          item.porcentaje;
 
-            const fecha = new Date(
-                Date.UTC(
-                    hoy.getFullYear(),
-                    hoy.getMonth(),
-                    hoy.getDate()
-                )
+        motivosSet.add(item.motivo);
+      }
+
+      const motivos =
+        Array.from(motivosSet).sort(
+          (a, b) =>
+            (a === 'Tiempo Productivo') -
+            (b === 'Tiempo Productivo')
+        );
+
+      const labels =
+        loteOrder.map(
+          id => byLote.get(id).label
+        );
+
+      const colorHSL = (index, total) =>
+        `hsl(${index * 360 / total},65%,55%)`;
+
+      const palette =
+        motivos.map(
+          (_, index) =>
+            colorHSL(index, motivos.length)
+        );
+
+      const datasets =
+        motivos.map((motivo, index) => ({
+          label: motivo,
+
+          data: loteOrder.map(
+            id =>
+              byLote.get(id).motivos[motivo] ?? 0
+          ),
+
+          backgroundColor:
+            motivo === 'Tiempo Productivo'
+              ? '#2ca02c'
+              : palette[index],
+
+          stack: 'x',
+          borderWidth: 1,
+          borderColor: 'rgba(0,0,0,0.1)'
+        }));
+
+      const TARGETS_ESTANDAR = {
+        '1-Colacion': 6.25,
+        '5-Falla mecanica': 4.17,
+        '7-Preparacion de insumos': 11.25,
+        '10-Aseo de linea': 12.5,
+        'Tiempo Productivo': 65.83,
+        'Objetivo total detenciones': 34.17
+      };
+
+      const NOMBRES_BONITOS = {
+        '1-Colacion': 'Colación',
+        '5-Falla mecanica': 'Falla mecánica',
+        '7-Preparacion de insumos':
+          'Preparación de insumos',
+        '10-Aseo de linea': 'Aseo de línea',
+        'Tiempo Productivo': 'Tiempo Productivo',
+        'Objetivo total detenciones':
+          'Objetivo total detenciones'
+      };
+
+      const hLine = {
+        id: 'hLine',
+
+        afterDraw(chart) {
+          const {
+            ctx,
+            chartArea,
+            scales
+          } = chart;
+
+          if (!chartArea || !scales?.y) {
+            return;
+          }
+
+          const visibles =
+            chart.data.datasets
+              .map((dataset, index) => ({
+                label: dataset.label,
+                visible:
+                  chart.isDatasetVisible(index)
+              }))
+              .filter(item => item.visible);
+
+          if (!visibles.length) {
+            return;
+          }
+
+          let valorLinea = null;
+          let textoLinea = '';
+
+          const esVisibleEstandarUnico =
+            visibles.length === 1 &&
+            Object.prototype.hasOwnProperty.call(
+              TARGETS_ESTANDAR,
+              visibles[0].label
             );
 
-            const numeroDia =
-                fecha.getUTCDay() || 7;
+          if (esVisibleEstandarUnico) {
+            valorLinea =
+              TARGETS_ESTANDAR[
+                visibles[0].label
+              ];
 
-            fecha.setUTCDate(
-                fecha.getUTCDate()
-                + 4
-                - numeroDia
-            );
+            const nombreBonito =
+              NOMBRES_BONITOS[
+                visibles[0].label
+              ] || visibles[0].label;
 
-            const inicioAnio = new Date(
-                Date.UTC(
-                    fecha.getUTCFullYear(),
-                    0,
-                    1
-                )
-            );
-
-            return Math.ceil(
-                (
-                    (
-                        fecha - inicioAnio
-                    ) / 86400000 + 1
-                ) / 7
-            );
-        }
-
-        function llenarSelect(
-            select,
-            valores
-        ) {
-            select.innerHTML = "";
-
-            valores.forEach(valor => {
-                const opcion =
-                    document.createElement(
-                        "option"
-                    );
-
-                opcion.value = valor;
-                opcion.textContent = valor;
-
-                select.appendChild(opcion);
-            });
-        }
-
-        function cargarSemanasDelAnio() {
-            const anioSeleccionado =
-                Number(filtroAnio.value);
-
-            const semanas = [
-                ...new Set(
-                    periodosDisponibles
-                        .filter(
-                            periodo =>
-                                Number(
-                                    periodo.numero_anio
-                                ) === anioSeleccionado
-                        )
-                        .map(
-                            periodo =>
-                                Number(
-                                    periodo.numero_semana
-                                )
-                        )
-                )
-            ].sort(
-                (a, b) => a - b
-            );
-
-            const semanaAnterior =
-                Number(filtroSemana.value);
-
-            llenarSelect(
-                filtroSemana,
-                semanas
-            );
+            textoLinea =
+              `Objetivo ${nombreBonito}: ` +
+              `${String(valorLinea).replace('.', ',')}%`;
+          } else {
+            const hayNoEstandar =
+              visibles.some(
+                item =>
+                  !Object.prototype
+                    .hasOwnProperty.call(
+                      TARGETS_ESTANDAR,
+                      item.label
+                    )
+              );
 
             if (
-                semanas.includes(
-                    semanaAnterior
-                )
+              visibles.length > 1 ||
+              hayNoEstandar
             ) {
-                filtroSemana.value =
-                    semanaAnterior;
-            } else if (
-                semanas.includes(
-                    obtenerSemanaActual()
-                )
-            ) {
-                filtroSemana.value =
-                    obtenerSemanaActual();
-            } else if (
-                filtroSemana.options.length
-            ) {
-                filtroSemana.selectedIndex =
-                    filtroSemana.options.length - 1;
+              valorLinea = 34.17;
+              textoLinea =
+                'Objetivo total detenciones: 34,17%';
             }
-        }
+          }
 
-        async function cargarOpciones() {
-            try {
-                const respuesta = await fetch(
-                    URL_OPCIONES,
-                    {
-                        credentials: "same-origin"
+          if (valorLinea == null) {
+            return;
+          }
+
+          const yPixel =
+            scales.y.getPixelForValue(valorLinea);
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(chartArea.left, yPixel);
+          ctx.lineTo(chartArea.right, yPixel);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#d62828';
+          ctx.setLineDash([6, 4]);
+          ctx.stroke();
+
+          ctx.fillStyle = '#d62828';
+          ctx.font =
+            '12px Quicksand, sans-serif';
+
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'bottom';
+
+          ctx.fillText(
+            textoLinea,
+            chartArea.right - 4,
+            yPixel - 4
+          );
+
+          ctx.restore();
+        }
+      };
+
+      if (chartDet) {
+        chartDet.destroy();
+      }
+
+      chartDet = new Chart(ctxDet, {
+        type: 'bar',
+
+        data: {
+          labels,
+          datasets
+        },
+
+        plugins: [hLine],
+
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+
+          onClick(event, elements) {
+            if (!elements.length) {
+              return;
+            }
+
+            const index =
+              elements[0].index;
+
+            const loteId =
+              loteOrder[index];
+
+            if (loteId) {
+              const urlDetalle =
+                `{% url 'detalle_turno' 0 %}`
+                  .replace('0', loteId);
+
+              const returnTo =
+                window.location.pathname +
+                window.location.search;
+
+              window.location.href =
+                `${urlDetalle}?next=` +
+                encodeURIComponent(returnTo);
+            }
+          },
+
+          plugins: {
+            legend: {
+              display: false
+            },
+
+            title: {
+              display: true,
+              text:
+                '% Distribución del Tiempo de Turno ' +
+                '(Detenciones + Productivo)'
+            },
+
+            tooltip: {
+              callbacks: {
+                title(items) {
+                  const label =
+                    items[0].label;
+
+                  return Array.isArray(label)
+                    ? label.join(' · ')
+                    : label;
+                },
+
+                label(item) {
+                  const motivo =
+                    item.dataset.label;
+
+                  const porcentaje =
+                    item.parsed.y ?? 0;
+
+                  const loteId =
+                    loteOrder[item.dataIndex];
+
+                  const minutosTurno =
+                    byLote.get(loteId)
+                      ?.minutos_turno;
+
+                  let minutosTexto = '';
+
+                  if (minutosTurno != null) {
+                    const minutos =
+                      (porcentaje / 100) *
+                      minutosTurno;
+
+                    minutosTexto =
+                      ` · ${minutos.toFixed(0)} min`;
+                  }
+
+                  return (
+                    `${motivo}: ` +
+                    `${porcentaje.toFixed(0)}%` +
+                    minutosTexto
+                  );
+                }
+              }
+            }
+          },
+
+          scales: {
+            x: {
+              stacked: true
+            },
+
+            y: {
+              stacked: true,
+              min: 0,
+              max: 100,
+
+              ticks: {
+                callback:
+                  value => value + '%'
+              }
+            }
+          }
+        }
+      });
+
+      renderLegendDet(chartDet);
+
+      requestAnimationFrame(() => {
+        chartDet.resize();
+        chartDet.update();
+      });
+    }
+
+    function destruirGraficoDetencionesSemanales() {
+      if (chartDetencionesSemanales) {
+        chartDetencionesSemanales.destroy();
+        chartDetencionesSemanales = null;
+      }
+    }
+
+    function minutosOperacionalesAHora(
+      minutosOperacionales
+    ) {
+      const inicioJornada = 23 * 60;
+
+      let minutosReales =
+        Number(minutosOperacionales) +
+        inicioJornada;
+
+      minutosReales =
+        minutosReales % (24 * 60);
+
+      const horas =
+        Math.floor(minutosReales / 60);
+
+      const minutos =
+        minutosReales % 60;
+
+      return (
+        String(horas).padStart(2, '0') +
+        ':' +
+        String(minutos).padStart(2, '0')
+      );
+    }
+
+    function obtenerRangoSemanal(turnos) {
+      const rangos = {
+        A: {
+          inicio: INICIO_TURNO_A,
+          fin: FIN_TURNO_A
+        },
+
+        B: {
+          inicio: INICIO_TURNO_B,
+          fin: FIN_TURNO_B
+        },
+
+        C: {
+          inicio: INICIO_TURNO_C,
+          fin: FIN_TURNO_C
+        }
+      };
+
+      if (!turnos.length) {
+        return null;
+      }
+
+      const inicios =
+        turnos.map(
+          turno => rangos[turno].inicio
+        );
+
+      const finales =
+        turnos.map(
+          turno => rangos[turno].fin
+        );
+
+      let fin =
+        Math.max(...finales);
+
+      if (turnos.includes('C')) {
+        fin = FIN_LIMPIEZA;
+      }
+
+      return {
+        inicio: Math.min(...inicios),
+        fin
+      };
+    }
+
+    function construirEtiquetasSemana(
+      fechaInicio
+    ) {
+      const etiquetas = [];
+      const partes = fechaInicio.split('-');
+
+      const fechaBase = new Date(
+        Number(partes[0]),
+        Number(partes[1]) - 1,
+        Number(partes[2])
+      );
+
+      for (
+        let indice = 0;
+        indice < 7;
+        indice++
+      ) {
+        const fechaDia =
+          new Date(fechaBase);
+
+        fechaDia.setDate(
+          fechaBase.getDate() + indice
+        );
+
+        const dia =
+          String(fechaDia.getDate())
+            .padStart(2, '0');
+
+        const mes =
+          String(fechaDia.getMonth() + 1)
+            .padStart(2, '0');
+
+        etiquetas.push(
+          `${nombresDiasSemana[indice]} ` +
+          `${dia}-${mes}`
+        );
+      }
+
+      return etiquetas;
+    }
+
+    function prepararDatosSemanales(
+      detenciones,
+      etiquetasDias
+    ) {
+      const turnoA = [];
+      const turnoB = [];
+      const turnoC = [];
+
+      detenciones.forEach(detencion => {
+        const punto = {
+          x: [
+            Number(detencion.inicio_minutos),
+            Number(detencion.fin_minutos)
+          ],
+
+          y:
+            etiquetasDias[
+              detencion.dia_indice
+            ],
+
+          motivo: detencion.motivo,
+          comentarios: detencion.comentarios,
+          turno: detencion.turno,
+          linea: detencion.linea,
+          fecha: detencion.fecha,
+          hora_inicio: detencion.hora_inicio,
+          hora_fin: detencion.hora_fin,
+          duracion: detencion.duracion,
+          lote_id: detencion.lote_id
+        };
+
+        if (detencion.turno === 'A') {
+          turnoA.push(punto);
+        } else if (
+          detencion.turno === 'B'
+        ) {
+          turnoB.push(punto);
+        } else if (
+          detencion.turno === 'C'
+        ) {
+          turnoC.push(punto);
+        }
+      });
+
+      return {
+        turnoA,
+        turnoB,
+        turnoC
+      };
+    }
+
+    function actualizarLeyendasSemanales(turnos) {
+      document.querySelectorAll(
+        '[data-leyenda-semanal]'
+      ).forEach(elemento => {
+        const turno =
+          elemento.dataset.leyendaSemanal;
+
+        elemento.style.display =
+          turnos.includes(turno)
+            ? 'flex'
+            : 'none';
+      });
+
+      leyendaLimpiezaSemanal.style.display =
+        turnos.includes('C')
+          ? 'flex'
+          : 'none';
+    }
+
+    function crearAnotacionesSemanales(turnos) {
+      const mostrarA = turnos.includes('A');
+      const mostrarB = turnos.includes('B');
+      const mostrarC = turnos.includes('C');
+
+      return {
+        fondoTurnoA: {
+          type: 'box',
+          xMin: INICIO_TURNO_A,
+          xMax: FIN_TURNO_A,
+          display: mostrarA,
+          backgroundColor:
+            'rgba(153,102,255,.06)',
+          borderWidth: 0,
+
+          label: {
+            display: true,
+            content:
+              'Turno A · 23:00 a 07:00',
+            position: {
+              x: 'center',
+              y: 'start'
+            },
+            color: '#6945a5',
+            font: {
+              weight: 'bold'
+            }
+          }
+        },
+
+        fondoTurnoB: {
+          type: 'box',
+          xMin: INICIO_TURNO_B,
+          xMax: FIN_TURNO_B,
+          display: mostrarB,
+          backgroundColor:
+            'rgba(54,162,235,.06)',
+          borderWidth: 0,
+
+          label: {
+            display: true,
+            content:
+              'Turno B · 07:00 a 14:30',
+            position: {
+              x: 'center',
+              y: 'start'
+            },
+            color: '#39789d',
+            font: {
+              weight: 'bold'
+            }
+          }
+        },
+
+        fondoTurnoC: {
+          type: 'box',
+          xMin: INICIO_TURNO_C,
+          xMax: FIN_TURNO_C,
+          display: mostrarC,
+          backgroundColor:
+            'rgba(255,159,64,.06)',
+          borderWidth: 0,
+
+          label: {
+            display: true,
+            content:
+              'Turno C · 14:30 a 22:00',
+            position: {
+              x: 'center',
+              y: 'start'
+            },
+            color: '#a86720',
+            font: {
+              weight: 'bold'
+            }
+          }
+        },
+
+        fondoLimpieza: {
+          type: 'box',
+          xMin: INICIO_LIMPIEZA,
+          xMax: FIN_LIMPIEZA,
+          display: mostrarC,
+          backgroundColor:
+            'rgba(120,120,120,.12)',
+          borderColor:
+            'rgba(90,90,90,.5)',
+          borderWidth: 1,
+
+          label: {
+            display: true,
+            content: 'Limpieza profunda',
+            position: {
+              x: 'center',
+              y: 'start'
+            },
+            color: '#555',
+            font: {
+              size: 11,
+              weight: 'bold'
+            }
+          }
+        },
+
+        separadorAB: {
+          type: 'line',
+          xMin: FIN_TURNO_A,
+          xMax: FIN_TURNO_A,
+          display: mostrarA || mostrarB,
+          borderColor: '#666',
+          borderWidth: 2,
+          borderDash: [6, 5],
+
+          label: {
+            display: true,
+            content: '07:00',
+            position: 'start',
+            backgroundColor: '#555',
+            color: '#fff'
+          }
+        },
+
+        separadorBC: {
+          type: 'line',
+          xMin: FIN_TURNO_B,
+          xMax: FIN_TURNO_B,
+          display: mostrarB || mostrarC,
+          borderColor: '#666',
+          borderWidth: 2,
+          borderDash: [6, 5],
+
+          label: {
+            display: true,
+            content: '14:30',
+            position: 'start',
+            backgroundColor: '#555',
+            color: '#fff'
+          }
+        },
+
+        inicioLimpieza: {
+          type: 'line',
+          xMin: INICIO_LIMPIEZA,
+          xMax: INICIO_LIMPIEZA,
+          display: mostrarC,
+          borderColor: '#555',
+          borderWidth: 2,
+
+          label: {
+            display: true,
+            content: '22:00',
+            position: 'start',
+            backgroundColor: '#555',
+            color: '#fff'
+          }
+        }
+      };
+    }
+
+    function construirGraficoDetencionesSemanales(
+      respuesta,
+      turnos
+    ) {
+      destruirGraficoDetencionesSemanales();
+
+      const rango =
+        obtenerRangoSemanal(turnos);
+
+      if (!rango) {
+        return;
+      }
+
+      const etiquetasDias =
+        construirEtiquetasSemana(
+          respuesta.fecha_inicio
+        );
+
+      const datos =
+        prepararDatosSemanales(
+          respuesta.datos,
+          etiquetasDias
+        );
+
+      actualizarLeyendasSemanales(turnos);
+
+      chartDetencionesSemanales =
+        new Chart(ctxDetencionesSemanales, {
+          type: 'bar',
+
+          data: {
+            labels: etiquetasDias,
+
+            datasets: [
+              {
+                label: 'Turno A',
+                data: datos.turnoA,
+                backgroundColor:
+                  'rgba(153,102,255,.82)',
+                borderColor:
+                  'rgba(153,102,255,1)',
+                borderWidth: 1,
+                borderRadius: 4,
+                barThickness: 22
+              },
+              {
+                label: 'Turno B',
+                data: datos.turnoB,
+                backgroundColor:
+                  'rgba(54,162,235,.82)',
+                borderColor:
+                  'rgba(54,162,235,1)',
+                borderWidth: 1,
+                borderRadius: 4,
+                barThickness: 22
+              },
+              {
+                label: 'Turno C',
+                data: datos.turnoC,
+                backgroundColor:
+                  'rgba(255,159,64,.82)',
+                borderColor:
+                  'rgba(255,159,64,1)',
+                borderWidth: 1,
+                borderRadius: 4,
+                barThickness: 22
+              }
+            ]
+          },
+
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+
+            parsing: {
+              xAxisKey: 'x',
+              yAxisKey: 'y'
+            },
+
+            interaction: {
+              mode: 'nearest',
+              intersect: true
+            },
+
+            plugins: {
+              legend: {
+                display: false
+              },
+
+              tooltip: {
+                callbacks: {
+                  title(items) {
+                    if (!items.length) {
+                      return '';
                     }
-                );
 
-                if (!respuesta.ok) {
-                    throw new Error(
-                        await respuesta.text()
+                    const dato =
+                      items[0].raw;
+
+                    return (
+                      fmtFecha(dato.fecha) +
+                      ' · Turno ' +
+                      dato.turno
                     );
+                  },
+
+                  label(context) {
+                    const dato = context.raw;
+
+                    return [
+                      `Motivo: ${dato.motivo}`,
+                      (
+                        `Línea: ` +
+                        `${dato.linea || 'Sin línea'}`
+                      ),
+                      (
+                        `Horario: ` +
+                        `${dato.hora_inicio} a ` +
+                        `${dato.hora_fin}`
+                      ),
+                      (
+                        `Duración: ` +
+                        `${dato.duracion} minutos`
+                      ),
+                      dato.comentarios
+                        ? (
+                            `Comentario: ` +
+                            dato.comentarios
+                          )
+                        : ''
+                    ].filter(Boolean);
+                  }
                 }
+              },
 
-                const opciones =
-                    await respuesta.json();
+              annotation: {
+                annotations:
+                  crearAnotacionesSemanales(
+                    turnos
+                  )
+              }
+            },
 
-                periodosDisponibles =
-                    opciones.periodos || [];
+            scales: {
+              x: {
+                type: 'linear',
+                min: rango.inicio,
+                max: rango.fin,
 
-                llenarSelect(
-                    filtroAnio,
-                    opciones.anios || []
-                );
+                title: {
+                  display: true,
+                  text: 'Horario operacional',
+                  font: {
+                    size: 15,
+                    weight: 'bold'
+                  }
+                },
 
-                filtroLinea.innerHTML =
-                    '<option value="">'
-                    + 'Todas las líneas'
-                    + '</option>';
+                ticks: {
+                  stepSize: 60,
 
-                (
-                    opciones.lineas || []
-                ).forEach(linea => {
-                    const opcion =
-                        document.createElement(
-                            "option"
-                        );
-
-                    opcion.value = linea;
-                    opcion.textContent = linea;
-
-                    filtroLinea.appendChild(
-                        opcion
+                  callback(value) {
+                    return (
+                      minutosOperacionalesAHora(
+                        value
+                      )
                     );
-                });
+                  },
 
-                const anioActual =
-                    new Date().getFullYear();
+                  maxRotation: 45,
+                  minRotation: 45
+                },
 
-                const existeAnioActual =
-                    Array.from(
-                        filtroAnio.options
-                    ).some(
-                        opcion =>
-                            Number(opcion.value)
-                            === anioActual
-                    );
-
-                if (existeAnioActual) {
-                    filtroAnio.value =
-                        anioActual;
-                } else if (
-                    filtroAnio.options.length
-                ) {
-                    filtroAnio.selectedIndex =
-                        filtroAnio.options.length - 1;
-                }
-
-                cargarSemanasDelAnio();
-
-            } catch (error) {
-                console.error(
-                    "Error cargando opciones:",
-                    error
-                );
-
-                mensajeSinDatos.style.display =
-                    "block";
-
-                mensajeSinDatos.textContent =
-                    "No fue posible cargar "
-                    + "los filtros.";
-            }
-        }
-
-        function construirEtiquetasDias(
-            fechaInicio
-        ) {
-            const etiquetas = [];
-
-            const partes =
-                fechaInicio.split("-");
-
-            const fechaBase = new Date(
-                Number(partes[0]),
-                Number(partes[1]) - 1,
-                Number(partes[2])
-            );
-
-            for (
-                let indice = 0;
-                indice < 7;
-                indice++
-            ) {
-                const fechaDia =
-                    new Date(fechaBase);
-
-                fechaDia.setDate(
-                    fechaBase.getDate()
-                    + indice
-                );
-
-                const dia = String(
-                    fechaDia.getDate()
-                ).padStart(2, "0");
-
-                const mes = String(
-                    fechaDia.getMonth() + 1
-                ).padStart(2, "0");
-
-                etiquetas.push(
-                    nombresDias[indice]
-                    + " "
-                    + dia
-                    + "-"
-                    + mes
-                );
-            }
-
-            return etiquetas;
-        }
-
-        function destruirGrafico() {
-            if (grafico) {
-                grafico.destroy();
-                grafico = null;
-            }
-        }
-
-        function prepararDatos(
-            detenciones,
-            etiquetasDias
-        ) {
-            const turnoA = [];
-            const turnoB = [];
-            const turnoC = [];
-
-            detenciones.forEach(
-                detencion => {
-                    const punto = {
-                        x: [
-                            detencion.inicio_minutos,
-                            detencion.fin_minutos
-                        ],
-
-                        y: etiquetasDias[
-                            detencion.dia_indice
-                        ],
-
-                        motivo:
-                            detencion.motivo,
-
-                        comentarios:
-                            detencion.comentarios,
-
-                        turno:
-                            detencion.turno,
-
-                        linea:
-                            detencion.linea,
-
-                        fecha:
-                            detencion.fecha,
-
-                        hora_inicio:
-                            detencion.hora_inicio,
-
-                        hora_fin:
-                            detencion.hora_fin,
-
-                        duracion:
-                            detencion.duracion,
-
-                        lote_id:
-                            detencion.lote_id
-                    };
+                grid: {
+                  color(context) {
+                    const value =
+                      context.tick.value;
 
                     if (
-                        detencion.turno === "A"
+                      value === FIN_TURNO_A ||
+                      value === FIN_TURNO_B ||
+                      value === INICIO_LIMPIEZA
                     ) {
-                        turnoA.push(punto);
-                    } else if (
-                        detencion.turno === "B"
-                    ) {
-                        turnoB.push(punto);
-                    } else if (
-                        detencion.turno === "C"
-                    ) {
-                        turnoC.push(punto);
+                      return (
+                        'rgba(0,0,0,.40)'
+                      );
                     }
+
+                    return 'rgba(0,0,0,.08)';
+                  }
                 }
-            );
+              },
 
-            return {
-                turnoA,
-                turnoB,
-                turnoC
-            };
-        }
-
-        function crearAnotaciones(
-            turnosSeleccionados
-        ) {
-            const mostrarA =
-                turnosSeleccionados.includes("A");
-
-            const mostrarB =
-                turnosSeleccionados.includes("B");
-
-            const mostrarC =
-                turnosSeleccionados.includes("C");
-
-            return {
-                fondoTurnoA: {
-                    type: "box",
-                    xMin: INICIO_TURNO_A,
-                    xMax: FIN_TURNO_A,
-                    display: mostrarA,
-                    backgroundColor:
-                        "rgba(153, 102, 255, 0.06)",
-                    borderWidth: 0,
-
-                    label: {
-                        display: true,
-                        content:
-                            "Turno A · 23:00 a 07:00",
-                        position: {
-                            x: "center",
-                            y: "start"
-                        },
-                        color: "#6945a5",
-                        font: {
-                            weight: "bold"
-                        }
-                    }
+              y: {
+                title: {
+                  display: true,
+                  text: 'Días de la semana',
+                  font: {
+                    size: 15,
+                    weight: 'bold'
+                  }
                 },
 
-                fondoTurnoB: {
-                    type: "box",
-                    xMin: INICIO_TURNO_B,
-                    xMax: FIN_TURNO_B,
-                    display: mostrarB,
-                    backgroundColor:
-                        "rgba(54, 162, 235, 0.06)",
-                    borderWidth: 0,
-
-                    label: {
-                        display: true,
-                        content:
-                            "Turno B · 07:00 a 14:30",
-                        position: {
-                            x: "center",
-                            y: "start"
-                        },
-                        color: "#39789d",
-                        font: {
-                            weight: "bold"
-                        }
-                    }
+                ticks: {
+                  font: {
+                    size: 13,
+                    weight: 'bold'
+                  }
                 },
 
-                fondoTurnoC: {
-                    type: "box",
-                    xMin: INICIO_TURNO_C,
-                    xMax: FIN_TURNO_C,
-                    display: mostrarC,
-                    backgroundColor:
-                        "rgba(255, 159, 64, 0.06)",
-                    borderWidth: 0,
-
-                    label: {
-                        display: true,
-                        content:
-                            "Turno C · 14:30 a 22:00",
-                        position: {
-                            x: "center",
-                            y: "start"
-                        },
-                        color: "#a86720",
-                        font: {
-                            weight: "bold"
-                        }
-                    }
-                },
-
-                fondoLimpieza: {
-                    type: "box",
-                    xMin: INICIO_LIMPIEZA,
-                    xMax: FIN_LIMPIEZA,
-                    display: mostrarC,
-                    backgroundColor:
-                        "rgba(120, 120, 120, 0.12)",
-                    borderColor:
-                        "rgba(90, 90, 90, 0.5)",
-                    borderWidth: 1,
-
-                    label: {
-                        display: true,
-                        content:
-                            "Limpieza profunda",
-                        position: {
-                            x: "center",
-                            y: "start"
-                        },
-                        color: "#555",
-                        font: {
-                            size: 11,
-                            weight: "bold"
-                        }
-                    }
-                },
-
-                separadorAB: {
-                    type: "line",
-                    xMin: FIN_TURNO_A,
-                    xMax: FIN_TURNO_A,
-                    display:
-                        mostrarA || mostrarB,
-                    borderColor: "#666",
-                    borderWidth: 2,
-                    borderDash: [6, 5],
-
-                    label: {
-                        display: true,
-                        content: "07:00",
-                        position: "start",
-                        backgroundColor: "#555",
-                        color: "#fff"
-                    }
-                },
-
-                separadorBC: {
-                    type: "line",
-                    xMin: FIN_TURNO_B,
-                    xMax: FIN_TURNO_B,
-                    display:
-                        mostrarB || mostrarC,
-                    borderColor: "#666",
-                    borderWidth: 2,
-                    borderDash: [6, 5],
-
-                    label: {
-                        display: true,
-                        content: "14:30",
-                        position: "start",
-                        backgroundColor: "#555",
-                        color: "#fff"
-                    }
-                },
-
-                inicioLimpieza: {
-                    type: "line",
-                    xMin: INICIO_LIMPIEZA,
-                    xMax: INICIO_LIMPIEZA,
-                    display: mostrarC,
-                    borderColor: "#555",
-                    borderWidth: 2,
-
-                    label: {
-                        display: true,
-                        content: "22:00",
-                        position: "start",
-                        backgroundColor: "#555",
-                        color: "#fff"
-                    }
+                grid: {
+                  color: 'rgba(0,0,0,.08)'
                 }
-            };
-        }
-
-        function actualizarLeyendas(
-            turnosSeleccionados
-        ) {
-            document.querySelectorAll(
-                "[data-leyenda-turno]"
-            ).forEach(elemento => {
-                const turno =
-                    elemento.dataset.leyendaTurno;
-
-                elemento.style.display =
-                    turnosSeleccionados.includes(
-                        turno
-                    )
-                        ? "flex"
-                        : "none";
-            });
-
-            leyendaLimpieza.style.display =
-                turnosSeleccionados.includes("C")
-                    ? "flex"
-                    : "none";
-        }
-
-        function construirGrafico(
-            respuesta,
-            turnosSeleccionados
-        ) {
-            destruirGrafico();
-
-            const rangoHorario =
-                obtenerRangoHorario(
-                    turnosSeleccionados
-                );
-
-            if (!rangoHorario) {
-                return;
+              }
             }
-
-            const etiquetasDias =
-                construirEtiquetasDias(
-                    respuesta.fecha_inicio
-                );
-
-            const datosPreparados =
-                prepararDatos(
-                    respuesta.datos,
-                    etiquetasDias
-                );
-
-            actualizarLeyendas(
-                turnosSeleccionados
-            );
-
-            grafico = new Chart(
-                canvas,
-                {
-                    type: "bar",
-
-                    data: {
-                        labels: etiquetasDias,
-
-                        datasets: [
-                            {
-                                label: "Turno A",
-                                data:
-                                    datosPreparados.turnoA,
-                                backgroundColor:
-                                    "rgba(153, 102, 255, 0.82)",
-                                borderColor:
-                                    "rgba(153, 102, 255, 1)",
-                                borderWidth: 1,
-                                borderRadius: 4,
-                                barThickness: 22
-                            },
-                            {
-                                label: "Turno B",
-                                data:
-                                    datosPreparados.turnoB,
-                                backgroundColor:
-                                    "rgba(54, 162, 235, 0.82)",
-                                borderColor:
-                                    "rgba(54, 162, 235, 1)",
-                                borderWidth: 1,
-                                borderRadius: 4,
-                                barThickness: 22
-                            },
-                            {
-                                label: "Turno C",
-                                data:
-                                    datosPreparados.turnoC,
-                                backgroundColor:
-                                    "rgba(255, 159, 64, 0.82)",
-                                borderColor:
-                                    "rgba(255, 159, 64, 1)",
-                                borderWidth: 1,
-                                borderRadius: 4,
-                                barThickness: 22
-                            }
-                        ]
-                    },
-
-                    options: {
-                        indexAxis: "y",
-                        responsive: true,
-                        maintainAspectRatio: false,
-
-                        parsing: {
-                            xAxisKey: "x",
-                            yAxisKey: "y"
-                        },
-
-                        interaction: {
-                            mode: "nearest",
-                            intersect: true
-                        },
-
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-
-                            tooltip: {
-                                callbacks: {
-                                    title: function (
-                                        items
-                                    ) {
-                                        if (
-                                            !items.length
-                                        ) {
-                                            return "";
-                                        }
-
-                                        const dato =
-                                            items[0].raw;
-
-                                        return (
-                                            fechaChile(
-                                                dato.fecha
-                                            )
-                                            + " · Turno "
-                                            + dato.turno
-                                        );
-                                    },
-
-                                    label: function (
-                                        context
-                                    ) {
-                                        const dato =
-                                            context.raw;
-
-                                        return [
-                                            (
-                                                "Motivo: "
-                                                + dato.motivo
-                                            ),
-                                            (
-                                                "Línea: "
-                                                + (
-                                                    dato.linea
-                                                    || "Sin línea"
-                                                )
-                                            ),
-                                            (
-                                                "Horario: "
-                                                + dato.hora_inicio
-                                                + " a "
-                                                + dato.hora_fin
-                                            ),
-                                            (
-                                                "Duración: "
-                                                + dato.duracion
-                                                + " minutos"
-                                            ),
-                                            dato.comentarios
-                                                ? (
-                                                    "Comentario: "
-                                                    + dato.comentarios
-                                                )
-                                                : ""
-                                        ].filter(Boolean);
-                                    }
-                                }
-                            },
-
-                            annotation: {
-                                annotations:
-                                    crearAnotaciones(
-                                        turnosSeleccionados
-                                    )
-                            }
-                        },
-
-                        scales: {
-                            x: {
-                                type: "linear",
-                                min:
-                                    rangoHorario.inicio,
-                                max:
-                                    rangoHorario.fin,
-
-                                title: {
-                                    display: true,
-                                    text:
-                                        "Horario operacional",
-                                    font: {
-                                        size: 15,
-                                        weight: "bold"
-                                    }
-                                },
-
-                                ticks: {
-                                    stepSize: 60,
-
-                                    callback: function (
-                                        valor
-                                    ) {
-                                        return minutosAHora(
-                                            valor
-                                        );
-                                    },
-
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                },
-
-                                grid: {
-                                    color: function (
-                                        context
-                                    ) {
-                                        const valor =
-                                            context.tick.value;
-
-                                        if (
-                                            valor ===
-                                                FIN_TURNO_A
-                                            || valor ===
-                                                FIN_TURNO_B
-                                            || valor ===
-                                                INICIO_LIMPIEZA
-                                        ) {
-                                            return (
-                                                "rgba(0, 0, 0, 0.40)"
-                                            );
-                                        }
-
-                                        return (
-                                            "rgba(0, 0, 0, 0.08)"
-                                        );
-                                    }
-                                }
-                            },
-
-                            y: {
-                                stacked: false,
-
-                                title: {
-                                    display: true,
-                                    text:
-                                        "Días de la semana",
-                                    font: {
-                                        size: 15,
-                                        weight: "bold"
-                                    }
-                                },
-
-                                ticks: {
-                                    font: {
-                                        size: 13,
-                                        weight: "bold"
-                                    }
-                                },
-
-                                grid: {
-                                    color:
-                                        "rgba(0, 0, 0, 0.08)"
-                                }
-                            }
-                        }
-                    }
-                }
-            );
-        }
-
-        async function cargarDetenciones() {
-            const semana =
-                filtroSemana.value;
-
-            const anio =
-                filtroAnio.value;
-
-            const linea =
-                filtroLinea.value;
-
-            const turnos =
-                obtenerTurnosSeleccionados();
-
-            if (!semana || !anio) {
-                destruirGrafico();
-
-                mensajeSinDatos.style.display =
-                    "block";
-
-                mensajeSinDatos.textContent =
-                    "Debe seleccionar una "
-                    + "semana y un año.";
-
-                return;
-            }
-
-            if (!turnos.length) {
-                destruirGrafico();
-
-                informacionSemana.innerHTML = "";
-
-                mensajeSinDatos.style.display =
-                    "block";
-
-                mensajeSinDatos.textContent =
-                    "Debe seleccionar al menos "
-                    + "un turno.";
-
-                actualizarLeyendas([]);
-
-                return;
-            }
-
-            btnAplicar.disabled = true;
-            btnLimpiar.disabled = true;
-
-            mensajeCargando.style.display =
-                "block";
-
-            mensajeSinDatos.style.display =
-                "none";
-
-            const parametros =
-                new URLSearchParams({
-                    semana: semana,
-                    anio: anio
-                });
-
-            if (linea) {
-                parametros.set(
-                    "linea",
-                    linea
-                );
-            }
-
-            turnos.forEach(turno => {
-                parametros.append(
-                    "turno",
-                    turno
-                );
-            });
-
-            try {
-                const respuestaHttp =
-                    await fetch(
-                        URL_DATOS
-                        + "?"
-                        + parametros.toString(),
-                        {
-                            credentials:
-                                "same-origin"
-                        }
-                    );
-
-                if (!respuestaHttp.ok) {
-                    let mensajeError =
-                        await respuestaHttp.text();
-
-                    try {
-                        const errorJson =
-                            JSON.parse(
-                                mensajeError
-                            );
-
-                        mensajeError =
-                            errorJson.error
-                            || mensajeError;
-                    } catch (errorParseo) {
-                        // La respuesta no era JSON.
-                    }
-
-                    throw new Error(
-                        mensajeError
-                    );
-                }
-
-                const respuesta =
-                    await respuestaHttp.json();
-
-                informacionSemana.innerHTML = `
-                    <strong>
-                        Semana ${respuesta.semana}
-                    </strong>
-
-                    <span>
-                        Desde
-                        ${fechaChile(
-                            respuesta.fecha_inicio
-                        )}
-                        hasta
-                        ${fechaChile(
-                            respuesta.fecha_fin
-                        )}
-                    </span>
-
-                    <span>
-                        Línea:
-                        ${linea || "Todas"}
-                    </span>
-
-                    <span>
-                        Turnos:
-                        ${turnos.join(", ")}
-                    </span>
-
-                    <span>
-                        Detenciones:
-                        ${respuesta.datos.length}
-                    </span>
-                `;
-
-                actualizarLeyendas(turnos);
-
-                if (!respuesta.datos.length) {
-                    destruirGrafico();
-
-                    mensajeSinDatos.style.display =
-                        "block";
-
-                    mensajeSinDatos.textContent =
-                        "No existen detenciones "
-                        + "registradas para los "
-                        + "filtros seleccionados.";
-
-                    return;
-                }
-
-                construirGrafico(
-                    respuesta,
-                    turnos
-                );
-
-            } catch (error) {
-                console.error(
-                    "Error cargando detenciones:",
-                    error
-                );
-
-                destruirGrafico();
-
-                mensajeSinDatos.style.display =
-                    "block";
-
-                mensajeSinDatos.textContent =
-                    "No fue posible cargar las "
-                    + "detenciones. "
-                    + error.message;
-
-            } finally {
-                mensajeCargando.style.display =
-                    "none";
-
-                btnAplicar.disabled = false;
-                btnLimpiar.disabled = false;
-            }
-        }
-
-        filtroAnio.addEventListener(
-            "change",
-            function () {
-                cargarSemanasDelAnio();
-            }
-        );
-
-        btnAplicar.addEventListener(
-            "click",
-            cargarDetenciones
-        );
-
-        btnLimpiar.addEventListener(
-            "click",
-            function () {
-                filtroLinea.value = "";
-
-                document.querySelectorAll(
-                    'input[name="turno"]'
-                ).forEach(input => {
-                    input.checked = true;
-                });
-
-                const anioActual =
-                    new Date().getFullYear();
-
-                const existeAnioActual =
-                    Array.from(
-                        filtroAnio.options
-                    ).some(
-                        opcion =>
-                            Number(opcion.value)
-                            === anioActual
-                    );
-
-                if (existeAnioActual) {
-                    filtroAnio.value =
-                        anioActual;
-                } else if (
-                    filtroAnio.options.length
-                ) {
-                    filtroAnio.selectedIndex =
-                        filtroAnio.options.length - 1;
-                }
-
-                cargarSemanasDelAnio();
-                cargarDetenciones();
-            }
-        );
-
-        await cargarOpciones();
-        await cargarDetenciones();
+          }
+        });
     }
-);
-</script>
 
+    async function cargarDetencionesSemanales() {
+      const semanas =
+        getCheckedValues(panelSemanas);
+
+      const lineas =
+        getCheckedValues(panelLineas);
+
+      const turnos =
+        getTurnosSeleccionados();
+
+      mensajeDetencionesSemanales.style.display =
+        'none';
+
+      if (semanas.length !== 1) {
+        destruirGraficoDetencionesSemanales();
+
+        informacionDetencionesSemanales.innerHTML =
+          '';
+
+        mensajeDetencionesSemanales.style.display =
+          'block';
+
+        mensajeDetencionesSemanales.textContent =
+          'Para visualizar la línea de tiempo ' +
+          'debes seleccionar exactamente una semana.';
+
+        return;
+      }
+
+      if (!sAnios.value) {
+        destruirGraficoDetencionesSemanales();
+
+        mensajeDetencionesSemanales.style.display =
+          'block';
+
+        mensajeDetencionesSemanales.textContent =
+          'Debes seleccionar un año.';
+
+        return;
+      }
+
+      if (!turnos.length) {
+        destruirGraficoDetencionesSemanales();
+
+        mensajeDetencionesSemanales.style.display =
+          'block';
+
+        mensajeDetencionesSemanales.textContent =
+          'Debes seleccionar al menos un turno.';
+
+        actualizarLeyendasSemanales([]);
+
+        return;
+      }
+
+      if (lineas.length > 1) {
+        destruirGraficoDetencionesSemanales();
+
+        mensajeDetencionesSemanales.style.display =
+          'block';
+
+        mensajeDetencionesSemanales.textContent =
+          'Para visualizar la línea de tiempo ' +
+          'selecciona una sola línea o deja las ' +
+          'líneas sin seleccionar.';
+
+        return;
+      }
+
+      const parametros =
+        new URLSearchParams();
+
+      parametros.set(
+        'semana',
+        semanas[0]
+      );
+
+      parametros.set(
+        'anio',
+        sAnios.value
+      );
+
+      if (lineas.length === 1) {
+        parametros.set(
+          'linea',
+          lineas[0]
+        );
+      }
+
+      turnos.forEach(turno => {
+        parametros.append(
+          'turno',
+          turno
+        );
+      });
+
+      const url =
+        `{% url 'detenciones_semanales_api' %}?` +
+        parametros.toString();
+
+      try {
+        const respuestaHttp = await fetch(
+          url,
+          {
+            credentials: 'same-origin'
+          }
+        );
+
+        if (!respuestaHttp.ok) {
+          let mensaje =
+            await respuestaHttp.text();
+
+          try {
+            const json = JSON.parse(mensaje);
+            mensaje = json.error || mensaje;
+          } catch (error) {
+            // La respuesta no era JSON.
+          }
+
+          throw new Error(mensaje);
+        }
+
+        const respuesta =
+          await respuestaHttp.json();
+
+        const datosOriginales =
+          respuesta.datos || [];
+
+        const datosSemanalesFiltrados =
+          filtrarDetencionesSemanalesPorMotivo(
+            datosOriginales
+          );
+
+        const respuestaFiltrada = {
+          ...respuesta,
+          datos: datosSemanalesFiltrados
+        };
+
+        informacionDetencionesSemanales.innerHTML = `
+          <strong>
+            Semana ${respuesta.semana}
+          </strong>
+
+          <span>
+            Desde
+            ${fmtFecha(respuesta.fecha_inicio)}
+            hasta
+            ${fmtFecha(respuesta.fecha_fin)}
+          </span>
+
+          <span>
+            Línea:
+            ${lineas.length ? lineas[0] : 'Todas'}
+          </span>
+
+          <span>
+            Turnos:
+            ${turnos.join(', ')}
+          </span>
+
+          <span>
+            Detenciones visibles:
+            ${datosSemanalesFiltrados.length}
+            de ${datosOriginales.length}
+          </span>
+        `;
+
+        actualizarLeyendasSemanales(turnos);
+
+        if (!datosSemanalesFiltrados.length) {
+          destruirGraficoDetencionesSemanales();
+
+          mensajeDetencionesSemanales.style.display =
+            'block';
+
+          mensajeDetencionesSemanales.textContent =
+            motivosDetencionesSeleccionados?.size === 0
+              ? (
+                  'Debes seleccionar al menos un motivo ' +
+                  'en la leyenda del gráfico de detenciones.'
+                )
+              : (
+                  'No existen detenciones de los motivos ' +
+                  'seleccionados para estos filtros.'
+                );
+
+          return;
+        }
+
+        construirGraficoDetencionesSemanales(
+          respuestaFiltrada,
+          turnos
+        );
+
+      } catch (error) {
+        console.error(
+          'Error cargando detenciones semanales:',
+          error
+        );
+
+        destruirGraficoDetencionesSemanales();
+
+        mensajeDetencionesSemanales.style.display =
+          'block';
+
+        mensajeDetencionesSemanales.textContent =
+          'No fue posible cargar la línea de tiempo. ' +
+          error.message;
+      }
+    }
+
+    btnSelTodoSem.onclick = () => {
+      panelSemanas.querySelectorAll(
+        'input[type="checkbox"]'
+      ).forEach(cb => {
+        cb.checked = true;
+      });
+
+      updateDropdownButtonText(ddSemanas);
+    };
+
+    btnSelTodoLin.onclick = () => {
+      panelLineas.querySelectorAll(
+        'input[type="checkbox"]'
+      ).forEach(cb => {
+        cb.checked = true;
+      });
+
+      updateDropdownButtonText(ddLineas);
+    };
+
+    btnSelTodoTur.onclick = () => {
+      document.querySelectorAll(
+        'input[name="f_turno"]'
+      ).forEach(input => {
+        input.checked = true;
+      });
+    };
+
+    btnAplicar.onclick = async event => {
+      event.preventDefault();
+
+      const paramsURL = buildParamsURL();
+
+      history.replaceState(
+        null,
+        '',
+        paramsURL.toString()
+          ? `?${paramsURL.toString()}`
+          : location.pathname
+      );
+
+      await Promise.all([
+        cargarOEE(),
+        cargarDetenciones()
+      ]);
+
+      await cargarDetencionesSemanales();
+    };
+
+    btnLimpiar.onclick = async () => {
+      panelSemanas.querySelectorAll(
+        'input[type="checkbox"]'
+      ).forEach(cb => {
+        cb.checked = false;
+      });
+
+      panelLineas.querySelectorAll(
+        'input[type="checkbox"]'
+      ).forEach(cb => {
+        cb.checked = false;
+      });
+
+      updateDropdownButtonText(ddSemanas);
+      updateDropdownButtonText(ddLineas);
+
+      setTurnosSeleccionados(['B', 'C']);
+
+      /*
+      Al limpiar filtros se restablecen todos los motivos
+      cuando vuelva a construirse el gráfico de detenciones.
+      */
+      motivosDetencionesSeleccionados = null;
+
+      sAnios.selectedIndex = -1;
+      fDesde.value = '';
+      fHasta.value = '';
+
+      history.replaceState(
+        null,
+        '',
+        location.pathname
+      );
+
+      await Promise.all([
+        cargarOEE(),
+        cargarDetenciones()
+      ]);
+
+      await cargarDetencionesSemanales();
+    };
+
+    await cargarOpciones();
+    aplicarFiltrosDesdeURL();
+
+    await Promise.all([
+      cargarOEE(),
+      cargarDetenciones(),
+      cargarDetencionesSemanales()
+    ]);
+  });
+  </script>
 </body>
 </html>
