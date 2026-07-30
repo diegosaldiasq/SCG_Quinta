@@ -291,6 +291,13 @@
       <!-- === FILTROS === -->
       <div class="filtros">
         <div class="filtro-box">
+          <label for="f_planta">Planta</label>
+
+          <select id="f_planta">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filtro-box">
           <label>Semanas</label>
 
           <div class="multi-dropdown" id="dd_semanas">
@@ -618,6 +625,7 @@
 
     const $ = selector => document.querySelector(selector);
 
+    const sPlanta = $('#f_planta');
     const sAnios = $('#f_anios');
     const fDesde = $('#f_desde');
     const fHasta = $('#f_hasta');
@@ -867,6 +875,13 @@
         params.append('semana', semana);
       }
 
+      if (sPlanta.value) {
+        params.append(
+          'planta',
+          sPlanta.value
+        );
+      }
+
       if (sAnios.value) {
         params.append('anio', sAnios.value);
       }
@@ -920,6 +935,7 @@
       }
 
       const {
+        plantas = [],
         semanas = [],
         anios = [],
         lineas = []
@@ -944,6 +960,14 @@
           opcion.value = valor;
           opcion.textContent = valor;
           select.appendChild(opcion);
+        });
+        plantas.forEach(planta => {
+          const opcion = document.createElement('option');
+
+          opcion.value = planta.valor;
+          opcion.textContent = planta.nombre;
+
+          sPlanta.appendChild(opcion);
         });
       };
 
@@ -975,6 +999,9 @@
     function aplicarFiltrosDesdeURL() {
       const params =
         new URLSearchParams(location.search);
+       
+      sPlanta.value =
+        params.get('planta') || '';
 
       setCheckedValues(
         panelSemanas,
@@ -2464,6 +2491,14 @@
 
       const parametros =
         new URLSearchParams();
+      
+      // Enviar la planta seleccionada a la API semanal
+      if (sPlanta.value) {
+        parametros.append(
+          'planta',
+          sPlanta.value
+        );
+      }
 
       parametros.set(
         'semana',
@@ -2649,6 +2684,7 @@
 
       setTurnosSeleccionados(['B', 'C']);
 
+      sPlanta.value = '';
       sAnios.selectedIndex = -1;
       fDesde.value = '';
       fHasta.value = '';
