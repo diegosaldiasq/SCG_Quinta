@@ -3,6 +3,20 @@ from django.db import models
 # Create your models here.
 
 class TurnoOEE(models.Model):
+    PLANTA_ENEA = 'ENEA'
+    PLANTA_PUERTO_VESPUCIO = 'PUERTO_VESPUCIO'
+
+    PLANTA_CHOICES = [
+        (PLANTA_ENEA, 'ENEA'),
+        (PLANTA_PUERTO_VESPUCIO, 'Puerto Vespucio'),
+    ]
+
+    planta = models.CharField(
+        max_length=30,
+        choices=PLANTA_CHOICES,
+        default=PLANTA_ENEA,
+        db_index=True,
+    )
     fecha = models.DateTimeField(null=False, blank=False)
     cliente = models.CharField(max_length=100, null=True, blank=True)
     codigo = models.CharField(max_length=20, null=True, blank=True) 
@@ -18,10 +32,20 @@ class TurnoOEE(models.Model):
 
     class Meta:
         # opción A: unique_together (deprecated pero sencillo)
-        unique_together = ('fecha', 'linea', 'producto', 'lote', 'turno')
+        unique_together = (
+            'planta',
+            'fecha',
+            'linea',
+            'producto',
+            'lote',
+            'turno',
+        )
 
     def __str__(self):
-        return f"{self.fecha} - {self.linea} - {self.turno}"
+        return (
+            f"{self.get_planta_display()} - "
+            f"{self.fecha} - {self.linea} - {self.turno}"
+        )
     
 class Producto(models.Model):
     lote = models.ForeignKey(TurnoOEE, on_delete=models.CASCADE, related_name='productos')
@@ -51,6 +75,12 @@ class Reproceso(models.Model):
     comentarios = models.TextField(null=True, blank=True, max_length=200, help_text="Comentarios adicionales sobre el reproceso")
 
 class ResumenTurnoOee(models.Model):
+    planta = models.CharField(
+        max_length=30,
+        choices=TurnoOEE.PLANTA_CHOICES,
+        default=TurnoOEE.PLANTA_ENEA,
+        db_index=True,
+    )
     fecha = models.DateTimeField(auto_now_add=False)
     cliente = models.CharField(max_length=100)
     codigo = models.CharField(max_length=200, null=True, blank=True)

@@ -28,20 +28,32 @@ from django.db.models.functions import ExtractWeek, ExtractYear, ExtractIsoYear
 from django.db.models import Sum
 from openpyxl.styles import Font, PatternFill
 from datetime import timedelta, date
+from django.db import transaction
 
 
 
 # Create your views here.
 
 AREA_OEE_PRODUCTOS = "TORTAS"
-CLIENTES_PERMITIDOS = ["Jumbo", "SISA"]
+CONFIGURACION_PLANTAS = {
+    TurnoOEE.PLANTA_ENEA: {
+        "nombre": "ENEA",
+        "clientes": ["Jumbo", "SISA"],
+    },
+    TurnoOEE.PLANTA_PUERTO_VESPUCIO: {
+        "nombre": "Puerto Vespucio",
+        "clientes": ["Walmart", "Unimarc"],
+    },
+}
 
 
-def obtener_catalogo_desde_bd():
+def obtener_catalogo_desde_bd(planta):
+    configuracion = CONFIGURACION_PLANTAS[planta]
+
     qs = ProductoControlPeso.objects.filter(
         area=AREA_OEE_PRODUCTOS,
         activo=True,
-        cliente__in=CLIENTES_PERMITIDOS
+        cliente__in=configuracion["clientes"],
     ).order_by("cliente", "producto")
 
     catalogo = {}
@@ -50,7 +62,7 @@ def obtener_catalogo_desde_bd():
         catalogo.setdefault(item.cliente, []).append({
             "producto": item.producto,
             "codigo": item.codigo,
-            "un_pp": float(item.un_pp or 80)  # valor por defecto si no hay un_pp,
+            "un_pp": float(item.un_pp or 80),
         })
 
     return catalogo
@@ -70,95 +82,237 @@ def obtener_un_pp(cliente, producto, codigo):
 
     return float(item.un_pp)
 
-@csrf_exempt
-@login_required
-def crear_turno(request):
+@transaction.atomic
+def _crear_turno_por_planta(request, planta):
+    configuracion = CONFIGURACION_PLANTAS[planta]
+
     if request.method == 'POST':
-        form = TurnoOEEForm(request.POST)
+        form = TurnoOEEForm(
+            request.POST,
+            planta=planta,
+        )
+
         if form.is_valid():
-            lote = form.save()
+            clientes = request.POST.getlist(
+                'cliente_producto[]'
+            )
+            productos = request.POST.getlist(
+                'producto[]'
+            )
+            codigos = request.POST.getlist(
+                'codigo[]'
+            )
+            planeadas = request.POST.getlist(
+                'produccion_planeada[]'
+            )
+            reales = request.POST.getlist(
+                'produccion_real[]'
+            )
+            comentarios_pro = request.POST.getlist(
+                'comentarios_producto[]'
+            )
 
-            # Guardar productos
-            cliente = request.POST.getlist('cliente_producto[]')
-            productos = request.POST.getlist('producto[]')
-            codigos = request.POST.getlist('codigo[]')
-            planeadas = request.POST.getlist('produccion_planeada[]')
-            reales = request.POST.getlist('produccion_real[]')
-            comentarios_pro = request.POST.getlist('comentarios_producto[]')
+            clientes_invalidos = (
+                set(clientes)
+                - set(configuracion["clientes"])
+            )
 
-            for cli, prod, cod, plan, real, com in zip(cliente, productos, codigos, planeadas, reales, comentarios_pro):
+            if clientes_invalidos:
+                form.add_error(
+                    None,
+                    (
+                        "Uno o más clientes no corresponden "
+                        "a la planta seleccionada."
+                    ),
+                )
+            else:
+                lote = form.save(commit=False)
+
+                # La planta la determina el backend.
+                lote.planta = planta
+                lote.save()
+
+            if form.errors:
+                return render(
+                    request,
+                    'calculo_oee/crear_turno.html',
+                    {
+                        'form': form,
+                        'catalogo_obj':
+                            obtener_catalogo_desde_bd(planta),
+                        'planta': planta,
+                        'planta_nombre':
+                            configuracion["nombre"],
+                        'crear_turno_url':
+                            request.resolver_match.url_name,
+                    },
+                )
+
+            for cli, prod, cod, plan, real, com in zip(
+                clientes,
+                productos,
+                codigos,
+                planeadas,
+                reales,
+                comentarios_pro,
+            ):
                 Producto.objects.create(
                     lote=lote,
                     cliente=cli,
                     producto=prod,
                     codigo=cod,
-                    produccion_planeada=int(plan) if plan else None,
-                    produccion_real=int(real) if real else None,
-                    comentarios=com.strip() if com else None
+                    produccion_planeada=(
+                        int(plan) if plan else None
+                    ),
+                    produccion_real=(
+                        int(real) if real else None
+                    ),
+                    comentarios=(
+                        com.strip() if com else None
+                    ),
                 )
 
-            # Actualizar cabecera TurnoOEE con el 1er producto (si existe)
-            if cliente and productos and codigos:
-                lote.cliente = cliente[0]
+            if clientes and productos and codigos:
+                lote.cliente = clientes[0]
                 lote.producto = productos[0]
                 lote.codigo = codigos[0] or None
 
-            # Sumar producción de todos los productos
-            lote.produccion_planeada = sum(int(p) for p in planeadas if str(p).isdigit())
-            lote.produccion_real = sum(int(r) for r in reales if str(r).isdigit())
+            lote.produccion_planeada = sum(
+                int(valor)
+                for valor in planeadas
+                if str(valor).isdigit()
+            )
+
+            lote.produccion_real = sum(
+                int(valor)
+                for valor in reales
+                if str(valor).isdigit()
+            )
+
             lote.save()
 
-            # Guardar detenciones
-            motivos = request.POST.getlist('motivo_det[]')
-            inicios = request.POST.getlist('hora_inicio_det[]')
-            finales = request.POST.getlist('hora_fin_det[]')
-            comentarios_det = request.POST.getlist('comentarios_det[]')
+            motivos = request.POST.getlist(
+                'motivo_det[]'
+            )
+            inicios = request.POST.getlist(
+                'hora_inicio_det[]'
+            )
+            finales = request.POST.getlist(
+                'hora_fin_det[]'
+            )
+            comentarios_det = request.POST.getlist(
+                'comentarios_det[]'
+            )
 
             from datetime import datetime, timedelta
-            fmt = "%H:%M"
 
-            for mot, hi, hf, com in zip(motivos, inicios, finales, comentarios_det):
-                if not hi or not hf:
+            formato = "%H:%M"
+
+            for motivo, inicio, fin, comentario in zip(
+                motivos,
+                inicios,
+                finales,
+                comentarios_det,
+            ):
+                if not inicio or not fin:
                     continue
 
-                t1 = datetime.strptime(hi, fmt)
-                t2 = datetime.strptime(hf, fmt)
-                if t2 < t1:
-                    t2 += timedelta(days=1)
-                dur = int((t2 - t1).total_seconds() // 60)
+                hora_inicio = datetime.strptime(
+                    inicio,
+                    formato,
+                )
+                hora_fin = datetime.strptime(
+                    fin,
+                    formato,
+                )
+
+                if hora_fin < hora_inicio:
+                    hora_fin += timedelta(days=1)
+
+                duracion = int(
+                    (
+                        hora_fin - hora_inicio
+                    ).total_seconds() // 60
+                )
 
                 Detencion.objects.create(
                     lote=lote,
-                    motivo=mot,
-                    hora_inicio=t1.time(),
-                    hora_fin=t2.time(),
-                    duracion=dur,
-                    comentarios=com.strip() if com else None
+                    motivo=motivo,
+                    hora_inicio=hora_inicio.time(),
+                    hora_fin=hora_fin.time(),
+                    duracion=duracion,
+                    comentarios=(
+                        comentario.strip()
+                        if comentario
+                        else None
+                    ),
                 )
 
-            # Guardar reprocesos
-            motivos_rep = request.POST.getlist('motivo_rep[]')
-            cantidades_rep = request.POST.getlist('cantidad_rep[]')
-            comentarios_rep = request.POST.getlist('comentarios_rep[]')
+            motivos_rep = request.POST.getlist(
+                'motivo_rep[]'
+            )
+            cantidades_rep = request.POST.getlist(
+                'cantidad_rep[]'
+            )
+            comentarios_rep = request.POST.getlist(
+                'comentarios_rep[]'
+            )
 
-            for motivo, cantidad, comentario in zip(motivos_rep, cantidades_rep, comentarios_rep):
+            for motivo, cantidad, comentario in zip(
+                motivos_rep,
+                cantidades_rep,
+                comentarios_rep,
+            ):
                 if not cantidad:
                     continue
+
                 Reproceso.objects.create(
                     lote=lote,
                     motivo=motivo,
-                    comentarios=comentario.strip() if comentario else None,
-                    cantidad=int(cantidad)
+                    cantidad=int(cantidad),
+                    comentarios=(
+                        comentario.strip()
+                        if comentario
+                        else None
+                    ),
                 )
 
             return redirect('lista_turnos')
+
     else:
-        form = TurnoOEEForm()
-    
-    return render(request, 'calculo_oee/crear_turno.html', {
-    'form': form,
-    'catalogo_obj': obtener_catalogo_desde_bd(),
-})
+        form = TurnoOEEForm(planta=planta)
+
+    return render(
+        request,
+        'calculo_oee/crear_turno.html',
+        {
+            'form': form,
+            'catalogo_obj':
+                obtener_catalogo_desde_bd(planta),
+            'planta': planta,
+            'planta_nombre':
+                configuracion["nombre"],
+            'crear_turno_url':
+                request.resolver_match.url_name,
+        },
+    )
+
+@csrf_exempt
+@login_required
+def crear_turno(request):
+    return _crear_turno_por_planta(
+        request,
+        TurnoOEE.PLANTA_ENEA,
+    )
+
+
+@csrf_exempt
+@login_required
+def crear_turno_puerto_vespucio(request):
+    return _crear_turno_por_planta(
+        request,
+        TurnoOEE.PLANTA_PUERTO_VESPUCIO,
+    )
 
 
 @login_required
@@ -220,6 +374,7 @@ def resumen_turno(request, lote_id):
         oee = disponibilidad * rendimiento * calidad * 100  # en %
 
         ResumenTurnoOee.objects.create(
+            planta=lote.planta,
             fecha=fecha,
             turno=turno,
             supervisor=supervisor,
@@ -281,6 +436,7 @@ def lista_turnos(request):
     qs = qs.annotate(tiene_resumen=Exists(resumen_subq))
 
     # --- 1. Aplicar filtros GET si vienen ---
+    planta = request.GET.get('planta', '')
     fecha    = request.GET.get('fecha', '')
     linea    = request.GET.get('linea', '')
     cliente  = request.GET.get('cliente', '')
@@ -288,6 +444,8 @@ def lista_turnos(request):
     turno   = request.GET.get('turno', '')
     produccion_real = request.GET.get('produccion_real', '')
 
+    if planta:
+        qs = qs.filter(planta=planta)
     if fecha:
         qs = qs.filter(fecha__date=fecha)
     if linea:

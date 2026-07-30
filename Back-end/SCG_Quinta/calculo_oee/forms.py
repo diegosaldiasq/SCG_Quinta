@@ -65,13 +65,20 @@ class TurnoOEEForm(forms.ModelForm):
         choices=[('', '--Seleccionar turno--')] + TURNOS_CHOICES,
         widget=forms.Select(attrs={'id': 'id_turno'})
     )
-    SUPERVISOR_CHOICES = [
-        ('Fabian Moncada', 'Fabian Moncada'),
-        ('Angela Tacon', 'Angela Tacon'),
-        ('Felipe Campos', 'Felipe Campos')
-    ]
+    SUPERVISORES_POR_PLANTA = {
+        TurnoOEE.PLANTA_ENEA: [
+            ('Fabian Moncada', 'Fabian Moncada'),
+            ('Angela Tacon', 'Angela Tacon'),
+            ('Felipe Campos', 'Felipe Campos'),
+        ],
+        TurnoOEE.PLANTA_PUERTO_VESPUCIO: [
+            ('Sebastian Ibarra', 'Sebastian Ibarra'),
+            ('Andres Gonzales', 'Andres Gonzales'),
+            ('Patricio Campos', 'Patricio Campos'),
+        ],
+    }
     supervisor = forms.ChoiceField(
-        choices=[('', '--Seleccionar supervisor--')] + SUPERVISOR_CHOICES,
+        choices=[],
         widget=forms.Select(attrs={'id': 'id_supervisor'})
     )
     LINEA_CHOICES = [
@@ -110,6 +117,25 @@ class TurnoOEEForm(forms.ModelForm):
             'codigo': HiddenInput(),
             'produccion_planeada': HiddenInput(),
         }
+    def __init__(
+        self,
+        *args,
+        planta=TurnoOEE.PLANTA_ENEA,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+
+        self.planta = planta
+
+        supervisores = self.SUPERVISORES_POR_PLANTA.get(
+            planta,
+            [],
+        )
+
+        self.fields['supervisor'].choices = [
+            ('', '--Seleccionar supervisor--'),
+            *supervisores,
+        ]
     #def __init__(self, *args, **kwargs):
     #    super().__init__(*args, **kwargs)
 
