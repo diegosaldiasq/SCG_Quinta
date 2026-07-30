@@ -24,6 +24,25 @@
             <!-- 🔎 Filtros -->
             <form method="get" class="filtros">
                 <div class="campo-filtro">
+                    <label>🏭 Planta:</label>
+
+                    <select name="planta">
+                        <option value="">--Todas--</option>
+
+                        {% for valor, nombre in plantas %}
+                        <option
+                            value="{{ valor }}"
+                            {% if filtro_planta == valor %}
+                            selected
+                            {% endif %}
+                        >
+                            {{ nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-filtro">
                     <label>📅 Fecha:</label>
                     <input
                     type="date"
@@ -119,6 +138,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>🏭 Planta</th>
                             <th>📅 Fecha</th>
                             <th>🏢 Cliente</th>
                             <th>🆔 Código</th>
@@ -135,6 +155,7 @@
                     <tbody>
                         {% for t in turnos %}
                         <tr>
+                            <td>{{ t.get_planta_display }}</td>
                             <td>{{ t.fecha|date:'d-m-Y' }}</td>
                             <td>{{ t.cliente }}</td>
                             <td>{{ t.codigo }}</td>
@@ -168,7 +189,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="10">⚠️ No hay turnos registrados.</td>
+                            <td colspan="12">⚠️ No hay turnos registrados.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -196,7 +217,19 @@
 
             <!-- ➕ Botón registrar -->
             <div class="botones">
-                <a href="{% url 'crear_turno' %}" class="primary-button">➕ Registrar nuevo turno</a>
+                <a
+                href="{% url 'crear_turno' %}"
+                class="primary-button"
+                >
+                ➕ Registrar turno ENEA
+                </a>
+
+                <a
+                href="{% url 'crear_turno_puerto_vespucio' %}"
+                class="primary-button"
+                >
+                ➕ Registrar turno Puerto Vespucio
+                </a>
                 <a href="{% url 'redireccionar_intermedio_2' %}" class="primary-button">🏠 Volver al Inicio</a>
             </div>
         </div>

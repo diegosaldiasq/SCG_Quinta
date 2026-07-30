@@ -4,7 +4,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Registrar Turno OEE</title>
+  <title>Registrar Turno OEE · {{ planta_nombre }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -299,13 +299,13 @@
     <img src="{% static 'calculo_oee/images/logoquinta.png' %}" alt="Logo Quinta" class="logo" />
 
     <div class="login_container">
-      <h1 class="title">📋 Crear Turno OEE</h1>
+      <h1 class="title">📋 Crear Turno OEE · {{ planta_nombre }}</h1>
 
-      <form method="post" action="{% url 'crear_turno' %}">
+      <form method="post" action="{% url crear_turno_url %}">
         {% csrf_token %}
 
         <fieldset>
-          <legend>📑 Datos del Turno</legend>
+          <legend>📑 Datos del Turno · Planta {{ planta_nombre }}</legend>
           <div class="form-stack">
             {{ form.as_p }}
           </div>
