@@ -29,5 +29,6 @@ urlpatterns = [
     path("crear_turno/", views.redireccionar_crear_turno, name="redireccionar_crear_turno"),
     path("control_parametros_bizcocho/", views.redireccionar_control_parametros_bizcocho, name="redireccionar_control_parametros_bizcocho"),
     path("registro_nuevo/", views.redireccionar_RegistroCreateView, name="registro_nuevo"),
+    path('crear_turno_puerto_vespucio/', views.redireccionar_crear_turno_puerto_vespucio, name='redireccionar_crear_turno_puerto_vespucio'),
 ]
 

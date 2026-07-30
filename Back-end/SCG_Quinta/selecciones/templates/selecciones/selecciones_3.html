@@ -19,13 +19,26 @@
         <h1 class="title">Seleccionar registro a ingresar</h1>
         <div class="login-container">
             <p class="subtitle">POE</p>
+
             <p class="registro">
                 <span>1.- Registro cálculo OEE - ENEA</span>
-                <a href="{% url 'redireccionar_crear_turno' %}">CÁLCULO OEE</a>
+                <a href="{% url 'redireccionar_crear_turno' %}">
+                    CÁLCULO OEE ENEA
+                </a>
             </p>
+
             <p class="registro">
-                <span>2.- Registro trazabilidad: </span>
-                <a href="{% url 'trazabilidad_productos:registrar_trazabilidad' %}">TRAZABILIDAD</a>
+                <span>2.- Registro cálculo OEE - Puerto Vespucio</span>
+                <a href="{% url 'redireccionar_crear_turno_puerto_vespucio' %}">
+                    CÁLCULO OEE PUERTO VESPUCIO
+                </a>
+            </p>
+
+            <p class="registro">
+                <span>3.- Registro trazabilidad:</span>
+                <a href="{% url 'trazabilidad_productos:registrar_trazabilidad' %}">
+                    TRAZABILIDAD
+                </a>
             </p>
         </div>
         <form class="form" action="{% url 'redireccionar_index' %}">
