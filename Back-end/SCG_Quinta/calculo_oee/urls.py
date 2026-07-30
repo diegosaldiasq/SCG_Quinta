@@ -26,4 +26,5 @@ urlpatterns = [
     path("grafico_detenciones_semanales/", views.grafico_detenciones_semanales, name="grafico_detenciones_semanales"),
     path("api/detenciones_semanales/opciones/", views.detenciones_semanales_opciones_api, name="detenciones_semanales_opciones_api"),
     path("api/detenciones_semanales/", views.detenciones_semanales_api, name="detenciones_semanales_api"),
+    path('crear_turno/puerto-vespucio/', views.crear_turno_puerto_vespucio, name='crear_turno_puerto_vespucio'),
 ]
