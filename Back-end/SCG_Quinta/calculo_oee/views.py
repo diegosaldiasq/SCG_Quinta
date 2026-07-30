@@ -1196,6 +1196,15 @@ def detenciones_semanales_opciones_api(request):
         ]
     )
 
+    plantas_solicitadas = request.GET.getlist(
+        "planta"
+    )
+
+    if plantas_solicitadas:
+        turnos = turnos.filter(
+            planta__in=plantas_solicitadas
+        )
+
     periodos = list(
         turnos
         .annotate(
@@ -1229,6 +1238,14 @@ def detenciones_semanales_opciones_api(request):
     )
 
     return JsonResponse({
+        "plantas": [
+            {
+                "valor": valor,
+                "nombre": nombre,
+            }
+            for valor, nombre
+            in TurnoOEE.PLANTA_CHOICES
+        ],
         "semanas": semanas,
         "anios": anios,
         "lineas": lineas,
@@ -1246,7 +1263,7 @@ def detenciones_semanales_api(request):
     La jornada del gráfico comienza a las 23:00 y termina
     a las 23:00 del día siguiente.
     """
-
+    plantas = request.GET.getlist("planta")
     semana = request.GET.get("semana")
     anio = request.GET.get("anio")
     linea = request.GET.get("linea", "").strip()
@@ -1317,6 +1334,11 @@ def detenciones_semanales_api(request):
             "hora_inicio",
         )
     )
+
+    if plantas:
+        queryset = queryset.filter(
+            lote__planta__in=plantas
+        )
 
     if linea:
         queryset = queryset.filter(
@@ -1429,6 +1451,7 @@ def detenciones_semanales_api(request):
         datos.append({
             "id": detencion.id,
             "lote_id": detencion.lote_id,
+            "planta": detencion.lote.planta,
             "fecha": fecha_registro.isoformat(),
             "dia": nombres_dias[indice_dia],
             "dia_indice": indice_dia,
@@ -1458,6 +1481,7 @@ def detenciones_semanales_api(request):
         })
 
     return JsonResponse({
+        "plantas": plantas,
         "semana": semana,
         "anio": anio,
         "fecha_inicio": fecha_inicio.isoformat(),
