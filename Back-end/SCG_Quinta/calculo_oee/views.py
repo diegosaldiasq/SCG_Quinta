@@ -472,10 +472,34 @@ def lista_turnos(request):
         qs = qs.filter(tiene_resumen=True)
 
     # --- 3. Obtener valores únicos para los desplegables ---
-    lineas    = TurnoOEE.objects.values_list('linea', flat=True).distinct()
-    clientes  = TurnoOEE.objects.values_list('cliente', flat=True).distinct()
-    productos = TurnoOEE.objects.values_list('producto', flat=True).distinct()
-    turnos   = TurnoOEE.objects.values_list('turno', flat=True).distinct()
+    # Si se seleccionó una planta, las opciones de los demás
+    # filtros se obtienen solamente desde esa planta.
+    opciones_qs = TurnoOEE.objects.all()
+
+    if planta:
+        opciones_qs = opciones_qs.filter(
+            planta=planta
+        )
+
+    lineas = opciones_qs.values_list(
+        'linea',
+        flat=True
+    ).distinct()
+
+    clientes = opciones_qs.values_list(
+        'cliente',
+        flat=True
+    ).distinct()
+
+    productos = opciones_qs.values_list(
+        'producto',
+        flat=True
+    ).distinct()
+
+    turnos = opciones_qs.values_list(
+        'turno',
+        flat=True
+    ).distinct()
 
     # --- 4. Paginación ---
     paginator = Paginator(qs, 10)
@@ -501,6 +525,8 @@ def lista_turnos(request):
         'filtro_produccion_real': produccion_real,
         'filtro_estado': estado, 
         'querystring': querystring,   # <-- nuevo
+        'plantas': TurnoOEE.PLANTA_CHOICES,
+        'filtro_planta': planta,
     })
     
 @login_required
@@ -559,6 +585,7 @@ def redireccionar_intermedio_4(request):
 @csrf_exempt
 @login_required
 def descargar_resumenturnooee(request):
+    planta = request.GET.getlist("planta")
     semana = request.GET.getlist("semana")
     anio = request.GET.get("anio")
     linea = request.GET.getlist("linea")
@@ -568,6 +595,10 @@ def descargar_resumenturnooee(request):
 
     queryset = ResumenTurnoOee.objects.select_related("lote").all()
 
+    if planta:
+        queryset = queryset.filter(
+            planta__in=planta
+        )
     if semana:
         queryset = queryset.filter(fecha__week__in=semana)
 
@@ -600,6 +631,7 @@ def descargar_resumenturnooee(request):
     ws1.title = "Resumen OEE"
 
     headers_resumen = [
+        "Planta",
         "Fecha",
         "Semana",
         "Año",
@@ -642,6 +674,7 @@ def descargar_resumenturnooee(request):
         lote_obj = r.lote
 
         ws1.append([
+            r.get_planta_display(),
             r.fecha.strftime("%d-%m-%Y") if r.fecha else "",
             r.fecha.isocalendar()[1] if r.fecha else "",
             r.fecha.year if r.fecha else "",
@@ -678,6 +711,7 @@ def descargar_resumenturnooee(request):
     ws2 = wb.create_sheet(title="Detenciones")
 
     headers_detenciones = [
+        "Planta",
         "Fecha",
         "Semana",
         "Año",
@@ -723,6 +757,7 @@ def descargar_resumenturnooee(request):
         fecha = resumen.fecha if resumen else None
 
         ws2.append([
+            resumen.get_planta_display() if resumen else "",
             fecha.strftime("%d-%m-%Y") if fecha else "",
             fecha.isocalendar()[1] if fecha else "",
             fecha.year if fecha else "",
@@ -753,6 +788,7 @@ def descargar_resumenturnooee(request):
     ws3 = wb.create_sheet(title="Reprocesos")
 
     headers_reprocesos = [
+        "Planta",
         "Fecha",
         "Semana",
         "Año",
@@ -788,6 +824,7 @@ def descargar_resumenturnooee(request):
         fecha = resumen.fecha if resumen else None
 
         ws3.append([
+            resumen.get_planta_display() if resumen else "",
             fecha.strftime("%d-%m-%Y") if fecha else "",
             fecha.isocalendar()[1] if fecha else "",
             fecha.year if fecha else "",
@@ -839,6 +876,14 @@ def descargar_resumenturnooee(request):
 def resumen_turno_oee_opciones(request):
     try:
         qs = ResumenTurnoOee.objects.all()
+        plantas_solicitadas = request.GET.getlist(
+            'planta'
+        )
+
+        if plantas_solicitadas:
+            qs = qs.filter(
+                planta__in=plantas_solicitadas
+            )
         semanas = (qs.annotate(sem=ExtractWeek('fecha'))
                      .values_list('sem', flat=True)
                      .distinct())
@@ -857,6 +902,14 @@ def resumen_turno_oee_opciones(request):
         anios = sorted([a for a in anios if a is not None])
 
         return JsonResponse({
+            "plantas": [
+                {
+                    "valor": valor,
+                    "nombre": nombre,
+                }
+                for valor, nombre
+                in TurnoOEE.PLANTA_CHOICES
+            ],
             "semanas": semanas,   # [1..53]
             "anios": anios,       # [2024, 2025, ...]
             "lineas": list(lineas),
@@ -872,6 +925,7 @@ def resumen_turno_oee_api(request):
     Soporta filtros múltiples: semana, anio, linea, turno, desde, hasta
     """
     try:
+        plantas = request.GET.getlist('planta')
         semanas = request.GET.getlist('semana')
         anios   = request.GET.getlist('anio')
         lineas  = request.GET.getlist('linea')
@@ -882,14 +936,15 @@ def resumen_turno_oee_api(request):
         qs = (ResumenTurnoOee.objects
               .annotate(target=Value(65.83, output_field=FloatField()))  # ajusta tu target si es otro
               .values(
-                        'id', 'fecha', 'turno', 'linea',
+                        'id', 'planta', 'fecha', 'turno', 'linea',
                         'disponibilidad', 'eficiencia', 'oee', 'target', 'lote_id',
                         'produccion_real',
                         'produccion_teorica',
                         'numero_personas',
                         'unidades_por_persona',
                     ))
-
+        if plantas:
+            qs = qs.filter(planta__in=plantas)
         if semanas:
             qs = qs.annotate(sem=ExtractWeek('fecha')) \
                    .filter(sem__in=[int(s) for s in semanas if s.isdigit()])
@@ -934,6 +989,7 @@ def detenciones_turno_api(request):
     Agrega un motivo extra: 'Tiempo Productivo' (resto).
     """
     try:
+        plantas = request.GET.getlist('planta')
         semanas = request.GET.getlist('semana')
         anios   = request.GET.getlist('anio')
         lineas  = request.GET.getlist('linea')
@@ -947,7 +1003,8 @@ def detenciones_turno_api(request):
               .filter(lote__resumenes_turno__isnull=False)
               .values(
                   'lote_id',                                  # 👈 NECESARIO
-                  'lote__resumenes_turno__id',                # id del resumen
+                  'lote__resumenes_turno__id',
+                  'lote__resumenes_turno__planta',                # id del resumen
                   'lote__resumenes_turno__fecha',
                   'lote__resumenes_turno__turno',
                   'lote__resumenes_turno__linea',
@@ -959,6 +1016,10 @@ def detenciones_turno_api(request):
                         'motivo'))
 
         # Filtros
+        if plantas:
+            qs = qs.filter(
+                lote__resumenes_turno__planta__in=plantas
+            )
         if semanas:
             qs = qs.annotate(sem=ExtractWeek('lote__resumenes_turno__fecha')) \
                    .filter(sem__in=[int(s) for s in semanas if s.isdigit()])
@@ -978,7 +1039,11 @@ def detenciones_turno_api(request):
 
         # Resúmenes con tiempo_planeado + lote_id para todos
         resumenes = (ResumenTurnoOee.objects
-                     .values('id', 'fecha', 'turno', 'linea', 'tiempo_planeado', 'lote_id'))
+                    .values('id', 'planta', 'fecha', 'turno', 'linea', 'tiempo_planeado', 'lote_id'))
+        if plantas:
+            resumenes = resumenes.filter(
+                planta__in=plantas
+            )
         resumen_map = {r['id']: r for r in resumenes}
 
         # Totales de detenciones por resumen
@@ -998,6 +1063,7 @@ def detenciones_turno_api(request):
             tp = res['tiempo_planeado'] or 1
             porcentaje = round(100 * (r['duracion_total'] or 0) / tp, 2)
             salida.append({
+                'planta': res['planta'],
                 'fecha': res['fecha'],
                 'turno': res['turno'],
                 'linea': res['linea'],
