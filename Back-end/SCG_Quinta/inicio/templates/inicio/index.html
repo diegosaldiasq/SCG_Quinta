@@ -45,7 +45,7 @@
                     </button>
                 </form>
                 {% endif %}
-                {% if user.id == 1 %}
+                {% if user.id == 1 or user.id == 49 or user.id == 58 %}
                     <form
                         class="form"
                         action="{% url 'administrar_productos_control_peso' %}"

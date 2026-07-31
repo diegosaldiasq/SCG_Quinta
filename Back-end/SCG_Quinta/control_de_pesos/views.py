@@ -373,15 +373,13 @@ def api_productos_base_control_pesos(request):
         "productos": productos
     })
 
-def solo_usuario_id_1(view_func):
-    """
-    Permite el acceso exclusivamente al usuario autenticado con ID 1.
-    """
-
+def solo_usuarios_autorizados(view_func):
     @wraps(view_func)
     @login_required
     def wrapper(request, *args, **kwargs):
-        if request.user.pk != 1:
+        usuarios_autorizados = {1, 49, 58}
+
+        if request.user.pk not in usuarios_autorizados:
             raise PermissionDenied(
                 "No tienes autorización para administrar los productos."
             )
@@ -391,7 +389,7 @@ def solo_usuario_id_1(view_func):
     return wrapper
 
 
-@solo_usuario_id_1
+@solo_usuarios_autorizados
 def administrar_productos_control_peso(request):
     producto_id = request.GET.get("editar") or request.POST.get("producto_id")
     producto_edicion = None
@@ -503,7 +501,7 @@ def administrar_productos_control_peso(request):
     )
 
 
-@solo_usuario_id_1
+@solo_usuarios_autorizados
 @require_POST
 def cambiar_estado_producto_control_peso(request, producto_id):
     producto = get_object_or_404(
