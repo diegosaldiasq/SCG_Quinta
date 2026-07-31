@@ -45,6 +45,21 @@
                     </button>
                 </form>
                 {% endif %}
+                {% if user.id == 1 %}
+                    <form
+                        class="form"
+                        action="{% url 'administrar_productos_control_peso' %}"
+                        method="get"
+                    >
+                        <button
+                            type="submit"
+                            class="primary-button login-button"
+                            id="administrar-productos"
+                        >
+                            Administrar productos
+                        </button>
+                    </form>
+                {% endif %}
                 <form class="form" action="{% url 'redireccionar_main' %}">
                     <button type="submit" class="primary-button login-button" id="salir">Cerrar sesion</button>
                 </form>

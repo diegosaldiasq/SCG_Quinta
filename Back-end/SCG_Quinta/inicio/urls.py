@@ -45,4 +45,5 @@ urlpatterns = [
     path("graficos_control_parametros_bizcocho/", views.redireccionar_graficos_control_parametros_bizcocho, name="redireccionar_graficos_control_parametros_bizcocho"),
     #path("abrir-registro-layout/<int:pk>/", views.abrir_registro_layout, name="abrir_registro_layout"),
     path("usuarios_conectados/", views.usuarios_conectados, name="usuarios_conectados"),
+    path("administrar_productos_control_peso/", views.administrar_productos_control_peso, name="administrar_productos_control_peso"),
 ]

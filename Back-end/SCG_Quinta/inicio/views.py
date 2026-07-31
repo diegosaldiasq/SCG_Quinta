@@ -573,3 +573,7 @@ def usuarios_conectados(request):
     }
 
     return render(request, "inicio/usuarios_conectados.html", context)
+
+@login_required
+def administrar_productos_control_peso(request):
+    return render(request, 'control_de_pesos/administrar_productos.html')   
