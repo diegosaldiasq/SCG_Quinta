@@ -522,3 +522,8 @@ def cambiar_estado_producto_control_peso(request, producto_id):
     )
 
     return redirect("administrar_productos_control_peso")
+
+@login_required
+def redireccionar_index(request):
+    url_index = reverse('index')
+    return HttpResponseRedirect(url_index)
