@@ -12,4 +12,6 @@ urlpatterns = [
     path('redireccionar_intermedio_4/', views.redireccionar_intermedio_4, name='redireccionar_intermedio_4'),
     path("api/clientes_base/", views.api_clientes_control_pesos, name="api_clientes_control_pesos"),
     path("api/productos_base/", views.api_productos_base_control_pesos, name="api_productos_base_control_pesos"),
+    path("productos/", views.administrar_productos_control_peso, name="administrar_productos_control_peso"),
+    path("productos/<int:producto_id>/cambiar-estado/", views.cambiar_estado_producto_control_peso, name="cambiar_estado_producto_control_peso"),
 ]

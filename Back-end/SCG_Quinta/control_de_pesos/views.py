@@ -13,6 +13,18 @@ from django.utils.timezone import make_aware
 
 from .models import DatosFormularioControlDePesos, ProductoControlPeso
 
+from functools import wraps
+from urllib.parse import urlencode
+
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
+
+from .forms import ProductoControlPesoForm
+
 
 @login_required
 def control_de_pesos(request):
@@ -360,3 +372,153 @@ def api_productos_base_control_pesos(request):
         "ok": True,
         "productos": productos
     })
+
+def solo_usuario_id_1(view_func):
+    """
+    Permite el acceso exclusivamente al usuario autenticado con ID 1.
+    """
+
+    @wraps(view_func)
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        if request.user.pk != 1:
+            raise PermissionDenied(
+                "No tienes autorización para administrar los productos."
+            )
+
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
+
+@solo_usuario_id_1
+def administrar_productos_control_peso(request):
+    producto_id = request.GET.get("editar") or request.POST.get("producto_id")
+    producto_edicion = None
+
+    if producto_id:
+        producto_edicion = get_object_or_404(
+            ProductoControlPeso,
+            pk=producto_id,
+        )
+
+    if request.method == "POST":
+        formulario = ProductoControlPesoForm(
+            request.POST,
+            instance=producto_edicion,
+        )
+
+        if formulario.is_valid():
+            producto_guardado = formulario.save()
+
+            if producto_edicion:
+                messages.success(
+                    request,
+                    f'El producto "{producto_guardado.producto}" '
+                    "fue actualizado correctamente."
+                )
+            else:
+                messages.success(
+                    request,
+                    f'El producto "{producto_guardado.producto}" '
+                    "fue creado correctamente."
+                )
+
+            return redirect("administrar_productos_control_peso")
+
+        messages.error(
+            request,
+            "No fue posible guardar el producto. Revisa los campos indicados."
+        )
+
+    else:
+        formulario = ProductoControlPesoForm(
+            instance=producto_edicion
+        )
+
+    productos = ProductoControlPeso.objects.all()
+
+    busqueda = request.GET.get("buscar", "").strip()
+    area = request.GET.get("area", "").strip()
+    cliente = request.GET.get("cliente", "").strip()
+    estado = request.GET.get("estado", "").strip()
+
+    if busqueda:
+        productos = productos.filter(
+            Q(codigo__icontains=busqueda)
+            | Q(producto__icontains=busqueda)
+            | Q(cliente__icontains=busqueda)
+        )
+
+    if area:
+        productos = productos.filter(area=area)
+
+    if cliente:
+        productos = productos.filter(cliente=cliente)
+
+    if estado == "activos":
+        productos = productos.filter(activo=True)
+    elif estado == "inactivos":
+        productos = productos.filter(activo=False)
+
+    productos = productos.order_by(
+        "area",
+        "cliente",
+        "producto",
+    )
+
+    paginador = Paginator(productos, 20)
+    pagina = paginador.get_page(request.GET.get("page"))
+
+    filtros_paginacion = {
+        "buscar": busqueda,
+        "area": area,
+        "cliente": cliente,
+        "estado": estado,
+    }
+
+    filtros_paginacion = {
+        clave: valor
+        for clave, valor in filtros_paginacion.items()
+        if valor
+    }
+
+    contexto = {
+        "formulario": formulario,
+        "producto_edicion": producto_edicion,
+        "pagina": pagina,
+        "busqueda": busqueda,
+        "area_seleccionada": area,
+        "cliente_seleccionado": cliente,
+        "estado_seleccionado": estado,
+        "areas": ProductoControlPeso.AREA_CHOICES,
+        "clientes": ProductoControlPeso.CLIENTE_CHOICES,
+        "filtros_qs": urlencode(filtros_paginacion),
+    }
+
+    return render(
+        request,
+        "control_de_pesos/administrar_productos.html",
+        contexto,
+    )
+
+
+@solo_usuario_id_1
+@require_POST
+def cambiar_estado_producto_control_peso(request, producto_id):
+    producto = get_object_or_404(
+        ProductoControlPeso,
+        pk=producto_id,
+    )
+
+    producto.activo = not producto.activo
+    producto.save(update_fields=["activo"])
+
+    estado = "activado" if producto.activo else "desactivado"
+
+    messages.success(
+        request,
+        f'El producto "{producto.producto}" fue {estado}.'
+    )
+
+    return redirect("administrar_productos_control_peso")
