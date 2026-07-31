@@ -1101,7 +1101,7 @@ def graficos_detencion(request):
 
 @login_required
 def panel_oee_y_detenciones(request):
-    return render(request, "calculo_oee/graficos_oee_detencion.html")
+    return render(request, "calculo_oee/grafico_detenciones_semanales.html")
 
 @login_required
 def redireccionar_intermedio_2(request):
