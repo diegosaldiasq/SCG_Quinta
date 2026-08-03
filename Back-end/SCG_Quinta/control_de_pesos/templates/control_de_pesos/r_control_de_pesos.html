@@ -152,8 +152,27 @@
             <input type="text" id="codigo_producto" name="codigo_producto" class="input" readonly placeholder="–">
 
             <!-- Campo que mostrará el peso receta -->
-            <label for="peso">Peso receta (gr)</label>
+            <label for="peso">Peso receta (neto) (gr)</label>
             <input type="number" id="peso_receta" name="peso_receta" class="input" readonly placeholder="–">
+
+            <!-- Información calculada del producto -->
+            <label for="peso_maximo">Peso máximo (gr)</label>
+            <input
+                type="text"
+                id="peso_maximo"
+                class="input"
+                readonly
+                placeholder="–"
+            >
+
+            <label for="rango_altura">Rango de altura permitido (mm)</label>
+            <input
+                type="text"
+                id="rango_altura"
+                class="input"
+                readonly
+                placeholder="–"
+            >
 
             <script>
             const AREA_CONTROL_PESOS = "TORTAS";
@@ -162,6 +181,9 @@
             const selectProducto = document.getElementById("producto");
             const inputCodigo = document.getElementById("codigo_producto");
             const inputPesoReceta = document.getElementById("peso_receta");
+
+            const inputPesoMaximo = document.getElementById("peso_maximo");
+            const inputRangoAltura = document.getElementById("rango_altura");
 
             let productosBase = [];
 
@@ -185,6 +207,8 @@
                 selectProducto.innerHTML = `<option value="">-- Selecciona producto --</option>`;
                 inputCodigo.value = "";
                 inputPesoReceta.value = "";
+                inputPesoMaximo.value = "";
+                inputRangoAltura.value = "";
                 productosBase = [];
 
                 if (!cliente) return;
@@ -210,16 +234,59 @@
             });
 
             selectProducto.addEventListener("change", function () {
-                const productoSeleccionado = productosBase.find(p => String(p.id) === String(this.value));
+                const productoSeleccionado = productosBase.find(
+                    p => String(p.id) === String(this.value)
+                );
 
                 if (!productoSeleccionado) {
                     inputCodigo.value = "";
                     inputPesoReceta.value = "";
+                    inputPesoMaximo.value = "";
+                    inputRangoAltura.value = "";
                     return;
                 }
 
                 inputCodigo.value = productoSeleccionado.codigo || "";
-                inputPesoReceta.value = productoSeleccionado.peso_receta || "";
+                inputPesoReceta.value = productoSeleccionado.peso_receta ?? "";
+
+                // Peso máximo:
+                // peso receta / (1 - porcentaje de pérdida / 100)
+                const pesoReceta = Number(productoSeleccionado.peso_receta);
+                const porcentajePerdida = Number(
+                    productoSeleccionado.porcentaje_perdida ?? 0
+                );
+
+                if (
+                    Number.isFinite(pesoReceta) &&
+                    Number.isFinite(porcentajePerdida) &&
+                    porcentajePerdida < 100
+                ) {
+                    const pesoMaximo =
+                        pesoReceta / (1 - porcentajePerdida / 100);
+
+                    inputPesoMaximo.value =
+                        `${pesoMaximo.toFixed(2)} gr`;
+                } else {
+                    inputPesoMaximo.value = "";
+                }
+
+                // Rango de altura:
+                // altura objetivo ± diferencia de altura
+                const alturaObjetivo = Number(productoSeleccionado.altura);
+                const diferenciaAltura = Number(productoSeleccionado.diff_altura);
+
+                if (
+                    Number.isFinite(alturaObjetivo) &&
+                    Number.isFinite(diferenciaAltura)
+                ) {
+                    const alturaMinima = alturaObjetivo - diferenciaAltura;
+                    const alturaMaxima = alturaObjetivo + diferenciaAltura;
+
+                    inputRangoAltura.value =
+                        `${alturaMinima.toFixed(2)} a ${alturaMaxima.toFixed(2)} mm`;
+                } else {
+                    inputRangoAltura.value = "";
+                }
             });
 
             document.addEventListener("DOMContentLoaded", cargarClientes);
