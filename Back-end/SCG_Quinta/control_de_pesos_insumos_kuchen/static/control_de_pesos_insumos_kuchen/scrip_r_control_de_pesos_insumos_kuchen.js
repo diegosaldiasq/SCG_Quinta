@@ -42,6 +42,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function setAlturaVisible(mostrar) {
+        const labelRangoAltura = document.getElementById("label_rango_altura");
+        const inputRangoAltura = document.getElementById("rango_altura");
+
+        if (labelRangoAltura) {
+            labelRangoAltura.style.display = mostrar ? "" : "none";
+        }
+
+        if (inputRangoAltura) {
+            inputRangoAltura.style.display = mostrar ? "" : "none";
+
+            if (!mostrar) {
+                inputRangoAltura.value = "";
+            }
+        }
         const tituloMuestras = document.querySelector(".contenedor-muestras h3, .muestras-card h3, h3");
 
         if (tituloMuestras && tituloMuestras.textContent.includes("altura")) {
