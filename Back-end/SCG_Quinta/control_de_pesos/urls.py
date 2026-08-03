@@ -15,4 +15,5 @@ urlpatterns = [
     path("productos/", views.administrar_productos_control_peso, name="administrar_productos_control_peso"),
     path("productos/<int:producto_id>/cambiar-estado/", views.cambiar_estado_producto_control_peso, name="cambiar_estado_producto_control_peso"),
     path("index/", views.redireccionar_index, name="redireccionar_index"),
+    path("productos/descargar-excel/", views.descargar_productos_control_peso_excel, name="descargar_productos_control_peso_excel"),
 ]

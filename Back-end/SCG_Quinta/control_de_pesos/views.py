@@ -25,6 +25,12 @@ from django.views.decorators.http import require_POST
 
 from .forms import ProductoControlPesoForm
 
+from django.http import HttpResponse
+
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
+
 
 @login_required
 def control_de_pesos(request):
@@ -525,3 +531,197 @@ def cambiar_estado_producto_control_peso(request, producto_id):
 def redireccionar_index(request):
     url_index = reverse('index')
     return HttpResponseRedirect(url_index)
+
+@solo_usuarios_autorizados
+def descargar_productos_control_peso_excel(request):
+    productos = ProductoControlPeso.objects.all()
+
+    busqueda = request.GET.get("buscar", "").strip()
+    area = request.GET.get("area", "").strip()
+    cliente = request.GET.get("cliente", "").strip()
+    estado = request.GET.get("estado", "").strip()
+
+    # Aplicar los mismos filtros del template
+    if busqueda:
+        productos = productos.filter(
+            Q(codigo__icontains=busqueda)
+            | Q(producto__icontains=busqueda)
+            | Q(cliente__icontains=busqueda)
+        )
+
+    if area:
+        productos = productos.filter(area=area)
+
+    if cliente:
+        productos = productos.filter(cliente=cliente)
+
+    if estado == "activos":
+        productos = productos.filter(activo=True)
+
+    elif estado == "inactivos":
+        productos = productos.filter(activo=False)
+
+    productos = productos.order_by(
+        "area",
+        "cliente",
+        "producto",
+    )
+
+    # Crear archivo Excel
+    libro = Workbook()
+    hoja = libro.active
+    hoja.title = "Productos"
+
+    encabezados = [
+        "ID",
+        "Área",
+        "Cliente",
+        "Código",
+        "Producto",
+        "Peso receta (gr)",
+        "Pérdida operacional (%)",
+        "Peso máximo calculado (gr)",
+        "Altura objetivo (mm)",
+        "Diferencia de altura (mm)",
+        "Altura mínima (mm)",
+        "Altura máxima (mm)",
+        "Unidades por persona",
+        "Estado",
+    ]
+
+    hoja.append(encabezados)
+
+    # Formato del encabezado
+    relleno_encabezado = PatternFill(
+        fill_type="solid",
+        fgColor="B43C2C",
+    )
+
+    for celda in hoja[1]:
+        celda.fill = relleno_encabezado
+        celda.font = Font(
+            color="FFFFFF",
+            bold=True,
+        )
+        celda.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+        )
+
+    for producto in productos:
+        porcentaje_perdida = float(
+            producto.porcentaje_perdida or 0
+        )
+
+        peso_maximo = None
+
+        if porcentaje_perdida < 100:
+            peso_maximo = round(
+                producto.peso_receta
+                / (1 - porcentaje_perdida / 100),
+                2,
+            )
+
+        altura_objetivo = producto.altura
+
+        diferencia_altura = float(
+            producto.diff_altura or 0
+        )
+
+        altura_minima = None
+        altura_maxima = None
+
+        if altura_objetivo is not None:
+            altura_minima = round(
+                float(altura_objetivo) - diferencia_altura,
+                2,
+            )
+
+            altura_maxima = round(
+                float(altura_objetivo) + diferencia_altura,
+                2,
+            )
+
+        hoja.append([
+            producto.id,
+            producto.get_area_display(),
+            producto.get_cliente_display(),
+            producto.codigo,
+            producto.producto,
+            producto.peso_receta,
+            porcentaje_perdida,
+            peso_maximo,
+            altura_objetivo,
+            diferencia_altura,
+            altura_minima,
+            altura_maxima,
+            (
+                float(producto.un_pp)
+                if producto.un_pp is not None
+                else None
+            ),
+            "Activo" if producto.activo else "Inactivo",
+        ])
+
+    # Inmovilizar encabezado
+    hoja.freeze_panes = "A2"
+
+    # Activar filtros en Excel
+    hoja.auto_filter.ref = hoja.dimensions
+
+    # Alinear contenido
+    for fila in hoja.iter_rows(
+        min_row=2,
+        max_row=hoja.max_row,
+    ):
+        for celda in fila:
+            celda.alignment = Alignment(
+                vertical="center"
+            )
+
+    # Anchos de columnas
+    anchos = {
+        1: 10,   # ID
+        2: 20,   # Área
+        3: 22,   # Cliente
+        4: 16,   # Código
+        5: 42,   # Producto
+        6: 20,   # Peso receta
+        7: 24,   # Pérdida
+        8: 28,   # Peso máximo
+        9: 23,   # Altura objetivo
+        10: 27,  # Diferencia altura
+        11: 22,  # Altura mínima
+        12: 22,  # Altura máxima
+        13: 24,  # Unidades persona
+        14: 15,  # Estado
+    }
+
+    for numero_columna, ancho in anchos.items():
+        letra = get_column_letter(numero_columna)
+        hoja.column_dimensions[letra].width = ancho
+
+    # Formato numérico con dos decimales
+    columnas_decimales = ["G", "H", "J", "K", "L", "M"]
+
+    for columna in columnas_decimales:
+        for celda in hoja[columna][1:]:
+            celda.number_format = "0.00"
+
+    fecha = timezone.localdate().strftime("%Y-%m-%d")
+    nombre_archivo = f"productos_control_peso_{fecha}.xlsx"
+
+    respuesta = HttpResponse(
+        content_type=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        )
+    )
+
+    respuesta["Content-Disposition"] = (
+        f'attachment; filename="{nombre_archivo}"'
+    )
+
+    libro.save(respuesta)
+
+    return respuesta
