@@ -19,9 +19,87 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    /* Pantalla de carga de gráficos */
+    .cargando-graficos {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(3px);
+    }
+
+    .cargando-graficos.oculto {
+      display: none;
+    }
+
+    .cargando-contenido {
+      width: min(420px, 100%);
+      padding: 30px 24px;
+      text-align: center;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+      font-family: "Quicksand", sans-serif;
+    }
+
+    .cargando-spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 18px;
+      border: 6px solid #ececec;
+      border-top-color: #b43c2c;
+      border-radius: 50%;
+      animation: girar-spinner 0.8s linear infinite;
+    }
+
+    .cargando-titulo {
+      margin: 0 0 8px;
+      color: #333;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .cargando-texto {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    @keyframes girar-spinner {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div
+    id="cargandoGraficos"
+    class="cargando-graficos"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="cargando-contenido">
+      <div class="cargando-spinner"></div>
+
+      <p class="cargando-titulo">
+        Graficando, por favor espere…
+      </p>
+
+      <p class="cargando-texto">
+        Estamos consultando y procesando la información.
+        Esta operación puede tardar hasta un minuto.
+      </p>
+    </div>
+  </div>
   <div class="login">
     <img src="{% static 'control_de_pesos/images/logoquinta.png' %}" alt="logo" class="logo">
 
@@ -138,6 +216,29 @@
     const XLSX = window.XLSX;
     const qs = new URLSearchParams(location.search);
     const $ = id => document.getElementById(id);
+
+    const cargandoGraficos = $('cargandoGraficos');
+    const btnAplicar = $('btn-aplicar');
+    const btnLimpiar = $('btn-limpiar');
+    const btnDescargar = $('btn-descargar');
+
+    function mostrarCargando() {
+      cargandoGraficos.classList.remove('oculto');
+      cargandoGraficos.setAttribute('aria-busy', 'true');
+
+      btnAplicar.disabled = true;
+      btnLimpiar.disabled = true;
+      btnDescargar.disabled = true;
+    }
+
+    function ocultarCargando() {
+      cargandoGraficos.classList.add('oculto');
+      cargandoGraficos.setAttribute('aria-busy', 'false');
+
+      btnAplicar.disabled = false;
+      btnLimpiar.disabled = false;
+      btnDescargar.disabled = false;
+    }
 
     const F = {
       cliente: $('f-cliente'),
@@ -857,77 +958,146 @@
     }
 
     async function aplicar() {
-      saveFilters();
+      mostrarCargando();
 
-      const data = await cargarDatos();
+      try {
+        saveFilters();
 
-      F.resumen.textContent = `${data.length} registros`;
+        const data = await cargarDatos();
 
-      destruirCharts();
+        F.resumen.textContent =
+          `${data.length} registros`;
 
-      if (data.length) {
-        construirSerieTemporal(data);
-        construirHistograma(data);
-        construirGraficoAlturas(data);
-      } else {
-        const cardAlturas = document.getElementById('cardAlturas');
-        if (cardAlturas) cardAlturas.style.display = 'none';
+        destruirCharts();
 
-        const c1 = document.getElementById('chartLinea').getContext('2d');
-        chartLinea = new Chart(c1, {
-          type: 'line',
-          data: {
-            labels: [],
-            datasets: [{ label: 'Sin datos', data: [] }]
-          },
-          options: {
-            maintainAspectRatio: false
+        if (data.length) {
+          construirSerieTemporal(data);
+          construirHistograma(data);
+          construirGraficoAlturas(data);
+        } else {
+          const cardAlturas =
+            document.getElementById('cardAlturas');
+
+          if (cardAlturas) {
+            cardAlturas.style.display = 'none';
           }
-        });
 
-        const c2 = document.getElementById('chartHist').getContext('2d');
-        chartHist = new Chart(c2, {
-          type: 'bar',
-          data: {
-            labels: [],
-            datasets: [{ label: 'Sin datos', data: [] }]
-          },
-          options: {
-            maintainAspectRatio: false
-          }
-        });
+          const c1 =
+            document
+              .getElementById('chartLinea')
+              .getContext('2d');
+
+          chartLinea = new Chart(c1, {
+            type: 'line',
+
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: 'Sin datos',
+                  data: []
+                }
+              ]
+            },
+
+            options: {
+              responsive: true,
+              maintainAspectRatio: false
+            }
+          });
+
+          const c2 =
+            document
+              .getElementById('chartHist')
+              .getContext('2d');
+
+          chartHist = new Chart(c2, {
+            type: 'bar',
+
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: 'Sin datos',
+                  data: []
+                }
+              ]
+            },
+
+            options: {
+              responsive: true,
+              maintainAspectRatio: false
+            }
+          });
+        }
+
+        window.__datosActuales = data;
+
+      } catch (error) {
+        console.error(
+          'Error generando los gráficos:',
+          error
+        );
+
+        alert(
+          'No fue posible generar los gráficos. ' +
+          'Intenta nuevamente.'
+        );
+
+      } finally {
+        ocultarCargando();
       }
-
-      window.__datosActuales = data;
     }
 
-    document.getElementById('btn-aplicar').addEventListener('click', e => {
+    btnAplicar.addEventListener('click', async e => {
       e.preventDefault();
-      aplicar();
+      await aplicar();
     });
 
-    document.getElementById('btn-limpiar').addEventListener('click', e => {
+    btnLimpiar.addEventListener('click', async e => {
       e.preventDefault();
 
-      ['f-cliente', 'f-producto', 'f-turno', 'f-lote', 'f-desde', 'f-hasta'].forEach(id => {
+      [
+        'f-cliente',
+        'f-producto',
+        'f-turno',
+        'f-lote',
+        'f-desde',
+        'f-hasta'
+      ].forEach(id => {
         const el = $(id);
-        if (el) el.value = '';
+
+        if (el) {
+          el.value = '';
+        }
       });
 
-      F.producto.disabled = true;
-      localStorage.removeItem(STORAGE_KEY);
-      history.replaceState(null, '', location.pathname);
+      F.producto.innerHTML =
+        '<option value="">Todos</option>';
 
-      aplicar();
+      F.producto.disabled = true;
+
+      localStorage.removeItem(STORAGE_KEY);
+
+      history.replaceState(
+        null,
+        '',
+        location.pathname
+      );
+
+      await aplicar();
     });
 
-    document.getElementById('btn-descargar').addEventListener('click', e => {
+    btnDescargar.addEventListener('click', e => {
       e.preventDefault();
-      descargarExcel(window.__datosActuales || []);
+
+      descargarExcel(
+        window.__datosActuales || []
+      );
     });
 
     loadFilters();
-    aplicar();
+    await aplicar();
   </script>
 </body>
 </html>
