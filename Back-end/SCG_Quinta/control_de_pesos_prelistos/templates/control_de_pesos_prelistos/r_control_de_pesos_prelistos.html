@@ -148,8 +148,17 @@
             <label for="codigo_producto">Código producto</label>
             <input type="text" id="codigo_producto" name="codigo_producto" class="input" readonly placeholder="-">
 
-            <label for="peso_receta">Peso receta (gr)</label>
+            <label for="peso_receta">Peso receta (neto) (gr)</label>
             <input type="number" id="peso_receta" name="peso_receta" class="input" readonly placeholder="-">
+
+            <label for="peso_maximo">Peso máximo (gr)</label>
+            <input
+                type="text"
+                id="peso_maximo"
+                class="input"
+                readonly
+                placeholder="-"
+            >
 
             <script>
             const AREA_CONTROL_PESOS = "PRELISTOS";
@@ -158,6 +167,7 @@
             const selectProducto = document.getElementById("producto");
             const inputCodigo = document.getElementById("codigo_producto");
             const inputPesoReceta = document.getElementById("peso_receta");
+            const inputPesoMaximo = document.getElementById("peso_maximo");
 
             let productosBase = [];
 
@@ -181,6 +191,7 @@
                 selectProducto.innerHTML = `<option value="">-- Selecciona producto --</option>`;
                 inputCodigo.value = "";
                 inputPesoReceta.value = "";
+                inputPesoMaximo.value = "";
                 productosBase = [];
 
                 if (!cliente) return;
@@ -213,11 +224,30 @@
                 if (!productoSeleccionado) {
                     inputCodigo.value = "";
                     inputPesoReceta.value = "";
+                    inputPesoMaximo.value = "";
                     return;
                 }
 
                 inputCodigo.value = productoSeleccionado.codigo || "";
-                inputPesoReceta.value = productoSeleccionado.peso_receta || "";
+                inputPesoReceta.value = productoSeleccionado.peso_receta ?? "";
+
+                const pesoReceta = Number(productoSeleccionado.peso_receta);
+                const porcentajePerdida = Number(
+                    productoSeleccionado.porcentaje_perdida ?? 0
+                );
+
+                if (
+                    Number.isFinite(pesoReceta) &&
+                    Number.isFinite(porcentajePerdida) &&
+                    porcentajePerdida < 100
+                ) {
+                    const pesoMaximo =
+                        pesoReceta / (1 - porcentajePerdida / 100);
+
+                    inputPesoMaximo.value = `${pesoMaximo.toFixed(0)} gr`;
+                } else {
+                    inputPesoMaximo.value = "";
+                }
             });
 
             document.addEventListener("DOMContentLoaded", cargarClientesBase);
