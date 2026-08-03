@@ -264,6 +264,61 @@
       font-weight: 700;
     }
 
+    /* Pantalla de carga de gráficos */
+    .cargando-graficos {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(3px);
+    }
+
+    .cargando-graficos.oculto {
+      display: none;
+    }
+
+    .cargando-contenido {
+      width: min(420px, 100%);
+      padding: 30px 24px;
+      text-align: center;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+    }
+
+    .cargando-spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 18px;
+      border: 6px solid #ececec;
+      border-top-color: #b43c2c;
+      border-radius: 50%;
+      animation: girar-spinner 0.8s linear infinite;
+    }
+
+    .cargando-titulo {
+      margin: 0 0 8px;
+      color: #333;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .cargando-texto {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+    }
+
+    @keyframes girar-spinner {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     @media (max-width: 700px) {
       .grafico-semanal {
         height: 500px;
@@ -278,6 +333,26 @@
 </head>
 
 <body>
+  <div
+    id="cargandoGraficos"
+    class="cargando-graficos"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="cargando-contenido">
+      <div class="cargando-spinner"></div>
+
+      <p class="cargando-titulo">
+        Graficando, por favor espere…
+      </p>
+
+      <p class="cargando-texto">
+        Estamos consultando y procesando la información.
+        Esta operación puede tardar hasta un minuto.
+      </p>
+    </div>
+  </div>
   <div class="login">
     <img
       src="{% static 'calculo_oee/images/logoquinta.png' %}"
@@ -641,6 +716,24 @@
     const btnSelTodoSem = $('#btn_sel_todo_sem');
     const btnSelTodoLin = $('#btn_sel_todo_lin');
     const btnSelTodoTur = $('#btn_sel_todo_tur');
+
+    const cargandoGraficos = $('#cargandoGraficos');
+
+    function mostrarCargando() {
+      cargandoGraficos.classList.remove('oculto');
+      cargandoGraficos.setAttribute('aria-busy', 'true');
+
+      btnAplicar.disabled = true;
+      btnLimpiar.disabled = true;
+    }
+
+    function ocultarCargando() {
+      cargandoGraficos.classList.add('oculto');
+      cargandoGraficos.setAttribute('aria-busy', 'false');
+
+      btnAplicar.disabled = false;
+      btnLimpiar.disabled = false;
+    }
 
     const ctxOEE = $('#graficoOEE').getContext('2d');
     const ctxDet = $('#graficoDetenciones').getContext('2d');
@@ -2618,6 +2711,25 @@
       }
     }
 
+    async function cargarTodosLosGraficos() {
+      mostrarCargando();
+
+      try {
+        await Promise.all([
+          cargarOEE(),
+          cargarDetenciones(),
+          cargarDetencionesSemanales()
+        ]);
+      } catch (error) {
+        console.error(
+          'Error durante la carga de los gráficos:',
+          error
+        );
+      } finally {
+        ocultarCargando();
+      }
+    }
+
     btnSelTodoSem.onclick = () => {
       panelSemanas.querySelectorAll(
         'input[type="checkbox"]'
@@ -2659,11 +2771,7 @@
           : location.pathname
       );
 
-      await Promise.all([
-        cargarOEE(),
-        cargarDetenciones(),
-        cargarDetencionesSemanales()
-      ]);
+      await cargarTodosLosGraficos();
     };
 
     btnLimpiar.onclick = async () => {
@@ -2695,21 +2803,28 @@
         location.pathname
       );
 
+      await cargarTodosLosGraficos();
+    };
+
+    try {
+      mostrarCargando();
+
+      await cargarOpciones();
+      aplicarFiltrosDesdeURL();
+
       await Promise.all([
         cargarOEE(),
         cargarDetenciones(),
         cargarDetencionesSemanales()
       ]);
-    };
-
-    await cargarOpciones();
-    aplicarFiltrosDesdeURL();
-
-    await Promise.all([
-      cargarOEE(),
-      cargarDetenciones(),
-      cargarDetencionesSemanales()
-    ]);
+    } catch (error) {
+      console.error(
+        'Error durante la carga inicial:',
+        error
+      );
+    } finally {
+      ocultarCargando();
+    }
   });
   </script>
 </body>
