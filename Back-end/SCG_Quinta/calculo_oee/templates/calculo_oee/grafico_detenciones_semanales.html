@@ -760,6 +760,22 @@
     let chartUnidadesPersona = null;
     let chartDetencionesSemanales = null;
 
+    /*
+    Mantiene sincronizados los motivos visibles entre:
+    1. Gráfico porcentual de detenciones.
+    2. Línea de tiempo semanal.
+    */
+    const motivosDetencionesOcultos = new Set();
+
+    let ultimaRespuestaSemanal = null;
+    let ultimosTurnosSemanales = [];
+
+    function motivoDetencionVisible(motivo) {
+      return !motivosDetencionesOcultos.has(
+        String(motivo || '').trim()
+      );
+    }
+
     const INICIO_TURNO_A = 0;
     const FIN_TURNO_A = 480;
 
@@ -1539,12 +1555,27 @@
             chart.isDatasetVisible(index);
 
           checkbox.onchange = () => {
+            const motivo =
+              String(dataset.label || '').trim();
+
             chart.setDatasetVisibility(
               index,
               checkbox.checked
             );
 
+            if (checkbox.checked) {
+              motivosDetencionesOcultos.delete(motivo);
+            } else {
+              motivosDetencionesOcultos.add(motivo);
+            }
+
             chart.update();
+
+            /*
+            Aplica inmediatamente la misma selección
+            a la línea de tiempo semanal.
+            */
+            actualizarLineaTiempoPorMotivos();
           };
 
           const swatch =
@@ -1646,8 +1677,14 @@
           }
         }
 
-        byLote.get(loteId).motivos[item.motivo] =
-          item.porcentaje;
+        byLote.get(loteId).motivos[item.motivo] = {
+          porcentaje: Number(item.porcentaje) || 0,
+          comentarios: Array.isArray(item.comentarios)
+            ? item.comentarios.filter(Boolean)
+            : item.comentarios
+              ? [item.comentarios]
+              : []
+        };
 
         motivosSet.add(item.motivo);
       }
@@ -1677,10 +1714,19 @@
         motivos.map((motivo, index) => ({
           label: motivo,
 
-          data: loteOrder.map(
-            id =>
-              byLote.get(id).motivos[motivo] ?? 0
-          ),
+          data: loteOrder.map(id => {
+            return (
+              byLote.get(id).motivos[motivo]
+                ?.porcentaje ?? 0
+            );
+          }),
+
+          comentarios: loteOrder.map(id => {
+            return (
+              byLote.get(id).motivos[motivo]
+                ?.comentarios ?? []
+            );
+          }),
 
           backgroundColor:
             motivo === 'Tiempo Productivo'
@@ -1689,7 +1735,13 @@
 
           stack: 'x',
           borderWidth: 1,
-          borderColor: 'rgba(0,0,0,0.1)'
+          borderColor: 'rgba(0,0,0,0.1)',
+
+          /*
+          Conserva la selección cuando se vuelven
+          a cargar los gráficos.
+          */
+          hidden: motivosDetencionesOcultos.has(motivo)
         }));
 
       const TARGETS_ESTANDAR = {
@@ -1885,35 +1937,43 @@
                 },
 
                 label(item) {
-                  const motivo =
-                    item.dataset.label;
-
-                  const porcentaje =
-                    item.parsed.y ?? 0;
+                  const motivo = item.dataset.label;
+                  const porcentaje = item.parsed.y ?? 0;
 
                   const loteId =
                     loteOrder[item.dataIndex];
 
                   const minutosTurno =
-                    byLote.get(loteId)
-                      ?.minutos_turno;
+                    byLote.get(loteId)?.minutos_turno;
 
                   let minutosTexto = '';
 
                   if (minutosTurno != null) {
                     const minutos =
-                      (porcentaje / 100) *
-                      minutosTurno;
+                      (porcentaje / 100) * minutosTurno;
 
                     minutosTexto =
                       ` · ${minutos.toFixed(0)} min`;
                   }
 
-                  return (
+                  const resultado = [
                     `${motivo}: ` +
                     `${porcentaje.toFixed(0)}%` +
                     minutosTexto
-                  );
+                  ];
+
+                  const comentarios =
+                    item.dataset.comentarios?.[
+                      item.dataIndex
+                    ] || [];
+
+                  comentarios.forEach(comentario => {
+                    resultado.push(
+                      `Comentario: ${comentario}`
+                    );
+                  });
+
+                  return resultado;
                 }
               }
             }
@@ -1951,6 +2011,45 @@
         chartDetencionesSemanales.destroy();
         chartDetencionesSemanales = null;
       }
+    }
+
+    function actualizarLineaTiempoPorMotivos() {
+      if (
+        !ultimaRespuestaSemanal ||
+        !Array.isArray(ultimaRespuestaSemanal.datos)
+      ) {
+        return;
+      }
+
+      const datosVisibles =
+        ultimaRespuestaSemanal.datos.filter(
+          detencion =>
+            motivoDetencionVisible(detencion.motivo)
+        );
+
+      destruirGraficoDetencionesSemanales();
+
+      if (!datosVisibles.length) {
+        mensajeDetencionesSemanales.style.display =
+          'block';
+
+        mensajeDetencionesSemanales.textContent =
+          'No existen detenciones visibles con los ' +
+          'motivos seleccionados.';
+
+        return;
+      }
+
+      mensajeDetencionesSemanales.style.display =
+        'none';
+
+      construirGraficoDetencionesSemanales(
+        {
+          ...ultimaRespuestaSemanal,
+          datos: datosVisibles
+        },
+        ultimosTurnosSemanales
+      );
     }
 
     function minutosOperacionalesAHora(
@@ -2646,6 +2745,19 @@
         const respuesta =
           await respuestaHttp.json();
 
+        /*
+        Guardamos la respuesta completa para poder filtrar
+        la línea de tiempo sin volver a consultar la API.
+        */
+        ultimaRespuestaSemanal = respuesta;
+        ultimosTurnosSemanales = [...turnos];
+
+        const datosVisibles =
+          respuesta.datos.filter(
+            detencion =>
+              motivoDetencionVisible(detencion.motivo)
+          );
+
         informacionDetencionesSemanales.innerHTML = `
           <strong>
             Semana ${respuesta.semana}
@@ -2689,8 +2801,24 @@
           return;
         }
 
+        if (!datosVisibles.length) {
+          destruirGraficoDetencionesSemanales();
+
+          mensajeDetencionesSemanales.style.display =
+            'block';
+
+          mensajeDetencionesSemanales.textContent =
+            'No existen detenciones visibles con los ' +
+            'motivos seleccionados.';
+
+          return;
+        }
+
         construirGraficoDetencionesSemanales(
-          respuesta,
+          {
+            ...respuesta,
+            datos: datosVisibles
+          },
           turnos
         );
 

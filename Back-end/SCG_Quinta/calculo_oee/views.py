@@ -26,6 +26,7 @@ from django.db.models import Value, FloatField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.functions import ExtractWeek, ExtractYear, ExtractIsoYear
 from django.db.models import Sum
+from django.contrib.postgres.aggregates import ArrayAgg
 from openpyxl.styles import Font, PatternFill
 from datetime import timedelta, date
 from django.db import transaction
@@ -1148,7 +1149,17 @@ def detenciones_turno_api(request):
                   'lote__resumenes_turno__linea',
                   'motivo'
               )
-              .annotate(duracion_total=Sum('duracion'))
+              .annotate(
+                    duracion_total=Sum('duracion'),
+                    comentarios_lista=ArrayAgg(
+                        'comentarios',
+                        distinct=True,
+                        filter=(
+                            Q(comentarios__isnull=False) &
+                            ~Q(comentarios='')
+                        ),
+                    ),
+                )
               .order_by('lote__resumenes_turno__fecha',
                         'lote__resumenes_turno__turno',
                         'motivo'))
@@ -1207,6 +1218,8 @@ def detenciones_turno_api(request):
                 'linea': res['linea'],
                 'motivo': r['motivo'],
                 'porcentaje': porcentaje,
+                'comentarios': r['comentarios_lista'] or [],
+                'minutos_turno': res['tiempo_planeado'],
                 'lote_id': r['lote_id'],  # 👈 ahora sí siempre va
             })
 
@@ -1219,11 +1232,13 @@ def detenciones_turno_api(request):
             restante = max(tp - det, 0)
             porcentaje_restante = round(100 * restante / tp, 2)
             salida.append({
+                'planta': res['planta'],
                 'fecha': res['fecha'],
                 'turno': res['turno'],
                 'linea': res['linea'],
                 'motivo': 'Tiempo Productivo',
                 'porcentaje': porcentaje_restante,
+                'comentarios': r['comentarios_lista'] or [],
                 'minutos_turno': res['tiempo_planeado'],   # ✅ NUEVO
                 'lote_id': res['lote_id'],  # 👈 también aquí
             })
