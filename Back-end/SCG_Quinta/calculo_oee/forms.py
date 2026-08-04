@@ -74,8 +74,11 @@ class TurnoOEEForm(forms.ModelForm):
         TurnoOEE.PLANTA_PUERTO_VESPUCIO: [
             ('Sebastian Ibarra', 'Sebastian Ibarra'),
             ('Andres Gonzales', 'Andres Gonzales'),
-            ('Patricio Campos', 'Patricio Campos'),
-        ],
+            ('Patricio Cardenas', 'Patricio Cardenas'),
+            ('Larry Torres', 'Larry Torres'),
+            ('Moises Mejias', 'Moises Mejias'),
+            ('Carlos Diaz', 'Cristian Diaz'),
+            ],
     }
     supervisor = forms.ChoiceField(
         choices=[],
