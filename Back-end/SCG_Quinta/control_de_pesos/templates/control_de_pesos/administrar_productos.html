@@ -624,7 +624,7 @@
 
                 {% if producto_edicion %}
                     <a
-                        href="{% url 'administrar_productos_control_peso' %}"
+                        href="{% url 'administrar_productos_control_peso' %}?{% if filtros_qs %}{{ filtros_qs }}&{% endif %}page={{ pagina.number }}#formulario-producto"
                         class="boton boton-gris"
                     >
                         Cancelar edición
@@ -711,7 +711,7 @@
 
                                     <form
                                         method="post"
-                                        action="{% url 'cambiar_estado_producto_control_peso' producto.id %}"
+                                        action="{% url 'cambiar_estado_producto_control_peso' producto.id %}?{% if filtros_qs %}{{ filtros_qs }}&{% endif %}page={{ pagina.number }}&editar={{ producto.id }}#formulario-producto"
                                     >
                                         {% csrf_token %}
                                         <input type="hidden" name="buscar" value="{{ busqueda }}">
