@@ -26,9 +26,84 @@
 
   <!-- SheetJS: Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    .cargando-graficos {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(3px);
+    }
+
+    .cargando-graficos.oculto {
+      display: none;
+    }
+
+    .cargando-contenido {
+      min-width: 260px;
+      padding: 28px 32px;
+      text-align: center;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+      color: #333333;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    .cargando-spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      border: 5px solid #ead4d0;
+      border-top-color: #b43c2c;
+      border-radius: 50%;
+      animation: girar-cargando 0.8s linear infinite;
+    }
+
+    .cargando-titulo {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .cargando-texto {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    @keyframes girar-cargando {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div
+    id="cargandoGraficos"
+    class="cargando-graficos"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="cargando-contenido">
+      <div class="cargando-spinner"></div>
+
+      <p class="cargando-titulo">
+        Graficando, por favor espere…
+      </p>
+
+      <p class="cargando-texto">
+        Estamos consultando y procesando la información.
+        Esta operación puede tardar hasta un minuto.
+      </p>
+    </div>
+  </div>
   <div class="login">
     <img src="{% static 'control_de_pesos_prelistos/images/logoquinta.png' %}" alt="logo" class="logo">
     <div class="login-container">
@@ -68,7 +143,8 @@
         <button class="primary-button" id="btn-limpiar" type="button">Limpiar</button>
         <button class="primary-button" id="btn-descargar" type="button">Descargar Excel</button>
         <span id="resumen" class="badge">0 registros</span>
-        <span id="peso-ref" class="badge">Peso receta: –</span>
+        <span id="peso-ref" class="badge">Peso neto: –</span>
+        <span id="peso-receta" class="badge">Peso receta: –</span>
       </div>
     </div>
 
@@ -77,7 +153,9 @@
       <div class="card">
         <h3 class="title" style="color:#333;margin-top:0">Serie temporal (Peso Real vs Receta)</h3>
         <div class="chart-wrap"><canvas id="chartLinea"></canvas></div>
-        <small id="nota-tolerancia" class="badge" style="margin-top:10px;">Tolerancia ±3%</small>
+        <small id="nota-tolerancia" class="badge" style="margin-top:10px;">
+          Mínimo: peso neto | Máximo: peso receta
+        </small>
       </div>
       <div class="card">
         <h3 class="title" style="color:#333;margin-top:0">Histograma de desviación (gr)</h3>
@@ -109,8 +187,18 @@
       hasta: $('f-hasta'),
       resumen: $('resumen'),
       pesoRef: $('peso-ref'),
+      pesoReceta: $('peso-receta'),
       notaTol: $('nota-tolerancia'),
     };
+    const cargandoGraficos = $('cargando-graficos');
+
+    function mostrarCargando() {
+      cargandoGraficos?.classList.remove('oculto');
+    }
+
+    function ocultarCargando() {
+      cargandoGraficos?.classList.add('oculto');
+    }
     const STORAGE_KEY = 'filtros_graficos_control_pesos_prelistos_v1';
 
     // ---------- Parser robusto de fechas ----------
@@ -200,136 +288,217 @@
     let chartLinea, chartHist;
     function destruirCharts(){ try{chartLinea?.destroy()}catch{} try{chartHist?.destroy()}catch{} }
 
-    const TOLERANCIA_PCT = 3;
-
-    function sanitizarSerie(data){
-      return data.map(d => ({
-        t: parseFechaLocal(d.ts),
-        y: Number(d.peso_real),
-        receta: d.peso_receta != null ? Number(d.peso_receta) : null
-      })).filter(p => p.t && Number.isFinite(p.y));
+    function sanitizarSerie(data) {
+      return data
+        .map(d => ({
+          t: parseFechaLocal(d.ts),
+          y: Number(d.peso_real),
+          peso_minimo:
+            d.peso_minimo != null
+              ? Number(d.peso_minimo)
+              : null,
+          peso_maximo:
+            d.peso_maximo != null
+              ? Number(d.peso_maximo)
+              : null,
+          perdida_operacional:
+            d.perdida_operacional != null
+              ? Number(d.perdida_operacional)
+              : null,
+        }))
+        .filter(p => p.t && Number.isFinite(p.y));
     }
 
-    function construirSerieTemporal(regs){
-      const ctx = document.getElementById('chartLinea').getContext('2d');
+    function construirSerieTemporal(regs) {
+      const ctx = document
+        .getElementById('chartLinea')
+        .getContext('2d');
+
       const pts = sanitizarSerie(regs);
-      if (!pts.length){
-        chartLinea = new Chart(ctx,{
-          type:'line',
-          data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
-          options:{responsive:true,maintainAspectRatio:false}
+
+      if (!pts.length) {
+        chartLinea = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: 'Sin datos',
+                data: [],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          },
         });
-        F.pesoRef.textContent = 'Peso receta: –';
+
+        F.pesoRef.textContent = 'Peso neto: –';
+        F.pesoReceta.textContent = 'Peso receta: –';
         F.notaTol.textContent = 'Sin datos';
         return;
       }
 
-      // forward-fill de receta para permitir línea escalonada con cambios
-      const recetaFF = [];
-      let last = null;
-      for (const p of pts) {
-        if (Number.isFinite(p.receta)) last = p.receta;
-        recetaFF.push(last);
-      }
+      const real = pts.map(p => ({
+        x: p.t,
+        y: p.y,
+      }));
 
-      const pesoRecetaDisplay = [...recetaFF].reverse().find(v => Number.isFinite(v)) ?? null;
-      F.pesoRef.textContent = pesoRecetaDisplay != null
-        ? `Peso receta ref: ${pesoRecetaDisplay}`
-        : 'Peso receta: –';
-      F.notaTol.textContent = `Tolerancia ±${TOLERANCIA_PCT}%`;
+      const minL = pts
+        .filter(p => Number.isFinite(p.peso_minimo))
+        .map(p => ({
+          x: p.t,
+          y: p.peso_minimo,
+        }));
 
-      const real = pts.map(p => ({x:p.t,y:p.y}));
+      const maxL = pts
+        .filter(p => Number.isFinite(p.peso_maximo))
+        .map(p => ({
+          x: p.t,
+          y: p.peso_maximo,
+        }));
 
-      const rec  = [];
-      const minL = [];
-      const maxL = [];
-      for (let i=0; i<pts.length; i++){
-        const v = recetaFF[i];
-        if (!Number.isFinite(v)) continue;
-        const x = pts[i].t;
-        const d = v * (TOLERANCIA_PCT/100);
-        rec.push({x, y:v});
-        minL.push({x, y:v - d});
-        maxL.push({x, y:v + d});
-      }
+      const pesoNetoDisplay = [...pts]
+        .reverse()
+        .find(p => Number.isFinite(p.peso_minimo))
+        ?.peso_minimo ?? null;
+
+      const pesoRecetaDisplay = [...pts]
+        .reverse()
+        .find(p => Number.isFinite(p.peso_maximo))
+        ?.peso_maximo ?? null;
+
+      const perdidaDisplay = [...pts]
+        .reverse()
+        .find(p => Number.isFinite(p.perdida_operacional))
+        ?.perdida_operacional ?? null;
+
+      F.pesoRef.textContent =
+        pesoNetoDisplay != null
+          ? `Peso neto: ${pesoNetoDisplay} gr`
+          : 'Peso neto: –';
+
+      F.pesoReceta.textContent =
+        pesoRecetaDisplay != null
+          ? `Peso receta: ${Math.round(pesoRecetaDisplay)} gr`
+          : 'Peso receta: –';
+
+      F.notaTol.textContent =
+        perdidaDisplay != null
+          ? `Mínimo: peso neto | Máximo: peso receta con ${perdidaDisplay}% de pérdida`
+          : 'Mínimo: peso neto | Máximo: peso receta';
 
       const minDate = pts[0].t;
       const maxDate = pts[pts.length - 1].t;
       const unit = unidadTiempoDesdeSpan(minDate, maxDate);
 
       const ys = [
-        ...real.map(p=>p.y),
-        ...rec.map(p=>p.y),
-        ...minL.map(p=>p.y),
-        ...maxL.map(p=>p.y),
+        ...real.map(p => p.y),
+        ...minL.map(p => p.y),
+        ...maxL.map(p => p.y),
       ].filter(Number.isFinite);
+
       const yMin = Math.min(...ys);
       const yMax = Math.max(...ys);
-      const pad  = (yMax - yMin) * 0.05 || 5;
-      const yMinFinal = Math.floor(yMin - pad);
-      const yMaxFinal = Math.ceil (yMax + pad);
+      const pad = (yMax - yMin) * 0.05 || 5;
 
-      chartLinea = new Chart(ctx,{
-        type:'line',
-        data:{
-          datasets:[
-            { label:'Peso real (gr)', data: real, borderWidth:2, pointRadius:2, tension:.25 },
-            ...(rec.length  ? [{
-              label:'Peso receta (gr)',
-              data: rec,
-              borderWidth:1,
-              pointRadius:0,
-              stepped:true
-            }] : []),
-            ...(minL.length ? [{
-              label:'Límite inf',
-              data: minL,
-              borderWidth:1,
-              pointRadius:0,
-              stepped:true
-            }] : []),
-            ...(maxL.length ? [{
-              label:'Límite sup',
-              data: maxL,
-              borderWidth:1,
-              pointRadius:0,
-              stepped:true
-            }] : []),
-          ]
-        },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          devicePixelRatio:1,
-          animation:false,
-          resizeDelay:150,
-          adapters:{ date:{ locale: window.dateFnsLocaleEs } },
-          interaction:{ mode:'nearest', intersect:false, axis:'x' },
-          scales:{
-            x:{
-              type:'time',
-              time:{
-                unit,
-                round: unit,
-                displayFormats:{
-                  minute:'HH:mm',
-                  hour:'HH:mm',
-                  day:'MMM d',
-                  //month:'MMM yyyy',
-                }
-              },
-              ticks:{ autoSkip:true, maxTicksLimit: 10 }
+      chartLinea = new Chart(ctx, {
+        type: 'line',
+
+        data: {
+          datasets: [
+            {
+              label: 'Peso real (gr)',
+              data: real,
+              borderWidth: 2,
+              pointRadius: 2,
+              tension: 0.25,
             },
-            y:{
-              title:{display:true,text:'gr'},
-              beginAtZero:false,
-              min:yMinFinal,
-              max:yMaxFinal,
-              grace:0
-            }
+            ...(maxL.length
+              ? [{
+                  label: 'Peso máximo / receta',
+                  data: maxL.map(p => ({
+                    ...p,
+                    y: Math.round(p.y),
+                  })),
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  stepped: true,
+                  borderDash: [10, 5],
+                }]
+              : []),
+            ...(minL.length
+              ? [{
+                  label: 'Peso mínimo / neto',
+                  data: minL,
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  stepped: true,
+                  borderDash: [6, 6],
+                }]
+              : []),
+          ],
+        },
+
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: 1,
+          animation: false,
+          resizeDelay: 150,
+          parsing: false,
+
+          interaction: {
+            mode: 'nearest',
+            intersect: false,
+            axis: 'x',
           },
-          plugins:{ tooltip:{ mode:'index', intersect:false } }
-        }
+
+          scales: {
+            x: {
+              type: 'time',
+              bounds: 'data',
+              min: minDate,
+              max: maxDate,
+
+              time: {
+                unit,
+                tooltipFormat: 'dd-MM-yyyy HH:mm',
+                displayFormats: {
+                  minute: 'HH:mm',
+                  hour: 'dd-MM HH:mm',
+                  day: 'dd-MM-yyyy',
+                  month: 'MM-yyyy',
+                  year: 'yyyy',
+                },
+              },
+
+              ticks: {
+                autoSkip: true,
+                maxTicksLimit: 10,
+              },
+            },
+
+            y: {
+              title: {
+                display: true,
+                text: 'gr',
+              },
+              beginAtZero: false,
+              min: Math.floor(yMin - pad),
+              max: Math.ceil(yMax + pad),
+              grace: 0,
+            },
+          },
+
+          plugins: {
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+            },
+          },
+        },
       });
     }
 
@@ -443,29 +612,84 @@
     }
 
     // ---------- Eventos + Init ----------
-    async function aplicar(){
-      saveFilters();
-      const data = await cargarDatos();
-      F.resumen.textContent = `${data.length} registros`;
-      destruirCharts();
-      if (data.length){
-        construirSerieTemporal(data);
-        construirHistograma(data);
-      } else {
-        const c1 = document.getElementById('chartLinea').getContext('2d');
-        chartLinea = new Chart(c1,{
-          type:'line',
-          data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
-          options:{maintainAspectRatio:false}
-        });
-        const c2 = document.getElementById('chartHist').getContext('2d');
-        chartHist  = new Chart(c2,{
-          type:'bar',
-          data:{labels:[],datasets:[{label:'Sin datos',data:[]}]},
-          options:{maintainAspectRatio:false}
-        });
+    async function aplicar() {
+      mostrarCargando();
+
+      try {
+        saveFilters();
+
+        const data = await cargarDatos();
+
+        F.resumen.textContent = `${data.length} registros`;
+
+        destruirCharts();
+
+        if (data.length) {
+          construirSerieTemporal(data);
+          construirHistograma(data);
+        } else {
+          F.pesoRef.textContent = 'Peso neto: –';
+          F.pesoReceta.textContent = 'Peso receta: –';
+          F.notaTol.textContent = 'Sin datos';
+
+          const c1 = document
+            .getElementById('chartLinea')
+            .getContext('2d');
+
+          chartLinea = new Chart(c1, {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: 'Sin datos',
+                  data: [],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+            },
+          });
+
+          const c2 = document
+            .getElementById('chartHist')
+            .getContext('2d');
+
+          chartHist = new Chart(c2, {
+            type: 'bar',
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: 'Sin datos',
+                  data: [],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+            },
+          });
+        }
+
+        window.__datosActuales = data;
+
+      } catch (error) {
+        console.error(
+          'Error generando los gráficos de prelistos:',
+          error
+        );
+
+        alert(
+          'No fue posible generar los gráficos. Intenta nuevamente.'
+        );
+
+      } finally {
+        ocultarCargando();
       }
-      window.__datosActuales = data;
     }
 
     document.getElementById('btn-aplicar').addEventListener('click', e => {

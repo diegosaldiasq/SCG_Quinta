@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import DatosFormularioControlDePesosPrelistos
+from control_de_pesos.models import ProductoControlPeso
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
@@ -148,61 +149,136 @@ def api_graficos_control_pesos_prelistos(request):
 
     cliente = (request.GET.get('cliente') or '').strip()
     producto = (request.GET.get('producto') or '').strip()
-    turno    = (request.GET.get('turno') or '').strip()
-    lote     = (request.GET.get('lote') or '').strip()
-    desde    = (request.GET.get('desde') or '').strip()
-    hasta    = (request.GET.get('hasta') or '').strip()
+    turno = (request.GET.get('turno') or '').strip()
+    lote = (request.GET.get('lote') or '').strip()
+    desde = (request.GET.get('desde') or '').strip()
+    hasta = (request.GET.get('hasta') or '').strip()
 
-    # si quieres mantener cliente “laxo”, déjalo así
     if cliente:
         qs = qs.filter(cliente__icontains=cliente)
 
-    # acá el cambio importante
     if producto:
-        qs = qs.filter(producto__iexact=producto)   # coincidencia exacta, sin importar mayúsculas
+        qs = qs.filter(producto__iexact=producto)
 
-    # estos los puedes dejar así o pasarlos a exacto si en BD vienen limpios
     if turno:
         qs = qs.filter(turno__iexact=turno)
+
     if lote:
         qs = qs.filter(lote__iexact=lote)
 
     if desde:
         try:
             dt_desde = datetime.fromisoformat(desde)
-            qs = qs.filter(fecha_registro__date__gte=dt_desde.date())
-        except Exception:
+            qs = qs.filter(
+                fecha_registro__date__gte=dt_desde.date()
+            )
+        except (TypeError, ValueError):
             pass
+
     if hasta:
         try:
             dt_hasta = datetime.fromisoformat(hasta)
-            qs = qs.filter(fecha_registro__date__lte=dt_hasta.date())
-        except Exception:
+            qs = qs.filter(
+                fecha_registro__date__lte=dt_hasta.date()
+            )
+        except (TypeError, ValueError):
             pass
 
     qs = qs.order_by('fecha_registro').values(
-        'id', 'fecha_registro', 'cliente', 'producto', 'codigo_producto',
-        'peso_receta', 'peso_real', 'lote', 'turno'
+        'id',
+        'fecha_registro',
+        'cliente',
+        'producto',
+        'codigo_producto',
+        'peso_receta',
+        'peso_real',
+        'lote',
+        'turno',
     )
 
     registros = []
+
     for r in qs:
-        pr = r['peso_receta']
-        p  = r['peso_real']
+        producto_base = ProductoControlPeso.objects.filter(
+            area='PRELISTOS',
+            cliente__iexact=r['cliente'],
+            codigo=r['codigo_producto'],
+            producto__iexact=r['producto'],
+            activo=True,
+        ).first()
+
+        # En ProductoControlPeso, peso_receta corresponde al peso neto.
+        peso_neto = (
+            int(producto_base.peso_receta)
+            if producto_base
+            else (
+                int(r['peso_receta'])
+                if r['peso_receta'] is not None
+                else None
+            )
+        )
+
+        porcentaje_perdida = (
+            float(producto_base.porcentaje_perdida)
+            if producto_base
+            else 0
+        )
+
+        # Peso que debe prepararse antes de la pérdida operacional.
+        peso_receta = None
+
+        if (
+            peso_neto is not None
+            and 0 <= porcentaje_perdida < 100
+        ):
+            peso_receta = round(
+                peso_neto
+                / (1 - porcentaje_perdida / 100),
+                2,
+            )
+
+        peso_real = (
+            int(r['peso_real'])
+            if r['peso_real'] is not None
+            else None
+        )
+
+        desviacion = None
+
+        if peso_real is not None and peso_neto is not None:
+            if peso_receta is not None:
+                if peso_neto <= peso_real <= peso_receta:
+                    desviacion = 0
+                elif peso_real < peso_neto:
+                    desviacion = peso_real - peso_neto
+                else:
+                    desviacion = peso_real - peso_receta
+            else:
+                desviacion = peso_real - peso_neto
+
         registros.append({
             'id': r['id'],
             'ts': r['fecha_registro'].isoformat(),
             'cliente': r['cliente'],
             'producto': r['producto'],
             'codigo_producto': r['codigo_producto'],
-            'peso_receta': pr,
-            'peso_real': p,
-            'desviacion': (p or 0) - (pr or 0),
+
+            'peso_neto': peso_neto,
+            'peso_minimo': peso_neto,
+            'peso_receta': peso_receta,
+            'peso_maximo': peso_receta,
+            'perdida_operacional': porcentaje_perdida,
+
+            'peso_real': peso_real,
+            'desviacion': desviacion,
             'lote': r['lote'],
             'turno': r['turno'],
         })
 
-    return JsonResponse({'ok': True, 'registros': registros})
+    return JsonResponse({
+        'ok': True,
+        'registros': registros,
+    })
 
 @login_required
 def redireccionar_intermedio_4(request):
