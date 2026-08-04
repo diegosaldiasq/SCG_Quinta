@@ -566,6 +566,11 @@
 
         <form method="post" novalidate>
             {% csrf_token %}
+            <input type="hidden" name="buscar" value="{{ busqueda }}">
+            <input type="hidden" name="area" value="{{ area_seleccionada }}">
+            <input type="hidden" name="cliente" value="{{ cliente_seleccionado }}">
+            <input type="hidden" name="estado" value="{{ estado_seleccionado }}">
+            <input type="hidden" name="page" value="{{ pagina.number }}">
 
             {% if producto_edicion %}
                 <input
@@ -698,7 +703,7 @@
                             <td>
                                 <div class="acciones-tabla">
                                     <a
-                                        href="{% url 'administrar_productos_control_peso' %}?editar={{ producto.id }}#formulario-producto"
+                                        href="{% url 'administrar_productos_control_peso' %}?{% if filtros_qs %}{{ filtros_qs }}&{% endif %}page={{ pagina.number }}&editar={{ producto.id }}#formulario-producto"
                                         class="boton boton-secundario boton-pequeno"
                                     >
                                         Editar
@@ -709,6 +714,11 @@
                                         action="{% url 'cambiar_estado_producto_control_peso' producto.id %}"
                                     >
                                         {% csrf_token %}
+                                        <input type="hidden" name="buscar" value="{{ busqueda }}">
+                                        <input type="hidden" name="area" value="{{ area_seleccionada }}">
+                                        <input type="hidden" name="cliente" value="{{ cliente_seleccionado }}">
+                                        <input type="hidden" name="estado" value="{{ estado_seleccionado }}">
+                                        <input type="hidden" name="page" value="{{ pagina.number }}">
 
                                         <button
                                             type="submit"

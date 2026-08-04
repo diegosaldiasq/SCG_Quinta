@@ -428,7 +428,26 @@ def administrar_productos_control_peso(request):
                     "fue creado correctamente."
                 )
 
-            return redirect("administrar_productos_control_peso")
+            parametros_retorno = {
+                "buscar": request.POST.get("buscar", "").strip(),
+                "area": request.POST.get("area", "").strip(),
+                "cliente": request.POST.get("cliente", "").strip(),
+                "estado": request.POST.get("estado", "").strip(),
+                "page": request.POST.get("page", "").strip(),
+            }
+
+            parametros_retorno = {
+                clave: valor
+                for clave, valor in parametros_retorno.items()
+                if valor
+            }
+
+            url_retorno = reverse("administrar_productos_control_peso")
+
+            if parametros_retorno:
+                url_retorno += f"?{urlencode(parametros_retorno)}"
+
+            return redirect(url_retorno)
 
         messages.error(
             request,
@@ -525,7 +544,26 @@ def cambiar_estado_producto_control_peso(request, producto_id):
         f'El producto "{producto.producto}" fue {estado}.'
     )
 
-    return redirect("administrar_productos_control_peso")
+    parametros_retorno = {
+        "buscar": request.POST.get("buscar", "").strip(),
+        "area": request.POST.get("area", "").strip(),
+        "cliente": request.POST.get("cliente", "").strip(),
+        "estado": request.POST.get("estado", "").strip(),
+        "page": request.POST.get("page", "").strip(),
+    }
+
+    parametros_retorno = {
+        clave: valor
+        for clave, valor in parametros_retorno.items()
+        if valor
+    }
+
+    url_retorno = reverse("administrar_productos_control_peso")
+
+    if parametros_retorno:
+        url_retorno += f"?{urlencode(parametros_retorno)}"
+
+    return redirect(url_retorno)
 
 @login_required
 def redireccionar_index(request):
