@@ -18,9 +18,85 @@
   <script src="https://cdn.jsdelivr.net/npm/date-fns@3" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+  <style>
+    .cargando-graficos {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(3px);
+    }
+
+    .cargando-graficos.oculto {
+      display: none;
+    }
+
+    .cargando-contenido {
+      min-width: 260px;
+      max-width: 400px;
+      padding: 28px 32px;
+      text-align: center;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+      color: #333333;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    .cargando-spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      border: 5px solid #ead4d0;
+      border-top-color: #b43c2c;
+      border-radius: 50%;
+      animation: girar-cargando 0.8s linear infinite;
+    }
+
+    .cargando-titulo {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .cargando-texto {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    @keyframes girar-cargando {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div
+    id="cargandoGraficos"
+    class="cargando-graficos"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="cargando-contenido">
+      <div class="cargando-spinner"></div>
+
+      <p class="cargando-titulo">
+        Cargando datos...
+      </p>
+
+      <p class="cargando-texto">
+        Consultando y generando los gráficos,
+        por favor espere...
+      </p>
+    </div>
+  </div>
   <div class="login">
     <img src="{% static 'control_de_pesos_insumos_kuchen/images/logoquinta.png' %}" alt="logo" class="logo">
 
@@ -112,8 +188,12 @@
         <div class="chart-wrap">
           <canvas id="chartAlturas"></canvas>
         </div>
-        <small class="badge" style="margin-top:10px;">
-          Altura real vs altura registrada en base de productos
+        <small
+          id="nota-alturas"
+          class="badge"
+          style="margin-top:10px;"
+        >
+          Altura objetivo con límites mínimo y máximo
         </small>
       </div>
     </div>
@@ -130,6 +210,21 @@
       const XLSX = window.XLSX;
       const qs = new URLSearchParams(location.search);
       const $ = id => document.getElementById(id);
+      const cargandoGraficos = $('cargandoGraficos');
+
+      function mostrarCargando() {
+        if (!cargandoGraficos) return;
+
+        cargandoGraficos.classList.remove('oculto');
+        cargandoGraficos.setAttribute('aria-busy', 'true');
+      }
+
+      function ocultarCargando() {
+        if (!cargandoGraficos) return;
+
+        cargandoGraficos.classList.add('oculto');
+        cargandoGraficos.setAttribute('aria-busy', 'false');
+      }
 
       const F = {
         cliente: $('f-cliente'),
@@ -428,10 +523,18 @@
       }
 
       function construirGraficoAlturas(regs) {
-        const cardAlturas = document.getElementById('cardAlturas');
-        const canvasAlturas = document.getElementById('chartAlturas');
+        const cardAlturas =
+          document.getElementById('cardAlturas');
 
-        if (!cardAlturas || !canvasAlturas) return;
+        const canvasAlturas =
+          document.getElementById('chartAlturas');
+
+        const notaAlturas =
+          document.getElementById('nota-alturas');
+
+        if (!cardAlturas || !canvasAlturas) {
+          return;
+        }
 
         const registrosConAltura = regs
           .filter(r =>
@@ -443,7 +546,11 @@
             Number.isFinite(Number(r.altura_objetivo)) &&
             parseFechaLocal(r.ts)
           )
-          .sort((a, b) => parseFechaLocal(a.ts) - parseFechaLocal(b.ts));
+          .sort(
+            (a, b) =>
+              parseFechaLocal(a.ts) -
+              parseFechaLocal(b.ts)
+          );
 
         if (!registrosConAltura.length) {
           cardAlturas.style.display = 'none';
@@ -454,102 +561,236 @@
 
         const alturaReal = registrosConAltura.map(r => ({
           x: parseFechaLocal(r.ts),
-          y: Number(r.altura)
+          y: Number(r.altura),
         }));
 
-        const alturaObjetivo = registrosConAltura.map(r => ({
-          x: parseFechaLocal(r.ts),
-          y: Number(r.altura_objetivo)
-        }));
+        const alturaObjetivo =
+          registrosConAltura.map(r => ({
+            x: parseFechaLocal(r.ts),
+            y: Number(r.altura_objetivo),
+          }));
+
+        const alturaMinima = registrosConAltura
+          .filter(r =>
+            Number.isFinite(Number(r.altura_minima))
+          )
+          .map(r => ({
+            x: parseFechaLocal(r.ts),
+            y: Number(r.altura_minima),
+          }));
+
+        const alturaMaxima = registrosConAltura
+          .filter(r =>
+            Number.isFinite(Number(r.altura_maxima))
+          )
+          .map(r => ({
+            x: parseFechaLocal(r.ts),
+            y: Number(r.altura_maxima),
+          }));
+
+        const diferenciaDisplay =
+          [...registrosConAltura]
+            .reverse()
+            .find(r =>
+              Number.isFinite(
+                Number(r.diferencia_altura)
+              )
+            )?.diferencia_altura ?? null;
+
+        if (notaAlturas) {
+          notaAlturas.textContent =
+            diferenciaDisplay !== null
+              ? (
+                  `Altura objetivo: ` +
+                  `límites ±${diferenciaDisplay} mm`
+                )
+              : (
+                  'Altura objetivo con límites ' +
+                  'mínimo y máximo'
+                );
+        }
 
         const fechas = alturaReal.map(p => p.x);
         const minDate = fechas[0];
         const maxDate = fechas[fechas.length - 1];
-        const unit = unidadTiempoDesdeSpan(minDate, maxDate);
+
+        const unit = unidadTiempoDesdeSpan(
+          minDate,
+          maxDate
+        );
 
         const ys = [
           ...alturaReal.map(p => p.y),
           ...alturaObjetivo.map(p => p.y),
+          ...alturaMinima.map(p => p.y),
+          ...alturaMaxima.map(p => p.y),
         ].filter(Number.isFinite);
 
         const yMin = Math.min(...ys);
         const yMax = Math.max(...ys);
         const pad = (yMax - yMin) * 0.05 || 2;
 
-        chartAlturas = new Chart(canvasAlturas.getContext('2d'), {
-          type: 'line',
-          data: {
-            datasets: [
-              {
-                label: 'Altura real (mm)',
-                data: alturaReal,
-                borderWidth: 2,
-                pointRadius: 2,
-                tension: 0.25
-              },
-              {
-                label: 'Altura objetivo (mm)',
-                data: alturaObjetivo,
-                borderWidth: 2,
-                pointRadius: 0,
-                stepped: true,
-                borderDash: [6, 6]
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            devicePixelRatio: 1,
-            animation: false,
-            resizeDelay: 150,
-            parsing: false,
-            interaction: {
-              mode: 'nearest',
-              intersect: false,
-              axis: 'x'
-            },
-            scales: {
-              x: {
-                type: 'time',
-                bounds: 'data',
-                min: minDate,
-                max: maxDate,
-                time: {
-                  unit,
-                  tooltipFormat: 'dd-MM-yyyy HH:mm',
-                  displayFormats: {
-                    minute: 'HH:mm',
-                    hour: 'dd-MM HH:mm',
-                    day: 'dd-MM-yyyy',
-                    month: 'MM-yyyy',
-                    year: 'yyyy'
-                  }
+        chartAlturas = new Chart(
+          canvasAlturas.getContext('2d'),
+          {
+            type: 'line',
+
+            data: {
+              datasets: [
+                {
+                  label: 'Altura real (mm)',
+                  data: alturaReal,
+                  borderColor: '#2563eb',
+                  backgroundColor: '#2563eb',
+                  borderWidth: 2,
+                  pointRadius: 3,
+                  pointHoverRadius: 5,
+                  tension: 0.25,
+                  order: 1,
                 },
-                ticks: {
-                  autoSkip: true,
-                  maxTicksLimit: 10
-                }
-              },
-              y: {
-                title: {
-                  display: true,
-                  text: 'Altura (mm)'
+                {
+                  label: 'Altura objetivo (mm)',
+                  data: alturaObjetivo,
+                  borderColor: '#111827',
+                  backgroundColor: '#111827',
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  stepped: true,
+                  borderDash: [6, 6],
+                  order: 2,
                 },
-                beginAtZero: false,
-                min: Math.floor(yMin - pad),
-                max: Math.ceil(yMax + pad),
-                grace: 0
-              }
+                ...(alturaMinima.length
+                  ? [{
+                      label: 'Altura mínima (mm)',
+                      data: alturaMinima,
+                      borderColor: '#dc2626',
+                      backgroundColor: '#dc2626',
+                      borderWidth: 2,
+                      pointRadius: 0,
+                      stepped: true,
+                      borderDash: [4, 4],
+                      order: 3,
+                    }]
+                  : []),
+                ...(alturaMaxima.length
+                  ? [{
+                      label: 'Altura máxima (mm)',
+                      data: alturaMaxima,
+                      borderColor: '#16a34a',
+                      backgroundColor: '#16a34a',
+                      borderWidth: 2,
+                      pointRadius: 0,
+                      stepped: true,
+                      borderDash: [4, 4],
+                      order: 3,
+                    }]
+                  : []),
+              ],
             },
-            plugins: {
-              tooltip: {
-                mode: 'index',
-                intersect: false
-              }
-            }
+
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              devicePixelRatio: 1,
+              animation: false,
+              resizeDelay: 150,
+              parsing: false,
+
+              interaction: {
+                mode: 'nearest',
+                intersect: false,
+                axis: 'x',
+              },
+
+              scales: {
+                x: {
+                  type: 'time',
+                  bounds: 'data',
+                  min: minDate,
+                  max: maxDate,
+
+                  time: {
+                    unit,
+                    tooltipFormat:
+                      'dd-MM-yyyy HH:mm',
+
+                    displayFormats: {
+                      minute: 'HH:mm',
+                      hour: 'dd-MM HH:mm',
+                      day: 'dd-MM-yyyy',
+                      month: 'MM-yyyy',
+                      year: 'yyyy',
+                    },
+                  },
+
+                  ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10,
+                  },
+                },
+
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Altura (mm)',
+                  },
+
+                  beginAtZero: false,
+                  min: Math.floor(yMin - pad),
+                  max: Math.ceil(yMax + pad),
+                  grace: 0,
+                },
+              },
+
+              plugins: {
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+
+                  callbacks: {
+                    afterBody(items) {
+                      if (!items.length) return '';
+
+                      const xSeleccionado =
+                        Number(items[0].parsed.x);
+
+                      const registro =
+                        registrosConAltura.find(r => {
+                          const fecha =
+                            parseFechaLocal(r.ts);
+
+                          return (
+                            fecha &&
+                            fecha.getTime() ===
+                              xSeleccionado
+                          );
+                        });
+
+                      if (
+                        registro &&
+                        Number.isFinite(
+                          Number(
+                            registro.diferencia_altura
+                          )
+                        )
+                      ) {
+                        return (
+                          'Diferencia permitida: ±' +
+                          Number(
+                            registro.diferencia_altura
+                          ) +
+                          ' mm'
+                        );
+                      }
+
+                      return '';
+                    },
+                  },
+                },
+              },
+            },
           }
-        });
+        );
       }
 
       function construirHistograma(regs) {
@@ -748,52 +989,95 @@
       }
 
       async function aplicar() {
-        saveFilters();
+        mostrarCargando();
 
-        const data = await cargarDatos();
+        try {
+          saveFilters();
 
-        F.resumen.textContent = `${data.length} registros`;
+          const data = await cargarDatos();
 
-        destruirCharts();
+          F.resumen.textContent =
+            `${data.length} registros`;
 
-        if (data.length) {
-          construirSerieTemporal(data);
-          construirHistograma(data);
-          construirGraficoAlturas(data);
-        } else {
-          const cardAlturas = document.getElementById('cardAlturas');
-          if (cardAlturas) cardAlturas.style.display = 'none';
+          destruirCharts();
 
-          const c1 = document.getElementById('chartLinea').getContext('2d');
-          chartLinea = new Chart(c1, {
-            type: 'line',
-            data: {
-              labels: [],
-              datasets: [{ label: 'Sin datos', data: [] }]
-            },
-            options: {
-              maintainAspectRatio: false
+          if (data.length) {
+            construirSerieTemporal(data);
+            construirHistograma(data);
+            construirGraficoAlturas(data);
+
+          } else {
+            const cardAlturas =
+              document.getElementById('cardAlturas');
+
+            if (cardAlturas) {
+              cardAlturas.style.display = 'none';
             }
-          });
 
-          const c2 = document.getElementById('chartHist').getContext('2d');
-          chartHist = new Chart(c2, {
-            type: 'bar',
-            data: {
-              labels: [],
-              datasets: [{ label: 'Sin datos', data: [] }]
-            },
-            options: {
-              maintainAspectRatio: false
-            }
-          });
+            const c1 = document
+              .getElementById('chartLinea')
+              .getContext('2d');
 
-          F.pesoRef.textContent = 'Peso neto: –';
-          F.pesoRec.textContent = 'Peso receta: –';
-          F.notaTol.textContent = 'Sin datos';
+            chartLinea = new Chart(c1, {
+              type: 'line',
+              data: {
+                labels: [],
+                datasets: [
+                  {
+                    label: 'Sin datos',
+                    data: [],
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+              },
+            });
+
+            const c2 = document
+              .getElementById('chartHist')
+              .getContext('2d');
+
+            chartHist = new Chart(c2, {
+              type: 'bar',
+              data: {
+                labels: [],
+                datasets: [
+                  {
+                    label: 'Sin datos',
+                    data: [],
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+              },
+            });
+
+            F.pesoRef.textContent = 'Peso neto: –';
+            F.pesoRec.textContent = 'Peso receta: –';
+            F.notaTol.textContent = 'Sin datos';
+          }
+
+          window.__datosActuales =
+            Array.isArray(data) ? data : [];
+
+        } catch (error) {
+          console.error(
+            'Error generando los gráficos:',
+            error
+          );
+
+          alert(
+            'No fue posible generar los gráficos. ' +
+            'Intenta nuevamente.'
+          );
+
+        } finally {
+          ocultarCargando();
         }
-
-        window.__datosActuales = Array.isArray(data) ? data : [];
       }
 
       $('btn-aplicar').addEventListener('click', e => {
