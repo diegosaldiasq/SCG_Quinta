@@ -84,23 +84,43 @@ class TurnoOEEForm(forms.ModelForm):
         choices=[],
         widget=forms.Select(attrs={'id': 'id_supervisor'})
     )
-    LINEA_CHOICES = [
-        ('Línea 1', 'Línea 1'),
-        ('Línea 2', 'Línea 2'),
-        ('Línea 3A', 'Línea 3A'),
-        ('Línea 3B', 'Línea 3B'),
-        ('Isla', 'Isla'),
-        ('Cakematic', 'Cakematic'),
-        ('Gorreri pasteleria', 'Gorreri pasteleria'),
-        ('Mesón 1', 'Mesón 1'),
-        ('Mesón 2', 'Mesón 2'),
-        ('Mesón 3', 'Mesón 3'),
-        ('Mesón 4', 'Mesón 4'),
-        ('Mesón 5', 'Mesón 5'),
-    ]
-    linea    = forms.ChoiceField(
-        choices= [('', '--Seleccionar linea--')] + LINEA_CHOICES,
-        widget=forms.Select(attrs={'id': 'id_linea'}))
+
+    LINEAS_POR_PLANTA = {
+        TurnoOEE.PLANTA_ENEA: [
+            ('Línea 1', 'Línea 1'),
+            ('Línea 2', 'Línea 2'),
+            ('Línea 3A', 'Línea 3A'),
+            ('Línea 3B', 'Línea 3B'),
+            ('Isla', 'Isla'),
+            ('Cakematic', 'Cakematic'),
+            ('Gorreri pasteleria', 'Gorreri pasteleria'),
+            ('Mesón 1', 'Mesón 1'),
+            ('Mesón 2', 'Mesón 2'),
+            ('Mesón 3', 'Mesón 3'),
+            ('Mesón 4', 'Mesón 4'),
+            ('Mesón 5', 'Mesón 5'),
+        ],
+
+        TurnoOEE.PLANTA_PUERTO_VESPUCIO: [
+            ('Gorreri pasteleria', 'Gorreri pasteleria'),
+            ('Linea 1', 'Linea 1'),
+            ('Linea 2', 'Linea 2'),
+            ('Linea 3', 'Linea 3'),
+            ('Pasteles', 'Pasteles'),
+            ('Gorreri batidos', 'Gorreri batidos'),
+            ('Macpan', 'Macpan'),
+            ('Tartomatic', 'Tartomatic'),
+            ('Gorreri kuchen', 'Gorreri kuchen'),
+            ('Hornos', 'Hornos'),
+            ('Envasado', 'Envasado'),
+        ],
+    }
+
+    linea = forms.ChoiceField(
+        choices=[],
+        widget=forms.Select(attrs={'id': 'id_linea'})
+    )
+    
     class Meta:
         model = TurnoOEE
         # 'cliente', 'producto', 'codigo', 'produccion_planeada'
@@ -120,25 +140,37 @@ class TurnoOEEForm(forms.ModelForm):
             'codigo': HiddenInput(),
             'produccion_planeada': HiddenInput(),
         }
-    def __init__(
-        self,
-        *args,
-        planta=TurnoOEE.PLANTA_ENEA,
-        **kwargs
-    ):
-        super().__init__(*args, **kwargs)
+        def __init__(
+            self,
+            *args,
+            planta=TurnoOEE.PLANTA_ENEA,
+            **kwargs
+        ):
+            super().__init__(*args, **kwargs)
 
-        self.planta = planta
+            self.planta = planta
 
-        supervisores = self.SUPERVISORES_POR_PLANTA.get(
-            planta,
-            [],
-        )
+            # Supervisores correspondientes a la planta
+            supervisores = self.SUPERVISORES_POR_PLANTA.get(
+                planta,
+                [],
+            )
 
-        self.fields['supervisor'].choices = [
-            ('', '--Seleccionar supervisor--'),
-            *supervisores,
-        ]
+            self.fields['supervisor'].choices = [
+                ('', '--Seleccionar supervisor--'),
+                *supervisores,
+            ]
+
+            # Líneas correspondientes a la planta
+            lineas = self.LINEAS_POR_PLANTA.get(
+                planta,
+                [],
+            )
+
+            self.fields['linea'].choices = [
+                ('', '--Seleccionar línea--'),
+                *lineas,
+            ]
     #def __init__(self, *args, **kwargs):
     #    super().__init__(*args, **kwargs)
 
