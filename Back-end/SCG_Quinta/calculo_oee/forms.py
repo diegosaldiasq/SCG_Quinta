@@ -140,37 +140,37 @@ class TurnoOEEForm(forms.ModelForm):
             'codigo': HiddenInput(),
             'produccion_planeada': HiddenInput(),
         }
-        def __init__(
-            self,
-            *args,
-            planta=TurnoOEE.PLANTA_ENEA,
-            **kwargs
-        ):
-            super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        *args,
+        planta=TurnoOEE.PLANTA_ENEA,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
 
-            self.planta = planta
+        self.planta = planta
 
-            # Supervisores correspondientes a la planta
-            supervisores = self.SUPERVISORES_POR_PLANTA.get(
-                planta,
-                [],
-            )
+        # Supervisores correspondientes a la planta
+        supervisores = self.SUPERVISORES_POR_PLANTA.get(
+            planta,
+            [],
+        )
 
-            self.fields['supervisor'].choices = [
-                ('', '--Seleccionar supervisor--'),
-                *supervisores,
-            ]
+        self.fields['supervisor'].choices = [
+            ('', '--Seleccionar supervisor--'),
+            *supervisores,
+        ]
 
-            # Líneas correspondientes a la planta
-            lineas = self.LINEAS_POR_PLANTA.get(
-                planta,
-                [],
-            )
+        # Líneas correspondientes a la planta
+        lineas = self.LINEAS_POR_PLANTA.get(
+            planta,
+            [],
+        )
 
-            self.fields['linea'].choices = [
-                ('', '--Seleccionar línea--'),
-                *lineas,
-            ]
+        self.fields['linea'].choices = [
+            ('', '--Seleccionar línea--'),
+            *lineas,
+        ]
     #def __init__(self, *args, **kwargs):
     #    super().__init__(*args, **kwargs)
 
