@@ -35,7 +35,7 @@ from django.db import transaction
 # Create your views here.
 
 AREA_TORTAS = "TORTAS"
-AREA_INSUMOS_KUCHEN = "INSUMOS KUCHEN"
+AREA_INSUMOS_KUCHEN = "INSUMOS_KUCHEN"
 
 CONFIGURACION_PLANTAS = {
     TurnoOEE.PLANTA_ENEA: {
