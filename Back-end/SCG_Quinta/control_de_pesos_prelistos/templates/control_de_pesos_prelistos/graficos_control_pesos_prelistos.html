@@ -190,14 +190,16 @@
       pesoReceta: $('peso-receta'),
       notaTol: $('nota-tolerancia'),
     };
-    const cargandoGraficos = $('cargando-graficos');
+    const cargandoGraficos = $('cargandoGraficos');
 
     function mostrarCargando() {
       cargandoGraficos?.classList.remove('oculto');
+      cargandoGraficos.setAttribute('aria-busy', 'true');
     }
 
     function ocultarCargando() {
       cargandoGraficos?.classList.add('oculto');
+      cargandoGraficos.setAttribute('aria-busy', 'false');
     }
     const STORAGE_KEY = 'filtros_graficos_control_pesos_prelistos_v1';
 
