@@ -1858,7 +1858,10 @@
       );
     }
 
-    function obtenerRangoSemanal(turnos) {
+    function obtenerRangoSemanal(
+      turnos,
+      detenciones = []
+    ) {
       const rangos = {
         A: {
           inicio: INICIO_TURNO_A,
@@ -1880,25 +1883,64 @@
         return null;
       }
 
-      const inicios =
+      /*
+      Primero se obtiene el horario teórico de los
+      turnos seleccionados.
+      */
+      const iniciosTurnos =
         turnos.map(
           turno => rangos[turno].inicio
         );
 
-      const finales =
+      const finalesTurnos =
         turnos.map(
           turno => rangos[turno].fin
         );
 
+      let inicio =
+        Math.min(...iniciosTurnos);
+
       let fin =
-        Math.max(...finales);
+        Math.max(...finalesTurnos);
 
       if (turnos.includes('C')) {
         fin = FIN_LIMPIEZA;
       }
 
+      /*
+      Luego el rango se amplía para incluir cualquier
+      detención que esté fuera del horario teórico.
+      */
+      const iniciosReales =
+        detenciones
+          .map(detencion =>
+            Number(detencion.inicio_minutos)
+          )
+          .filter(Number.isFinite);
+
+      const finalesReales =
+        detenciones
+          .map(detencion =>
+            Number(detencion.fin_minutos)
+          )
+          .filter(Number.isFinite);
+
+      if (iniciosReales.length) {
+        inicio = Math.min(
+          inicio,
+          ...iniciosReales
+        );
+      }
+
+      if (finalesReales.length) {
+        fin = Math.max(
+          fin,
+          ...finalesReales
+        );
+      }
+
       return {
-        inicio: Math.min(...inicios),
+        inicio,
         fin
       };
     }
@@ -2180,7 +2222,10 @@
       destruirGraficoDetencionesSemanales();
 
       const rango =
-        obtenerRangoSemanal(turnos);
+        obtenerRangoSemanal(
+          turnos,
+          respuesta.datos
+        );
 
       if (!rango) {
         return;

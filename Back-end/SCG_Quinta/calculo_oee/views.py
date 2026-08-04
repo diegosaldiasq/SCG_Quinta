@@ -1508,21 +1508,6 @@ def detenciones_semanales_api(request):
         "Domingo",
     ]
 
-    limites_turnos = {
-        "A": {
-            "inicio": 0,
-            "fin": 480,
-        },
-        "B": {
-            "inicio": 480,
-            "fin": 930,
-        },
-        "C": {
-            "inicio": 930,
-            "fin": 1380,
-        },
-    }
-
     datos = []
 
     for detencion in queryset:
@@ -1574,24 +1559,11 @@ def detenciones_semanales_api(request):
         if fin_minutos <= inicio_minutos:
             fin_minutos += 1440
 
-        limite_turno = limites_turnos[turno]
-
-        # Mantiene las barras dentro del horario del turno.
-        inicio_grafico = max(
-            inicio_minutos,
-            limite_turno["inicio"],
-        )
-
-        fin_grafico = min(
-            fin_minutos,
-            limite_turno["fin"],
-        )
-
-        # Si los horarios almacenados son inconsistentes,
-        # evita crear barras negativas.
-        if fin_grafico <= inicio_grafico:
-            inicio_grafico = inicio_minutos
-            fin_grafico = fin_minutos
+        # Se utilizan las horas reales de la detención.
+        # No se recortan según los límites teóricos del turno,
+        # porque una detención puede comenzar antes o terminar después.
+        inicio_grafico = inicio_minutos
+        fin_grafico = fin_minutos
 
         duracion = detencion.duracion
 
