@@ -418,7 +418,7 @@
   </div>
 
   <!-- ✅ Catálogo como JSON válido -->
-  {{ catalogo_obj|json_script:"catalogo-data" }}
+  {{ catalogos_supervisor_obj|json_script:"catalogos-supervisor-data" }}
 
   <template id="fila-producto-template">
     <tr>
@@ -444,7 +444,13 @@
 
   <script>
     // ✅ JSON real (no dict python)
-    const catalogo = JSON.parse(document.getElementById('catalogo-data').textContent);
+    const catalogosPorSupervisor = JSON.parse(
+        document.getElementById(
+            'catalogos-supervisor-data'
+        ).textContent
+    );
+
+    let catalogo = {};
 
     const motivosDetenciones = [
       "1-Colacion",
@@ -484,6 +490,27 @@
       const tablaBodyProd = document.querySelector('#tabla-productos tbody');
       const templateProd = document.getElementById('fila-producto-template').content;
       const btnAgregarProd = document.getElementById('btn-agregar-producto');
+      const selectSupervisor = document.getElementById('id_supervisor');
+
+      function actualizarCatalogoPorSupervisor() {
+          const supervisor = selectSupervisor.value;
+
+          catalogo = catalogosPorSupervisor[supervisor] || {};
+
+          // Evita conservar productos del supervisor anterior.
+          tablaBodyProd.innerHTML = '';
+
+          // Solo permite agregar productos después
+          // de seleccionar supervisor.
+          btnAgregarProd.disabled = !supervisor;
+      }
+
+      selectSupervisor.addEventListener(
+          'change',
+          actualizarCatalogoPorSupervisor
+      );
+
+      actualizarCatalogoPorSupervisor();
 
       function getClientesDesdeCatalogo(cat) {
         // Caso correcto: dict { Jumbo: [...], SISA: [...] }

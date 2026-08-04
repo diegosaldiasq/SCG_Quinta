@@ -77,7 +77,7 @@ class TurnoOEEForm(forms.ModelForm):
             ('Patricio Cardenas', 'Patricio Cardenas'),
             ('Larry Torres', 'Larry Torres'),
             ('Moises Mejias', 'Moises Mejias'),
-            ('Carlos Diaz', 'Cristian Diaz'),
+            ('Carlos Diaz', 'Carlos Diaz'),
             ],
     }
     supervisor = forms.ChoiceField(

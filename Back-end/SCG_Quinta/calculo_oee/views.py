@@ -34,32 +34,82 @@ from django.db import transaction
 
 # Create your views here.
 
-AREA_OEE_PRODUCTOS = "TORTAS"
+AREA_TORTAS = "TORTAS"
+AREA_INSUMOS_KUCHEN = "INSUMOS KUCHEN"
+
 CONFIGURACION_PLANTAS = {
     TurnoOEE.PLANTA_ENEA: {
         "nombre": "ENEA",
-        "clientes": ["Jumbo", "SISA"],
+
+        "area_por_supervisor": {
+            "Fabian Moncada": AREA_TORTAS,
+            "Angela Tacon": AREA_TORTAS,
+            "Felipe Campos": AREA_TORTAS,
+        },
+
+        "clientes_por_area": {
+            AREA_TORTAS: [
+                "Jumbo",
+                "SISA",
+            ],
+        },
     },
+
     TurnoOEE.PLANTA_PUERTO_VESPUCIO: {
         "nombre": "Puerto Vespucio",
-        "clientes": ["Walmart", "Unimarc"],
+
+        "area_por_supervisor": {
+            "Sebastian Ibarra": AREA_TORTAS,
+            "Andres Gonzales": AREA_TORTAS,
+            "Patricio Cardenas": AREA_TORTAS,
+
+            "Larry Torres": AREA_INSUMOS_KUCHEN,
+            "Moises Mejias": AREA_INSUMOS_KUCHEN,
+            "Carlos Diaz": AREA_INSUMOS_KUCHEN,
+        },
+
+        "clientes_por_area": {
+            AREA_TORTAS: [
+                "Walmart",
+                "Unimarc",
+            ],
+
+            AREA_INSUMOS_KUCHEN: [
+                "Insumo",
+                "Jumbo",
+                "Pasteles",
+                "SISA",
+                "Sub",
+                "Walmart",
+            ],
+        },
     },
 }
 
 
-def obtener_catalogo_desde_bd(planta):
+def obtener_catalogo_por_area(planta, area):
     configuracion = CONFIGURACION_PLANTAS[planta]
 
+    clientes_permitidos = configuracion[
+        "clientes_por_area"
+    ].get(area, [])
+
     qs = ProductoControlPeso.objects.filter(
-        area=AREA_OEE_PRODUCTOS,
+        area=area,
         activo=True,
-        cliente__in=configuracion["clientes"],
-    ).order_by("cliente", "producto")
+        cliente__in=clientes_permitidos,
+    ).order_by(
+        "cliente",
+        "producto",
+    )
 
     catalogo = {}
 
     for item in qs:
-        catalogo.setdefault(item.cliente, []).append({
+        catalogo.setdefault(
+            item.cliente,
+            [],
+        ).append({
             "producto": item.producto,
             "codigo": item.codigo,
             "un_pp": float(item.un_pp or 80),
@@ -68,13 +118,51 @@ def obtener_catalogo_desde_bd(planta):
     return catalogo
 
 
-def obtener_un_pp(cliente, producto, codigo):
+def obtener_catalogos_por_supervisor(planta):
+    configuracion = CONFIGURACION_PLANTAS[planta]
+    catalogos = {}
+
+    for supervisor, area in configuracion[
+        "area_por_supervisor"
+    ].items():
+        catalogos[supervisor] = obtener_catalogo_por_area(
+            planta,
+            area,
+        )
+
+    return catalogos
+
+
+def obtener_un_pp(
+    planta,
+    supervisor,
+    cliente,
+    producto,
+    codigo
+):
+    configuracion = CONFIGURACION_PLANTAS.get(planta)
+
+    if not configuracion:
+        return 0
+
+    area = configuracion[
+        "area_por_supervisor"
+    ].get(supervisor)
+
+    if not area:
+        return 0
+
+    clientes_permitidos = configuracion[
+        "clientes_por_area"
+    ].get(area, [])
+
     item = ProductoControlPeso.objects.filter(
-        area=AREA_OEE_PRODUCTOS,
+        area=area,
         activo=True,
+        cliente__in=clientes_permitidos,
         cliente=cliente,
         producto=producto,
-        codigo=codigo
+        codigo=codigo,
     ).first()
 
     if not item or not item.un_pp:
@@ -111,11 +199,61 @@ def _crear_turno_por_planta(request, planta):
             comentarios_pro = request.POST.getlist(
                 'comentarios_producto[]'
             )
+            supervisor = form.cleaned_data.get("supervisor")
 
-            clientes_invalidos = (
-                set(clientes)
-                - set(configuracion["clientes"])
-            )
+            area_supervisor = configuracion[
+                "area_por_supervisor"
+            ].get(supervisor)
+
+            if not area_supervisor:
+                form.add_error(
+                    "supervisor",
+                    "El supervisor no tiene un área configurada.",
+                )
+            else:
+                clientes_permitidos = configuracion[
+                    "clientes_por_area"
+                ].get(area_supervisor, [])
+
+                clientes_invalidos = (
+                    set(clientes)
+                    - set(clientes_permitidos)
+                )
+
+                if clientes_invalidos:
+                    form.add_error(
+                        None,
+                        (
+                            "Uno o más clientes no corresponden "
+                            "al área del supervisor seleccionado."
+                        ),
+                    )
+
+                for cliente, producto, codigo in zip(
+                    clientes,
+                    productos,
+                    codigos,
+                ):
+                    producto_valido = (
+                        ProductoControlPeso.objects.filter(
+                            area=area_supervisor,
+                            activo=True,
+                            cliente=cliente,
+                            producto=producto,
+                            codigo=codigo,
+                        ).exists()
+                    )
+
+                    if not producto_valido:
+                        form.add_error(
+                            None,
+                            (
+                                f"El producto «{producto}» no "
+                                f"corresponde al área "
+                                f"«{area_supervisor}»."
+                            ),
+                        )
+                        break
 
             if clientes_invalidos:
                 form.add_error(
@@ -138,8 +276,8 @@ def _crear_turno_por_planta(request, planta):
                     'calculo_oee/crear_turno.html',
                     {
                         'form': form,
-                        'catalogo_obj':
-                            obtener_catalogo_desde_bd(planta),
+                        'catalogos_supervisor_obj':
+                            obtener_catalogos_por_supervisor(planta),
                         'planta': planta,
                         'planta_nombre':
                             configuracion["nombre"],
@@ -287,8 +425,8 @@ def _crear_turno_por_planta(request, planta):
         'calculo_oee/crear_turno.html',
         {
             'form': form,
-            'catalogo_obj':
-                obtener_catalogo_desde_bd(planta),
+            'catalogos_supervisor_obj':
+                obtener_catalogos_por_supervisor(planta),
             'planta': planta,
             'planta_nombre':
                 configuracion["nombre"],
@@ -345,7 +483,7 @@ def resumen_turno(request, lote_id):
             tasas = []
 
             for p in productos_qs:
-                un_pp = obtener_un_pp(p.cliente, p.producto, p.codigo)
+                un_pp = obtener_un_pp(lote.planta, lote.supervisor, p.cliente, p.producto, p.codigo)
                 if un_pp:
                     tasas.append(un_pp)
 
@@ -357,7 +495,7 @@ def resumen_turno(request, lote_id):
             productos_concat = lote.producto
             codigos_concat = lote.codigo or ""
             cliente_concat = lote.cliente
-            tasa_nominal = obtener_un_pp(lote.cliente, lote.producto, lote.codigo)
+            tasa_nominal = obtener_un_pp(lote.planta, lote.supervisor, lote.cliente, lote.producto, lote.codigo)
 
         tiempo_paro = sum(d.duracion for d in lote.detenciones.all())
         productos_malos = sum(r.cantidad for r in lote.reprocesos.all())
