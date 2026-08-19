@@ -256,6 +256,16 @@
       background: rgba(120, 120, 120, .55);
     }
 
+    .color-semanal-estandar {
+      background: rgba(40, 167, 69, .88);
+      border: 1px solid rgba(25, 120, 48, 1);
+    }
+
+    .color-semanal-sobretiempo {
+      background: rgba(220, 53, 69, .88);
+      border: 1px solid rgba(160, 30, 43, 1);
+    }
+
     .mensaje-detenciones-semanales {
       display: none;
       padding: 20px;
@@ -666,6 +676,21 @@
               <span class="color-semanal color-semanal-limpieza"></span>
               Limpieza profunda: 22:00 a 23:00
             </div>
+            <div class="leyenda-semanal-item">
+              <span
+                class="color-semanal color-semanal-estandar"
+              ></span>
+
+              Tiempo dentro del estándar
+            </div>
+
+            <div class="leyenda-semanal-item">
+              <span
+                class="color-semanal color-semanal-sobretiempo"
+              ></span>
+
+              Sobretiempo del estándar
+            </div>
           </div>
 
           <div
@@ -787,6 +812,52 @@
 
     const INICIO_LIMPIEZA = 1380;
     const FIN_LIMPIEZA = 1440;
+    /*
+    Objetivos máximos por turno y motivo.
+
+    Las claves deben estar normalizadas:
+    - minúsculas
+    - sin tildes
+    - sin espacios adicionales
+    */
+    const OBJETIVOS_DETENCIONES_ESTANDAR = {
+      'colacion': 30,
+      'aseo de linea': 60,
+      'preparacion de insumos': 54,
+      'falla mecanica': 20
+    };
+
+    const COLOR_DENTRO_ESTANDAR =
+      'rgba(40,167,69,.88)';
+
+    const BORDE_DENTRO_ESTANDAR =
+      'rgba(25,120,48,1)';
+
+    const COLOR_SOBRETIEMPO =
+      'rgba(220,53,69,.88)';
+
+    const BORDE_SOBRETIEMPO =
+      'rgba(160,30,43,1)';
+
+    function normalizarMotivoEstandar(motivo) {
+      return String(motivo || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' ');
+    }
+
+    function obtenerObjetivoDetencion(motivo) {
+      const motivoNormalizado =
+        normalizarMotivoEstandar(motivo);
+
+      return (
+        OBJETIVOS_DETENCIONES_ESTANDAR[
+          motivoNormalizado
+        ] ?? null
+      );
+    }
 
     const nombresDiasSemana = [
       'Lunes',
@@ -2171,11 +2242,70 @@
       const turnoB = [];
       const turnoC = [];
 
-      detenciones.forEach(detencion => {
-        const punto = {
+      /*
+      Controla cuánto tiempo estándar ya fue utilizado
+      por cada lote/turno y motivo.
+      */
+      const estandarConsumido = new Map();
+
+      /*
+      Se ordenan cronológicamente para repartir correctamente
+      el estándar cuando existen varias detenciones del mismo
+      motivo dentro de un turno.
+      */
+      const detencionesOrdenadas = [
+        ...detenciones
+      ].sort((a, b) => {
+        const fechaA = String(a.fecha || '');
+        const fechaB = String(b.fecha || '');
+
+        if (fechaA !== fechaB) {
+          return fechaA.localeCompare(fechaB);
+        }
+
+        const turnoAOrden =
+          ['A', 'B', 'C'].indexOf(a.turno);
+
+        const turnoBOrden =
+          ['A', 'B', 'C'].indexOf(b.turno);
+
+        if (turnoAOrden !== turnoBOrden) {
+          return turnoAOrden - turnoBOrden;
+        }
+
+        return (
+          Number(a.inicio_minutos) -
+          Number(b.inicio_minutos)
+        );
+      });
+
+      function agregarPuntoPorTurno(
+        punto,
+        turno
+      ) {
+        if (turno === 'A') {
+          turnoA.push(punto);
+        } else if (turno === 'B') {
+          turnoB.push(punto);
+        } else if (turno === 'C') {
+          turnoC.push(punto);
+        }
+      }
+
+      function crearPunto(
+        detencion,
+        inicio,
+        fin,
+        tipoTramo,
+        minutosTramo,
+        objetivo,
+        minutosEstandar,
+        minutosSobretiempo
+      ) {
+        return {
           x: [
-            Number(detencion.inicio_minutos),
-            Number(detencion.fin_minutos)
+            Number(inicio),
+            Number(fin)
           ],
 
           y:
@@ -2190,21 +2320,139 @@
           fecha: detencion.fecha,
           hora_inicio: detencion.hora_inicio,
           hora_fin: detencion.hora_fin,
-          duracion: detencion.duracion,
-          lote_id: detencion.lote_id
-        };
+          duracion: Number(detencion.duracion) || 0,
+          lote_id: detencion.lote_id,
 
-        if (detencion.turno === 'A') {
-          turnoA.push(punto);
-        } else if (
-          detencion.turno === 'B'
+          tipo_tramo: tipoTramo,
+          minutos_tramo: minutosTramo,
+          objetivo_estandar: objetivo,
+          minutos_estandar: minutosEstandar,
+          minutos_sobretiempo: minutosSobretiempo
+        };
+      }
+
+      detencionesOrdenadas.forEach(detencion => {
+        const inicio =
+          Number(detencion.inicio_minutos);
+
+        const fin =
+          Number(detencion.fin_minutos);
+
+        if (
+          !Number.isFinite(inicio) ||
+          !Number.isFinite(fin) ||
+          fin <= inicio
         ) {
-          turnoB.push(punto);
-        } else if (
-          detencion.turno === 'C'
-        ) {
-          turnoC.push(punto);
+          return;
         }
+
+        /*
+        Se utiliza el largo real de la barra para evitar
+        diferencias por redondeo en detencion.duracion.
+        */
+        const duracionReal = fin - inicio;
+
+        const motivoNormalizado =
+          normalizarMotivoEstandar(
+            detencion.motivo
+          );
+
+        const objetivo =
+          obtenerObjetivoDetencion(
+            detencion.motivo
+          );
+
+        /*
+        Si el motivo no tiene estándar, se grafica
+        normalmente con el color correspondiente al turno.
+        */
+        if (objetivo === null) {
+          agregarPuntoPorTurno(
+            crearPunto(
+              detencion,
+              inicio,
+              fin,
+              'sin_estandar',
+              duracionReal,
+              null,
+              0,
+              0
+            ),
+            detencion.turno
+          );
+
+          return;
+        }
+
+        /*
+        lote_id identifica el turno registrado.
+        El estándar se comparte entre todas las detenciones
+        del mismo motivo dentro de ese lote.
+        */
+        const claveEstandar = [
+          detencion.lote_id,
+          detencion.turno,
+          motivoNormalizado
+        ].join('|');
+
+        const yaConsumido =
+          estandarConsumido.get(claveEstandar) || 0;
+
+        const disponible =
+          Math.max(objetivo - yaConsumido, 0);
+
+        const minutosEstandar =
+          Math.min(duracionReal, disponible);
+
+        const minutosSobretiempo =
+          Math.max(
+            duracionReal - minutosEstandar,
+            0
+          );
+
+        /*
+        Primer tramo: minutos dentro del estándar.
+        */
+        if (minutosEstandar > 0) {
+          agregarPuntoPorTurno(
+            crearPunto(
+              detencion,
+              inicio,
+              inicio + minutosEstandar,
+              'estandar',
+              minutosEstandar,
+              objetivo,
+              minutosEstandar,
+              minutosSobretiempo
+            ),
+            detencion.turno
+          );
+        }
+
+        /*
+        Segundo tramo: minutos que exceden el estándar.
+        Comienza exactamente donde termina el tramo verde.
+        */
+        if (minutosSobretiempo > 0) {
+          agregarPuntoPorTurno(
+            crearPunto(
+              detencion,
+              inicio + minutosEstandar,
+              fin,
+              'sobretiempo',
+              minutosSobretiempo,
+              objetivo,
+              minutosEstandar,
+              minutosSobretiempo
+            ),
+            detencion.turno
+          );
+        }
+
+        estandarConsumido.set(
+          claveEstandar,
+          yaConsumido + duracionReal
+        );
       });
 
       return {
@@ -2212,6 +2460,48 @@
         turnoB,
         turnoC
       };
+    }
+
+    function colorFondoTramo(
+      context,
+      colorTurno
+    ) {
+      const dato = context.raw;
+
+      if (!dato) {
+        return colorTurno;
+      }
+
+      if (dato.tipo_tramo === 'estandar') {
+        return COLOR_DENTRO_ESTANDAR;
+      }
+
+      if (dato.tipo_tramo === 'sobretiempo') {
+        return COLOR_SOBRETIEMPO;
+      }
+
+      return colorTurno;
+    }
+
+    function colorBordeTramo(
+      context,
+      bordeTurno
+    ) {
+      const dato = context.raw;
+
+      if (!dato) {
+        return bordeTurno;
+      }
+
+      if (dato.tipo_tramo === 'estandar') {
+        return BORDE_DENTRO_ESTANDAR;
+      }
+
+      if (dato.tipo_tramo === 'sobretiempo') {
+        return BORDE_SOBRETIEMPO;
+      }
+
+      return bordeTurno;
     }
 
     function actualizarLeyendasSemanales(turnos) {
@@ -2429,10 +2719,17 @@
               {
                 label: 'Turno A',
                 data: datos.turnoA,
-                backgroundColor:
-                  'rgba(153,102,255,.82)',
-                borderColor:
-                  'rgba(153,102,255,1)',
+                backgroundColor: context =>
+                  colorFondoTramo(
+                    context,
+                    'rgba(153,102,255,.82)'
+                  ),
+
+                borderColor: context =>
+                  colorBordeTramo(
+                    context,
+                    'rgba(153,102,255,1)'
+                  ),
                 borderWidth: 1,
                 borderRadius: 4,
                 barThickness: 22
@@ -2440,10 +2737,17 @@
               {
                 label: 'Turno B',
                 data: datos.turnoB,
-                backgroundColor:
-                  'rgba(54,162,235,.82)',
-                borderColor:
-                  'rgba(54,162,235,1)',
+                backgroundColor: context =>
+                  colorFondoTramo(
+                    context,
+                    'rgba(54,162,235,.82)'
+                  ),
+
+                borderColor: context =>
+                  colorBordeTramo(
+                    context,
+                    'rgba(54,162,235,1)'
+                  ),
                 borderWidth: 1,
                 borderRadius: 4,
                 barThickness: 22
@@ -2451,10 +2755,17 @@
               {
                 label: 'Turno C',
                 data: datos.turnoC,
-                backgroundColor:
-                  'rgba(255,159,64,.82)',
-                borderColor:
-                  'rgba(255,159,64,1)',
+                backgroundColor: context =>
+                  colorFondoTramo(
+                    context,
+                    'rgba(255,159,64,.82)'
+                  ),
+
+                borderColor: context =>
+                  colorBordeTramo(
+                    context,
+                    'rgba(255,159,64,1)'
+                  ),
                 borderWidth: 1,
                 borderRadius: 4,
                 barThickness: 22
@@ -2502,28 +2813,62 @@
                   label(context) {
                     const dato = context.raw;
 
-                    return [
+                    const lineas = [
                       `Motivo: ${dato.motivo}`,
                       (
                         `Línea: ` +
                         `${dato.linea || 'Sin línea'}`
                       ),
                       (
-                        `Horario: ` +
+                        `Horario completo: ` +
                         `${dato.hora_inicio} a ` +
                         `${dato.hora_fin}`
                       ),
                       (
-                        `Duración: ` +
+                        `Duración total: ` +
                         `${dato.duracion} minutos`
-                      ),
-                      dato.comentarios
-                        ? (
-                            `Comentario: ` +
-                            dato.comentarios
-                          )
-                        : ''
-                    ].filter(Boolean);
+                      )
+                    ];
+
+                    if (dato.tipo_tramo === 'estandar') {
+                      lineas.push(
+                        'Tramo: Dentro del estándar'
+                      );
+
+                      lineas.push(
+                        `Minutos de este tramo: ` +
+                        `${dato.minutos_tramo}`
+                      );
+
+                      lineas.push(
+                        `Objetivo del motivo: ` +
+                        `${dato.objetivo_estandar} minutos`
+                      );
+                    }
+
+                    if (dato.tipo_tramo === 'sobretiempo') {
+                      lineas.push(
+                        'Tramo: Sobretiempo'
+                      );
+
+                      lineas.push(
+                        `Exceso de este tramo: ` +
+                        `${dato.minutos_tramo} minutos`
+                      );
+
+                      lineas.push(
+                        `Objetivo del motivo: ` +
+                        `${dato.objetivo_estandar} minutos`
+                      );
+                    }
+
+                    if (dato.comentarios) {
+                      lineas.push(
+                        `Comentario: ${dato.comentarios}`
+                      );
+                    }
+
+                    return lineas;
                   }
                 }
               },
