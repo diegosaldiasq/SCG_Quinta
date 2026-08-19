@@ -193,12 +193,33 @@ class TurnoOEEForm(forms.ModelForm):
 class ProduccionRealForm(forms.ModelForm):
     produccion_real = forms.IntegerField(
         required=True,
-        help_text="Producción real en unidades",
+        min_value=0,
+        error_messages={
+            'required': (
+                'Debe ingresar la producción real antes '
+                'de cerrar el turno. Si no hubo producción, '
+                'ingrese 0.'
+            ),
+            'min_value': (
+                'La producción real no puede ser negativa.'
+            ),
+            'invalid': (
+                'Ingrese una producción real válida.'
+            ),
+        },
+        help_text=(
+            "Producción real en unidades. "
+            "Ingrese 0 si el turno no tuvo producción."
+        ),
         widget=forms.NumberInput(attrs={
             'id': 'id_produccion_real',
-            'placeholder': 'Producción real'
+            'placeholder': 'Ingrese 0 si no hubo producción',
+            'min': '0',
+            'step': '1',
+            'required': 'required',
         })
     )
+
     class Meta:
         model = TurnoOEE
         fields = ['produccion_real']

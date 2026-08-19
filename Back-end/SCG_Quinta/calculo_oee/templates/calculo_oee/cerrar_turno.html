@@ -56,7 +56,33 @@
 
     <script>
         function confirmarEnvio() {
-            return confirm("✅ ¿Estás seguro de guardar la producción real y cerrar el turno?");
+            const produccionReal = document.getElementById(
+                'id_produccion_real'
+            );
+
+            if (produccionReal.value.trim() === '') {
+                alert(
+                    '⚠️ Debes ingresar la producción real. ' +
+                    'Si el turno no tuvo producción, ingresa 0.'
+                );
+
+                produccionReal.focus();
+                return false;
+            }
+
+            if (Number(produccionReal.value) < 0) {
+                alert(
+                    '⚠️ La producción real no puede ser negativa.'
+                );
+
+                produccionReal.focus();
+                return false;
+            }
+
+            return confirm(
+                '✅ ¿Estás seguro de guardar la producción real ' +
+                'y cerrar el turno?'
+            );
         }
     </script>
 </body>

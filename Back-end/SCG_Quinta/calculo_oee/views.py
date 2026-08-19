@@ -30,6 +30,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from openpyxl.styles import Font, PatternFill
 from datetime import timedelta, date
 from django.db import transaction
+from django.contrib import messages
 
 
 
@@ -197,6 +198,32 @@ def _crear_turno_por_planta(request, planta):
             reales = request.POST.getlist(
                 'produccion_real[]'
             )
+            # Validar que exista al menos un producto.
+            if not productos:
+                form.add_error(
+                    None,
+                    (
+                        "Debe agregar al menos un producto "
+                        "antes de guardar el turno."
+                    ),
+                )
+
+            # Validar producción planeada de cada producto.
+            for indice, valor in enumerate(planeadas, start=1):
+                try:
+                    produccion = int(valor)
+                except (TypeError, ValueError):
+                    produccion = 0
+
+                if produccion <= 0:
+                    form.add_error(
+                        None,
+                        (
+                            f"La producción planeada del producto "
+                            f"N.º {indice} es obligatoria y debe "
+                            f"ser mayor que cero."
+                        ),
+                    )
             comentarios_pro = request.POST.getlist(
                 'comentarios_producto[]'
             )
@@ -265,6 +292,21 @@ def _crear_turno_por_planta(request, planta):
                     ),
                 )
             else:
+                if form.errors:
+                    return render(
+                        request,
+                        'calculo_oee/crear_turno.html',
+                        {
+                            'form': form,
+                            'catalogos_supervisor_obj':
+                                obtener_catalogos_por_supervisor(planta),
+                            'planta': planta,
+                            'planta_nombre':
+                                configuracion["nombre"],
+                            'crear_turno_url':
+                                request.resolver_match.url_name,
+                        },
+                    )
                 lote = form.save(commit=False)
 
                 # La planta la determina el backend.
@@ -457,6 +499,33 @@ def crear_turno_puerto_vespucio(request):
 @login_required
 def resumen_turno(request, lote_id):
     lote = get_object_or_404(TurnoOEE, id=lote_id)
+    if (
+        lote.produccion_planeada is None
+        or lote.produccion_planeada <= 0
+    ):
+        messages.error(
+            request,
+            (
+                "No se puede calcular el OEE: "
+                "falta la producción planeada."
+            ),
+        )
+        return redirect('lista_turnos')
+
+    if lote.produccion_real is None:
+        messages.error(
+            request,
+            (
+                "No se puede calcular el OEE porque falta "
+                "ingresar la producción real. Si el turno "
+                "no tuvo producción, ingrese 0."
+            ),
+        )
+
+        return redirect(
+            'cerrar_turno',
+            lote_id=lote.id,
+        )
 
     # Evitar duplicados en ResumenTurnoOee
     if not ResumenTurnoOee.objects.filter(lote=lote).exists():
@@ -468,8 +537,21 @@ def resumen_turno(request, lote_id):
         productos_qs = lote.productos.all()
         if productos_qs.exists():
             # Suma planeada y real desde productos
-            produccion_planificada = sum(p.produccion_planeada or 0 for p in productos_qs)
-            produccion_real = sum(p.produccion_real or 0 for p in productos_qs)
+            produccion_planificada = sum(
+                p.produccion_planeada or 0
+                for p in productos_qs
+            )
+
+            producciones_reales = [
+                p.produccion_real
+                for p in productos_qs
+                if p.produccion_real is not None
+            ]
+
+            if producciones_reales:
+                produccion_real = sum(producciones_reales)
+            else:
+                produccion_real = lote.produccion_real or 0
             # Concatenar nombres y códigos únicos
             productos_concat = ", ".join(
                 dict.fromkeys(p.producto for p in productos_qs if p.producto)

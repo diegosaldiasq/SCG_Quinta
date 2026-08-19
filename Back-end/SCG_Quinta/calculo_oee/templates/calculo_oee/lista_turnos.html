@@ -167,21 +167,27 @@
                             <td>{{ t.produccion_planeada|default:'-' }}</td>
                             <td>{{ t.produccion_real|default:'-' }}</td>
                             <td>
-                                {% if not t.produccion_real %}
-                                    {# 1) Aún no hay producción real -> cerrar turno #}
-                                    <a href="{% url 'cerrar_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
+                                {% if t.produccion_real == None %}
+                                    <a
+                                        href="{% url 'cerrar_turno' t.id %}?next={{ request.get_full_path|urlencode }}"
+                                        class="primary-button"
+                                    >
                                         Cerrar turno
                                     </a>
 
                                 {% elif t.tiene_resumen %}
-                                    {# 2) Ya existe resumen -> ver resumen #}
-                                    <a href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
+                                    <a
+                                        href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}"
+                                        class="primary-button"
+                                    >
                                         Ver resumen
                                     </a>
 
                                 {% else %}
-                                    {# 3) Hay producción real pero aún no se calcula -> calcular OEE #}
-                                    <a href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}" class="primary-button">
+                                    <a
+                                        href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}"
+                                        class="primary-button"
+                                    >
                                         Calcular OEE
                                     </a>
                                 {% endif %}

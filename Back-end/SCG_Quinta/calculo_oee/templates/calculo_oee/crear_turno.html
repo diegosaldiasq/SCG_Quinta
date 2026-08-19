@@ -301,7 +301,11 @@
     <div class="login_container">
       <h1 class="title">📋 Crear Turno OEE · {{ planta_nombre }}</h1>
 
-      <form method="post" action="{% url crear_turno_url %}">
+      <form
+          method="post"
+          action="{% url crear_turno_url %}"
+          id="form-crear-turno"
+      >
         {% csrf_token %}
 
         <fieldset>
@@ -410,7 +414,7 @@
         </fieldset>
 
         <div class="botones">
-          <button type="submit" class="primary-button" onclick="return confirm('¿Estás seguro de guardar este turno?')">💾 Guardar Turno</button>
+          <button type="submit" class="primary-button">💾 Guardar Turno</button>
           <a href="{% url 'intermedio' %}" class="primary-button">🏠 Volver al Inicio</a>
         </div>
       </form>
@@ -435,8 +439,26 @@
       <td>
         <input type="text" name="codigo[]" readonly class="codigo-en-turno" placeholder="Autocompleta" />
       </td>
-      <td><input type="number" name="produccion_planeada[]" min="0" placeholder="Planeada" /></td>
-      <td><input type="number" name="produccion_real[]" min="0" placeholder="Real" /></td>
+      <td>
+          <input
+              type="number"
+              name="produccion_planeada[]"
+              min="1"
+              step="1"
+              placeholder="Planeada"
+              required
+          />
+      </td>
+      <td>
+          <input
+              type="number"
+              name="produccion_real[]"
+              min="1"
+              step="1"
+              placeholder="Real"
+              required
+          />
+      </td>
       <td><input type="text" name="comentarios_producto[]" placeholder="Comentarios" /></td>
       <td><button type="button" class="btn-eliminar">Eliminar</button></td>
     </tr>
@@ -491,6 +513,56 @@
       const templateProd = document.getElementById('fila-producto-template').content;
       const btnAgregarProd = document.getElementById('btn-agregar-producto');
       const selectSupervisor = document.getElementById('id_supervisor');
+      const formCrearTurno = document.getElementById('form-crear-turno');
+
+      formCrearTurno.addEventListener('submit', function (event) {
+          const filasProductos = document.querySelectorAll(
+              '#tabla-productos tbody tr'
+          );
+
+          if (filasProductos.length === 0) {
+              event.preventDefault();
+
+              alert(
+                  '⚠️ Debes agregar al menos un producto antes de guardar el turno.'
+              );
+
+              return;
+          }
+
+          for (const fila of filasProductos) {
+              const produccionPlaneada = fila.querySelector(
+                  'input[name="produccion_planeada[]"]'
+              );
+
+              if (
+                  !produccionPlaneada.value ||
+                  Number(produccionPlaneada.value) <= 0
+              ) {
+                  event.preventDefault();
+
+                  alert(
+                      '⚠️ Falta ingresar la producción planeada de uno o más productos. Este dato es obligatorio para calcular el OEE.'
+                  );
+
+                  produccionPlaneada.focus();
+                  produccionPlaneada.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'center'
+                  });
+
+                  return;
+              }
+          }
+
+          if (
+              !confirm(
+                  '¿Estás seguro de guardar este turno?'
+              )
+          ) {
+              event.preventDefault();
+          }
+      });
 
       function actualizarCatalogoPorSupervisor() {
           const supervisor = selectSupervisor.value;
