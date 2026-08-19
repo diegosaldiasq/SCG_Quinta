@@ -31,6 +31,78 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0"></script>
 
   <style>
+    /*
+    Evita que el ancho mínimo de la línea de tiempo
+    expanda y descentre todo el panel.
+    */
+    html,
+    body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .login {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .login-container {
+      width: min(1200px, 100%);
+      max-width: 1200px;
+      min-width: 0;
+      margin: 24px auto;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .panel-graficos,
+    .seccion-detenciones-semanales {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .grafico-contenedor {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: auto;
+      overflow-y: hidden;
+      box-sizing: border-box;
+    }
+
+    /*
+    Solamente la línea de tiempo puede tener un ancho
+    interno mayor y desplazamiento horizontal.
+    */
+    .grafico-semanal {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .grafico-semanal canvas {
+      display: block;
+      min-width: 1000px;
+    }
+
+    /*
+    Los demás gráficos nunca deben heredar
+    el ancho de la línea de tiempo.
+    */
+    .grafico-oee canvas,
+    .grafico-detenciones canvas,
+    #graficoUnidadesPersona {
+      display: block;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
     .filtros {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -845,7 +917,17 @@
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .trim()
-        .replace(/\s+/g, ' ');
+
+        /*
+        Elimina códigos iniciales como:
+        1-Colacion
+        7-Preparacion de insumos
+        10-Aseo de linea
+        */
+        .replace(/^\s*\d+\s*[-–—._:)]\s*/, '')
+
+        .replace(/\s+/g, ' ')
+        .trim();
     }
 
     function obtenerObjetivoDetencion(motivo) {
