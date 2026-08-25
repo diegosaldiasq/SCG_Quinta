@@ -1159,8 +1159,10 @@ def resumen_turno_oee_api(request):
               .values(
                         'id', 'planta', 'fecha', 'turno', 'linea',
                         'disponibilidad', 'eficiencia', 'oee', 'target', 'lote_id',
+                        'producto',
                         'produccion_real',
                         'produccion_teorica',
+                        'produccion_planificada',
                         'numero_personas',
                         'unidades_por_persona',
                     ))

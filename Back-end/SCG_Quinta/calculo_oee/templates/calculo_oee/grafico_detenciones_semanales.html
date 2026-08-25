@@ -1677,6 +1677,51 @@
                 display: true,
                 text:
                   'Unidades por persona: Real vs Teórico'
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+
+                callbacks: {
+                  title(items) {
+                    if (!items.length) {
+                      return '';
+                    }
+
+                    const item = data[items[0].dataIndex];
+
+                    return (
+                      `${fmtFecha(item.fecha)} · ` +
+                      `${item.turno}`
+                    );
+                  },
+
+                  label(context) {
+                    const item = data[context.dataIndex];
+                    const lineas = [];
+
+                    /*
+                    Mostramos la información general una sola vez
+                    para evitar que se repita en ambos datasets.
+                    */
+                    if (context.datasetIndex === 0) {
+                      lineas.push(
+                        `Producto: ${item.producto || 'Sin información'}`,
+                        `Cantidad teórica: ${item.produccion_teorica ?? 0}`,
+                        `Cantidad planeada: ${item.produccion_planificada ?? 0}`,
+                        `Cantidad real: ${item.produccion_real ?? 0}`,
+                        `Cantidad de personas: ${item.numero_personas ?? 0}`
+                      );
+                    }
+
+                    lineas.push(
+                      `${context.dataset.label}: ` +
+                      `${context.parsed.y}`
+                    );
+
+                    return lineas;
+                  }
+                }
               }
             },
 
