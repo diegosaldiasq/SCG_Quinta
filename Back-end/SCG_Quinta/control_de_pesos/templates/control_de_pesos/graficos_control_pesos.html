@@ -170,7 +170,7 @@
     <div class="grid">
 
       <div class="card">
-        <h3 class="title" style="color:#333;margin-top:0">
+        <h3 id="tituloSeriePeso" class="title" style="color:#333;margin-top:0">
           Serie temporal (Peso Real vs Mínimo/Máximo)
         </h3>
         <div class="chart-wrap">
@@ -427,6 +427,24 @@
     let chartLinea = null;
     let chartHist = null;
     let chartAlturas = null;
+
+    const TITULO_SERIE_PESO =
+      'Serie temporal (Peso Real vs Mínimo/Máximo)';
+
+    function actualizarTituloSeriePeso(regs) {
+      const titulo = $('tituloSeriePeso');
+      if (!titulo) return;
+
+      const productos = [...new Set(
+        regs
+          .map(r => String(r.producto || '').trim())
+          .filter(Boolean)
+      )];
+
+      titulo.textContent = productos.length === 1
+        ? `${TITULO_SERIE_PESO} · ${productos[0]}`
+        : TITULO_SERIE_PESO;
+    }
 
     function destruirCharts() {
       try { chartLinea?.destroy(); } catch (e) {}
@@ -1028,6 +1046,8 @@
         saveFilters();
 
         const data = await cargarDatos();
+
+        actualizarTituloSeriePeso(data);
 
         F.resumen.textContent =
           `${data.length} registros`;
