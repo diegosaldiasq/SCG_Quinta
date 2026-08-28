@@ -259,22 +259,34 @@
       notaTol: $('nota-tolerancia'),
     };
 
-    const STORAGE_KEY = 'filtros_graficos_control_pesos_v2';
+    const STORAGE_KEY = 'filtros_graficos_control_pesos_v3';
 
-    function rangoAnioActual() {
-      const hoy = new Date();
-      const anio = hoy.getFullYear();
-      const formato = fecha => {
-        const y = fecha.getFullYear();
-        const m = String(fecha.getMonth() + 1).padStart(2, '0');
-        const d = String(fecha.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-      };
+    function semanaAnteriorISO() {
+      const fecha = new Date();
+      fecha.setDate(fecha.getDate() - 7);
 
-      return {
-        desde: `${anio}-01-01`,
-        hasta: formato(hoy)
-      };
+      const utc = new Date(Date.UTC(
+        fecha.getFullYear(),
+        fecha.getMonth(),
+        fecha.getDate()
+      ));
+
+      utc.setUTCDate(
+        utc.getUTCDate() + 4 - (utc.getUTCDay() || 7)
+      );
+
+      const inicioAnio = new Date(
+        Date.UTC(utc.getUTCFullYear(), 0, 1)
+      );
+
+      const numeroSemana = Math.ceil(
+        (((utc - inicioAnio) / 86400000) + 1) / 7
+      );
+
+      return (
+        `${utc.getUTCFullYear()}-W` +
+        String(numeroSemana).padStart(2, '0')
+      );
     }
 
     function parseFechaLocal(ts) {
@@ -297,7 +309,7 @@
       F.cliente.value = f.cliente || '';
       F.turno.value = f.turno || '';
       if (!f.semana && !f.desde && !f.hasta) {
-        Object.assign(f, rangoAnioActual());
+        f.semana = semanaAnteriorISO();
       }
 
       F.lote.value = f.lote || '';
@@ -1130,9 +1142,9 @@
 
       F.producto.disabled = true;
 
-      const rango = rangoAnioActual();
-      F.desde.value = rango.desde;
-      F.hasta.value = rango.hasta;
+      F.semana.value = semanaAnteriorISO();
+      F.desde.value = '';
+      F.hasta.value = '';
 
       localStorage.removeItem(STORAGE_KEY);
 

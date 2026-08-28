@@ -236,17 +236,18 @@ def api_graficos_control_pesos(request):
                 )
 
     else:
-        # Sin filtro de fecha, limitar la consulta al año en curso.
+        # Sin filtro de fecha, consultar solo la semana anterior
+        # completa: desde el lunes hasta antes del lunes actual.
         hoy = timezone.localdate()
-        inicio_anio = hoy.replace(month=1, day=1)
-        inicio_siguiente_anio = inicio_anio.replace(year=hoy.year + 1)
+        inicio_semana_actual = hoy - timedelta(days=hoy.weekday())
+        inicio_semana_anterior = inicio_semana_actual - timedelta(days=7)
 
         qs = qs.filter(
             fecha_registro__gte=make_aware(
-                datetime.combine(inicio_anio, time.min)
+                datetime.combine(inicio_semana_anterior, time.min)
             ),
             fecha_registro__lt=make_aware(
-                datetime.combine(inicio_siguiente_anio, time.min)
+                datetime.combine(inicio_semana_actual, time.min)
             ),
         )
 
