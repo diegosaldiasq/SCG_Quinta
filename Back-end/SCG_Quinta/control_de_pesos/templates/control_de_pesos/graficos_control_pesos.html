@@ -142,6 +142,11 @@
         </div>
 
         <div>
+          <label>Semana</label>
+          <input id="f-semana" type="week" />
+        </div>
+
+        <div>
           <label>Desde</label>
           <input id="f-desde" type="date" />
         </div>
@@ -245,6 +250,7 @@
       producto: $('f-producto'),
       turno: $('f-turno'),
       lote: $('f-lote'),
+      semana: $('f-semana'),
       desde: $('f-desde'),
       hasta: $('f-hasta'),
       resumen: $('resumen'),
@@ -253,7 +259,23 @@
       notaTol: $('nota-tolerancia'),
     };
 
-    const STORAGE_KEY = 'filtros_graficos_control_pesos_v1';
+    const STORAGE_KEY = 'filtros_graficos_control_pesos_v2';
+
+    function rangoAnioActual() {
+      const hoy = new Date();
+      const anio = hoy.getFullYear();
+      const formato = fecha => {
+        const y = fecha.getFullYear();
+        const m = String(fecha.getMonth() + 1).padStart(2, '0');
+        const d = String(fecha.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      };
+
+      return {
+        desde: `${anio}-01-01`,
+        hasta: formato(hoy)
+      };
+    }
 
     function parseFechaLocal(ts) {
       if (!ts) return null;
@@ -263,7 +285,7 @@
 
     function loadFilters() {
       const f = Object.fromEntries(
-        ['cliente', 'producto', 'turno', 'lote', 'desde', 'hasta'].map(k => [k, qs.get(k) || ''])
+        ['cliente', 'producto', 'turno', 'lote', 'semana', 'desde', 'hasta'].map(k => [k, qs.get(k) || ''])
       );
 
       if (!qs.toString()) {
@@ -274,7 +296,12 @@
 
       F.cliente.value = f.cliente || '';
       F.turno.value = f.turno || '';
+      if (!f.semana && !f.desde && !f.hasta) {
+        Object.assign(f, rangoAnioActual());
+      }
+
       F.lote.value = f.lote || '';
+      F.semana.value = f.semana || '';
       F.desde.value = f.desde || '';
       F.hasta.value = f.hasta || '';
 
@@ -289,6 +316,7 @@
         producto: F.producto.value,
         turno: F.turno.value,
         lote: F.lote.value,
+        semana: F.semana.value,
         desde: F.desde.value,
         hasta: F.hasta.value,
       };
@@ -338,6 +366,19 @@
 
     F.cliente.addEventListener('change', () => {
       cargarProductos(F.cliente.value, '');
+    });
+
+    F.semana.addEventListener('change', () => {
+      if (F.semana.value) {
+        F.desde.value = '';
+        F.hasta.value = '';
+      }
+    });
+
+    [F.desde, F.hasta].forEach(campo => {
+      campo.addEventListener('change', () => {
+        if (campo.value) F.semana.value = '';
+      });
     });
 
     function unidadTiempoDesdeSpan(minDate, maxDate) {
@@ -393,6 +434,7 @@
           peso_minimo: d.peso_minimo != null ? Number(d.peso_minimo) : null,
           peso_maximo: d.peso_maximo != null ? Number(d.peso_maximo) : null,
           perdida_operacional: d.perdida_operacional != null ? Number(d.perdida_operacional) : null,
+          producto: d.producto || 'Sin producto',
         }))
         .filter(p => p.t && Number.isFinite(p.y))
         .sort((a, b) => a.t - b.t);
@@ -425,21 +467,24 @@
 
       const real = pts.map(p => ({
         x: p.t,
-        y: p.y
+        y: p.y,
+        producto: p.producto
       }));
 
       const minL = pts
         .filter(p => Number.isFinite(p.peso_minimo))
         .map(p => ({
           x: p.t,
-          y: p.peso_minimo
+          y: p.peso_minimo,
+          producto: p.producto
         }));
 
       const maxL = pts
         .filter(p => Number.isFinite(p.peso_maximo))
         .map(p => ({
           x: p.t,
-          y: p.peso_maximo
+          y: p.peso_maximo,
+          producto: p.producto
         }));
 
       const pesoRecetaDisplay = [...pts]
@@ -557,7 +602,13 @@
           plugins: {
             tooltip: {
               mode: 'index',
-              intersect: false
+              intersect: false,
+              callbacks: {
+                afterTitle(items) {
+                  const producto = items[0]?.raw?.producto;
+                  return producto ? `Producto: ${producto}` : '';
+                }
+              }
             }
           }
         }
@@ -855,6 +906,7 @@
         producto: F.producto.value || '',
         turno: F.turno.value || '',
         lote: F.lote.value || '',
+        semana: F.semana.value || '',
         desde: F.desde.value || '',
         hasta: F.hasta.value || ''
       });
@@ -1062,6 +1114,7 @@
         'f-producto',
         'f-turno',
         'f-lote',
+        'f-semana',
         'f-desde',
         'f-hasta'
       ].forEach(id => {
@@ -1076,6 +1129,10 @@
         '<option value="">Todos</option>';
 
       F.producto.disabled = true;
+
+      const rango = rangoAnioActual();
+      F.desde.value = rango.desde;
+      F.hasta.value = rango.hasta;
 
       localStorage.removeItem(STORAGE_KEY);
 

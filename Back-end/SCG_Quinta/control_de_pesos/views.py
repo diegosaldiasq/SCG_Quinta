@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
@@ -178,6 +178,7 @@ def api_graficos_control_pesos(request):
     producto = (request.GET.get('producto') or '').strip()
     turno = (request.GET.get('turno') or '').strip()
     lote = (request.GET.get('lote') or '').strip()
+    semana = (request.GET.get('semana') or '').strip()
     desde = (request.GET.get('desde') or '').strip()
     hasta = (request.GET.get('hasta') or '').strip()
 
@@ -193,39 +194,61 @@ def api_graficos_control_pesos(request):
     if lote:
         qs = qs.filter(lote_norm=lote)
 
-    # -------------------------
-    # FILTRO DESDE
-    # -------------------------
-    if desde:
+    # La semana ISO tiene prioridad sobre el rango manual.
+    if semana:
         try:
+            inicio_semana = datetime.strptime(
+                f"{semana}-1", "%G-W%V-%u"
+            ).date()
+            fin_semana = inicio_semana + timedelta(days=6)
+
+            qs = qs.filter(
+                fecha_registro__gte=make_aware(
+                    datetime.combine(inicio_semana, time.min)
+                ),
+                fecha_registro__lte=make_aware(
+                    datetime.combine(fin_semana, time.max)
+                ),
+            )
+        except ValueError:
+            return JsonResponse(
+                {"ok": False, "error": "Semana inválida"},
+                status=400,
+            )
+
+    elif desde or hasta:
+        if desde:
             fecha_desde = parse_date(desde)
-
             if fecha_desde:
-                dt_desde = make_aware(
-                    datetime.combine(fecha_desde, time.min)
+                qs = qs.filter(
+                    fecha_registro__gte=make_aware(
+                        datetime.combine(fecha_desde, time.min)
+                    )
                 )
 
-                qs = qs.filter(fecha_registro__gte=dt_desde)
-
-        except Exception as e:
-            print("Error filtro desde:", e)
-
-    # -------------------------
-    # FILTRO HASTA
-    # -------------------------
-    if hasta:
-        try:
+        if hasta:
             fecha_hasta = parse_date(hasta)
-
             if fecha_hasta:
-                dt_hasta = make_aware(
-                    datetime.combine(fecha_hasta, time.max)
+                qs = qs.filter(
+                    fecha_registro__lte=make_aware(
+                        datetime.combine(fecha_hasta, time.max)
+                    )
                 )
 
-                qs = qs.filter(fecha_registro__lte=dt_hasta)
+    else:
+        # Sin filtro de fecha, limitar la consulta al año en curso.
+        hoy = timezone.localdate()
+        inicio_anio = hoy.replace(month=1, day=1)
+        inicio_siguiente_anio = inicio_anio.replace(year=hoy.year + 1)
 
-        except Exception as e:
-            print("Error filtro hasta:", e)
+        qs = qs.filter(
+            fecha_registro__gte=make_aware(
+                datetime.combine(inicio_anio, time.min)
+            ),
+            fecha_registro__lt=make_aware(
+                datetime.combine(inicio_siguiente_anio, time.min)
+            ),
+        )
 
     qs = qs.order_by('fecha_registro').values(
         'id',
