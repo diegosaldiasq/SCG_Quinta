@@ -32,6 +32,7 @@ class ProductoControlPeso(models.Model):
         ("SISA", "SISA"),
         ("Walmart", "Walmart"),
         ("Unimarc", "Unimarc"),
+        ("Tottus", "Tottus"),
         ("Insumo", "Insumo"),
         ("Sub", "Sub"),
         ("Pasteles", "Pasteles"),
