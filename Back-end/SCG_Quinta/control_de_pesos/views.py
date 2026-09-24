@@ -176,7 +176,11 @@ def api_graficos_control_pesos(request):
 
     cliente = (request.GET.get('cliente') or '').strip()
     producto = (request.GET.get('producto') or '').strip()
-    turno = (request.GET.get('turno') or '').strip()
+    turnos = list(dict.fromkeys(
+        turno.strip().upper()
+        for turno in request.GET.getlist('turno')
+        if turno.strip()
+    ))
     lote = (request.GET.get('lote') or '').strip()
     semana = (request.GET.get('semana') or '').strip()
     desde = (request.GET.get('desde') or '').strip()
@@ -188,8 +192,8 @@ def api_graficos_control_pesos(request):
     if producto:
         qs = qs.filter(producto_norm=producto.upper())
 
-    if turno:
-        qs = qs.filter(turno_norm=turno.upper())
+    if turnos:
+        qs = qs.filter(turno_norm__in=turnos)
 
     if lote:
         qs = qs.filter(lote_norm=lote)

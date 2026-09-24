@@ -71,6 +71,36 @@
       line-height: 1.5;
     }
 
+    .turnos-multiples {
+      min-height: 42px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 14px;
+      padding: 8px 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .turno-opcion {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 0;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .turno-opcion input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: #b43c2c;
+      cursor: pointer;
+    }
+
     @keyframes girar-spinner {
       to {
         transform: rotate(360deg);
@@ -127,13 +157,15 @@
         </div>
 
         <div>
-          <label>Turno</label>
-          <select id="f-turno">
-            <option value="">Todos</option>
+          <label>Turnos</label>
+          <div id="f-turnos" class="turnos-multiples" role="group" aria-label="Seleccionar turnos">
             {% for t in turnos %}
-              <option value="{{ t }}">{{ t }}</option>
+              <label class="turno-opcion">
+                <input type="checkbox" name="turno" value="{{ t }}">
+                <span>{{ t }}</span>
+              </label>
             {% endfor %}
-          </select>
+          </div>
         </div>
 
         <div>
@@ -248,7 +280,7 @@
     const F = {
       cliente: $('f-cliente'),
       producto: $('f-producto'),
-      turno: $('f-turno'),
+      turnos: $('f-turnos'),
       lote: $('f-lote'),
       semana: $('f-semana'),
       desde: $('f-desde'),
@@ -297,8 +329,9 @@
 
     function loadFilters() {
       const f = Object.fromEntries(
-        ['cliente', 'producto', 'turno', 'lote', 'semana', 'desde', 'hasta'].map(k => [k, qs.get(k) || ''])
+        ['cliente', 'producto', 'lote', 'semana', 'desde', 'hasta'].map(k => [k, qs.get(k) || ''])
       );
+      f.turnos = qs.getAll('turno').filter(Boolean);
 
       if (!qs.toString()) {
         try {
@@ -307,7 +340,10 @@
       }
 
       F.cliente.value = f.cliente || '';
-      F.turno.value = f.turno || '';
+      const turnosGuardados = Array.isArray(f.turnos) && (f.turnos.length || !f.turno)
+        ? f.turnos
+        : (f.turno ? [f.turno] : []);
+      seleccionarTurnos(turnosGuardados);
       if (!f.semana && !f.desde && !f.hasta) {
         f.semana = semanaAnteriorISO();
       }
@@ -322,11 +358,41 @@
       }
     }
 
+    function obtenerTurnosSeleccionados() {
+      return Array.from(
+        F.turnos.querySelectorAll('input[name="turno"]:checked')
+      ).map(input => input.value);
+    }
+
+    function seleccionarTurnos(turnos = []) {
+      const seleccionados = new Set(turnos.map(String));
+      F.turnos.querySelectorAll('input[name="turno"]').forEach(input => {
+        input.checked = seleccionados.has(input.value);
+      });
+    }
+
+    function crearParametrosFiltros() {
+      const params = new URLSearchParams({
+        cliente: F.cliente.value,
+        producto: F.producto.value,
+        lote: F.lote.value,
+        semana: F.semana.value,
+        desde: F.desde.value,
+        hasta: F.hasta.value,
+      });
+
+      obtenerTurnosSeleccionados().forEach(turno => {
+        params.append('turno', turno);
+      });
+
+      return params;
+    }
+
     function saveFilters() {
       const f = {
         cliente: F.cliente.value,
         producto: F.producto.value,
-        turno: F.turno.value,
+        turnos: obtenerTurnosSeleccionados(),
         lote: F.lote.value,
         semana: F.semana.value,
         desde: F.desde.value,
@@ -334,7 +400,7 @@
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
-      history.replaceState(null, '', '?' + new URLSearchParams(f).toString());
+      history.replaceState(null, '', '?' + crearParametrosFiltros().toString());
     }
 
     async function cargarProductos(cliente, preselect = '') {
@@ -931,15 +997,7 @@
     }
 
     async function cargarDatos() {
-      const q = new URLSearchParams({
-        cliente: F.cliente.value || '',
-        producto: F.producto.value || '',
-        turno: F.turno.value || '',
-        lote: F.lote.value || '',
-        semana: F.semana.value || '',
-        desde: F.desde.value || '',
-        hasta: F.hasta.value || ''
-      });
+      const q = crearParametrosFiltros();
 
       const url = `{% url 'api_graficos_control_pesos' %}?${q.toString()}`;
 
@@ -1144,7 +1202,6 @@
       [
         'f-cliente',
         'f-producto',
-        'f-turno',
         'f-lote',
         'f-semana',
         'f-desde',
@@ -1156,6 +1213,8 @@
           el.value = '';
         }
       });
+
+      seleccionarTurnos([]);
 
       F.producto.innerHTML =
         '<option value="">Todos</option>';
