@@ -50,6 +50,8 @@ class HistorialTrazabilidadFilterForm(forms.Form):
         required=False,
         widget=forms.DateInput(attrs={"type": "date"})
     )
+    turno = forms.ChoiceField(required=False, choices=[("", "Todos los turnos")])
+    linea = forms.ChoiceField(required=False, choices=[("", "Todas las líneas")])
     lote_producto = forms.CharField(required=False)
     lote_ingrediente = forms.CharField(required=False)
 
@@ -61,3 +63,16 @@ class HistorialTrazabilidadFilterForm(forms.Form):
             ("verificados", "Verificadas"),
         ]
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for campo, etiqueta in (("turno", "Todos los turnos"), ("linea", "Todas las líneas")):
+            valores = (
+                RegistroTrazabilidad.objects
+                .exclude(**{f"{campo}__isnull": True})
+                .exclude(**{campo: ""})
+                .order_by(campo)
+                .values_list(campo, flat=True)
+                .distinct()
+            )
+            self.fields[campo].choices = [("", etiqueta)] + [(valor, valor) for valor in valores]

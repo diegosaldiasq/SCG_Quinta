@@ -52,6 +52,16 @@
             </label>
 
             <label>
+                Turno
+                {{ form.turno }}
+            </label>
+
+            <label>
+                Línea
+                {{ form.linea }}
+            </label>
+
+            <label>
                 Desde
                 {{ form.desde }}
             </label>
@@ -206,10 +216,10 @@
     {% if is_paginated %}
         <div class="pagination">
             {% if page_obj.has_previous %}
-                <a href="?page=1{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.producto %}&producto={{ request.GET.producto }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}{% if request.GET.lote_producto %}&lote_producto={{ request.GET.lote_producto }}{% endif %}{% if request.GET.lote_ingrediente %}&lote_ingrediente={{ request.GET.lote_ingrediente }}{% endif %}">
+                <a href="?page=1{% if filtros_query %}&{{ filtros_query }}{% endif %}">
                     Primera
                 </a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.producto %}&producto={{ request.GET.producto }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}{% if request.GET.lote_producto %}&lote_producto={{ request.GET.lote_producto }}{% endif %}{% if request.GET.lote_ingrediente %}&lote_ingrediente={{ request.GET.lote_ingrediente }}{% endif %}">
+                <a href="?page={{ page_obj.previous_page_number }}{% if filtros_query %}&{{ filtros_query }}{% endif %}">
                     Anterior
                 </a>
             {% endif %}
@@ -219,10 +229,10 @@
             </span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.producto %}&producto={{ request.GET.producto }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}{% if request.GET.lote_producto %}&lote_producto={{ request.GET.lote_producto }}{% endif %}{% if request.GET.lote_ingrediente %}&lote_ingrediente={{ request.GET.lote_ingrediente }}{% endif %}">
+                <a href="?page={{ page_obj.next_page_number }}{% if filtros_query %}&{{ filtros_query }}{% endif %}">
                     Siguiente
                 </a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.producto %}&producto={{ request.GET.producto }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}{% if request.GET.lote_producto %}&lote_producto={{ request.GET.lote_producto }}{% endif %}{% if request.GET.lote_ingrediente %}&lote_ingrediente={{ request.GET.lote_ingrediente }}{% endif %}">
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if filtros_query %}&{{ filtros_query }}{% endif %}">
                     Última
                 </a>
             {% endif %}

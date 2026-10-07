@@ -205,6 +205,8 @@ def historial_trazabilidad(request):
     if form.is_valid():
         cliente = form.cleaned_data.get("cliente")
         producto = form.cleaned_data.get("producto")
+        turno = form.cleaned_data.get("turno")
+        linea = form.cleaned_data.get("linea")
         desde = form.cleaned_data.get("desde")
         hasta = form.cleaned_data.get("hasta")
         lote_producto = form.cleaned_data.get("lote_producto")
@@ -215,6 +217,12 @@ def historial_trazabilidad(request):
 
         if producto:
             registros_qs = registros_qs.filter(producto=producto)
+
+        if turno:
+            registros_qs = registros_qs.filter(turno=turno)
+
+        if linea:
+            registros_qs = registros_qs.filter(linea=linea)
 
         if desde:
             registros_qs = registros_qs.filter(
@@ -240,8 +248,12 @@ def historial_trazabilidad(request):
     page_number = request.GET.get("page")
     registros = paginator.get_page(page_number)
 
+    filtros = request.GET.copy()
+    filtros.pop("page", None)
+
     contexto = {
         "form": form,
+        "filtros_query": filtros.urlencode(),
         "registros": registros,
         "paginator": paginator,
         "page_obj": registros,
@@ -345,6 +357,8 @@ def descargar_historial_trazabilidad_excel(request):
 
     cliente_id = request.GET.get("cliente")
     producto_id = request.GET.get("producto")
+    turno = request.GET.get("turno")
+    linea = request.GET.get("linea")
     lote_producto = request.GET.get("lote_producto")
     lote_ingrediente = request.GET.get("lote_ingrediente")
     estado_verificacion = request.GET.get("estado_verificacion")
@@ -364,6 +378,12 @@ def descargar_historial_trazabilidad_excel(request):
 
     if producto_id:
         registros = registros.filter(producto_id=producto_id)
+
+    if turno:
+        registros = registros.filter(turno=turno)
+
+    if linea:
+        registros = registros.filter(linea=linea)
 
     # Filtro por FECHA ELABORACION PRODUCTO
     if desde:
