@@ -103,8 +103,8 @@ def evaluar_turno(lote):
         raise ValueError('OEE_RENDIMIENTO_MAXIMO debe ser finito y mayor o igual a 100.')
     if rendimiento > limite + 1e-9:
         motivos.append(f'Rendimiento {rendimiento:.2f} % superior al límite de {limite:g} %. Revisar tasa nominal, personas y producción.')
-    if oee > 100 + 1e-9:
-        motivos.append(f'OEE {oee:.2f} % superior al 100 %.')
+    if oee > 200 + 1e-9:
+        motivos.append(f'OEE {oee:.2f} % superior al 200 %.')
     if motivos:
         return None, motivos
 
