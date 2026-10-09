@@ -82,6 +82,8 @@ DJANGO_APPS = [
 
 INSTALLED_APPS = LOCAL_APPS + DJANGO_APPS
 
+OEE_RENDIMIENTO_MAXIMO = 200
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
