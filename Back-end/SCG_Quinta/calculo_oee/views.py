@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import TurnoOEE, Producto, Detencion, Reproceso, ResumenTurnoOee
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from .forms import ProduccionRealForm, TurnoOEEForm, RevisionTurnoOEEForm, ProductosRevisionFormSet, DetencionesRevisionFormSet, ReprocesosRevisionFormSet
+from .forms import ProduccionRealForm, TurnoOEEForm, RevisionTurnoOEEForm, ProductosRevisionFormSet, DetencionesRevisionFormSet, ReprocesosRevisionFormSet, AprobacionExcepcionOEEForm
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -438,6 +438,7 @@ def resumen_turno(request, lote_id):
     return render(request, 'calculo_oee/resumen_turno.html', {
         'resumen': resumen,
         'next_url': _siguiente_url(request),
+        'aprobaciones_excepcion': _aprobaciones_excepcion(resumen),
     })
 
 
@@ -1555,6 +1556,9 @@ def revisar_turno_oee(request, lote_id):
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied('Solo administración puede corregir un turno para revisión.')
     _, motivos = evaluar_turno(lote)
+    aprobar_excepcion = request.method == 'POST' and request.POST.get('accion') == 'aprobar_excepcion'
+    excepcion = AprobacionExcepcionOEEForm(request.POST if request.method == 'POST' else None)
+    excepcion.fields['justificacion_excepcion'].required = aprobar_excepcion
     if request.method == 'POST':
         # El mismo bloqueo protege los cambios y el cálculo de un turno.
         with transaction.atomic():
@@ -1565,15 +1569,21 @@ def revisar_turno_oee(request, lote_id):
             productos = ProductosRevisionFormSet(request.POST, instance=lote, prefix='productos')
             detenciones = DetencionesRevisionFormSet(request.POST, instance=lote, prefix='detenciones')
             reprocesos = ReprocesosRevisionFormSet(request.POST, instance=lote, prefix='reprocesos')
-            validaciones = [f.is_valid() for f in (form, productos, detenciones, reprocesos)]
+            validaciones = [f.is_valid() for f in (form, productos, detenciones, reprocesos, excepcion)]
             if all(validaciones):
                 form.save()
                 productos.save()
                 detenciones.save()
                 reprocesos.save()
-                resumen, motivos = calcular_oee_automatico(lote.id)
+                resumen, motivos = calcular_oee_automatico(
+                    lote.id,
+                    usuario_excepcion=request.user if aprobar_excepcion else None,
+                    justificacion=excepcion.cleaned_data.get('justificacion_excepcion', ''),
+                )
                 if resumen:
-                    messages.success(request, 'Datos corregidos y OEE calculado automáticamente.')
+                    mensaje = ('Excepción aprobada. OEE calculado y verificado con justificación.'
+                               if aprobar_excepcion else 'Datos corregidos y OEE calculado automáticamente.')
+                    messages.success(request, mensaje)
                     return redirect(_siguiente_url(request))
                 messages.warning(request, 'Datos guardados. El turno aún requiere revisión.')
                 # Redirigir evita repetir altas de detenciones al recargar.
@@ -1588,6 +1598,7 @@ def revisar_turno_oee(request, lote_id):
         'lote': lote, 'motivos': motivos, 'form': form, 'productos': productos,
         'detenciones': detenciones, 'reprocesos': reprocesos,
         'puede_editar': puede_editar, 'next_url': _siguiente_url(request),
+        'excepcion': excepcion,
     })
 
 
@@ -1609,3 +1620,14 @@ def procesar_oee_pendientes(request):
             revision += 1
     messages.success(request, f'{calculados} turnos calculados; {revision} turnos requieren revisión.')
     return redirect(_siguiente_url(request))
+
+
+
+def _aprobaciones_excepcion(resumen):
+    from django.contrib.admin.models import LogEntry, CHANGE
+    from django.contrib.contenttypes.models import ContentType
+    return LogEntry.objects.filter(
+        content_type=ContentType.objects.get_for_model(ResumenTurnoOee),
+        object_id=str(resumen.pk), action_flag=CHANGE,
+        change_message__startswith='Aprobación excepcional de OEE.',
+    ).select_related('user').order_by('-action_time')

@@ -56,7 +56,7 @@ class CalculoAutomaticoTests(TestCase):
             ('tasa', lambda: ProductoControlPeso.objects.filter(pk=self.tasa.pk).update(un_pp=None)),
             ('parcial', lambda: Producto.objects.filter(pk=self.producto.pk).update(produccion_real=None)),
             ('total', lambda: Producto.objects.filter(pk=self.producto.pk).update(produccion_real=149)),
-            ('rendimiento', lambda: ProductoControlPeso.objects.filter(pk=self.tasa.pk).update(un_pp=50)),
+            ('rendimiento', lambda: ProductoControlPeso.objects.filter(pk=self.tasa.pk).update(un_pp=25)),
             ('mermas', lambda: Reproceso.objects.create(lote=self.lote, motivo='Error', cantidad=151)),
             ('detenciones', lambda: Detencion.objects.create(lote=self.lote, motivo='Falla', hora_inicio=time(0), hora_fin=time(8), duracion=480)),
         ]
@@ -105,7 +105,7 @@ class CalculoAutomaticoTests(TestCase):
         self.assertEqual(datos['eficiencia'], 75)
         self.assertEqual(datos['produccion_teorica'], 133)
 
-    @override_settings(OEE_RENDIMIENTO_MAXIMO=120)
+    @override_settings(OEE_RENDIMIENTO_MAXIMO=120, OEE_MAXIMO=100)
     def test_tolerancia_no_permite_oee_mayor_100(self):
         self.tasa.un_pp = 70
         self.tasa.save()
@@ -207,3 +207,81 @@ class CalculoAutomaticoTests(TestCase):
         url = reverse('revisar_turno_oee', args=[self.lote.pk])
         self.assertContains(self.client.get(url), 'Solicita a administración')
         self.assertEqual(self.client.post(url, {}).status_code, 403)
+
+
+    def test_excepcion_mayor_200_con_auditoria(self):
+        from django.contrib.admin.models import LogEntry
+        self.tasa.un_pp = 25
+        self.tasa.save()
+        resumen, motivos = calcular_oee_automatico(self.lote.id)
+        self.assertIsNone(resumen)
+        self.assertTrue(motivos)
+        resumen, motivos = calcular_oee_automatico(
+            self.lote.id, usuario_excepcion=self.user,
+            justificacion='Capacidad revisada en prueba industrial.',
+        )
+        self.assertEqual(motivos, [])
+        self.assertEqual(resumen.oee, 300)
+        self.assertTrue(resumen.verificado)
+        self.assertEqual(resumen.verificado_por, self.user.get_username())
+        self.assertIsNotNone(resumen.fecha_de_verificacion)
+        registro = LogEntry.objects.get()
+        self.assertEqual(registro.user_id, self.user.pk)
+        self.assertIn('Capacidad revisada', registro.change_message)
+        respuesta = self.client.get(reverse('resumen_turno', args=[self.lote.id]))
+        self.assertContains(respuesta, 'Aprobación excepcional')
+        self.assertContains(respuesta, 'Capacidad revisada')
+        calcular_oee_automatico(self.lote.id, usuario_excepcion=self.user, justificacion='Repetición')
+        self.assertEqual(LogEntry.objects.count(), 1)
+
+    def test_excepcion_requiere_permiso_y_justificacion(self):
+        from django.core.exceptions import PermissionDenied
+        self.user.is_staff = False
+        self.user.save()
+        with self.assertRaises(PermissionDenied):
+            calcular_oee_automatico(self.lote.id, usuario_excepcion=self.user, justificacion='Revisado')
+        self.user.is_staff = True
+        self.user.save()
+        with self.assertRaises(ValueError):
+            calcular_oee_automatico(self.lote.id, usuario_excepcion=self.user, justificacion='  ')
+        self.assertFalse(ResumenTurnoOee.objects.exists())
+
+    def test_excepcion_no_omite_validaciones_de_datos(self):
+        from django.contrib.admin.models import LogEntry
+        Reproceso.objects.create(lote=self.lote, motivo='Error', cantidad=151)
+        resumen, motivos = calcular_oee_automatico(
+            self.lote.id, usuario_excepcion=self.user, justificacion='Revisado',
+        )
+        self.assertIsNone(resumen)
+        self.assertTrue(any('Reprocesos' in m for m in motivos))
+        self.assertFalse(LogEntry.objects.exists())
+
+    def test_boton_excepcion_y_comentario_obligatorio(self):
+        from django.contrib.admin.models import LogEntry
+        self.tasa.un_pp = 25
+        self.tasa.save()
+        url = reverse('revisar_turno_oee', args=[self.lote.id])
+        datos = {
+            'supervisor': 'Felipe Campos', 'numero_personas': 2, 'tiempo_planeado': 450,
+            'produccion_planeada': 200, 'produccion_real': 150, 'cliente': 'Jumbo',
+            'producto': 'Torta prueba', 'codigo': '1',
+            'productos-TOTAL_FORMS': 1, 'productos-INITIAL_FORMS': 1,
+            'productos-0-id': self.producto.id, 'productos-0-lote': self.lote.id,
+            'productos-0-cliente': 'Jumbo', 'productos-0-producto': 'Torta prueba',
+            'productos-0-codigo': '1', 'productos-0-produccion_planeada': 200,
+            'productos-0-produccion_real': 150,
+            'detenciones-TOTAL_FORMS': 1, 'detenciones-INITIAL_FORMS': 0,
+            'reprocesos-TOTAL_FORMS': 1, 'reprocesos-INITIAL_FORMS': 0,
+            'accion': 'aprobar_excepcion',
+        }
+        respuesta = self.client.post(url, datos)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertTrue(respuesta.context['excepcion'].errors)
+        self.assertFalse(ResumenTurnoOee.objects.exists())
+        datos['justificacion_excepcion'] = 'Revisado por procesos <script>alert(1)</script>'
+        self.assertRedirects(self.client.post(url, datos), reverse('lista_turnos'))
+        self.assertEqual(ResumenTurnoOee.objects.get().oee, 300)
+        self.assertEqual(LogEntry.objects.count(), 1)
+        respuesta = self.client.get(reverse('resumen_turno', args=[self.lote.id]))
+        self.assertContains(respuesta, '&lt;script&gt;')
+        self.assertNotContains(respuesta, '<script>alert(1)</script>')

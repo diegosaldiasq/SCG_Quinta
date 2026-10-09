@@ -61,6 +61,14 @@
                 {% endif %}
             </div>
 
+            {% for aprobacion in aprobaciones_excepcion %}
+            <div class="resumen-box">
+                <h2>Aprobación excepcional</h2>
+                <p><strong>Aprobado por:</strong> {{ aprobacion.user.get_username }} · {{ aprobacion.action_time|date:'d-m-Y H:i' }}</p>
+                <p>{{ aprobacion.change_message }}</p>
+            </div>
+            {% endfor %}
+
             <!-- Botones bajo el resumen -->
             <div class="botones-resumen">
                 {% if resumen.verificado %}

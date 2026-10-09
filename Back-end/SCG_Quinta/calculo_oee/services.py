@@ -22,7 +22,7 @@ def obtener_un_pp(planta, supervisor, cliente, producto, codigo):
     return float(item.un_pp) if item and item.un_pp is not None else 0
 
 
-def evaluar_turno(lote):
+def evaluar_turno(lote, *, permitir_fuera_rango=False):
     """Devuelve datos del resumen y motivos; nunca guarda ni limita porcentajes."""
     motivos = []
     personas = lote.numero_personas or 0
@@ -98,13 +98,16 @@ def evaluar_turno(lote):
     rendimiento = real / teorica * 100
     calidad = (real - malos) / real * 100 if real else 0
     oee = disponibilidad * rendimiento * calidad / 10000
-    limite = float(getattr(settings, 'OEE_RENDIMIENTO_MAXIMO', 100))
+    limite = float(getattr(settings, 'OEE_RENDIMIENTO_MAXIMO', 200))
     if not isfinite(limite) or limite < 100:
         raise ValueError('OEE_RENDIMIENTO_MAXIMO debe ser finito y mayor o igual a 100.')
-    if rendimiento > limite + 1e-9:
+    limite_oee = float(getattr(settings, 'OEE_MAXIMO', 200))
+    if not isfinite(limite_oee) or limite_oee < 100:
+        raise ValueError('OEE_MAXIMO debe ser finito y mayor o igual a 100.')
+    if not permitir_fuera_rango and rendimiento > limite + 1e-9:
         motivos.append(f'Rendimiento {rendimiento:.2f} % superior al límite de {limite:g} %. Revisar tasa nominal, personas y producción.')
-    if oee > 200 + 1e-9:
-        motivos.append(f'OEE {oee:.2f} % superior al 200 %.')
+    if not permitir_fuera_rango and oee > limite_oee + 1e-9:
+        motivos.append(f'OEE {oee:.2f} % superior al límite de {limite_oee:g} %.')
     if motivos:
         return None, motivos
 
@@ -130,14 +133,43 @@ def evaluar_turno(lote):
 
 
 @transaction.atomic
-def calcular_oee_automatico(lote_id):
+def calcular_oee_automatico(lote_id, *, usuario_excepcion=None, justificacion=''):
+    excepcional = usuario_excepcion is not None
+    if excepcional:
+        from django.core.exceptions import PermissionDenied
+        if not (usuario_excepcion.is_authenticated and usuario_excepcion.is_active
+                and (usuario_excepcion.is_staff or usuario_excepcion.is_superuser)):
+            raise PermissionDenied('Solo administración puede aprobar una excepción de OEE.')
+        justificacion = str(justificacion).strip()
+        if not justificacion or len(justificacion) > 2000:
+            raise ValueError('La justificación es obligatoria y admite hasta 2000 caracteres.')
     # Serializar todos los cálculos de un mismo turno para impedir duplicados.
     lote = TurnoOEE.objects.select_for_update().get(pk=lote_id)
     existente = lote.resumenes_turno.first()
     if existente:
         # Los resúmenes históricos y la verificación humana se conservan.
         return existente, []
-    datos, motivos = evaluar_turno(lote)
+    datos, motivos = evaluar_turno(lote, permitir_fuera_rango=excepcional)
     if motivos:
         return None, motivos
-    return ResumenTurnoOee.objects.create(lote=lote, **datos), []
+    resumen = ResumenTurnoOee.objects.create(lote=lote, **datos)
+    if excepcional:
+        from django.contrib.admin.models import LogEntry, CHANGE
+        from django.contrib.contenttypes.models import ContentType
+        from django.utils import timezone
+        resumen.verificado = True
+        resumen.verificado_por = usuario_excepcion.get_username()[:50]
+        resumen.fecha_de_verificacion = timezone.now()
+        resumen.save(update_fields=['verificado', 'verificado_por', 'fecha_de_verificacion'])
+        # El registro de administración conserva usuario, fecha, motivo y valores.
+        # Se guarda en la misma transacción: si falla, no se crea el resumen.
+        LogEntry.objects.log_action(
+            user_id=usuario_excepcion.pk,
+            content_type_id=ContentType.objects.get_for_model(ResumenTurnoOee).pk,
+            object_id=resumen.pk, object_repr=str(resumen)[:200], action_flag=CHANGE,
+            change_message=(f'Aprobación excepcional de OEE. '
+                            f'Rendimiento: {resumen.eficiencia:.2f} %. '
+                            f'OEE: {resumen.oee:.2f} %. '
+                            f'Justificación: {justificacion}'),
+        )
+    return resumen, []

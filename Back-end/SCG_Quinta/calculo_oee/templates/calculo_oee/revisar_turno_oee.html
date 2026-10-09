@@ -55,7 +55,13 @@
                 {{ reprocesos.management_form }}{{ reprocesos.non_form_errors }}
                 {% for fila in reprocesos %}<div class="revision-fila">{{ fila.as_p }}</div>{% endfor %}
             </div>
-            <button type="submit" class="primary-button">Guardar correcciones y recalcular OEE</button>
+            <button type="submit" name="accion" value="recalcular" class="primary-button">Guardar correcciones y recalcular OEE</button>
+            <div class="revision-seccion">
+                <h2>Aprobación excepcional</h2>
+                <p>Después de revisar los datos, puedes aprobar un rendimiento u OEE superior al límite. Las demás validaciones se mantienen. El resultado quedará verificado con tu usuario, fecha y justificación.</p>
+                {{ excepcion.as_p }}
+                <button type="submit" name="accion" value="aprobar_excepcion" class="primary-button">Aprobar excepción y calcular OEE</button>
+            </div>
         </form>
         {% else %}
         <p>Solicita a administración corregir los datos indicados.</p>

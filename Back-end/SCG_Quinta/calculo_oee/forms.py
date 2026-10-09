@@ -279,3 +279,11 @@ ReprocesosRevisionFormSet = inlineformset_factory(
     TurnoOEE, Reproceso, fields=['motivo', 'cantidad', 'comentarios'],
     extra=1, can_delete=True,
 )
+
+
+class AprobacionExcepcionOEEForm(forms.Form):
+    justificacion_excepcion = forms.CharField(
+        required=False, max_length=2000, strip=True,
+        label='Justificación de la aprobación excepcional',
+        widget=forms.Textarea(attrs={'rows': 3, 'maxlength': 2000}),
+    )
