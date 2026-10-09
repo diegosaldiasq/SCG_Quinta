@@ -21,6 +21,18 @@
         <div class="login_container">
             <h1 class="title">📋 Listado de Turnos OEE</h1>
 
+            {% for message in messages %}
+            <p role="status">{{ message }}</p>
+            {% endfor %}
+            {% if request.user.is_staff or request.user.is_superuser %}
+            <form method="post" action="{% url 'procesar_oee_pendientes' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="primary-button">Calcular automáticamente los turnos pendientes</button>
+                <p>Los registros inconsistentes quedan en revisión. Los resúmenes existentes se conservan.</p>
+            </form>
+            {% endif %}
+
             <!-- 🔎 Filtros -->
             <form method="get" class="filtros">
                 <div class="campo-filtro">
@@ -115,8 +127,8 @@
                     <label>🧮 Estado:</label>
                     <select name="estado">
                         <option value="">--Todos--</option>
-                        <option value="calcular_oee" {% if filtro_estado == 'calcular_oee' %}selected{% endif %}>
-                        Calcular OEE
+                        <option value="revision_oee" {% if filtro_estado == 'calcular_oee' or filtro_estado == 'revision_oee' %}selected{% endif %}>
+                        Requiere revisión / pendiente
                         </option>
                         <option value="cerrar_turno" {% if filtro_estado == 'cerrar_turno' %}selected{% endif %}>
                         Cerrar turno
@@ -149,6 +161,7 @@
                             <th>👤 Supervisor</th>
                             <th>📈 Producción Plan</th>
                             <th>✅ Producción Real</th>
+                            <th>Estado / motivo</th>
                             <th>⚙️ Acciones</th>
                         </tr>
                     </thead>
@@ -165,7 +178,15 @@
                             <td>{{ t.lote }}</td>
                             <td>{{ t.supervisor }}</td>
                             <td>{{ t.produccion_planeada|default:'-' }}</td>
-                            <td>{{ t.produccion_real|default:'-' }}</td>
+                            <td>{{ t.produccion_real|default_if_none:'-' }}</td>
+                            <td>
+                                {% if t.tiene_resumen %}Calculado
+                                {% elif t.produccion_real == None %}Pendiente de cierre
+                                {% elif t.motivos_revision %}
+                                <strong>Requiere revisión</strong>
+                                <ul>{% for motivo in t.motivos_revision %}<li>{{ motivo }}</li>{% endfor %}</ul>
+                                {% else %}Pendiente de cálculo automático{% endif %}
+                            </td>
                             <td>
                                 {% if t.produccion_real == None %}
                                     <a
@@ -185,17 +206,17 @@
 
                                 {% else %}
                                     <a
-                                        href="{% url 'resumen_turno' t.id %}?next={{ request.get_full_path|urlencode }}"
+                                        href="{% url 'revisar_turno_oee' t.id %}?next={{ request.get_full_path|urlencode }}"
                                         class="primary-button"
                                     >
-                                        Calcular OEE
+                                        Requiere revisión / pendiente
                                     </a>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="12">⚠️ No hay turnos registrados.</td>
+                            <td colspan="13">⚠️ No hay turnos registrados.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

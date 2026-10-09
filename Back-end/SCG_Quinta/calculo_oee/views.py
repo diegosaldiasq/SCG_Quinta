@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import TurnoOEE, Producto, Detencion, Reproceso, ResumenTurnoOee
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from .forms import ProduccionRealForm, TurnoOEEForm
+from .forms import ProduccionRealForm, TurnoOEEForm, RevisionTurnoOEEForm, ProductosRevisionFormSet, DetencionesRevisionFormSet, ReprocesosRevisionFormSet
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -18,10 +18,10 @@ from django.forms.models import model_to_dict
 from openpyxl import Workbook
 from datetime import datetime
 import pytz
-from urllib.parse import unquote
+from urllib.parse import unquote, urlencode
 from django.db.models import Exists, OuterRef
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Value, FloatField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.functions import ExtractWeek, ExtractYear, ExtractIsoYear
@@ -36,57 +36,8 @@ from django.contrib import messages
 
 # Create your views here.
 
-AREA_TORTAS = "TORTAS"
-AREA_INSUMOS_KUCHEN = "INSUMOS_KUCHEN"
-
-CONFIGURACION_PLANTAS = {
-    TurnoOEE.PLANTA_ENEA: {
-        "nombre": "ENEA",
-
-        "area_por_supervisor": {
-            "Fabian Moncada": AREA_TORTAS,
-            "Angela Tacon": AREA_TORTAS,
-            "Felipe Campos": AREA_TORTAS,
-        },
-
-        "clientes_por_area": {
-            AREA_TORTAS: [
-                "Jumbo",
-                "SISA",
-            ],
-        },
-    },
-
-    TurnoOEE.PLANTA_PUERTO_VESPUCIO: {
-        "nombre": "Puerto Vespucio",
-
-        "area_por_supervisor": {
-            "Sebastian Ibarra": AREA_TORTAS,
-            "Andres Gonzales": AREA_TORTAS,
-            "Patricio Cardenas": AREA_TORTAS,
-
-            "Larry Torres": AREA_INSUMOS_KUCHEN,
-            "Moises Mejias": AREA_INSUMOS_KUCHEN,
-            "Carlos Diaz": AREA_INSUMOS_KUCHEN,
-        },
-
-        "clientes_por_area": {
-            AREA_TORTAS: [
-                "Walmart",
-                "Unimarc",
-            ],
-
-            AREA_INSUMOS_KUCHEN: [
-                "Insumo",
-                "Jumbo",
-                "Pasteles",
-                "SISA",
-                "Sub",
-                "Walmart",
-            ],
-        },
-    },
-}
+from .configuracion import AREA_TORTAS, AREA_INSUMOS_KUCHEN, CONFIGURACION_PLANTAS
+from .services import calcular_oee_automatico, evaluar_turno, obtener_un_pp
 
 
 def obtener_catalogo_por_area(planta, area):
@@ -114,7 +65,7 @@ def obtener_catalogo_por_area(planta, area):
         ).append({
             "producto": item.producto,
             "codigo": item.codigo,
-            "un_pp": float(item.un_pp or 80),
+            "un_pp": float(item.un_pp or 0),
         })
 
     return catalogo
@@ -134,43 +85,6 @@ def obtener_catalogos_por_supervisor(planta):
 
     return catalogos
 
-
-def obtener_un_pp(
-    planta,
-    supervisor,
-    cliente,
-    producto,
-    codigo
-):
-    configuracion = CONFIGURACION_PLANTAS.get(planta)
-
-    if not configuracion:
-        return 0
-
-    area = configuracion[
-        "area_por_supervisor"
-    ].get(supervisor)
-
-    if not area:
-        return 0
-
-    clientes_permitidos = configuracion[
-        "clientes_por_area"
-    ].get(area, [])
-
-    item = ProductoControlPeso.objects.filter(
-        area=area,
-        activo=True,
-        cliente__in=clientes_permitidos,
-        cliente=cliente,
-        producto=producto,
-        codigo=codigo,
-    ).first()
-
-    if not item or not item.un_pp:
-        return 0
-
-    return float(item.un_pp)
 
 @transaction.atomic
 def _crear_turno_por_planta(request, planta):
@@ -198,6 +112,12 @@ def _crear_turno_por_planta(request, planta):
             reales = request.POST.getlist(
                 'produccion_real[]'
             )
+            if not all(len(valores) == len(productos) for valores in
+                       (clientes, codigos, planeadas, reales)):
+                form.add_error(None, 'El detalle de productos está incompleto. Recargue y complete todas las filas.')
+            for indice, valor in enumerate(reales, start=1):
+                if valor and not str(valor).isdigit():
+                    form.add_error(None, f'La producción real del producto N.º {indice} debe ser un entero mayor o igual a cero.')
             # Validar que exista al menos un producto.
             if not productos:
                 form.add_error(
@@ -227,12 +147,14 @@ def _crear_turno_por_planta(request, planta):
             comentarios_pro = request.POST.getlist(
                 'comentarios_producto[]'
             )
+            comentarios_pro = (comentarios_pro + [''] * len(productos))[:len(productos)]
             supervisor = form.cleaned_data.get("supervisor")
 
             area_supervisor = configuracion[
                 "area_por_supervisor"
             ].get(supervisor)
 
+            clientes_invalidos = set()
             if not area_supervisor:
                 form.add_error(
                     "supervisor",
@@ -311,6 +233,10 @@ def _crear_turno_por_planta(request, planta):
 
                 # La planta la determina el backend.
                 lote.planta = planta
+                lote.produccion_planeada = sum(int(valor) for valor in planeadas)
+                from django.conf import settings
+                if settings.USE_TZ and timezone.is_naive(lote.fecha):
+                    lote.fecha = timezone.make_aware(lote.fecha)
                 lote.save()
 
             if form.errors:
@@ -364,11 +290,9 @@ def _crear_turno_por_planta(request, planta):
                 if str(valor).isdigit()
             )
 
-            lote.produccion_real = sum(
-                int(valor)
-                for valor in reales
-                if str(valor).isdigit()
-            )
+            lote.produccion_real = (sum(
+                int(valor) for valor in reales if str(valor).isdigit()
+            ) if any(str(valor).isdigit() for valor in reales) else None)
 
             lote.save()
 
@@ -458,6 +382,13 @@ def _crear_turno_por_planta(request, planta):
                     ),
                 )
 
+            resumen, motivos = calcular_oee_automatico(lote.id)
+            if lote.produccion_real is None:
+                messages.success(request, 'Turno guardado. Falta cerrar la producción real.')
+            elif motivos:
+                messages.warning(request, 'Turno guardado. El OEE requiere revisión: ' + '; '.join(motivos))
+            else:
+                messages.success(request, 'Turno guardado y OEE calculado automáticamente.')
             return redirect('lista_turnos')
 
     else:
@@ -499,149 +430,39 @@ def crear_turno_puerto_vespucio(request):
 @login_required
 def resumen_turno(request, lote_id):
     lote = get_object_or_404(TurnoOEE, id=lote_id)
-    if (
-        lote.produccion_planeada is None
-        or lote.produccion_planeada <= 0
-    ):
-        messages.error(
-            request,
-            (
-                "No se puede calcular el OEE: "
-                "falta la producción planeada."
-            ),
-        )
-        return redirect('lista_turnos')
-
-    if lote.produccion_real is None:
-        messages.error(
-            request,
-            (
-                "No se puede calcular el OEE porque falta "
-                "ingresar la producción real. Si el turno "
-                "no tuvo producción, ingrese 0."
-            ),
-        )
-
-        return redirect(
-            'cerrar_turno',
-            lote_id=lote.id,
-        )
-
-    # Evitar duplicados en ResumenTurnoOee
-    if not ResumenTurnoOee.objects.filter(lote=lote).exists():
-        fecha = lote.fecha
-        turno = lote.turno
-        supervisor = lote.supervisor
-
-        # Productos asociados (pueden ser múltiples)
-        productos_qs = lote.productos.all()
-        if productos_qs.exists():
-            # Suma planeada y real desde productos
-            produccion_planificada = sum(
-                p.produccion_planeada or 0
-                for p in productos_qs
-            )
-
-            producciones_reales = [
-                p.produccion_real
-                for p in productos_qs
-                if p.produccion_real is not None
-            ]
-
-            if producciones_reales:
-                produccion_real = sum(producciones_reales)
-            else:
-                produccion_real = lote.produccion_real or 0
-            # Concatenar nombres y códigos únicos
-            productos_concat = ", ".join(
-                dict.fromkeys(p.producto for p in productos_qs if p.producto)
-            )
-            codigos_concat = ", ".join(
-                dict.fromkeys(p.codigo for p in productos_qs if p.codigo)
-            )
-            cliente_concat = ", ".join(
-                dict.fromkeys(p.cliente for p in productos_qs if p.cliente)
-            )
-            # Tasa nominal promedio (promedio simple)
-            tasas = []
-
-            for p in productos_qs:
-                un_pp = obtener_un_pp(lote.planta, lote.supervisor, p.cliente, p.producto, p.codigo)
-                if un_pp:
-                    tasas.append(un_pp)
-
-            tasa_nominal = sum(tasas) / len(tasas) if tasas else 80  # valor por defecto si no hay tasas
-        else:
-            # Caída a lógica previa de un solo producto en el turno
-            produccion_planificada = lote.produccion_planeada or 0
-            produccion_real = lote.produccion_real or 0
-            productos_concat = lote.producto
-            codigos_concat = lote.codigo or ""
-            cliente_concat = lote.cliente
-            tasa_nominal = obtener_un_pp(lote.planta, lote.supervisor, lote.cliente, lote.producto, lote.codigo)
-
-        tiempo_paro = sum(d.duracion for d in lote.detenciones.all())
-        productos_malos = sum(r.cantidad for r in lote.reprocesos.all())
-
-        tiempo_operativo = lote.tiempo_planeado - tiempo_paro
-        num_personas = lote.numero_personas or 0
-        produccion_teorica = tasa_nominal * num_personas
-
-        productos_buenos = produccion_real - productos_malos if produccion_real else 0
-
-        disponibilidad = tiempo_operativo / lote.tiempo_planeado if lote.tiempo_planeado else 0
-        rendimiento = produccion_real / produccion_teorica if produccion_teorica else 0
-        calidad = productos_buenos / produccion_real if produccion_real else 0
-        oee = disponibilidad * rendimiento * calidad * 100  # en %
-
-        ResumenTurnoOee.objects.create(
-            planta=lote.planta,
-            fecha=fecha,
-            turno=turno,
-            supervisor=supervisor,
-            lote=lote,
-            cliente=cliente_concat,
-            codigo=codigos_concat,
-            producto=productos_concat,
-            linea=lote.linea,
-            tiempo_paro=tiempo_paro,
-            tiempo_planeado=lote.tiempo_planeado,
-            produccion_teorica=round(produccion_teorica),
-            produccion_planificada=produccion_planificada,
-            produccion_real=produccion_real,
-            productos_malos=productos_malos,
-            productos_buenos=productos_buenos,
-            numero_personas=lote.numero_personas,
-            unidades_por_persona=round(produccion_real / lote.numero_personas, 2) if lote.numero_personas else 0,
-            unidades_pp_hora=round(produccion_real / (lote.tiempo_planeado / 60) / lote.numero_personas, 2) if lote.numero_personas and lote.tiempo_planeado else 0,
-            eficiencia=round(rendimiento * 100, 2),
-            disponibilidad=round(disponibilidad * 100, 2),
-            calidad=round(calidad * 100, 2),
-            oee=round(oee, 2)
-        )
-
-    resumen = ResumenTurnoOee.objects.get(lote=lote)
-
-    raw_next = request.GET.get('next', '')
-    if raw_next:
-        next_url = unquote(raw_next)
-    else:
-        next_url = reverse('lista_turnos')
-
+    resumen = lote.resumenes_turno.first()
+    if resumen is None:
+        # Las visitas no escriben datos: los pendientes se revisan mediante POST.
+        return redirect(reverse('revisar_turno_oee', args=[lote.id]) + '?' +
+                        urlencode({'next': _siguiente_url(request)}))
     return render(request, 'calculo_oee/resumen_turno.html', {
         'resumen': resumen,
-        'next_url': next_url,
+        'next_url': _siguiente_url(request),
     })
 
-@csrf_exempt
+
 @login_required
 def cerrar_turno(request, lote_id):
     lote = get_object_or_404(TurnoOEE, id=lote_id)
+    if lote.resumenes_turno.exists():
+        return redirect('resumen_turno', lote_id=lote.id)
 
     if request.method == 'POST':
         form = ProduccionRealForm(request.POST, instance=lote)
         if form.is_valid():
-            form.save()
+            with transaction.atomic():
+                bloqueado = TurnoOEE.objects.select_for_update().get(pk=lote_id)
+                if bloqueado.resumenes_turno.exists():
+                    return redirect('resumen_turno', lote_id=lote_id)
+                lote = form.save()
+                productos = list(lote.productos.all())
+                if len(productos) == 1:
+                    productos[0].produccion_real = lote.produccion_real
+                    productos[0].save(update_fields=['produccion_real'])
+                resumen, motivos = calcular_oee_automatico(lote.id)
+            if motivos:
+                messages.warning(request, 'El turno requiere revisión: ' + '; '.join(motivos))
+                return redirect('revisar_turno_oee', lote_id=lote.id)
             return redirect('resumen_turno', lote_id=lote.id)
     else:
         form = ProduccionRealForm(instance=lote)
@@ -682,7 +503,7 @@ def lista_turnos(request):
 
      # --- 2. Filtro por estado (nuevo) ---
     estado = request.GET.get('estado', '')
-    if estado == 'calcular_oee':
+    if estado in ('calcular_oee', 'revision_oee'):
         # Tiene produccion_real, pero no tiene resumen aún
         qs = qs.filter(produccion_real__isnull=False, tiene_resumen=False)
     elif estado == 'cerrar_turno':
@@ -726,6 +547,12 @@ def lista_turnos(request):
     paginator = Paginator(qs, 10)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
+    from django.db.models import prefetch_related_objects
+    prefetch_related_objects(page_obj.object_list, 'productos', 'detenciones', 'reprocesos')
+    for lote in page_obj:
+        lote.motivos_revision = []
+        if lote.produccion_real is not None and not lote.tiene_resumen:
+            _, lote.motivos_revision = evaluar_turno(lote)
 
     # Construimos un querystring sin el parámetro page:
     query_params = request.GET.copy()
@@ -1707,3 +1534,78 @@ def grafico_detenciones_semanales(request):
         request,
         "calculo_oee/grafico_detenciones_semanales.html",
     )
+
+def _siguiente_url(request):
+    from django.utils.http import url_has_allowed_host_and_scheme
+    valor = request.POST.get('next') or request.GET.get('next', '')
+    if valor and url_has_allowed_host_and_scheme(
+        valor, allowed_hosts={request.get_host()}, require_https=request.is_secure(),
+    ):
+        return valor
+    return reverse('lista_turnos')
+
+
+@login_required
+def revisar_turno_oee(request, lote_id):
+    lote = get_object_or_404(TurnoOEE, pk=lote_id)
+    if lote.resumenes_turno.exists():
+        return redirect('resumen_turno', lote_id=lote.id)
+    puede_editar = request.user.is_staff or request.user.is_superuser
+    if request.method == 'POST' and not puede_editar:
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied('Solo administración puede corregir un turno para revisión.')
+    _, motivos = evaluar_turno(lote)
+    if request.method == 'POST':
+        # El mismo bloqueo protege los cambios y el cálculo de un turno.
+        with transaction.atomic():
+            lote = TurnoOEE.objects.select_for_update().get(pk=lote_id)
+            if lote.resumenes_turno.exists():
+                return redirect('resumen_turno', lote_id=lote.id)
+            form = RevisionTurnoOEEForm(request.POST, instance=lote)
+            productos = ProductosRevisionFormSet(request.POST, instance=lote, prefix='productos')
+            detenciones = DetencionesRevisionFormSet(request.POST, instance=lote, prefix='detenciones')
+            reprocesos = ReprocesosRevisionFormSet(request.POST, instance=lote, prefix='reprocesos')
+            validaciones = [f.is_valid() for f in (form, productos, detenciones, reprocesos)]
+            if all(validaciones):
+                form.save()
+                productos.save()
+                detenciones.save()
+                reprocesos.save()
+                resumen, motivos = calcular_oee_automatico(lote.id)
+                if resumen:
+                    messages.success(request, 'Datos corregidos y OEE calculado automáticamente.')
+                    return redirect(_siguiente_url(request))
+                messages.warning(request, 'Datos guardados. El turno aún requiere revisión.')
+                # Redirigir evita repetir altas de detenciones al recargar.
+                return redirect(reverse('revisar_turno_oee', args=[lote.id]) + '?' +
+                                urlencode({'next': _siguiente_url(request)}))
+    else:
+        form = RevisionTurnoOEEForm(instance=lote)
+        productos = ProductosRevisionFormSet(instance=lote, prefix='productos')
+        detenciones = DetencionesRevisionFormSet(instance=lote, prefix='detenciones')
+        reprocesos = ReprocesosRevisionFormSet(instance=lote, prefix='reprocesos')
+    return render(request, 'calculo_oee/revisar_turno_oee.html', {
+        'lote': lote, 'motivos': motivos, 'form': form, 'productos': productos,
+        'detenciones': detenciones, 'reprocesos': reprocesos,
+        'puede_editar': puede_editar, 'next_url': _siguiente_url(request),
+    })
+
+
+@login_required
+@require_POST
+def procesar_oee_pendientes(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied
+    calculados = revision = 0
+    ids = TurnoOEE.objects.filter(
+        produccion_real__isnull=False, resumenes_turno__isnull=True,
+    ).values_list('pk', flat=True)
+    for lote_id in ids.iterator():
+        resumen, motivos = calcular_oee_automatico(lote_id)
+        if resumen:
+            calculados += 1
+        else:
+            revision += 1
+    messages.success(request, f'{calculados} turnos calculados; {revision} turnos requieren revisión.')
+    return redirect(_siguiente_url(request))

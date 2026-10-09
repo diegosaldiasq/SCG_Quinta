@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect
 from . import views
 
 urlpatterns = [
+    path('revision/<int:lote_id>/', views.revisar_turno_oee, name='revisar_turno_oee'),
+    path('procesar-pendientes/', views.procesar_oee_pendientes, name='procesar_oee_pendientes'),
     #path("", views.calculo_oee, name="calculo_oee"),
     path('crear_turno/', views.crear_turno, name='crear_turno'),
     path('turno-exito/', lambda request: HttpResponse("Turno registrado con éxito."), name='turno_exito'),

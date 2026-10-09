@@ -223,3 +223,59 @@ class ProduccionRealForm(forms.ModelForm):
     class Meta:
         model = TurnoOEE
         fields = ['produccion_real']
+
+
+class RevisionTurnoOEEForm(forms.ModelForm):
+    numero_personas = forms.IntegerField(min_value=1)
+    tiempo_planeado = forms.IntegerField(min_value=1)
+    produccion_planeada = forms.IntegerField(min_value=1)
+    produccion_real = forms.IntegerField(min_value=0)
+
+    class Meta:
+        model = TurnoOEE
+        fields = ['supervisor', 'numero_personas', 'tiempo_planeado',
+                  'produccion_planeada', 'produccion_real', 'cliente', 'producto', 'codigo']
+
+
+from django.forms import inlineformset_factory
+from .models import Producto, Detencion, Reproceso
+
+
+class ProductoRevisionForm(forms.ModelForm):
+    produccion_planeada = forms.IntegerField(min_value=1)
+    produccion_real = forms.IntegerField(min_value=0)
+
+    class Meta:
+        model = Producto
+        fields = ['cliente', 'producto', 'codigo', 'produccion_planeada',
+                  'produccion_real', 'comentarios']
+
+
+class DetencionRevisionForm(forms.ModelForm):
+    class Meta:
+        model = Detencion
+        fields = ['motivo', 'hora_inicio', 'hora_fin', 'comentarios']
+        widgets = {
+            'hora_inicio': forms.TimeInput(format='%H:%M', attrs={'type': 'time'}),
+            'hora_fin': forms.TimeInput(format='%H:%M', attrs={'type': 'time'}),
+        }
+
+    def clean(self):
+        datos = super().clean()
+        inicio, fin = datos.get('hora_inicio'), datos.get('hora_fin')
+        if inicio and fin:
+            self.instance.duracion = ((fin.hour * 60 + fin.minute)
+                                      - (inicio.hour * 60 + inicio.minute)) % 1440
+        return datos
+
+
+ProductosRevisionFormSet = inlineformset_factory(
+    TurnoOEE, Producto, form=ProductoRevisionForm, extra=0, can_delete=False,
+)
+DetencionesRevisionFormSet = inlineformset_factory(
+    TurnoOEE, Detencion, form=DetencionRevisionForm, extra=1, can_delete=True,
+)
+ReprocesosRevisionFormSet = inlineformset_factory(
+    TurnoOEE, Reproceso, fields=['motivo', 'cantidad', 'comentarios'],
+    extra=1, can_delete=True,
+)
