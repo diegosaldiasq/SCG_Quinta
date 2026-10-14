@@ -365,7 +365,14 @@ def descargar_historial_trazabilidad_excel(request):
         .order_by("-fecha_registro")
     )
 
-    form = HistorialTrazabilidadFilterForm(request.GET)
+    parametros = request.GET.copy()
+    # Los filtros explícitos del historial tienen prioridad sobre la sesión de inicio.
+    if not any(campo in parametros for campo in ("desde", "hasta")):
+        for campo, clave_sesion in (("desde", "fechainicio"), ("hasta", "fechafin")):
+            fecha = request.session.get(clave_sesion)
+            if fecha:
+                parametros[campo] = fecha
+    form = HistorialTrazabilidadFilterForm(parametros)
     if not form.is_valid():
         return HttpResponse("Filtros inválidos: revise las fechas y los campos seleccionados.", status=400)
     filtros = form.cleaned_data
@@ -437,7 +444,7 @@ def descargar_historial_trazabilidad_excel(request):
                     registro.producto.nombre if registro.producto else "",
                     registro.codigo_producto or "",
                     registro.lote_producto or "",
-                    registro.unidades_elaboradas,
+                registro.unidades_elaboradas,
                     registro.fecha_elaboracion_producto,
                     registro.turno or "",
                     registro.linea or "",
