@@ -226,12 +226,12 @@ def historial_trazabilidad(request):
 
         if desde:
             registros_qs = registros_qs.filter(
-                fecha_registro__gte=datetime.combine(desde, time.min)
+                fecha_elaboracion_producto__gte=desde
             )
 
         if hasta:
             registros_qs = registros_qs.filter(
-                fecha_registro__lte=datetime.combine(hasta, time.max)
+                fecha_elaboracion_producto__lte=hasta
             )
 
         if lote_producto:
@@ -243,6 +243,16 @@ def historial_trazabilidad(request):
             registros_qs = registros_qs.filter(
                 detalles__lote__icontains=lote_ingrediente.strip()
             ).distinct()
+
+    if form.is_bound and not form.is_valid():
+        registros_qs = registros_qs.none()
+
+    if form.is_valid():
+        estado = form.cleaned_data.get("estado_verificacion")
+        if estado == "no_verificados":
+            registros_qs = registros_qs.filter(verificado=False)
+        elif estado == "verificados":
+            registros_qs = registros_qs.filter(verificado=True)
 
     paginator = Paginator(registros_qs, 10)  # 10 registros por página
     page_number = request.GET.get("page")
@@ -355,62 +365,24 @@ def descargar_historial_trazabilidad_excel(request):
         .order_by("-fecha_registro")
     )
 
-    cliente_id = request.GET.get("cliente")
-    producto_id = request.GET.get("producto")
-    turno = request.GET.get("turno")
-    linea = request.GET.get("linea")
-    lote_producto = request.GET.get("lote_producto")
-    lote_ingrediente = request.GET.get("lote_ingrediente")
-    estado_verificacion = request.GET.get("estado_verificacion")
-
-    # Primero intenta tomar fechas desde GET
-    desde = request.GET.get("desde")
-    hasta = request.GET.get("hasta")
-
-    # Si no vienen por GET, toma las fechas guardadas en sesión desde /inicio
-    if not desde:
-        desde = request.session.get("fechainicio")
-    if not hasta:
-        hasta = request.session.get("fechafin")
-
-    if cliente_id:
-        registros = registros.filter(cliente_id=cliente_id)
-
-    if producto_id:
-        registros = registros.filter(producto_id=producto_id)
-
-    if turno:
-        registros = registros.filter(turno=turno)
-
-    if linea:
-        registros = registros.filter(linea=linea)
-
-    # Filtro por FECHA ELABORACION PRODUCTO
-    if desde:
-        try:
-            desde_date = datetime.strptime(desde, "%Y-%m-%d").date()
-            registros = registros.filter(fecha_elaboracion_producto__gte=desde_date)
-        except ValueError:
-            pass
-
-    if hasta:
-        try:
-            hasta_date = datetime.strptime(hasta, "%Y-%m-%d").date()
-            registros = registros.filter(fecha_elaboracion_producto__lte=hasta_date)
-        except ValueError:
-            pass
-
-    if lote_producto:
-        registros = registros.filter(lote_producto__icontains=lote_producto.strip())
-
-    if lote_ingrediente:
-        registros = registros.filter(
-            detalles__lote__icontains=lote_ingrediente.strip()
-        ).distinct()
-
-    if estado_verificacion == "no_verificados":
+    form = HistorialTrazabilidadFilterForm(request.GET)
+    if not form.is_valid():
+        return HttpResponse("Filtros inválidos: revise las fechas y los campos seleccionados.", status=400)
+    filtros = form.cleaned_data
+    for campo in ("cliente", "producto", "turno", "linea"):
+        if filtros.get(campo):
+            registros = registros.filter(**{campo: filtros[campo]})
+    if filtros.get("desde"):
+        registros = registros.filter(fecha_elaboracion_producto__gte=filtros["desde"])
+    if filtros.get("hasta"):
+        registros = registros.filter(fecha_elaboracion_producto__lte=filtros["hasta"])
+    if filtros.get("lote_producto"):
+        registros = registros.filter(lote_producto__icontains=filtros["lote_producto"].strip())
+    if filtros.get("lote_ingrediente"):
+        registros = registros.filter(detalles__lote__icontains=filtros["lote_ingrediente"].strip()).distinct()
+    if filtros.get("estado_verificacion") == "no_verificados":
         registros = registros.filter(verificado=False)
-    elif estado_verificacion == "verificados":
+    elif filtros.get("estado_verificacion") == "verificados":
         registros = registros.filter(verificado=True)
 
     if not registros.exists():
@@ -426,7 +398,7 @@ def descargar_historial_trazabilidad_excel(request):
     ws.title = "Trazabilidad"
 
     encabezados = [
-        "Cliente", "Producto", "Código", "Lote producto", "Fecha elab. producto",
+        "Cliente", "Producto", "Código", "Lote producto", "Unidades elaboradas", "Fecha elab. producto",
         "Turno", "Línea", "Elaborado por", "Fecha registro",
         "Ingrediente", "Proveedor", "Lote ingrediente", "Fecha elaboración",
         "Fecha vencimiento", "Acción correctiva", "Observaciones",
@@ -465,6 +437,7 @@ def descargar_historial_trazabilidad_excel(request):
                     registro.producto.nombre if registro.producto else "",
                     registro.codigo_producto or "",
                     registro.lote_producto or "",
+                    registro.unidades_elaboradas,
                     registro.fecha_elaboracion_producto,
                     registro.turno or "",
                     registro.linea or "",
@@ -490,6 +463,7 @@ def descargar_historial_trazabilidad_excel(request):
                 registro.producto.nombre if registro.producto else "",
                 registro.codigo_producto or "",
                 registro.lote_producto or "",
+                    registro.unidades_elaboradas,
                 registro.fecha_elaboracion_producto,
                 registro.turno or "",
                 registro.linea or "",

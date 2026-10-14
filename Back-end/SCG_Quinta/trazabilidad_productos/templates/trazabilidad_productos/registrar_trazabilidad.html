@@ -133,7 +133,13 @@
                         <input type="date" id="id_fecha_modificacion" readonly>
                     </div>
 
-                    <div class="campo"></div>
+                    <div class="campo">
+                        <label for="id_unidades_elaboradas">Unidades elaboradas</label>
+                        {{ form.unidades_elaboradas }}
+                        {% if form.unidades_elaboradas.errors %}
+                            <small class="error-text">{{ form.unidades_elaboradas.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="grid grid-1">

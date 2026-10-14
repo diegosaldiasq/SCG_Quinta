@@ -3,6 +3,11 @@ from .models import RegistroTrazabilidad, Cliente, Producto
 
 
 class RegistroTrazabilidadForm(forms.ModelForm):
+    unidades_elaboradas = forms.IntegerField(
+        label="Unidades elaboradas", min_value=1, required=True,
+        widget=forms.NumberInput(attrs={"min": 1, "step": 1})
+    )
+
     class Meta:
         model = RegistroTrazabilidad
         fields = [
@@ -10,6 +15,7 @@ class RegistroTrazabilidadForm(forms.ModelForm):
             "producto",
             "codigo_producto",
             "lote_producto",
+            "unidades_elaboradas",
             "fecha_elaboracion_producto",
             "turno",
             "linea",
@@ -76,3 +82,11 @@ class HistorialTrazabilidadFilterForm(forms.Form):
                 .distinct()
             )
             self.fields[campo].choices = [("", etiqueta)] + [(valor, valor) for valor in valores]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        desde = cleaned_data.get("desde")
+        hasta = cleaned_data.get("hasta")
+        if desde and hasta and desde > hasta:
+            self.add_error("hasta", "La fecha final no puede ser anterior a la inicial.")
+        return cleaned_data

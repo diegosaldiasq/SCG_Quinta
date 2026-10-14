@@ -39,6 +39,7 @@
     <div class="bloque">
         <h2>Filtros</h2>
 
+        {{ form.errors }}
         <form method="get" class="filtros">
 
             <label>
@@ -62,13 +63,14 @@
             </label>
 
             <label>
-                Desde
+                Fecha elaboración desde
                 {{ form.desde }}
             </label>
 
             <label>
-                Hasta
+                Fecha elaboración hasta
                 {{ form.hasta }}
+                {{ form.hasta.errors }}
             </label>
 
             <label>
@@ -116,6 +118,7 @@
                     <!-- DATOS RESUMEN -->
                     <div class="grid grid-4 datos-resumen">
 
+                        <div><strong>Unidades elaboradas:</strong> {{ registro.unidades_elaboradas|default_if_none:"Sin registro" }}</div>
                         <div><strong>Lote producto:</strong> {{ registro.lote_producto|default:"-" }}</div>
                         <div><strong>Fecha elab. producto:</strong> {{ registro.fecha_elaboracion_producto|date:"d/m/Y"|default:"-" }}</div>
                         <div><strong>Turno:</strong> {{ registro.turno|default:"-" }}</div>

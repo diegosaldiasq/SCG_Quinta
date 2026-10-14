@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -76,6 +77,10 @@ class RegistroTrazabilidad(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
     codigo_producto = models.CharField(max_length=50)
+
+    unidades_elaboradas = models.PositiveIntegerField(
+        "Unidades elaboradas", null=True, blank=True, validators=[MinValueValidator(1)]
+    )
 
     lote_producto = models.CharField(max_length=100, blank=True, null=True)
     fecha_elaboracion_producto = models.DateField(blank=True, null=True)
