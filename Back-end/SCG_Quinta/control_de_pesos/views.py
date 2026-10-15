@@ -411,7 +411,7 @@ def solo_usuarios_autorizados(view_func):
     @wraps(view_func)
     @login_required
     def wrapper(request, *args, **kwargs):
-        usuarios_autorizados = {1, 47, 58, 75}
+        usuarios_autorizados = {1, 42, 47, 58, 75}
 
         if request.user.pk not in usuarios_autorizados:
             raise PermissionDenied(
