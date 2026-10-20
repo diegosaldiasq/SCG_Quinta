@@ -226,10 +226,40 @@ def verificar(request):
         # Obtener el modelo dinámicamente utilizando apps.get_model
         model = apps.get_model(config , model_name) 
         datos_sf = model.objects.filter(verificado=False)
+
+        planta_seleccionada = ''
+        plantas = []
+
+        if config == 'higiene_y_conducta_personal':
+            planta_seleccionada = request.GET.get('planta', '')
+
+            # Obtener las plantas que tienen registros pendientes.
+            plantas = (
+                datos_sf
+                .exclude(planta='')
+                .exclude(planta__isnull=True)
+                .order_by('planta')
+                .values_list('planta', flat=True)
+                .distinct()
+            )
+
+            if planta_seleccionada:
+                datos_sf = datos_sf.filter(planta=planta_seleccionada)
+
+        # Mantener un orden estable entre páginas.
+        datos_sf = datos_sf.order_by('id')
+
         paginator = Paginator(datos_sf, 10)
         datos = paginator.get_page(pagina_numero)
         nombres_campos = get_field_names(model)
-        return render(request, 'inicio/verificar.html', {'datos': datos, 'config': config, 'nombres_campos': nombres_campos})
+
+        return render(request, 'inicio/verificar.html', {
+            'datos': datos,
+            'config': config,
+            'nombres_campos': nombres_campos,
+            'plantas': plantas,
+            'planta_seleccionada': planta_seleccionada,
+        })
     else:
         return render(request, 'inicio/falta_permiso.html')
 

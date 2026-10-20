@@ -18,7 +18,28 @@
 
     <div class="login-container">
         <h2 class="subtitle">Registros no verificados {{ config }}</h2>
+        {% if config == 'higiene_y_conducta_personal' %}
+            <form method="get" style="margin-bottom: 20px;">
+                <input type="hidden" name="config" value="{{ config }}">
 
+                <label for="filtro-planta">Planta:</label>
+
+                <select name="planta" id="filtro-planta">
+                    <option value="">Todas las plantas</option>
+
+                    {% for planta in plantas %}
+                        <option value="{{ planta }}"
+                            {% if planta == planta_seleccionada %}selected{% endif %}>
+                            {{ planta }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="primary-button">
+                    Filtrar
+                </button>
+            </form>
+        {% endif %}
         <div style="margin-bottom: 14px; font-weight: bold;">
             <label>
                 <input type="checkbox" id="seleccionar-todos">
@@ -60,8 +81,12 @@
 
         <div class="pagination">
             {% if datos.has_previous %}
-                <a href="?config={{ config }}&page=1">« primero</a>
-                <a href="?config={{ config }}&page={{ datos.previous_page_number }}">anterior</a>
+                <a href="?config={{ config|urlencode }}&planta={{ planta_seleccionada|urlencode }}&page=1">
+                    « primero
+                </a>
+                <a href="?config={{ config|urlencode }}&planta={{ planta_seleccionada|urlencode }}&page={{ datos.previous_page_number }}">
+                    anterior
+                </a>
             {% endif %}
 
             <span class="current">
@@ -69,8 +94,12 @@
             </span>
 
             {% if datos.has_next %}
-                <a href="?config={{ config }}&page={{ datos.next_page_number }}">siguiente</a>
-                <a href="?config={{ config }}&page={{ datos.paginator.num_pages }}">último »</a>
+                <a href="?config={{ config|urlencode }}&planta={{ planta_seleccionada|urlencode }}&page={{ datos.next_page_number }}">
+                    siguiente
+                </a>
+                <a href="?config={{ config|urlencode }}&planta={{ planta_seleccionada|urlencode }}&page={{ datos.paginator.num_pages }}">
+                    último »
+                </a>
             {% endif %}
         </div>
 
