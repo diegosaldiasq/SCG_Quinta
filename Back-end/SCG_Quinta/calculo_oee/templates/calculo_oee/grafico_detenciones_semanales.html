@@ -1266,6 +1266,64 @@
       }
     }
 
+    function obtenerSemanaAnterior(fechaActual = new Date()) {
+      // La semana de producción se calcula según la fecha de Chile.
+      const partes = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Santiago',
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric'
+      }).formatToParts(fechaActual);
+      const valor = tipo => Number(
+        partes.find(parte => parte.type === tipo).value
+      );
+      const fecha = new Date(Date.UTC(
+        valor('year'), valor('month') - 1, valor('day') - 7
+      ));
+
+      // El jueves determina el año ISO, incluso entre diciembre y enero.
+      fecha.setUTCDate(
+        fecha.getUTCDate() + 4 - (fecha.getUTCDay() || 7)
+      );
+      const anio = fecha.getUTCFullYear();
+      const inicioAnio = Date.UTC(anio, 0, 1);
+      const semana = Math.ceil(
+        ((fecha.getTime() - inicioAnio) / 86400000 + 1) / 7
+      );
+      return { semana, anio };
+    }
+
+    function aplicarSemanaAnteriorPorDefecto() {
+      const params = new URLSearchParams(location.search);
+      const tienePeriodo = ['semana', 'anio', 'desde', 'hasta']
+        .some(nombre => params.getAll(nombre).some(Boolean));
+
+      if (tienePeriodo) {
+        return;
+      }
+
+      const { semana, anio } = obtenerSemanaAnterior();
+      const semanas = Array.from(
+        panelSemanas.querySelectorAll('input[type="checkbox"]'),
+        cb => Number(cb.value)
+      );
+
+      // Mantener el filtro aunque todavía no existan registros de esa semana.
+      if (!semanas.includes(semana)) {
+        renderCheckboxPanel(
+          panelSemanas,
+          [...semanas, semana].sort((a, b) => a - b),
+          ddSemanas
+        );
+      }
+      if (!Array.from(sAnios.options).some(op => op.value === String(anio))) {
+        sAnios.add(new Option(String(anio), String(anio)));
+      }
+
+      sAnios.value = String(anio);
+      setCheckedValues(panelSemanas, [semana], ddSemanas);
+    }
+
     function aplicarFiltrosDesdeURL() {
       const params =
         new URLSearchParams(location.search);
@@ -3419,6 +3477,7 @@
 
       await cargarOpciones();
       aplicarFiltrosDesdeURL();
+      aplicarSemanaAnteriorPorDefecto();
 
       await Promise.all([
         cargarOEE(),

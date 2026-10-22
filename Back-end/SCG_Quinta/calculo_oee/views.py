@@ -939,6 +939,9 @@ def resumen_turno_oee_opciones(request):
         anios = (qs.annotate(y=ExtractYear('fecha'))
                    .values_list('y', flat=True)
                    .distinct())
+        anios_iso = (qs.annotate(y=ExtractIsoYear('fecha'))
+                       .values_list('y', flat=True)
+                       .distinct())
         lineas = (qs.values_list('linea', flat=True)
                     .distinct()
                     .order_by('linea'))
@@ -948,7 +951,7 @@ def resumen_turno_oee_opciones(request):
 
         # Ordena semanas y años
         semanas = sorted([s for s in semanas if s is not None])
-        anios = sorted([a for a in anios if a is not None])
+        anios = sorted({a for a in [*anios, *anios_iso] if a is not None})
 
         return JsonResponse({
             "plantas": [
@@ -1000,7 +1003,9 @@ def resumen_turno_oee_api(request):
             qs = qs.annotate(sem=ExtractWeek('fecha')) \
                    .filter(sem__in=[int(s) for s in semanas if s.isdigit()])
         if anios:
-            qs = qs.annotate(an=ExtractYear('fecha')) \
+            # Con semanas, el año debe seguir el mismo calendario ISO.
+            extraer_anio = ExtractIsoYear if semanas else ExtractYear
+            qs = qs.annotate(an=extraer_anio('fecha')) \
                    .filter(an__in=[int(a) for a in anios if a.isdigit()])
         if lineas:
             qs = qs.filter(linea__in=lineas)
@@ -1085,7 +1090,8 @@ def detenciones_turno_api(request):
             qs = qs.annotate(sem=ExtractWeek('lote__resumenes_turno__fecha')) \
                    .filter(sem__in=[int(s) for s in semanas if s.isdigit()])
         if anios:
-            qs = qs.annotate(an=ExtractYear('lote__resumenes_turno__fecha')) \
+            extraer_anio = ExtractIsoYear if semanas else ExtractYear
+            qs = qs.annotate(an=extraer_anio('lote__resumenes_turno__fecha')) \
                    .filter(an__in=[int(a) for a in anios if a.isdigit()])
         if lineas:
             qs = qs.filter(lote__resumenes_turno__linea__in=lineas)
