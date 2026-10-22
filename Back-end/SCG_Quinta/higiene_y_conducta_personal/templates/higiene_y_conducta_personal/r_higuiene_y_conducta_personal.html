@@ -1,148 +1,172 @@
 {% load static %}
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'higiene_y_conducta_personal/estilos_r_higiene_y_conducta_personal.css' %}">
-    <link rel="icon" href="{% static 'higiene_y_conducta_personal/images/logoquinta2.png' %}" />
+    <link rel="stylesheet" href="{% static 'higiene_y_conducta_personal/estilos_r_higiene_y_conducta_personal.css' %}?v=2">
+    <link rel="icon" href="{% static 'higiene_y_conducta_personal/images/logoquinta2.png' %}">
     <title>Higiene y conducta personal P-POES-Q-02-01</title>
 </head>
 <body>
-    <div class="login">
-        <img src="{% static 'higiene_y_conducta_personal/images/logoquinta.png' %}" alt="logo" class="logo">
-        <div class="login-container">
-            <h1 class="title">Registo higiene y conducta personal P-POES-Q-02-01</h1>
-            <form class="ingreso" method="POST">
-                <label class="label">Nombre colaborador</label>
-                <input class="input" type="text" id="nombre-personal"/>
-   
-                <label class="label">Turno</label>
-                <select class="input" name="turno" id="turno">
-                    <option value="blanco"> </option>
-                    <option value="Turno A">A</option>
-                    <option value="Turno B">B</option>
-                    <option value="Turno C">C</option>
-                </select>
-      
-                <label class="label">Planta</label>
-                <select class="input" name="planta" id="planta">
-                    <option value="blanco"> </option>
-                    <option value="pv">Puerto vespucio</option>
-                    <option value="enea">ENEA</option>
-                    <option value="curico">Curico</option>
-                </select>
-    
-                <label class="label">Area</label>
-                <select class="input" name="area" id="area">
-                    <option value="blanco"> </option>
-                    <option value="B.M.P">B.M.P.</option>
-                    <option value="Cremas">Cremas</option>
-                    <option value="Dosificado">Dosificado</option>
-                    <option value="Prelisto">Prelisto</option>
-                    <option value="Decorado">Decorado</option>
-                    <option value="Jefes">Jefes</option>
-                    <option value="B.P.T.">B.P.T.</option>
-                    <option value="Area panqueque">Area panqueques</option>
-                    <option value="Mantencion">Mantencion</option>
-                    <option value="SAP">SAP</option>
-                    <option value="Aseo">Aseo</option>
-                    <option value="Kucehn y tartaleta">Kuchen y tartaleta</option>
-                    <option value="Pasteles">Pasteles</option>
-                    <option value="Envasado pt">Envasado de PT</option>
-                    <option value="Masas">Masas</option>
-                    <option value="Batidos">Batidos</option>
-                    <option value="Pasteleria">Pasteleria</option>
-                    <option value="Envasado insumos">Envasado de insumos</option>
-                    <option value="Horno y/o desmolde">Horno y/o desmolde</option>
-                    <option value="Supervisor">Supervisor</option>
-                    <option value="Desarrollo">Desarrollo</option>
-                    <option value="Operarios">Operarios</option>
-                </select>
-  
-                <label class="label">Cumplimiento</label>
-                <select class="input" name="cumplimiento" id="cumpl">
-                    <option value="blanco"> </option>
-                    <option value="Cumple">Cumple</option>
-                    <option value="No cumple">No cumple</option>
-                    <option value="No aplica">No aplica</option>
-                </select>
-      
-                <label class="label">Desviacion</label>
-                <select class="input" name="desviacion" id="desv">
-                    <option value="blanco"> </option>
-                    <option value="Uñas largas">Uñas largas, sucias y/o esmalte</option>
-                    <option value="Uniforme sucio">Uniforme sucio</option>
-                    <option value="Zapato sucio">Zapatos sucios</option>
-                    <option value="Mascarilla sucia">Mascarilla sucia/sin mascarilla/sin cofia</option>
-                    <option value="Accesorios prohibidos">Uso de accesorios prohibidos</option>
-                    <option value="Sin afeitar">Sin afeitar</option>
-                    <option value="Maquillaje">Maquillaje</option>
-                    <option value="Pelo afuera">Pelo afuera</option>
-                    <option value="Come en planta">Come en planta</option>
-                    <option value="Uniforme incompleto">Uniforme incompleto</option>
-                    <option value="Estado salud">No cumple con estado de salud optimo</option>
-                    <option value="Estado lentes">Estado defectuoso lentes</option>
-                    <option value="Presenta herida">Presenta una herida</option>
-                    <option value="Uso pestañas">Uso pestañas postisas</option>
-                    <option value="Lavado manos">Accede a planta sin realizar lavado de manos en filtro sanitario</option>
-                    <option value="Ingreso de medicamentos">Ingreso de medicamentos</option>
-                </select>
-        
-                <label class="label">AC</label>
-                <select class="input" name="ac" id="ac">
-                    <option value="blanco"> </option>
-                    <option value="Cortar, quitar y/o limpiar esmalte">Cortar, limpiar y/o quitar esmalte</option>
-                    <option value="Limpar lavar uniforme">Limpiar y/o lavar uniforme</option>
-                    <option value="Enviar a limpiar">Enviar a limpiar</option>
-                    <option value="Reemplazar mascarilla">Reemplazar mascarilla</option>
-                    <option value="Quitar accesorios">Quitar accesorios</option>
-                    <option value="Afeitar">Afeitar</option>
-                    <option value="Desmaquillar">Desmaquillar</option>
-                    <option value="Arreglar pelo">Arreglar pelo</option>
-                    <option value="Capacitacion">Capacitacion</option>
-                    <option value="Reponer uniforme">Reponer uniforme con RRHH</option>
-                    <option value="Asignar area">Asignar a un area donde no tenga contanto directo con alimentos</option>
-                    <option value="Cambio lentes">Solicitar cambio de lentes</option>
-                    <option value="Entrega parche curita">Se entrega parche curita y guantes</option>
-                    <option value="Quitar pestañas">Quitar pestañas postizas</option>
-                    <option value="Realizar lavado manos">Realizar lavado de manos en filtro sanitario</option>
-                    <option value="Informar jefatura y coordinar consumo fuera de zona productiva">Informar jefatura y coordinar consumo fuera de zona productiva</option>
-                </select>
-        
-                <label class="label">VAC</label>
-                <select class="input" name="vac" id="vac">
-                    <option value="blanco"> </option>
-                    <option value="Cumple">Cumple</option>
-                    <option value="No cumple">No cumple</option>
-                    <option value="No aplica">No aplica</option>
-                </select>
-        
-                <label class="label">Observacion</label>
-                <input class="input" type="text" id="obs"/>
-        
-            </form>
-        </div>
-        <div class="botones">
-            <form class="form">
+    <main class="login">
+        <img src="{% static 'higiene_y_conducta_personal/images/logoquinta.png' %}" alt="Quinta" class="logo">
+        <section class="login-container" aria-labelledby="titulo-registro">
+            <h1 class="title" id="titulo-registro">Registro higiene y conducta personal P-POES-Q-02-01</h1>
+            <p class="ayuda" id="ayuda-registros">Completa una fila por colaborador. Puedes agregar filas y editar todas las variables en cada una. Desliza la tabla horizontalmente para ver todos los campos.</p>
+            <form id="form-higiene" class="ingreso" method="post" action="{% url 'vista_higiene_y_conducta_personal' %}">
                 {% csrf_token %}
-                <button type="button" class="secundary-button login-button2" id="miBoton">Grabar y continuar</button>
+                <fieldset id="campos-registros">
+                    <legend class="solo-lectores">Registros de colaboradores</legend>
+                    <div class="tabla-registros-wrap" tabindex="0" role="region" aria-label="Tabla de registros de higiene" aria-describedby="ayuda-registros">
+                        <table class="tabla-registros">
+                            <caption class="solo-lectores">Higiene y conducta personal por colaborador</caption>
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nombre colaborador</th>
+                                <th scope="col">Turno</th>
+                                <th scope="col">Planta</th>
+                                <th scope="col">Área</th>
+                                <th scope="col">Cumplimiento</th>
+                                <th scope="col">Desviación</th>
+                                <th scope="col">AC (acción correctiva)</th>
+                                <th scope="col">VAC (verificación de AC)</th>
+                                <th scope="col">Observación</th>
+                                <th scope="col">Acción</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbody-registros">
+                            <tr class="fila-registro">
+                                <th scope="row" class="num-registro">1</th>
+                                <td>
+                                    <input class="input" type="text" name="nombre_personal" data-campo="nombre_personal" data-etiqueta="Nombre colaborador" aria-label="Nombre colaborador" maxlength="100" required>
+                                </td>
+                                <td>
+                                    <select class="input" name="turno" data-campo="turno" data-etiqueta="Turno" aria-label="Turno" required>
+                                        <option value="">Selecciona</option>
+                                        <option value="Turno A">A</option>
+                                        <option value="Turno B">B</option>
+                                        <option value="Turno C">C</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="input" name="planta" data-campo="planta" data-etiqueta="Planta" aria-label="Planta" required>
+                                        <option value="">Selecciona</option>
+                                        <option value="pv">Puerto vespucio</option>
+                                        <option value="enea">ENEA</option>
+                                        <option value="curico">Curico</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="input" name="area" data-campo="area" data-etiqueta="Área" aria-label="Área" required>
+                                        <option value="">Selecciona</option>
+                                        <option value="B.M.P">B.M.P.</option>
+                                        <option value="Cremas">Cremas</option>
+                                        <option value="Dosificado">Dosificado</option>
+                                        <option value="Prelisto">Prelisto</option>
+                                        <option value="Decorado">Decorado</option>
+                                        <option value="Jefes">Jefes</option>
+                                        <option value="B.P.T.">B.P.T.</option>
+                                        <option value="Area panqueque">Area panqueques</option>
+                                        <option value="Mantencion">Mantencion</option>
+                                        <option value="SAP">SAP</option>
+                                        <option value="Aseo">Aseo</option>
+                                        <option value="Kucehn y tartaleta">Kuchen y tartaleta</option>
+                                        <option value="Pasteles">Pasteles</option>
+                                        <option value="Envasado pt">Envasado de PT</option>
+                                        <option value="Masas">Masas</option>
+                                        <option value="Batidos">Batidos</option>
+                                        <option value="Pasteleria">Pasteleria</option>
+                                        <option value="Envasado insumos">Envasado de insumos</option>
+                                        <option value="Horno y/o desmolde">Horno y/o desmolde</option>
+                                        <option value="Supervisor">Supervisor</option>
+                                        <option value="Desarrollo">Desarrollo</option>
+                                        <option value="Operarios">Operarios</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="input" name="cumplimiento" data-campo="cumplimiento" data-etiqueta="Cumplimiento" aria-label="Cumplimiento" required>
+                                        <option value="">Selecciona</option>
+                                        <option value="Cumple">Cumple</option>
+                                        <option value="No cumple">No cumple</option>
+                                        <option value="No aplica">No aplica</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="input" name="desviacion" data-campo="desviacion" data-etiqueta="Desviación" aria-label="Desviación">
+                                        <option value="blanco">Sin selección</option>
+                                        <option value="Uñas largas">Uñas largas, sucias y/o esmalte</option>
+                                        <option value="Uniforme sucio">Uniforme sucio</option>
+                                        <option value="Zapato sucio">Zapatos sucios</option>
+                                        <option value="Mascarilla sucia">Mascarilla sucia/sin mascarilla/sin cofia</option>
+                                        <option value="Accesorios prohibidos">Uso de accesorios prohibidos</option>
+                                        <option value="Sin afeitar">Sin afeitar</option>
+                                        <option value="Maquillaje">Maquillaje</option>
+                                        <option value="Pelo afuera">Pelo afuera</option>
+                                        <option value="Come en planta">Come en planta</option>
+                                        <option value="Uniforme incompleto">Uniforme incompleto</option>
+                                        <option value="Estado salud">No cumple con estado de salud optimo</option>
+                                        <option value="Estado lentes">Estado defectuoso lentes</option>
+                                        <option value="Presenta herida">Presenta una herida</option>
+                                        <option value="Uso pestañas">Uso pestañas postisas</option>
+                                        <option value="Lavado manos">Accede a planta sin realizar lavado de manos en filtro sanitario</option>
+                                        <option value="Ingreso de medicamentos">Ingreso de medicamentos</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="input" name="accion_correctiva" data-campo="accion_correctiva" data-etiqueta="AC (acción correctiva)" aria-label="AC (acción correctiva)">
+                                        <option value="blanco">Sin selección</option>
+                                        <option value="Cortar, quitar y/o limpiar esmalte">Cortar, limpiar y/o quitar esmalte</option>
+                                        <option value="Limpar lavar uniforme">Limpiar y/o lavar uniforme</option>
+                                        <option value="Enviar a limpiar">Enviar a limpiar</option>
+                                        <option value="Reemplazar mascarilla">Reemplazar mascarilla</option>
+                                        <option value="Quitar accesorios">Quitar accesorios</option>
+                                        <option value="Afeitar">Afeitar</option>
+                                        <option value="Desmaquillar">Desmaquillar</option>
+                                        <option value="Arreglar pelo">Arreglar pelo</option>
+                                        <option value="Capacitacion">Capacitacion</option>
+                                        <option value="Reponer uniforme">Reponer uniforme con RRHH</option>
+                                        <option value="Asignar area">Asignar a un area donde no tenga contanto directo con alimentos</option>
+                                        <option value="Cambio lentes">Solicitar cambio de lentes</option>
+                                        <option value="Entrega parche curita">Se entrega parche curita y guantes</option>
+                                        <option value="Quitar pestañas">Quitar pestañas postizas</option>
+                                        <option value="Realizar lavado manos">Realizar lavado de manos en filtro sanitario</option>
+                                        <option value="Informar jefatura y coordinar consumo fuera de zona productiva">Informar jefatura y coordinar consumo fuera de zona productiva</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="input" name="verificacion_accion_correctiva" data-campo="verificacion_accion_correctiva" data-etiqueta="VAC (verificación de AC)" aria-label="VAC (verificación de AC)">
+                                        <option value="blanco">Sin selección</option>
+                                        <option value="Cumple">Cumple</option>
+                                        <option value="No cumple">No cumple</option>
+                                        <option value="No aplica">No aplica</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input class="input" type="text" name="observacion" data-campo="observacion" data-etiqueta="Observación" aria-label="Observación">
+                                </td>
+                                <td><button type="button" class="btn-eliminar-fila" disabled>Eliminar</button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="acciones-registros">
+                        <button type="button" id="btn-agregar-fila" class="btn-agregar">+ Agregar registro</button>
+                        <span id="contador-registros" aria-live="polite">1 registro</span>
+                    </div>
+                    <div class="botones">
+                        <button type="submit" class="secundary-button" id="miBoton">Grabar y continuar</button>
+                        <a class="secundary-button" href="{% url 'redireccionar_selecciones' %}">Salir</a>
+                    </div>
+                </fieldset>
+                <p id="estado-guardado" class="estado-guardado" role="status" aria-live="polite"></p>
             </form>
-            <form class="form" action="{% url 'redireccionar_selecciones' %}">
-                <button type="submit" class="secundary-button login-button2">Salir</button>
-            </form>
-        </div>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        // Definir el token CSRF para su uso en las solicitudes AJAX
-        var csrftoken = "{{ csrf_token }}";
-    </script>
-    <script src="{% static 'higiene_y_conducta_personal/scrip_r_higiene_y_conducta_personal.js' %}"></script>
+        </section>
+    </main>
+    <script src="{% static 'higiene_y_conducta_personal/scrip_r_higiene_y_conducta_personal.js' %}?v=2" defer></script>
 </body>
 </html>
