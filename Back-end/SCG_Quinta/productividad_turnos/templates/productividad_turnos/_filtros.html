@@ -1,0 +1,10 @@
+<form method="get" class="filters">
+<input type="hidden" name="filtrar" value="1">
+<input type="hidden" name="periodo" value="{{ periodo }}">
+{% if periodo == 'semana' %}<label>{{ filtro.anio.label }}{{ filtro.anio }}{{ filtro.anio.errors }}</label><label>{{ filtro.semana.label }}{{ filtro.semana }}{{ filtro.semana.errors }}</label>{% else %}<label>{{ filtro.fecha.label }}{{ filtro.fecha }}{{ filtro.fecha.errors }}</label>{% endif %}
+<label>Planta{{ filtro.planta }}{{ filtro.planta.errors }}</label><label>Área{{ filtro.area }}{{ filtro.area.errors }}</label>
+<div><span class="muted">Turnos</span><div class="turnos">{{ filtro.turnos }}</div>{{ filtro.turnos.errors }}</div>
+<button class="btn primary" type="submit">Consultar</button>
+{{ filtro.non_field_errors }}
+{% if filtro.errors %}<p class="error-text">Revise los filtros. Si no aparecen áreas, solicite una asignación de planta y área al administrador.</p>{% endif %}
+</form>

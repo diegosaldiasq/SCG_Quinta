@@ -69,6 +69,7 @@ LOCAL_APPS = [
     "ventas_geo.apps.VentasGeoConfig",
     "control_sala_cremas.apps.ControlSalaCremasConfig",
     "temperatura_post_spiral.apps.TemperaturaPostSpiralConfig",
+    "productividad_turnos.apps.ProductividadTurnosConfig"
 ]
 
 DJANGO_APPS = [
