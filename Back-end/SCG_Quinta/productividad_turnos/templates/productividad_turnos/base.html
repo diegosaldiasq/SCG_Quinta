@@ -11,7 +11,7 @@
 <a href="{% url 'productividad_turnos:seleccionar' %}">Registrar cierre</a>
 <a href="{% url 'productividad_turnos:historial' %}">Historial de turnos</a>
 {% if perms.productividad_turnos.programar_turno %}<a href="{% url 'productividad_turnos:programacion' %}">Programación y metas</a>{% endif %}
-<a href="{{ inicio_url }}">Volver a inicio</a></nav>
+<a href="{% url 'index' %}">Volver a inicio</a></nav>
 <div class="side-note">{{ usuario_nombre }}<br>SCG_Quinta<br>Productividad por turnos</div></aside>
 <main><div class="eyebrow">Producción / Control de turnos</div><h1>{% block heading %}Productividad por turnos{% endblock %}</h1>
 {% for message in messages %}<div role="status" class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>{% endfor %}
