@@ -70,7 +70,16 @@ class FiltroForm(forms.Form):
         areas = allowed_areas(user, active_only=False)
         default_area = areas.filter(codigo="TORTAS").first() or areas.first()
         today = timezone.localdate()
-        defaults = {"fecha": today.isoformat(), "anio": today.isocalendar().year, "semana": today.isocalendar().week, "area": default_area.pk if default_area else "", "planta": "", "turnos": ["A", "B", "C"]}
+        iso_year, iso_week, _ = today.isocalendar()
+
+        defaults = {
+            "fecha": today.isoformat(),
+            "anio": iso_year,
+            "semana": iso_week,
+            "area": default_area.pk if default_area else "",
+            "planta": "",
+            "turnos": ["A", "B", "C"],
+        }
         # QueryDict mantiene selecciones múltiples y distingue una selección vacía.
         from django.http import QueryDict
         bound = QueryDict(mutable=True)
