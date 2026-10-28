@@ -27,6 +27,10 @@
                 <span>2.- Registros trazabilidad: </span>
                 <a href="{% url 'trazabilidad_productos:historial_trazabilidad' %}">TRAZABILIDAD</a>
             </p>
+            <p class="registro">
+                <span>3.- Panel productividad por turnos: </span>
+                <a href="{% url 'productividad_turnos:diario' %}">PRODUCTIVIDAD</a>
+            </p>
         </div>
         <form class="form" action="{% url 'redireccionar_inicio' %}">
             <button class="primary-button login-button">Volver inicio</button>
