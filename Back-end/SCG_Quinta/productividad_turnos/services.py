@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from zoneinfo import ZoneInfo
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    from backports.zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
