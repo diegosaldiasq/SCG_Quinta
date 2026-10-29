@@ -3,7 +3,7 @@
 {% block content %}
 <p class="muted">Resultados de turnos cerrados y verificados. Unidades por persona calculadas desde sus totales.</p>
 {% include 'productividad_turnos/_filtros.html' %}
-{% if resumen %}<div class="toolbar"><button class="btn" id="actualizar-panel" type="button">Actualizar</button><a class="btn" href="{{ export_url }}">Descargar CSV</a></div>
+{% if resumen %}<div class="toolbar"><button class="btn" id="actualizar-panel" type="button">Actualizar</button><a class="btn" href="{{ export_url }}">Descargar Excel</a></div>
 <p id="poll-status" class="muted" role="status">Actualización automática cada 60 segundos.</p>
 <div id="dashboard" data-api="{{ api_url }}">{% include 'productividad_turnos/_panel_content.html' %}</div>{% endif %}
 {% endblock %}

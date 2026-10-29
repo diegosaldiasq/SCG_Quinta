@@ -1,4 +1,5 @@
-import csv
+from decimal import Decimal
+from io import BytesIO
 
 from django.conf import settings
 from django.contrib import messages
@@ -163,12 +164,6 @@ def programacion(request, pk=None):
     return render(request, "productividad_turnos/programacion.html", base_context(request, form=form, plan=plan))
 
 
-def csv_safe(value):
-    """Evita interpretar texto libre como fórmula al abrir un CSV en Excel."""
-    text = "" if value is None else str(value)
-    return "'" + text if isinstance(value, str) and text.lstrip().startswith(("=", "+", "-", "@")) else text
-
-
 @require_permission(VIEW)
 @require_GET
 def exportar(request):
@@ -179,16 +174,85 @@ def exportar(request):
     if not form.is_valid():
         return HttpResponse("Filtros inválidos", status=400)
     plans, start, end = programs_from_filter(request.user, form.cleaned_data, periodo)
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = f'attachment; filename="productividad_{start}_{end}.csv"'
-    response.write("\ufeff")
-    writer = csv.writer(response, delimiter=";")
-    writer.writerow(["Fecha operativa", "Planta", "Área", "Turno", "Estado", "Dotación", "Semielaborados", "Terminadas", "Meta programada", "Meta congelada cierre", "Horas-persona", "Cumplimiento %", "Unidades/persona-turno", "Unidades/HH", "Responsable cierre", "Fecha cierre", "Observaciones"])
+    # openpyxl ya forma parte de requirements.txt. La importación local mantiene
+    # independiente la carga de las demás páginas de la aplicación.
+    from openpyxl import Workbook
+    from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+    from openpyxl.styles import Alignment, Font, PatternFill
+    from openpyxl.utils import get_column_letter
     from .selectors import estado_plan
-    for p in plans:
+
+    workbook = Workbook()
+    workbook.properties.creator = "SCG_Quinta"
+    sheet = workbook.active
+    sheet.title = "Turnos"
+    sheet.sheet_view.showGridLines = False
+    headers = ["Fecha operativa", "Planta", "Área", "Turno", "Estado", "Dotación", "Semielaborados", "Terminadas", "Meta programada", "Meta congelada cierre", "Horas-persona", "Cumplimiento", "Unidades/persona-turno", "Unidades/HH", "Responsable cierre", "Fecha cierre", "Observaciones"]
+    metadata = [
+        "Quinta · Productividad por turnos",
+        "Panel {0}: {1:%d/%m/%Y} al {2:%d/%m/%Y}".format("semanal" if periodo == "semana" else "diario", start, end),
+        "Fechas de cierre en zona horaria: {0}".format(timezone.get_default_timezone()),
+        "Incluye los estados de los turnos filtrados. Los indicadores solo corresponden a cierres de turnos programados. Los semielaborados se registran por separado.",
+    ]
+    for index, text in enumerate(metadata, 1):
+        sheet.merge_cells(start_row=index, start_column=1, end_row=index, end_column=len(headers))
+        cell = sheet.cell(index, 1, text)
+        cell.font = Font(name="Calibri", size=16 if index == 1 else 11, bold=index == 1, color="FFFFFF" if index == 1 else "173C35")
+        cell.alignment = Alignment(vertical="center", wrap_text=True)
+        if index == 1:
+            cell.fill = PatternFill("solid", fgColor="173C35")
+    sheet.row_dimensions[1].height = 30
+    sheet.row_dimensions[4].height = 32
+    for column, label in enumerate(headers, 1):
+        cell = sheet.cell(5, column, label)
+        cell.font = Font(name="Calibri", bold=True, color="FFFFFF")
+        cell.fill = PatternFill("solid", fgColor="206B54")
+        cell.alignment = Alignment(wrap_text=True, vertical="center")
+    sheet.row_dimensions[5].height = 34
+
+    for row_index, p in enumerate(plans, 6):
         r = registro_of(p)
         official = r and r.estado != "BORRADOR" and p.programado
         m = metrics([r]) if official else {}
-        vals = [p.fecha_operativa, p.get_planta_display(), p.area.nombre, p.turno, estado_plan(p), r.dotacion if r else None, r.semielaborados if r else None, r.terminadas if r else None, p.meta_pt, r.meta_pt_cierre if official else None, r.horas_persona if r else None, m.get("cumplimiento"), m.get("up"), m.get("uph"), user_label(r.cerrado_por) if official and r.cerrado_por else "", r.cerrado.isoformat() if official else "", r.observaciones if r else ""]
-        writer.writerow([csv_safe(v) for v in vals])
+        closed_at = timezone.localtime(r.cerrado, timezone.get_default_timezone()).replace(tzinfo=None) if official else None
+        compliance = m.get("cumplimiento")
+        vals = [p.fecha_operativa, p.get_planta_display(), p.area.nombre, p.turno, estado_plan(p), r.dotacion if r else None, r.semielaborados if r else None, r.terminadas if r else None, p.meta_pt, r.meta_pt_cierre if official else None, r.horas_persona if r else None, compliance / Decimal(100) if compliance is not None else None, m.get("up"), m.get("uph"), user_label(r.cerrado_por) if official and r.cerrado_por else None, closed_at, r.observaciones if r else None]
+        for column, value in enumerate(vals, 1):
+            cell = sheet.cell(row_index, column)
+            if isinstance(value, str):
+                # Guardar siempre texto literal, incluso si comienza con '='.
+                cell.value = ILLEGAL_CHARACTERS_RE.sub("", value)
+                cell.data_type = "s"
+            else:
+                cell.value = value
+            cell.font = Font(name="Calibri", size=11)
+            cell.alignment = Alignment(vertical="top", wrap_text=column == 17)
+            if row_index % 2 == 0:
+                cell.fill = PatternFill("solid", fgColor="F0F5F2")
+            if column == 1:
+                cell.number_format = "dd/mm/yyyy"
+            elif column == 16:
+                cell.number_format = "dd/mm/yyyy hh:mm:ss"
+            elif 6 <= column <= 10:
+                cell.number_format = "#,##0"
+            elif column == 12:
+                cell.number_format = "0.00%"
+            elif column in (11, 13, 14):
+                cell.number_format = "#,##0.00"
+
+    widths = [18, 23, 22, 10, 20, 13, 18, 16, 19, 21, 18, 18, 24, 18, 30, 24, 60]
+    for column, width in enumerate(widths, 1):
+        sheet.column_dimensions[get_column_letter(column)].width = width
+    sheet.freeze_panes = "A6"
+    sheet.auto_filter.ref = "A5:Q{0}".format(max(5, sheet.max_row))
+    sheet.print_title_rows = "1:5"
+    sheet.sheet_properties.pageSetUpPr.fitToPage = True
+    sheet.page_setup.orientation = "landscape"
+    sheet.page_setup.paperSize = sheet.PAPERSIZE_A3
+    sheet.page_setup.fitToWidth = 1
+    sheet.page_setup.fitToHeight = 0
+    output = BytesIO()
+    workbook.save(output)
+    response = HttpResponse(output.getvalue(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = f'attachment; filename="productividad_{start}_{end}.xlsx"'
     return response

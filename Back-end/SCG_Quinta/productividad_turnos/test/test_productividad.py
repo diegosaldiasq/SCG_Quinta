@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from io import StringIO
+from io import BytesIO, StringIO
 from types import SimpleNamespace
 from unittest.mock import patch
 try:
@@ -60,6 +60,11 @@ class ProductividadTests(TestCase):
         data = {"fecha": "2026-10-13", "anio": "2026", "semana": "42", "planta": "ENEA", "area": str(self.area.pk), "turnos": ["A", "B", "C"]}
         data.update(overrides)
         return data
+
+    def excel_sheet(self, response):
+        from openpyxl import load_workbook
+        self.assertEqual(response.status_code, 200)
+        return load_workbook(BytesIO(response.content))["Turnos"]
 
     def example(self):
         for fecha, rows in [(date(2026, 10, 13), [("A", 53, 3464, 2975, 3800), ("B", 82, 4652, 5599, 5700), ("C", 65, 3291, 4492, 5500)]), (date(2026, 10, 14), [("A", 50, 3488, 2446, 3800), ("B", 82, 4300, 4813, 5700), ("C", 64, 3767, 4609, 5500)])]:
@@ -229,7 +234,9 @@ class ProductividadTests(TestCase):
         self.assertIn("13.066", api.json()["html"])
         export = self.client.get(reverse("productividad_turnos:exportar"), self.query(periodo="semana"))
         self.assertEqual(export.status_code, 200)
-        self.assertIn("text/csv", export["Content-Type"])
+        self.assertEqual(export["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        self.assertTrue(export["Content-Disposition"].endswith('.xlsx"'))
+        self.assertEqual(len(list(self.excel_sheet(export).iter_rows(min_row=6))), 6)
 
     def test_invalid_filter_or_empty_turns_cannot_broaden_scope(self):
         self.client.force_login(self.user)
@@ -254,7 +261,8 @@ class ProductividadTests(TestCase):
         response = self.client.get(reverse("productividad_turnos:api_resumen"), self.query(planta=""))
         self.assertEqual(response.json()["total"]["cierres"], 0)
         response = self.client.get(reverse("productividad_turnos:exportar"), self.query(planta=""))
-        self.assertNotIn("Puerto Vespucio", response.content.decode())
+        rows = list(self.excel_sheet(response).iter_rows(min_row=6, values_only=True))
+        self.assertEqual(rows, [])
 
     def test_csrf_enforced_for_writes(self):
         p = self.plan()
@@ -291,16 +299,108 @@ class ProductividadTests(TestCase):
             call_command("programar_semana_productividad", usuario_id=self.user.pk, planta="ENEA", anio=2026, semana=42, dias=[1, 2], turnos=["A"], meta_a=3800, stdout=StringIO())
         self.assertEqual(ProgramacionTurno.objects.count(), before)
 
-    def test_csv_formula_and_template_escaping(self):
+    def test_excel_formula_and_template_escaping(self):
         p = self.plan()
         self.close(p)
         RegistroProductividadTurno.objects.filter(programacion=p).update(observaciones="=SUM(1+1)")
         self.client.force_login(self.user)
         response = self.client.get(reverse("productividad_turnos:exportar"), self.query())
-        self.assertIn("'=SUM(1+1)", response.content.decode())
+        cell = self.excel_sheet(response)["Q6"]
+        self.assertEqual(cell.value, "=SUM(1+1)")
+        self.assertEqual(cell.data_type, "s")
         RevisionProductividad.objects.create(programacion=p, usuario=self.user, accion="TEST", motivo="<script>alert(1)</script>")
         response = self.client.get(reverse("productividad_turnos:registro", args=[p.pk]))
         self.assertContains(response, "&lt;script&gt;")
+
+    def test_excel_numeric_dates_semifinished_and_percent(self):
+        p = self.plan()
+        self.close(p, hh=Decimal("424.50"))
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("productividad_turnos:exportar"), self.query())
+        sheet = self.excel_sheet(response)
+        self.assertEqual(sheet["A6"].value, datetime(2026, 10, 13))
+        self.assertEqual(sheet["F6"].value, 53)
+        self.assertEqual(sheet["G6"].value, 3464)
+        self.assertEqual(sheet["H6"].value, 2975)
+        self.assertEqual(sheet["I6"].value, 3800)
+        self.assertEqual(sheet["J6"].value, 3800)
+        self.assertEqual(sheet["K6"].value, 424.5)
+        self.assertAlmostEqual(sheet["L6"].value, 2975 / 3800)
+        self.assertEqual(sheet["L6"].number_format, "0.00%")
+        self.assertAlmostEqual(sheet["M6"].value, 2975 / 53)
+        self.assertAlmostEqual(sheet["N6"].value, 2975 / 424.5)
+        self.assertEqual(sheet["P6"].value, datetime(2026, 10, 15, 8))
+        self.assertIsNone(sheet["P6"].value.tzinfo)
+        self.assertEqual(sheet.freeze_panes, "A6")
+        self.assertEqual(sheet.auto_filter.ref, "A5:Q6")
+        self.assertContains(self.client.get(reverse("productividad_turnos:diario"), self.query()), "Descargar Excel")
+
+    def test_excel_filters_week_day_and_shift(self):
+        self.example()
+        self.close(self.plan(fecha=date(2026, 10, 5)), pt=999)
+        self.client.force_login(self.user)
+        url = reverse("productividad_turnos:exportar")
+        day = self.excel_sheet(self.client.get(url, self.query(turnos=["B"])))
+        rows = list(day.iter_rows(min_row=6, values_only=True))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0][3], "B")
+        self.assertEqual(rows[0][7], 5599)
+        week = self.excel_sheet(self.client.get(url, self.query(periodo="semana", turnos=["A"])))
+        self.assertEqual([r[7] for r in week.iter_rows(min_row=6, values_only=True)], [2975, 2446])
+
+    def test_excel_drafts_and_missing_values_do_not_become_official_zeros(self):
+        self.plan(turno="A")
+        draft = self.plan(turno="B")
+        guardar_registro(self.user, draft.pk, self.values(pt=22, semi=12), 0)
+        self.client.force_login(self.user)
+        sheet = self.excel_sheet(self.client.get(reverse("productividad_turnos:exportar"), self.query()))
+        self.assertEqual(sheet["E6"].value, "Pendiente")
+        self.assertIsNone(sheet["H6"].value)
+        self.assertEqual(sheet["E7"].value, "Borrador")
+        self.assertEqual(sheet["G7"].value, 12)
+        self.assertEqual(sheet["H7"].value, 22)
+        for row in (6, 7):
+            for column in (10, 12, 13, 14, 16):
+                self.assertIsNone(sheet.cell(row, column).value)
+
+    def test_excel_zero_above_one_hundred_and_missing_meta(self):
+        self.close(self.plan(turno="A", meta=100), pt=250)
+        self.close(self.plan(turno="B", meta=100), pt=0, semi=0)
+        self.close(self.plan(turno="C", meta=0), pt=50)
+        self.client.force_login(self.user)
+        sheet = self.excel_sheet(self.client.get(reverse("productividad_turnos:exportar"), self.query()))
+        self.assertEqual(sheet["L6"].value, 2.5)
+        self.assertEqual(sheet["L7"].value, 0)
+        self.assertEqual(sheet["G7"].value, 0)
+        self.assertIsNone(sheet["L8"].value)
+
+    def test_excel_empty_invalid_and_access_controls(self):
+        url = reverse("productividad_turnos:exportar")
+        self.assertEqual(self.client.get(url, self.query()).status_code, 302)
+        self.client.force_login(self.user)
+        empty = self.client.get(url, self.query())
+        self.assertEqual(self.excel_sheet(empty).max_row, 5)
+        self.assertIn("productividad_2026-10-13_2026-10-13.xlsx", empty["Content-Disposition"])
+        self.assertEqual(ProgramacionTurno.objects.count(), 0)
+        for query in (self.query(periodo="otro"), self.query(area="99999"), self.query(turnos=[], filtrar="1")):
+            self.assertEqual(self.client.get(url, query).status_code, 400)
+        self.assertEqual(self.client.post(url, self.query()).status_code, 405)
+        self.user.user_permissions.clear()
+        self.assertEqual(self.client.get(url, self.query()).status_code, 403)
+
+    def test_excel_free_text_is_literal_and_control_characters_are_cleaned(self):
+        p = self.plan()
+        self.close(p)
+        self.area.nombre = "=1+1"
+        self.area.save()
+        self.client.force_login(self.user)
+        for text in ("=HYPERLINK(\"https://example.com\")", "+SUM(1,2)", "-1+2", "@SUM(1,2)", "Texto\x01 con control", "Línea 1\nLínea 2"):
+            RegistroProductividadTurno.objects.filter(programacion=p).update(observaciones=text)
+            sheet = self.excel_sheet(self.client.get(reverse("productividad_turnos:exportar"), self.query()))
+            self.assertEqual(sheet["C6"].value, "=1+1")
+            self.assertEqual(sheet["C6"].data_type, "s")
+            self.assertEqual(sheet["Q6"].value, text.replace("\x01", ""))
+            self.assertEqual(sheet["Q6"].data_type, "s")
 
     def test_non_applicable_semifinished_is_not_zero(self):
         self.area.mide_semielaborado = False
