@@ -3,7 +3,10 @@ from decimal import Decimal
 from io import StringIO
 from types import SimpleNamespace
 from unittest.mock import patch
-from zoneinfo import ZoneInfo
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    from backports.zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -99,7 +102,7 @@ class ProductividadTests(TestCase):
         start, end = horario(date(2026, 10, 26), "A")
         self.assertEqual(start.date(), date(2026, 10, 25))
         self.assertEqual(end.date(), date(2026, 10, 26))
-        self.assertEqual(date(2027, 1, 1).isocalendar().year, 2026)
+        self.assertEqual(date(2027, 1, 1).isocalendar()[0], 2026)
         self.assertTrue(FiltroForm(self.query(anio="2026", semana="53"), user=self.user, periodo="semana").is_valid())
         self.assertFalse(FiltroForm(self.query(anio="2025", semana="53"), user=self.user, periodo="semana").is_valid())
 

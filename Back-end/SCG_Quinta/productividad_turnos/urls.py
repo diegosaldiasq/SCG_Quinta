@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, weekly_views
 
 app_name = "productividad_turnos"
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
     path("registrar/", views.seleccionar, name="seleccionar"),
     path("historial/", views.historial, name="historial"),
     path("programacion/", views.programacion, name="programacion"),
+    path("programacion-semanal/", weekly_views.programacion_semanal, name="programacion_semanal"),
     path("programacion/<int:pk>/", views.programacion, name="editar_programacion"),
     path("registro/<int:pk>/", views.registro, name="registro"),
     path("registro/<int:pk>/verificar/", views.verificar, name="verificar"),

@@ -1,0 +1,44 @@
+{% extends 'productividad_turnos/base.html' %}{% load static productividad %}
+{% block title %}Programación semanal{% endblock %}
+{% block heading %}Programación semanal{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'productividad_turnos/semanas.css' %}">
+<script src="{% static 'productividad_turnos/semanas.js' %}" defer></script>
+<p class="muted">Configura una semana completa por planta y área. Cada día puede tener turnos y metas diferentes.</p>
+<div class="panel"><form method="get" id="seleccion-semana">
+<div class="week-selector">
+<label>{{ scope.anio.label }}{{ scope.anio }}{{ scope.anio.errors }}</label>
+<label>{{ scope.semana.label }}{{ scope.semana }}{{ scope.semana.errors }}</label>
+<label>{{ scope.planta.label }}{{ scope.planta }}{{ scope.planta.errors }}</label>
+<label>{{ scope.area.label }}{{ scope.area }}{{ scope.area.errors }}</label>
+<button class="btn primary" name="accion" value="cargar" type="submit">Cargar semana</button>
+</div>
+<details class="week-copy"><summary>Copiar la programación de otra semana</summary><p class="muted">Elige el origen y revisa los valores antes de guardar. Se copian turnos y metas de la misma planta y área. Los cierres y las cantidades producidas se conservan en sus fechas originales.</p>
+<div class="week-copy-fields"><label>{{ scope.copiar_anio.label }}{{ scope.copiar_anio }}{{ scope.copiar_anio.errors }}</label><label>{{ scope.copiar_semana.label }}{{ scope.copiar_semana }}{{ scope.copiar_semana.errors }}</label><button class="btn" name="accion" value="copiar" type="submit">Previsualizar copia</button></div></details>
+</form>{{ scope.non_field_errors }}</div>
+{% if scope.errors %}<div class="alert">Revise el año, la semana y su asignación de planta/área. Los cambios se guardan únicamente al presionar Guardar semana.</div>{% endif %}
+{% if formset %}{{ formset.non_form_errors }}{% endif %}
+{% if grid %}
+<div class="panel-head"><div><h2>Semana {{ scope.semana.value }} / {{ scope.anio.value }}</h2><p class="muted">{{ desde|date:'d/m/Y' }} al {{ hasta|date:'d/m/Y' }} · {{ scope.cleaned_data.area }} · {{ planta_nombre }}</p></div><a class="btn" href="{% url 'productividad_turnos:programacion' %}">Programar un turno individual</a></div>
+{% if copying %}<div class="alert"><strong>Copia en previsualización.</strong> Todavía no se guardó ningún cambio. Ajusta las metas necesarias y presiona Guardar semana. Los turnos cerrados o verificados de destino mantienen sus valores.</div>{% endif %}
+<form method="post" id="form-semana">{% csrf_token %}
+<input type="hidden" name="anio" value="{{ scope.anio.value }}"><input type="hidden" name="semana" value="{{ scope.semana.value }}"><input type="hidden" name="planta" value="{{ scope.planta.value }}"><input type="hidden" name="area" value="{{ scope.area.value }}">
+{{ formset.management_form }}
+<div class="panel week-matrix"><div class="table-wrap"><table class="week-table"><thead><tr><th>Día / fecha operativa</th><th>Turno A</th><th>Turno B</th><th>Turno C</th></tr></thead><tbody>
+{% for row in grid %}<tr><th scope="row"><strong>{{ row.dia }}</strong><span class="muted">{{ row.fecha|date:'d/m/Y' }}</span><span class="muted week-day-total" data-day-total>Meta del día: —</span></th>
+{% for cell in row.cells %}<td class="week-cell {% if cell.form.locked %}week-locked{% endif %}">
+{% for hidden in cell.form.hidden_fields %}{{ hidden }}{{ hidden.errors }}{% endfor %}
+<label class="week-check">{{ cell.form.programado }} Programado</label>{{ cell.form.programado.errors }}
+<label class="week-meta" for="{{ cell.form.meta_pt.id_for_label }}">Meta PT{{ cell.form.meta_pt }}</label>{{ cell.form.meta_pt.errors }}
+<label class="week-check">{{ cell.form.extraordinario }} Extraordinario</label>{{ cell.form.extraordinario.errors }}
+{% if cell.form.locked %}<span class="pill good">{{ cell.estado }} · bloqueado</span>{% else %}<span class="muted week-state">{{ cell.estado }}</span>{% endif %}
+{{ cell.form.non_field_errors }}
+</td>{% endfor %}</tr>{% endfor %}
+</tbody></table></div></div>
+<div class="panel"><div class="week-save-summary" aria-live="polite"><span>Turnos programados: <strong id="week-turn-count">—</strong></span><span>Meta de la semana: <strong id="week-target-total">—</strong> PT</span></div>
+<p class="muted">Los turnos sin marcar se guardan como no programados, con meta cero. Los resultados reales se ingresan cada día al terminar el turno. El turno A pertenece a la fecha en que termina.</p>
+<label>{{ motivo_form.motivo.label }}{{ motivo_form.motivo }}{{ motivo_form.motivo.errors }}</label>{{ motivo_form.non_field_errors }}
+<div class="toolbar"><button class="btn primary" type="submit">Guardar semana</button></div></div></form>
+<div class="panel"><h2>Semanas independientes</h2><p class="muted">Cada semana conserva su propia configuración. Puedes copiar una semana anterior y modificar los días que cambien. Para corregir la programación de un turno cerrado o verificado, primero debe reabrirse con permiso y motivo.</p></div>
+{% endif %}
+{% endblock %}
