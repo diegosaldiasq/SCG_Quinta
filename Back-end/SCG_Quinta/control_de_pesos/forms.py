@@ -83,6 +83,12 @@ class ProductoControlPesoForm(forms.ModelForm):
                 "class": "campo-checkbox",
             }),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Mostrar el placeholder al agregar un producto.
+        if not self.is_bound and not self.instance.pk:
+            self.initial["porcentaje_perdida"] = None
 
     def clean_codigo(self):
         return self.cleaned_data["codigo"].strip()
