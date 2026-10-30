@@ -57,7 +57,7 @@ class ProductoControlPesoForm(forms.ModelForm):
             }),
             "porcentaje_perdida": forms.NumberInput(attrs={
                 "class": "campo-formulario",
-                "placeholder": "Ej: (1 - Peso neto/Peso teorico)*100, colocar 2 decimales",
+                "placeholder": "(1 - Peso neto/Peso teorico)*100, 2 decimales",
                 "min": "0",
                 "max": "99.99",
                 "step": "0.01",
